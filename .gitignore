@@ -1,0 +1,45 @@
+# gradle
+
+.gradle/
+build/
+out/
+classes/
+
+# eclipse
+
+*.launch
+.classpath
+.project
+
+# idea
+
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# vscode
+
+.settings/
+.vscode/
+bin/
+.classpath
+.project
+
+# macos
+
+*.DS_Store
+
+# fabric
+
+run/
+
+logs/
+resourcepacks/
+saves/
+config/
+.fabric/
+data/
+mods/
+options.txt
+usercache.json

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "lasertag-mod",
+  "version": "${version}",
+
+  "name": "Lasertag mod",
+  "description": "A mod to play lasertag in minecraft with your friends.",
+  "authors": [
+    "Étienne Muser",
+	"The other one"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+
+  "license": "CC0-1.0",
+  "icon": "assets/lasertag-mod/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "de.kleiner3.lasertag.LasertagMod"
+    ]
+  },
+  "mixins": [
+    "modid.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.9",
+    "minecraft": "~1.19",
+    "java": ">=17"
+  },
+  "suggests": {
+    "sodium": "*",
+	"phosphor": "*",
+	"lithium": "*"
+  }
+}
