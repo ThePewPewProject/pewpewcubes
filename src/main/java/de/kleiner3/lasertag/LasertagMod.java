@@ -12,6 +12,7 @@ import net.minecraft.util.registry.Registry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 /**
  * This class initializes the mod.
  * 
@@ -19,18 +20,19 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class LasertagMod implements ModInitializer {
-	
+
 	// Log4j logger instance for this mod
 	public static final Logger LOGGER = LoggerFactory.getLogger("lasertag-mod");
-	
+
 	// Example block. See: https://fabricmc.net/wiki/tutorial:blocks
 	public static final Block EXAMPLE_BLOCK = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
-	
+
 	@Override
 	public void onInitialize() {
 		Registry.register(Registry.BLOCK, new Identifier("lasertag", "example_block"), EXAMPLE_BLOCK);
-		Registry.register(Registry.ITEM, new Identifier("tutorial", "example_block"), new BlockItem(EXAMPLE_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
-		
+		Registry.register(Registry.ITEM, new Identifier("tutorial", "example_block"),
+				new BlockItem(EXAMPLE_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
+
 		LOGGER.info("Lasertag mod initialized!");
 	}
 }
