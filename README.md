@@ -1,4 +1,4 @@
-# Lasertag mod
+# Minecraft Lasertag mod
 
 ## About the mod
 
