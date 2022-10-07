@@ -26,3 +26,7 @@ Meet us on our [Discord Server](https://discord.gg/SPbV8P2kHN) or watch us devel
 4. Start your Minecraft Launcher
     1. If fabric-loader isn't selected as startup game profile, select it
     2. Start your game
+### Recommended
+5. Download the 1.19.2 versions of [Sodium](https://www.curseforge.com/minecraft/mc-mods/sodium/files/all?filter-game-version=2020709689%3A9366), [Lithium](https://www.curseforge.com/minecraft/mc-mods/lithium/files/all?filter-game-version=2020709689%3A9366) and [Phosphor](https://www.curseforge.com/minecraft/mc-mods/phosphor/files/all?filter-game-version=2020709689%3A9366). Those mods will improve the overall performance of your game.
+    1. Put those jars in the %AppData%\.minecraft\mods folder
+    2. Restart your game
