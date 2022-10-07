@@ -13,7 +13,7 @@ public class LasertagItemGroupBuilder {
 		return new ItemGroup(ItemGroup.GROUPS.length - 1, String.format("%s.%s", identifier.getNamespace(), identifier.getPath())) {
 			@Override
 			public ItemStack createIcon() {
-				return new ItemStack(LasertagMod.ARENA_BLOCK);
+				return new ItemStack(LasertagMod.LASERTAG_WEAPONS.get(0));
 			}
 		};
 	}
