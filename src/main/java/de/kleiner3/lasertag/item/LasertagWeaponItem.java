@@ -85,7 +85,6 @@ public class LasertagWeaponItem extends RangedWeaponItem{
 		// TODO: Render laser ray? If yes: create laser ray entity and render it using custum entity renderer (see BeaconBlockEntityRenderer)
 		
 		// ===== Raycast the crosshair
-		MinecraftClient client = MinecraftClient.getInstance();
 		HitResult hit = RaycastUtil.raycastCrosshair(playerEntity, LasertagConfig.lasertagWeaponReach);
 
 		// If a block was hit
@@ -97,7 +96,7 @@ public class LasertagWeaponItem extends RangedWeaponItem{
 			BlockPos blockPos = blockHit.getBlockPos();
 			
 			// Get the hit block
-	        BlockState blockState = client.world.getBlockState(blockPos);
+	        BlockState blockState = world.getBlockState(blockPos);
 	        net.minecraft.block.Block block = blockState.getBlock();
 	        
 	        // If hit block is not a lasertarget block
