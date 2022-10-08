@@ -8,6 +8,8 @@ You will be able to play the well-known game of lasertag inside prebuilt or proc
 
 The mod is developed for minecraft version 1.19.2 and requires Fabric API.
 
+Currently there are only translations for american english.
+
 ## About us - The developers
 
 This mod is developed by a small team of coming professionals in the fields of programming, graphics- and sounddesign from germany. We are supported by some friends which help us build the maps.
