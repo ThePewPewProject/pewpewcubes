@@ -21,7 +21,7 @@ Meet us on our [Discord Server](https://discord.gg/SPbV8P2kHN) or watch us devel
 1. Download and install the 1.19.2 version of the [Fabric Loader](https://fabricmc.net/use/installer/).
 2. Download the 1.19.2 version of [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/all?filter-game-version=2020709689%3A9366).
     1. Put the Fabric API jar into the %AppData%\.minecraft\mods folder
-3. Download our mod
+3. Download [our mod](https://github.com/efibs/mc-lasertag-mod/releases)
     1. Put our mod into the %AppData%\.minecraft\mods folder
 4. Start your Minecraft Launcher
     1. If fabric-loader isn't selected as startup game profile, select it
