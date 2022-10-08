@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "lasertag-mod",
+  "id": "lasertag",
   "version": "${version}",
 
   "name": "Lasertag mod",
@@ -15,7 +15,7 @@
   },
 
   "license": "",
-  "icon": "assets/lasertag-mod/icon.png",
+  "icon": "assets/lasertag/icon.png",
 
   "environment": "*",
   "entrypoints": {
