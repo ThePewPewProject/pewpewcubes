@@ -7,26 +7,27 @@ import org.slf4j.LoggerFactory;
 
 import de.kleiner3.lasertag.Types.Colors;
 import de.kleiner3.lasertag.block.LaserTargetBlock;
+import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.item.LasertagItemGroupBuilder;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.PressurePlateBlock;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
 
 /**
@@ -54,6 +55,12 @@ public class LasertagMod implements ModInitializer {
 	// Create Instances for all items
 	public static final ArrayList<Item> LASERTAG_WEAPONS = new ArrayList<>();
 	public static final ArrayList<Item> LASERTAG_VESTS = new ArrayList<>();
+	
+	// Register all entities
+	public static final EntityType<LaserRayEntity> LASER_RAY = Registry.register(
+			Registry.ENTITY_TYPE, 
+			new Identifier("lasertag", "laser_ray_entity"), 
+			FabricEntityTypeBuilder.<LaserRayEntity>create(SpawnGroup.MISC, LaserRayEntity::new).dimensions(EntityDimensions.fixed(.1F, .1F)).build());
 	
 	@Override
 	public void onInitialize() {

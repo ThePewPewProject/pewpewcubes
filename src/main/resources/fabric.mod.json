@@ -24,7 +24,10 @@
   "entrypoints": {
     "main": [
       "de.kleiner3.lasertag.LasertagMod"
-    ]
+    ],
+	"client": [
+	  "de.kleiner3.lasertag.LasertagModClient"
+	]
   },
   "mixins": [
     "lasertag.mixins.json"
