@@ -3,10 +3,10 @@ package de.kleiner3.lasertag.item;
 import java.util.function.Predicate;
 
 import de.kleiner3.lasertag.LasertagConfig;
-import de.kleiner3.lasertag.Types.Colors;
-import de.kleiner3.lasertag.Util.RaycastUtil;
 import de.kleiner3.lasertag.block.LaserTargetBlock;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
+import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.util.RaycastUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;

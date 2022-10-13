@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.Types;
+package de.kleiner3.lasertag.types;
 
 /**
  * Enumeration of all available lasertag colors

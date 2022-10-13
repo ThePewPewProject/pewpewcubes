@@ -1,7 +1,8 @@
 package de.kleiner3.lasertag.entity;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.Types.Colors;
+import de.kleiner3.lasertag.networking.NetworkingConstants;
+import de.kleiner3.lasertag.types.Colors;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EntityType;
@@ -9,7 +10,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -21,9 +21,6 @@ import net.minecraft.world.World;
  *
  */
 public class LaserRayEntity extends ProjectileEntity {
-
-	// TODO: Make global class to contain all networking ids
-	public static final Identifier LASER_RAY_SPAWNED = new Identifier("laser_ray_spawned");
 	
 	/**
 	 * The color of the ray
@@ -100,6 +97,6 @@ public class LaserRayEntity extends ProjectileEntity {
 		// Put color
 		buf.writeString(color.name());
 		
-		return ServerPlayNetworking.createS2CPacket(LASER_RAY_SPAWNED, buf);
+		return ServerPlayNetworking.createS2CPacket(NetworkingConstants.LASER_RAY_SPAWNED, buf);
 	}
 }

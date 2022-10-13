@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.Util;
+package de.kleiner3.lasertag.util;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.hit.HitResult;

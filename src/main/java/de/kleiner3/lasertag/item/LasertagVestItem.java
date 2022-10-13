@@ -1,6 +1,6 @@
 package de.kleiner3.lasertag.item;
 
-import de.kleiner3.lasertag.Types.Colors;
+import de.kleiner3.lasertag.types.Colors;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.DyeableArmorItem;
