@@ -12,6 +12,12 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.util.math.Vec3d;
 
+/**
+ * Initializes the client side of the mod
+ * 
+ * @author Étienne Muser
+ *
+ */
 @Environment(EnvType.CLIENT)
 public class LasertagModClient implements ClientModInitializer {
 
@@ -23,6 +29,7 @@ public class LasertagModClient implements ClientModInitializer {
 		});
 		
 		// ===== Register packet recievers ====================
+		// TODO: Make seperate classes to do network handling
 		ClientPlayNetworking.registerGlobalReceiver(LaserRayEntity.LASER_RAY_SPAWNED, (client, handler, buf, responseSender) -> {
 		    double x = buf.readDouble();
 		    double y = buf.readDouble();

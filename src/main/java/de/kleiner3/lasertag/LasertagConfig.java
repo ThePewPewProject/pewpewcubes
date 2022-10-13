@@ -1,5 +1,11 @@
 package de.kleiner3.lasertag;
 
+/**
+ * All configuration variables for lasertag.
+ * 
+ * @author Étienne Muser
+ *
+ */
 public class LasertagConfig {
 	// ===== Weapon settings ====================
 	public static int lasertagWeaponCooldown = 2;

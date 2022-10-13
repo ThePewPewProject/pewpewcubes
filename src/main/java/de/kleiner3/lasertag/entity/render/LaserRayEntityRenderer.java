@@ -16,6 +16,12 @@ import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3d;
 
+/**
+ * A custom renderer to render the laser ray entity as a smaller beacon beam
+ * 
+ * @author Étienne Muser
+ *
+ */
 public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
 
 	public static final Identifier BEAM_TEXTURE = new Identifier("textures/entity/beacon_beam.png");
@@ -29,6 +35,9 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
 		return BEAM_TEXTURE;
 	}
 
+	/**
+	 * Renders the entity
+	 */
 	@Override
     public void render(LaserRayEntity laserRayEntity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
 		long worldTime = laserRayEntity.getWorld().getTime();
@@ -37,10 +46,31 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
         renderBeam(matrices, vertexConsumers, tickDelta, worldTime, color, end);
     }
 	
+	/**
+	 * Render a beacon beam
+	 * @param matrices
+	 * @param vertexConsumers
+	 * @param tickDelta
+	 * @param worldTime
+	 * @param color
+	 * @param end The end position of the ray relative to its start position
+	 */
 	private static void renderBeam(MatrixStack matrices, VertexConsumerProvider vertexConsumers, float tickDelta, long worldTime, float[] color, Vec3d end) {
         renderBeam(matrices, vertexConsumers, BEAM_TEXTURE, tickDelta, worldTime, end, color, 0.025f, 0.03125f);
     }
 	
+	/**
+	 * Render a beacon beam
+	 * @param matrices
+	 * @param vertexConsumers
+	 * @param textureId
+	 * @param tickDelta
+	 * @param worldTime
+	 * @param end
+	 * @param color
+	 * @param innerRadius
+	 * @param outerRadius
+	 */
 	public static void renderBeam(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Identifier textureId, float tickDelta, long worldTime, Vec3d end, float[] color, float innerRadius, float outerRadius) {
         double length = end.length();
         Quaternion rot = getRot(end);
@@ -48,9 +78,9 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
         
         float beamSpinProgress = (float)Math.floorMod(worldTime, 40) + tickDelta;;
         float h = MathHelper.fractionalPart(beamSpinProgress * 0.2f - (float)MathHelper.floor(beamSpinProgress * 0.1f));
-        float j = color[0];
-        float k = color[1];
-        float l = color[2];
+        float colorR = color[0];
+        float colorG = color[1];
+        float colorB = color[2];
         matrices.push();
         matrices.multiply(rot);
         float m = 0.0f;
@@ -63,7 +93,7 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
         float t = -innerRadius;
         float w = -1.0f + h;
         float x = (float)length * (0.5f / innerRadius) + w;
-        renderBeamLayer(matrices, vertexConsumers.getBuffer(RenderLayer.getBeaconBeam(textureId, false)), j, k, l, 1.0f, length, 0.0f, n, o, 0.0f, q, 0.0f, 0.0f, t, 0.0f, 1.0f, x, w);
+        renderBeamLayer(matrices, vertexConsumers.getBuffer(RenderLayer.getBeaconBeam(textureId, false)), colorR, colorG, colorB, 1.0f, length, 0.0f, n, o, 0.0f, q, 0.0f, 0.0f, t, 0.0f, 1.0f, x, w);
         matrices.pop();
         matrices.multiply(rot);
         m = -outerRadius;
@@ -76,10 +106,32 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
         t = outerRadius;
         w = -1.0f + h;
         x = (float)length + w;
-        renderBeamLayer(matrices, vertexConsumers.getBuffer(RenderLayer.getBeaconBeam(textureId, true)), j, k, l, 0.125f, length, m, n, o, p, q, r, s, t, 0.0f, 1.0f, x, w);
+        renderBeamLayer(matrices, vertexConsumers.getBuffer(RenderLayer.getBeaconBeam(textureId, true)), colorR, colorG, colorB, 0.125f, length, m, n, o, p, q, r, s, t, 0.0f, 1.0f, x, w);
         matrices.pop();
     }
 
+	/**
+	 * Renders a single layer of a beacon
+	 * @param matrices
+	 * @param vertices
+	 * @param red
+	 * @param green
+	 * @param blue
+	 * @param alpha
+	 * @param length
+	 * @param x1
+	 * @param z1
+	 * @param x2
+	 * @param z2
+	 * @param x3
+	 * @param z3
+	 * @param x4
+	 * @param z4
+	 * @param u1
+	 * @param u2
+	 * @param v1
+	 * @param v2
+	 */
     private static void renderBeamLayer(MatrixStack matrices, VertexConsumer vertices, float red, float green, float blue, float alpha, double length, float x1, float z1, float x2, float z2, float x3, float z3, float x4, float z4, float u1, float u2, float v1, float v2) {
         MatrixStack.Entry entry = matrices.peek();
         Matrix4f matrix4f = entry.getPositionMatrix();
@@ -105,6 +157,11 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
         vertices.vertex(positionMatrix, x, (float)y, z).color(red, green, blue, alpha).texture(u, v).overlay(OverlayTexture.DEFAULT_UV).light(LightmapTextureManager.MAX_LIGHT_COORDINATE).normal(normalMatrix, 0.0f, 1.0f, 0.0f).next();
     }
     
+    /**
+     * Helper method to get the rotation quaternion to rotate the up-vector to the direction vector
+     * @param direction The direction vector
+     * @return
+     */
     private static Quaternion getRot(Vec3d direction) {
     	Vec3d up = new Vec3d(0, 1, 0);
     	

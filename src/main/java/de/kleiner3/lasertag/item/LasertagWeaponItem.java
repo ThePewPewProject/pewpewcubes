@@ -21,6 +21,12 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+/**
+ * Class to implement the custom behavior of the lasertag weapon
+ * 
+ * @author Étienne Muser
+ *
+ */
 public class LasertagWeaponItem extends RangedWeaponItem {
 	private Colors color;
 
@@ -75,7 +81,7 @@ public class LasertagWeaponItem extends RangedWeaponItem {
 		// TODO: Play weapon fire sound
 		playerEntity.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 1.0F, 1.0F);
 
-		// ===== Raycast the crosshair
+		// Raycast the crosshair
 		HitResult hit = RaycastUtil.raycastCrosshair(playerEntity, LasertagConfig.lasertagWeaponReach);
 
 		switch (hit.getType()) {
@@ -115,6 +121,7 @@ public class LasertagWeaponItem extends RangedWeaponItem {
 			LaserRayEntity ray = new LaserRayEntity(world, playerEntity, color, hit);
 			world.spawnEntity(ray);
 
+			// Despawn ray after 100ms
 			new Thread(() -> {
 				try {
 					Thread.sleep(100);

@@ -1,5 +1,11 @@
 package de.kleiner3.lasertag.Types;
 
+/**
+ * Enumeration of all available lasertag colors
+ * 
+ * @author Étienne Muser
+ *
+ */
 public enum Colors {
 	RED(255, 0, 0),
 	GREEN(0, 255, 0),

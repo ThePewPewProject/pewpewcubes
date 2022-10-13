@@ -5,6 +5,12 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.DyeableArmorItem;
 
+/**
+ * Class to implement the custom behavior of the lasertag vest
+ * 
+ * @author Étienne Muser
+ *
+ */
 public class LasertagVestItem extends DyeableArmorItem{
 
 	private Colors color;

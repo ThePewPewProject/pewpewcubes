@@ -6,7 +6,18 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
+/**
+ * Helper class to build the lasertag item group
+ * 
+ * @author etien
+ *
+ */
 public class LasertagItemGroupBuilder {
+	
+	/**
+	 * Build the lasertag item group with the lasertag weapon as icon
+	 * @return The lasertag item group
+	 */
 	public static ItemGroup build() {
 		Identifier identifier = new Identifier("lasertag", "lasertag_item_group");
 		((ItemGroupExtensions) ItemGroup.BUILDING_BLOCKS).fabric_expandArray();

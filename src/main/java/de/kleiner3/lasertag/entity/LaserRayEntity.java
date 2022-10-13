@@ -14,11 +14,24 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+/**
+ * An Entity to show the laser ray
+ * 
+ * @author Étienne Muser
+ *
+ */
 public class LaserRayEntity extends ProjectileEntity {
 
+	// TODO: Make global class to contain all networking ids
 	public static final Identifier LASER_RAY_SPAWNED = new Identifier("laser_ray_spawned");
 	
+	/**
+	 * The color of the ray
+	 */
 	private Colors color;
+	/**
+	 * The end of the laser ray in world coordinates
+	 */
 	private Vec3d end;
 
 	public LaserRayEntity(EntityType<? extends ProjectileEntity> type, World world) {
@@ -45,6 +58,10 @@ public class LaserRayEntity extends ProjectileEntity {
 		return color;
 	}
 
+	/**
+	 * Gets the end position of the ray in world coordinates
+	 * @return the position vector of the end position
+	 */
 	public Vec3d getEnd() {
 		return end;
 	}
@@ -54,6 +71,10 @@ public class LaserRayEntity extends ProjectileEntity {
 
 	}
 	
+	/**
+	 * Send the spawn information to the client.
+	 * This manual step is necessary, because for some reason only living entities have this done automatically
+	 */
 	@Override
 	public Packet<?> createSpawnPacket() {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
