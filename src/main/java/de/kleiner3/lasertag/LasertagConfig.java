@@ -11,4 +11,7 @@ public class LasertagConfig {
 	public static int lasertagWeaponCooldown = 2;
 	public static int lasertagWeaponReach = 50;
 	public static boolean showLaserRays = true;
+	
+	// ===== General game settings ==============
+	public static int maxTeamSize = 6;
 }

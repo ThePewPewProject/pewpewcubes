@@ -10,6 +10,9 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 
 /**
@@ -28,6 +31,9 @@ public class ClientNetworkingHandler {
 	 */
 	public void register() {
 		ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASER_RAY_SPAWNED, Callbacks::handleLaserRaySpawned);
+		ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_GAME_TEAMS_UPDATE, Callbacks::handleTeamUpdate);
+		ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_GAME_SCORE_UPDATE, Callbacks::handleScoreUpdate);
+		ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.ERROR_MESSAGE, Callbacks::handleErrorMessage);
 	}
 	
 	/**
@@ -69,5 +75,31 @@ public class ClientNetworkingHandler {
 			    client.world.addEntity(entityId, entity);
 		    });
 		}
+		
+		public static void handleErrorMessage(MinecraftClient client,
+				 ClientPlayNetworkHandler handler,
+				 PacketByteBuf buf,
+				 PacketSender responseSender)
+		{
+			client.player.sendMessage(Text.translatable(buf.readString())
+					.fillStyle(Style.EMPTY.withColor(Formatting.RED)), true);
+		}
+		
+		public static void handleTeamUpdate(MinecraftClient client,
+				 ClientPlayNetworkHandler handler,
+				 PacketByteBuf buf,
+				 PacketSender responseSender)
+		{
+			
+		}
+		
+		public static void handleScoreUpdate(MinecraftClient client,
+				 ClientPlayNetworkHandler handler,
+				 PacketByteBuf buf,
+				 PacketSender responseSender)
+		{
+			
+		}
+		
 	}
 }

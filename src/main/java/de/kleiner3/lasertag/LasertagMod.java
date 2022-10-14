@@ -38,6 +38,8 @@ import net.minecraft.util.registry.Registry;
  */
 public class LasertagMod implements ModInitializer {
 
+	// TODO: Make global mod id constant
+	
 	// Log4j logger instance for this mod
 	public static final Logger LOGGER = LoggerFactory.getLogger("lasertag-mod");
 

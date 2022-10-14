@@ -32,6 +32,12 @@
   "mixins": [
     "lasertag.mixins.json"
   ],
+  "custom": {
+	"loom:injected_interfaces": {
+		"net/minecraft/server/MinecraftServer": ["de/kleiner3/lasertag/lasertaggame/ILasertagGame"],
+		"net/minecraft/entity/player/PlayerEntity": ["de/kleiner3/lasertag/lasertaggame/ILasertagPlayer"]
+	}		
+  },
 
   "depends": {
     "fabricloader": ">=0.14.9",
