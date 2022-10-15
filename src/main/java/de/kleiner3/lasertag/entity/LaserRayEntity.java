@@ -16,87 +16,89 @@ import net.minecraft.world.World;
 
 /**
  * An Entity to show the laser ray
- * 
- * @author Étienne Muser
  *
+ * @author Étienne Muser
  */
 public class LaserRayEntity extends ProjectileEntity {
-	
-	/**
-	 * The color of the ray
-	 */
-	private Colors color;
-	/**
-	 * The end of the laser ray in world coordinates
-	 */
-	private Vec3d end;
 
-	public LaserRayEntity(EntityType<? extends ProjectileEntity> type, World world) {
-		super(type, world);
+    /**
+     * The color of the ray
+     */
+    private final Colors color;
+    /**
+     * The end of the laser ray in world coordinates
+     */
+    private Vec3d end;
 
-		// Set default color Teal
-		color = Colors.TEAL;
-		System.out.println("WRONG CONSTRUCTOR CALLED!!!");
-	}
+    public LaserRayEntity(EntityType<? extends ProjectileEntity> type, World world) {
+        super(type, world);
 
-	public LaserRayEntity(World world, LivingEntity owner, Colors color, HitResult hit) {
-		this(world, owner.getEyePos(), owner.getYaw(), owner.getPitch(), color, hit.getPos());
-	}
+        // Set default color Teal
+        color = Colors.TEAL;
+        System.out.println("WRONG CONSTRUCTOR CALLED!!!");
+    }
 
-	public LaserRayEntity(World world, Vec3d pos, float yaw, float pitch, Colors color, Vec3d endPos) {
-		super(LasertagMod.LASER_RAY, world);
+    public LaserRayEntity(World world, LivingEntity owner, Colors color, HitResult hit) {
+        this(world, owner.getEyePos(), owner.getYaw(), owner.getPitch(), color, hit.getPos());
+    }
 
-		this.color = color;
-		this.end = endPos;
-		this.setPosition(pos);
-	}
+    public LaserRayEntity(World world, Vec3d pos, float yaw, float pitch, Colors color, Vec3d endPos) {
+        super(LasertagMod.LASER_RAY, world);
 
-	public Colors getColor() {
-		return color;
-	}
+        this.color = color;
+        this.end = endPos;
+        this.setYaw(yaw);
+        this.setPitch(pitch);
+        this.setPosition(pos);
+    }
 
-	/**
-	 * Gets the end position of the ray in world coordinates
-	 * @return the position vector of the end position
-	 */
-	public Vec3d getEnd() {
-		return end;
-	}
+    public Colors getColor() {
+        return color;
+    }
 
-	@Override
-	protected void initDataTracker() {
+    /**
+     * Gets the end position of the ray in world coordinates
+     *
+     * @return the position vector of the end position
+     */
+    public Vec3d getEnd() {
+        return end;
+    }
 
-	}
-	
-	/**
-	 * Send the spawn information to the client.
-	 * This manual step is necessary, because for some reason only living entities have this done automatically
-	 */
-	@Override
-	public Packet<?> createSpawnPacket() {
-		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-			
-		// Put position
-		buf.writeDouble(getX());
-		buf.writeDouble(getY());
-		buf.writeDouble(getZ());
-		
-		// Put end position
-		buf.writeDouble(end.x);
-		buf.writeDouble(end.y);
-		buf.writeDouble(end.z);
-		
-		// Put yaw & pitch
-		buf.writeFloat(getYaw());
-		buf.writeFloat(getPitch());
-		
-		// Put id
-		buf.writeInt(getId());
-		buf.writeUuid(getUuid());
-		
-		// Put color
-		buf.writeString(color.name());
-		
-		return ServerPlayNetworking.createS2CPacket(NetworkingConstants.LASER_RAY_SPAWNED, buf);
-	}
+    @Override
+    protected void initDataTracker() {
+
+    }
+
+    /**
+     * Send the spawn information to the client.
+     * This manual step is necessary, because for some reason only living entities have this done automatically
+     */
+    @Override
+    public Packet<?> createSpawnPacket() {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+
+        // Put position
+        buf.writeDouble(getX());
+        buf.writeDouble(getY());
+        buf.writeDouble(getZ());
+
+        // Put end position
+        buf.writeDouble(end.x);
+        buf.writeDouble(end.y);
+        buf.writeDouble(end.z);
+
+        // Put yaw & pitch
+        buf.writeFloat(getYaw());
+        buf.writeFloat(getPitch());
+
+        // Put id
+        buf.writeInt(getId());
+        buf.writeUuid(getUuid());
+
+        // Put color
+        buf.writeString(color.name());
+
+        return ServerPlayNetworking.createS2CPacket(NetworkingConstants.LASER_RAY_SPAWNED, buf);
+    }
 }

@@ -6,7 +6,8 @@
   "mixins": [
 	"MinecraftServerMixin",
 	"PlayerEntityMixin",
-	"LivingEntityMixin"
+	"LivingEntityMixin",
+	"PlayerManagerMixin"
   ],
   "client": [
   ],

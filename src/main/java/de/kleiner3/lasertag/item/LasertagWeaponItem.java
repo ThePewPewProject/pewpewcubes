@@ -8,6 +8,7 @@ import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.RaycastUtil;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.RangedWeaponItem;
@@ -23,117 +24,129 @@ import net.minecraft.world.World;
 
 /**
  * Class to implement the custom behavior of the lasertag weapon
- * 
- * @author Étienne Muser
  *
+ * @author Étienne Muser
  */
 public class LasertagWeaponItem extends RangedWeaponItem {
-	private Colors color;
+    /**
+     * The color of the weapon
+     */
+    private Colors color;
 
-	public LasertagWeaponItem(Settings settings, Colors color) {
-		super(settings);
-		this.color = color;
-	}
+    public LasertagWeaponItem(Settings settings, Colors color) {
+        super(settings);
+        this.color = color;
+    }
 
-	@Override
-	public Predicate<ItemStack> getProjectiles() {
-		// Laser has no projectiles
-		return null;
-	}
+    @Override
+    public Predicate<ItemStack> getProjectiles() {
+        // Laser has no projectiles
+        return null;
+    }
 
-	@Override
-	public int getRange() {
-		return LasertagConfig.lasertagWeaponReach;
-	}
+    @Override
+    public int getRange() {
+        return LasertagConfig.lasertagWeaponReach;
+    }
 
-	public Colors getColor() {
-		return color;
-	}
+    public Colors getColor() {
+        return color;
+    }
 
-	@Override
-	public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
-		// Apply cooldown
-		playerEntity.getItemCooldownManager().set(this, LasertagConfig.lasertagWeaponCooldown);
+    @Override
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
+        // Apply cooldown
+        playerEntity.getItemCooldownManager().set(this, LasertagConfig.lasertagWeaponCooldown);
 
-		// Get all armor pieces of the player
-		DefaultedList<ItemStack> armorPieces = (DefaultedList<ItemStack>) playerEntity.getArmorItems();
+        // Get all armor pieces of the player
+        DefaultedList<ItemStack> armorPieces = (DefaultedList<ItemStack>) playerEntity.getArmorItems();
 
-		// Get breastplate of the player
-		ItemStack breastplate = armorPieces.get(2);
+        // Get breastplate of the player
+        ItemStack breastplate = armorPieces.get(2);
 
-		// Check if player wears vest as breastplate
-		if (!(breastplate.getItem() instanceof LasertagVestItem)) {
-			playWeaponFailSound(playerEntity);
-			return TypedActionResult.fail(playerEntity.getStackInHand(hand));
-		}
+        // Check if player wears vest as breastplate
+        if (!(breastplate.getItem() instanceof LasertagVestItem)) {
+            playWeaponFailSound(playerEntity);
+            return TypedActionResult.fail(playerEntity.getStackInHand(hand));
+        }
 
-		// Check if vest is of same color as weapon
-		if (!(((LasertagVestItem) breastplate.getItem()).getColor() == this.color)) {
-			playWeaponFailSound(playerEntity);
-			return TypedActionResult.fail(playerEntity.getStackInHand(hand));
-		}
+        // Check if vest is of same color as weapon
+        if (!(((LasertagVestItem) breastplate.getItem()).getColor() == this.color)) {
+            playWeaponFailSound(playerEntity);
+            return TypedActionResult.fail(playerEntity.getStackInHand(hand));
+        }
 
-		fireWeapon(world, playerEntity, hand);
-		return TypedActionResult.success(playerEntity.getStackInHand(hand));
-	}
+        fireWeapon(world, playerEntity, hand);
+        return TypedActionResult.success(playerEntity.getStackInHand(hand));
+    }
 
-	private void fireWeapon(World world, PlayerEntity playerEntity, Hand hand) {
-		// TODO: Play weapon fire sound
-		playerEntity.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 1.0F, 1.0F);
+    private void fireWeapon(World world, PlayerEntity playerEntity, Hand hand) {
+        // TODO: Play weapon fire sound
+        playerEntity.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 1.0F, 1.0F);
 
-		// Raycast the crosshair
-		HitResult hit = RaycastUtil.raycastCrosshair(playerEntity, LasertagConfig.lasertagWeaponReach);
+        // Raycast the crosshair
+        HitResult hit = RaycastUtil.raycastCrosshair(playerEntity, LasertagConfig.lasertagWeaponReach);
 
-		switch (hit.getType()) {
-		// If a block was hit
-		case BLOCK:
-			// Cast to BlockHitResult
-			BlockHitResult blockHit = (BlockHitResult) hit;
+        switch (hit.getType()) {
+            // If a block was hit
+            case BLOCK:
+                // Cast to BlockHitResult
+                BlockHitResult blockHit = (BlockHitResult) hit;
 
-			// Get the block pos of the hit block
-			BlockPos blockPos = blockHit.getBlockPos();
+                // Get the block pos of the hit block
+                BlockPos blockPos = blockHit.getBlockPos();
 
-			// Get the hit block
-			BlockState blockState = world.getBlockState(blockPos);
-			net.minecraft.block.Block block = blockState.getBlock();
+                // Get the hit block
+                BlockState blockState = world.getBlockState(blockPos);
+                net.minecraft.block.Block block = blockState.getBlock();
 
-			// If hit block is not a lasertarget block
-			if (!(block instanceof LaserTargetBlock)) {
-				break;
-			}
+                // If hit block is not a lasertarget block
+                if (!(block instanceof LaserTargetBlock)) {
+                    break;
+                }
 
-			// Cast to lasertarget block and trigger onHit
-			LaserTargetBlock laserTarget = (LaserTargetBlock) block;
-			laserTarget.onHitBy(playerEntity);
-			break;
+                // Cast to lasertarget block and trigger onHit
+                LaserTargetBlock laserTarget = (LaserTargetBlock) block;
+                laserTarget.onHitBy(playerEntity);
+                break;
 
-		case ENTITY:
-			// Cast to EntityHitResult
-			EntityHitResult entityHit = (EntityHitResult) hit;
-			break;
-		case MISS:
+            case ENTITY:
+                // Cast to EntityHitResult
+                EntityHitResult entityHit = (EntityHitResult) hit;
 
-			break;
-		}
+                // Get hit entity
+                Entity hitEntity = entityHit.getEntity();
 
-		// Spawn laser ray entity
-		if (LasertagConfig.showLaserRays) {
-			LaserRayEntity ray = new LaserRayEntity(world, playerEntity, color, hit);
-			world.spawnEntity(ray);
+                // Check that hit entity is a player
+                if (!(hitEntity instanceof PlayerEntity))
+                    break;
 
-			// Despawn ray after 100ms
-			new Thread(() -> {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-				}
-				ray.discard();
-			}).start();
-		}
-	}
+                // Cast to player and trigger onHit
+                PlayerEntity hitPlayer = (PlayerEntity) hitEntity;
+                hitPlayer.onHitBy(playerEntity);
+                break;
+            case MISS:
+                break;
+        }
 
-	private void playWeaponFailSound(PlayerEntity playerEntity) {
-		// TODO: Play weapon failed sound
-		playerEntity.playSound(SoundEvents.BLOCK_BAMBOO_BREAK, 1.0F, 1.0F);
-	}
+        // Spawn laser ray entity
+        if (LasertagConfig.showLaserRays) {
+            LaserRayEntity ray = new LaserRayEntity(world, playerEntity, color, hit);
+            world.spawnEntity(ray);
+
+            // Despawn ray after 100ms
+            new Thread(() -> {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                }
+                ray.discard();
+            }).start();
+        }
+    }
+
+    private void playWeaponFailSound(PlayerEntity playerEntity) {
+        // TODO: Play weapon failed sound
+        playerEntity.playSound(SoundEvents.BLOCK_BAMBOO_BREAK, 1.0F, 1.0F);
+    }
 }

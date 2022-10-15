@@ -14,38 +14,46 @@ import net.minecraft.item.ItemStack;
 
 /**
  * Mixin into class LivingEntity to get the trigger to join / leave teams
- * 
- * @author Étienne Muser
  *
+ * @author Étienne Muser
  */
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
-	@Inject(method="onEquipStack", at=@At("HEAD"))
-	private void onPlayerEquipStack(EquipmentSlot slot, ItemStack oldStack, ItemStack newStack, CallbackInfo ci) {
-		
-		// If this is not a player
-		if (!(((LivingEntity)(Object)this) instanceof PlayerEntity)) {
-			return;
-		}
-		
-		// If old item is lasertag vest
-		Item oldItem = oldStack.getItem();
-		if (oldItem instanceof LasertagVestItem) {
-			// Cast to lasertag vest
-			LasertagVestItem vest = (LasertagVestItem)oldItem;
-			
-			// Call leave team on vest
-			vest.leaveTeam(((PlayerEntity)(Object)this));
-		}
-		
-		// If new item is lasertag vest
-		Item newItem = newStack.getItem();
-		if (newItem instanceof LasertagVestItem) {
-			// Cast to lasertag vest
-			LasertagVestItem vest = (LasertagVestItem)newItem;
-			
-			// Call join team on vest
-			vest.joinTeam(((PlayerEntity)(Object)this));
-		}
-	}
+
+    /**
+     * Inject into onEquipStack method ad the start of the method. Called when a living entity equips an armor piece.
+     *
+     * @param slot
+     * @param oldStack
+     * @param newStack
+     * @param ci
+     */
+    @Inject(method = "onEquipStack", at = @At("HEAD"))
+    private void onPlayerEquipStack(EquipmentSlot slot, ItemStack oldStack, ItemStack newStack, CallbackInfo ci) {
+
+        // If this is not a player
+        if (!(((LivingEntity) (Object) this) instanceof PlayerEntity)) {
+            return;
+        }
+
+        // If old item is lasertag vest
+        Item oldItem = oldStack.getItem();
+        if (oldItem instanceof LasertagVestItem) {
+            // Cast to lasertag vest
+            LasertagVestItem vest = (LasertagVestItem) oldItem;
+
+            // Call leave team on vest
+            vest.leaveTeam(((PlayerEntity) (Object) this));
+        }
+
+        // If new item is lasertag vest
+        Item newItem = newStack.getItem();
+        if (newItem instanceof LasertagVestItem) {
+            // Cast to lasertag vest
+            LasertagVestItem vest = (LasertagVestItem) newItem;
+
+            // Call join team on vest
+            vest.joinTeam(((PlayerEntity) (Object) this));
+        }
+    }
 }
