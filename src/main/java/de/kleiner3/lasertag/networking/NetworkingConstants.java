@@ -17,4 +17,10 @@ public class NetworkingConstants {
 
     // ===== General ================
     public static final Identifier ERROR_MESSAGE = new Identifier(LasertagMod.ID, "error_message");
+
+    // ===== Events =================
+    public static final Identifier PLAY_WEAPON_FIRED_SOUND = new Identifier(LasertagMod.ID, "play_weapon_fired_sound");
+    public static final Identifier PLAY_WEAPON_FAILED_SOUND = new Identifier(LasertagMod.ID, "play_weapon_failed_sound");
+    public static final Identifier PLAY_PLAYER_SCORED_SOUND = new Identifier(LasertagMod.ID, "play_player_scored_sound");
+    public static final Identifier GAME_STARTED = new Identifier(LasertagMod.ID, "game_started");
 }

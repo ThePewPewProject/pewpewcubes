@@ -7,7 +7,10 @@ package de.kleiner3.lasertag;
  */
 public class LasertagConfig {
     // ===== Weapon settings ====================
-    public static int lasertagWeaponCooldown = 2;
+    /**
+     * Weapon cooldown in game ticks
+     */
+    public static int lasertagWeaponCooldown = 5;
     public static int lasertagWeaponReach = 50;
     public static boolean showLaserRays = true;
 

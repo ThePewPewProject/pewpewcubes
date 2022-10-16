@@ -1,9 +1,17 @@
 package de.kleiner3.lasertag.mixin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.render.DimensionEffects;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -31,6 +39,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin implements ILasertagGame {
 
+    private HashMap<Colors, ArrayList<BlockPos>> spawnpointCache = null;
+
     /**
      * Map every player to their team color
      */
@@ -54,6 +64,63 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     public void startGame() {
         // TODO Auto-generated method stub
 
+        // Reset all scores
+        for (List<PlayerEntity> team : teamMap.values()) {
+            for (PlayerEntity player : team) {
+                player.resetLasertagScore();
+            }
+        }
+        notifyPlayersAboutUpdate();
+
+        // If spawnpoint cache is not initialized
+        if (spawnpointCache == null) {
+            // Initialize cache
+            spawnpointCache = new HashMap<>();
+
+            // Initialize team lists
+            for (Colors team : Colors.values()) {
+                spawnpointCache.put(team, new ArrayList<>());
+            }
+
+            // Get the overworld
+            World world = ((MinecraftServer)(Object)this).getOverworld();
+
+            // Iterate over every block in the world
+            for (int x = -1000; x < 1000; x++) {
+                for (int y = -64; y < 200; y++) {
+                    for (int z = -1000; z < 1000; z++) {
+                        BlockPos pos = new BlockPos(x, y, z);
+
+                        BlockState blockState = world.getBlockState(pos);
+
+                        Block block = blockState.getBlock();
+
+                        for (Colors color : Colors.values()) {
+                            if (color.getSpawnpointBlock().equals(block)) {
+                                spawnpointCache.get(color).add(pos);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Teleport players
+        for (Colors teamColor : Colors.values()) {
+            List<PlayerEntity> team = teamMap.get(teamColor);
+
+            World world = ((MinecraftServer)(Object)this).getOverworld();
+
+            for (PlayerEntity player : team) {
+                BlockPos destination = spawnpointCache.get(teamColor).get(0);
+                player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
+            }
+        }
+
+        // Start game
+
+        sendGameStartedEvent();
     }
 
     @Override
@@ -166,5 +233,10 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
 
         // Send to all clients
         ServerEventSending.sendToEveryone(((MinecraftServer) (Object) this).getOverworld(), NetworkingConstants.LASERTAG_GAME_TEAM_OR_SCORE_UPDATE, buf);
+    }
+
+    private void sendGameStartedEvent() {
+        ServerWorld world = ((MinecraftServer)(Object)this).getOverworld();
+        ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_STARTED, PacketByteBufs.empty());
     }
 }

@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag;
 
 import de.kleiner3.lasertag.block.LaserTargetBlock;
+import de.kleiner3.lasertag.command.CommandInitializer;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.item.LasertagItemGroupBuilder;
 import de.kleiner3.lasertag.item.LasertagVestItem;
@@ -35,7 +36,9 @@ import java.util.ArrayList;
  */
 public class LasertagMod implements ModInitializer {
 
-    // Mod id
+    /**
+     * The mod id of this mod
+     */
     public static final String ID = "lasertag";
 
     // Log4j logger instance for this mod
@@ -108,5 +111,8 @@ public class LasertagMod implements ModInitializer {
             // Save in static lasertag vest list
             LASERTAG_VESTS.add(vest);
         }
+
+        // ===== Register commands =====================
+        CommandInitializer.initCommands();
     }
 }

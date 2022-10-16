@@ -17,10 +17,14 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.thread.TaskQueue;
+import org.apache.commons.compress.harmony.pack200.NewAttributeBands;
 
 /**
  * Class to handle all networking on the client
@@ -39,6 +43,10 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASER_RAY_SPAWNED, Callbacks::handleLaserRaySpawned);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_GAME_TEAM_OR_SCORE_UPDATE, Callbacks::handleTeamOrScoreUpdate);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.ERROR_MESSAGE, Callbacks::handleErrorMessage);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_WEAPON_FIRED_SOUND, Callbacks::handleWeaponFiredSoundEvent);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_WEAPON_FAILED_SOUND, Callbacks::handleWeaponFailedSoundEvent);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_PLAYER_SCORED_SOUND, Callbacks::handlePlayerScoredSoundEvent);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_STARTED, Callbacks::handleLasertagGameStarted);
     }
 
     /**
@@ -96,6 +104,45 @@ public class ClientNetworkingHandler {
                     }.getType());
         }
 
+        public static void handleWeaponFiredSoundEvent(MinecraftClient client,
+                                                       ClientPlayNetworkHandler handler,
+                                                       PacketByteBuf buf,
+                                                       PacketSender responseSender) {
+            // Get position of sound event
+            double x = buf.readDouble();
+            double y = buf.readDouble();
+            double z = buf.readDouble();
 
+            // Execute sound playing on main thread to avoid weird exceptions
+            client.execute(() -> client.world.playSound(x, y, z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 1.0F, 1.0F, true));
+        }
+
+        public static void handleWeaponFailedSoundEvent(MinecraftClient client,
+                                                        ClientPlayNetworkHandler handler,
+                                                        PacketByteBuf buf,
+                                                        PacketSender responseSender) {
+            // Get position of sound event
+            double x = buf.readDouble();
+            double y = buf.readDouble();
+            double z = buf.readDouble();
+
+            // Execute sound playing on main thread to avoid weird exceptions
+            client.execute(() -> client.world.playSound(x, y, z, SoundEvents.BLOCK_BAMBOO_BREAK, SoundCategory.BLOCKS, 1.0F, 1.0F, true));
+        }
+
+        public static void handlePlayerScoredSoundEvent(MinecraftClient client,
+                                                        ClientPlayNetworkHandler handler,
+                                                        PacketByteBuf buf,
+                                                        PacketSender responseSender) {
+            // Execute sound playing on main thread to avoid weird exceptions
+            client.execute(() -> client.player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F, 1.0F));
+        }
+
+        public static void handleLasertagGameStarted(MinecraftClient client,
+                                                     ClientPlayNetworkHandler handler,
+                                                     PacketByteBuf buf,
+                                                     PacketSender responseSender) {
+            System.out.println("GAME STARTED!");
+        }
     }
 }

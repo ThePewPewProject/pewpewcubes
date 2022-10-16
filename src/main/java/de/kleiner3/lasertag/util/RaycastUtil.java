@@ -39,7 +39,7 @@ public class RaycastUtil {
                 .expand(1.0D, 1.0D, 1.0D);
 
         // Do the entity-raycast
-        EntityHitResult entityhit = ProjectileUtil.raycast(playerEntity, startPos, ray, box, entity -> !entity.isSpectator(), maxDistance);
+        EntityHitResult entityhit = ProjectileUtil.raycast(playerEntity, startPos, ray, box, entity -> !entity.isSpectator(), Double.MAX_VALUE);
 
         // If no entity was hit
         if (entityhit == null) {

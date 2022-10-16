@@ -34,7 +34,7 @@ public class LaserRayEntity extends ProjectileEntity {
         super(type, world);
 
         // Set default color Teal
-        color = Colors.TEAL;
+        color = Colors.RED;
         System.out.println("WRONG CONSTRUCTOR CALLED!!!");
     }
 

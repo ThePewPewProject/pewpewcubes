@@ -4,7 +4,9 @@ import java.util.List;
 
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -49,5 +51,14 @@ public class ServerEventSending {
         for (ServerPlayerEntity player : players) {
             ServerPlayNetworking.send(player, id, buf);
         }
+    }
+
+    /**
+     * Sends the player scored sound event to the client
+     *
+     * @param client
+     */
+    public static void sendPlayerScoredSoundEvent(ServerPlayerEntity client) {
+        ServerPlayNetworking.send(client, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND, PacketByteBufs.empty());
     }
 }

@@ -1,17 +1,25 @@
 package de.kleiner3.lasertag.item;
 
-import java.util.function.Predicate;
-
 import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.block.LaserTargetBlock;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
+import de.kleiner3.lasertag.networking.NetworkingConstants;
+import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.RaycastUtil;
+import io.netty.buffer.Unpooled;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.RangedWeaponItem;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -20,7 +28,10 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
+import java.util.function.Predicate;
 
 /**
  * Class to implement the custom behavior of the lasertag weapon
@@ -31,7 +42,7 @@ public class LasertagWeaponItem extends RangedWeaponItem {
     /**
      * The color of the weapon
      */
-    private Colors color;
+    private final Colors color;
 
     public LasertagWeaponItem(Settings settings, Colors color) {
         super(settings);
@@ -76,13 +87,14 @@ public class LasertagWeaponItem extends RangedWeaponItem {
             return TypedActionResult.fail(playerEntity.getStackInHand(hand));
         }
 
-        fireWeapon(world, playerEntity, hand);
+        if (!world.isClient) {
+            fireWeapon(world, playerEntity, hand);
+        }
         return TypedActionResult.success(playerEntity.getStackInHand(hand));
     }
 
     private void fireWeapon(World world, PlayerEntity playerEntity, Hand hand) {
-        // TODO: Play weapon fire sound
-        playerEntity.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 1.0F, 1.0F);
+        playWeaponFireSound(playerEntity);
 
         // Raycast the crosshair
         HitResult hit = RaycastUtil.raycastCrosshair(playerEntity, LasertagConfig.lasertagWeaponReach);
@@ -145,8 +157,27 @@ public class LasertagWeaponItem extends RangedWeaponItem {
         }
     }
 
-    private void playWeaponFailSound(PlayerEntity playerEntity) {
-        // TODO: Play weapon failed sound
-        playerEntity.playSound(SoundEvents.BLOCK_BAMBOO_BREAK, 1.0F, 1.0F);
+    private static void playWeaponFailSound(PlayerEntity playerEntity) {
+        // Create packet byte buffer
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+
+        // Put position of sound event into packet
+        buf.writeDouble(playerEntity.getX());
+        buf.writeDouble(playerEntity.getY());
+        buf.writeDouble(playerEntity.getZ());
+
+        ServerEventSending.sendToEveryone((ServerWorld) playerEntity.world, NetworkingConstants.PLAY_WEAPON_FAILED_SOUND, buf);
+    }
+
+    private static void playWeaponFireSound(PlayerEntity playerEntity) {
+        // Create packet byte buffer
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+
+        // Put position of sound event into packet
+        buf.writeDouble(playerEntity.getX());
+        buf.writeDouble(playerEntity.getY());
+        buf.writeDouble(playerEntity.getZ());
+
+        ServerEventSending.sendToEveryone((ServerWorld) playerEntity.world, NetworkingConstants.PLAY_WEAPON_FIRED_SOUND, buf);
     }
 }
