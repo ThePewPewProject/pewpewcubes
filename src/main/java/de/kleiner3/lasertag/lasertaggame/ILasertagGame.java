@@ -16,7 +16,7 @@ public interface ILasertagGame {
     /**
      * Start the lasertag game
      */
-    default public void startGame() {
+    default public void startGame(boolean scanSpawnpoints) {
     }
 
     /**
@@ -62,5 +62,11 @@ public interface ILasertagGame {
      * @param player
      */
     default public void playerLeaveHisTeam(PlayerEntity player) {
+    }
+
+    /**
+     * Seraches the world for the spawnpoint blocks and caches them
+     */
+    default public void initSpawnpointCache() {
     }
 }

@@ -47,7 +47,7 @@ public class LasertagMod implements ModInitializer {
     // Item group for lasertag items
     public static final ItemGroup LASERTAG_ITEM_GROUP = LasertagItemGroupBuilder.build();
 
-    // Create Instances for all blocks
+    // Create instances for all blocks
     public static final Block ARENA_BLOCK = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
     public static final Block ARENA_BLOCK_STAIRS = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
     public static final Block ARENA_BLOCK_SLAB = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
@@ -55,7 +55,10 @@ public class LasertagMod implements ModInitializer {
     public static final Block ARENA_PRESSURE_PLATE = new PressurePlateBlock(PressurePlateBlock.ActivationRule.MOBS, AbstractBlock.Settings.of(Material.STONE).requiresTool().noCollision().strength(0.5f));
     public static final Block LASER_TARGET = new LaserTargetBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f));
 
-    // Create Instances for all items
+    // Create instances for all block entities
+
+
+    // Create instances for all items
     public static final ArrayList<Item> LASERTAG_WEAPONS = new ArrayList<>();
     public static final ArrayList<Item> LASERTAG_VESTS = new ArrayList<>();
 
@@ -114,5 +117,7 @@ public class LasertagMod implements ModInitializer {
 
         // ===== Register commands =====================
         CommandInitializer.initCommands();
+
+        // ===== Listen to events ======================
     }
 }

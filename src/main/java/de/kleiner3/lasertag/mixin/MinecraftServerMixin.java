@@ -1,14 +1,19 @@
 package de.kleiner3.lasertag.mixin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.google.gson.Gson;
+import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.lasertaggame.ILasertagGame;
+import de.kleiner3.lasertag.networking.NetworkingConstants;
+import de.kleiner3.lasertag.networking.server.ServerEventSending;
+import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.util.Tuple;
+import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.DimensionEffects;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -17,19 +22,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.google.gson.Gson;
-
-import de.kleiner3.lasertag.LasertagConfig;
-import de.kleiner3.lasertag.lasertaggame.ILasertagGame;
-import de.kleiner3.lasertag.networking.NetworkingConstants;
-import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import de.kleiner3.lasertag.types.Colors;
-import de.kleiner3.lasertag.util.Tuple;
-import io.netty.buffer.Unpooled;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Interface injection into MinecraftServer to implement the lasertag game
@@ -61,9 +57,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     }
 
     @Override
-    public void startGame() {
-        // TODO Auto-generated method stub
-
+    public void startGame(boolean scanSpawnpoints) {
         // Reset all scores
         for (List<PlayerEntity> team : teamMap.values()) {
             for (PlayerEntity player : team) {
@@ -72,54 +66,32 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         }
         notifyPlayersAboutUpdate();
 
-        // If spawnpoint cache is not initialized
-        if (spawnpointCache == null) {
-            // Initialize cache
-            spawnpointCache = new HashMap<>();
-
-            // Initialize team lists
-            for (Colors team : Colors.values()) {
-                spawnpointCache.put(team, new ArrayList<>());
-            }
-
-            // Get the overworld
-            World world = ((MinecraftServer)(Object)this).getOverworld();
-
-            // Iterate over every block in the world
-            for (int x = -1000; x < 1000; x++) {
-                for (int y = -64; y < 200; y++) {
-                    for (int z = -1000; z < 1000; z++) {
-                        BlockPos pos = new BlockPos(x, y, z);
-
-                        BlockState blockState = world.getBlockState(pos);
-
-                        Block block = blockState.getBlock();
-
-                        for (Colors color : Colors.values()) {
-                            if (color.getSpawnpointBlock().equals(block)) {
-                                spawnpointCache.get(color).add(pos);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+        // If spawnpoint cache needs to be filled
+        if (spawnpointCache == null || scanSpawnpoints) {
+            initSpawnpointCache();;
         }
 
         // Teleport players
         for (Colors teamColor : Colors.values()) {
             List<PlayerEntity> team = teamMap.get(teamColor);
 
-            World world = ((MinecraftServer)(Object)this).getOverworld();
+            World world = ((MinecraftServer) (Object) this).getOverworld();
 
             for (PlayerEntity player : team) {
-                BlockPos destination = spawnpointCache.get(teamColor).get(0);
-                player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
+                // Get spawnpoints
+                List<BlockPos> spawnpoints = spawnpointCache.get(teamColor);
+
+                // If there are spawnpoints for this team
+                if (spawnpoints.size() > 0) {
+                    BlockPos destination = spawnpoints.get(0);
+                    player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
+                }
             }
         }
 
         // Start game
 
+        // Notify players
         sendGameStartedEvent();
     }
 
@@ -236,7 +208,49 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     }
 
     private void sendGameStartedEvent() {
-        ServerWorld world = ((MinecraftServer)(Object)this).getOverworld();
+        ServerWorld world = ((MinecraftServer) (Object) this).getOverworld();
         ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_STARTED, PacketByteBufs.empty());
     }
+
+    public void initSpawnpointCache() {
+
+        // Initialize cache
+        spawnpointCache = new HashMap<>();
+
+        // Initialize team lists
+        for (Colors team : Colors.values()) {
+            spawnpointCache.put(team, new ArrayList<>());
+        }
+
+        // Get the overworld
+        World world = ((MinecraftServer) (Object) this).getOverworld();
+
+        // Start time measurement
+        long startTime = System.nanoTime();
+
+        // Iterate over blocks and find spawnpoints
+        world.fastSearchBlock((block, pos) -> {
+            for (Colors color : Colors.values()) {
+                if (color.getSpawnpointBlock().equals(block)) {
+                    var team = spawnpointCache.get(color);
+                    synchronized (color) {
+                        team.add(pos);
+                    }
+                    break;
+                }
+            }
+        }, (currChunk, maxChunk) -> {
+            LasertagMod.LOGGER.info("Searched chunk " + currChunk + "/" + maxChunk);
+        });
+
+        // Stop time measurement
+        long stopTime = System.nanoTime();
+        double duration = (stopTime - startTime) / 1000000000.0F;
+        LasertagMod.LOGGER.info("Spawnpoint search took " + duration + "s.");
+    }
+
+    private static final int LOWER_SEARCH_BORDER = -1024;
+    private static final int UPPER_SERACH_BORDER = 1024;
+    private static final int WORLD_LOWER_BORDER = -64;
+    private static final int WORLD_UPPER_BORDER = 319;
 }
