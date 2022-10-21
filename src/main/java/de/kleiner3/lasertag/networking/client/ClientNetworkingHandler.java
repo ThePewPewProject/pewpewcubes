@@ -47,6 +47,7 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_WEAPON_FAILED_SOUND, Callbacks::handleWeaponFailedSoundEvent);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_PLAYER_SCORED_SOUND, Callbacks::handlePlayerScoredSoundEvent);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_STARTED, Callbacks::handleLasertagGameStarted);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PROGRESS, Callbacks::handleProgress);
     }
 
     /**
@@ -142,7 +143,23 @@ public class ClientNetworkingHandler {
                                                      ClientPlayNetworkHandler handler,
                                                      PacketByteBuf buf,
                                                      PacketSender responseSender) {
-            System.out.println("GAME STARTED!");
+            LasertagHudOverlay.progress = 0.0;
+
+            new Thread(() -> {
+                for (LasertagHudOverlay.startingIn = 10; LasertagHudOverlay.startingIn >= 0; --LasertagHudOverlay.startingIn) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }).start();
+        }
+
+        public static void handleProgress(MinecraftClient client,
+                                          ClientPlayNetworkHandler handler,
+                                          PacketByteBuf buf,
+                                          PacketSender responseSender) {
+            LasertagHudOverlay.progress = buf.readDouble();
         }
     }
 }

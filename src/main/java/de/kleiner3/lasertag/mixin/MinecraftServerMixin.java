@@ -18,6 +18,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -35,12 +36,16 @@ import java.util.List;
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin implements ILasertagGame {
 
+    @Shadow public abstract boolean isDebugRunning();
+
     private HashMap<Colors, ArrayList<BlockPos>> spawnpointCache = null;
 
     /**
      * Map every player to their team color
      */
     private HashMap<Colors, List<PlayerEntity>> teamMap = new HashMap<>();
+
+    private boolean isRunning = false;
 
     /**
      * Inject into constructor of MinecraftServer
@@ -68,7 +73,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
 
         // If spawnpoint cache needs to be filled
         if (spawnpointCache == null || scanSpawnpoints) {
-            initSpawnpointCache();;
+            initSpawnpointCache();
         }
 
         // Teleport players
@@ -83,13 +88,27 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
 
                 // If there are spawnpoints for this team
                 if (spawnpoints.size() > 0) {
-                    BlockPos destination = spawnpoints.get(0);
+                    int idx = world.getRandom().nextInt(spawnpoints.size());
+
+                    BlockPos destination = spawnpoints.get(idx);
                     player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
                 }
             }
         }
 
         // Start game
+        isRunning = true;
+        new Thread(() -> {
+            for(int i = 0; i < LasertagConfig.playTime; i++) {
+                lasertagTick();
+                try {
+                    Thread.sleep(1000 * 60);
+                } catch (InterruptedException e) {
+                }
+            }
+
+            lasertagGameOver();
+        }).start();
 
         // Notify players
         sendGameStartedEvent();
@@ -175,6 +194,29 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         notifyPlayersAboutUpdate();
     }
 
+    @Override
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    /**
+     * This method is called every minute when the game is running
+     */
+    private void lasertagTick() {
+        // TODO
+    }
+
+    /**
+     * This method is called when the game ends
+     */
+    private void lasertagGameOver() {
+        isRunning = false;
+        // TODO
+    }
+
+    /**
+     * Notifies every player of this world about a team or score update
+     */
     private void notifyPlayersAboutUpdate() {
         // Create simplified team map
         final HashMap<Colors, List<Tuple<String, Integer>>> simplifiedTeamMap = new HashMap<>();
@@ -187,7 +229,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             // For every player in the team
             for (PlayerEntity player : teamMap.get(c)) {
                 // Add his name and score to the list
-                playerDatas.add(new Tuple<String, Integer>(player.getDisplayName().getString(), player.getLasertagScore()));
+                playerDatas.add(new Tuple<>(player.getDisplayName().getString(), player.getLasertagScore()));
             }
 
             // Add the current team to the simplified team map
@@ -207,11 +249,18 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         ServerEventSending.sendToEveryone(((MinecraftServer) (Object) this).getOverworld(), NetworkingConstants.LASERTAG_GAME_TEAM_OR_SCORE_UPDATE, buf);
     }
 
+    /**
+     * Notifies every player of this world about the start of a lasertag game
+     */
     private void sendGameStartedEvent() {
         ServerWorld world = ((MinecraftServer) (Object) this).getOverworld();
         ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_STARTED, PacketByteBufs.empty());
     }
 
+    /**
+     * Initializes the spawnpoint cache. Searches a 63 x 63 chunk area for spawnpoint blocks specified by the team color.
+     * This method is computationally intensive, don't call too often or when responsiveness is important. The call of this method blocks the server from ticking!
+     */
     public void initSpawnpointCache() {
 
         // Initialize cache
@@ -223,7 +272,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         }
 
         // Get the overworld
-        World world = ((MinecraftServer) (Object) this).getOverworld();
+        ServerWorld world = ((MinecraftServer) (Object) this).getOverworld();
 
         // Start time measurement
         long startTime = System.nanoTime();
@@ -240,7 +289,18 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
                 }
             }
         }, (currChunk, maxChunk) -> {
-            LasertagMod.LOGGER.info("Searched chunk " + currChunk + "/" + maxChunk);
+            // Only send a progress update every second chunk to not ddos our players
+            if (currChunk % 2 == 0) {
+                return;
+            }
+
+            // Create packet buffer
+            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+
+            // Write progress to buffer
+            buf.writeDouble((double)currChunk / (double)maxChunk);
+
+            ServerEventSending.sendToEveryone(world, NetworkingConstants.PROGRESS, buf);
         });
 
         // Stop time measurement
@@ -248,9 +308,4 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         double duration = (stopTime - startTime) / 1000000000.0F;
         LasertagMod.LOGGER.info("Spawnpoint search took " + duration + "s.");
     }
-
-    private static final int LOWER_SEARCH_BORDER = -1024;
-    private static final int UPPER_SERACH_BORDER = 1024;
-    private static final int WORLD_LOWER_BORDER = -64;
-    private static final int WORLD_UPPER_BORDER = 319;
 }

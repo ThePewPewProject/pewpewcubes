@@ -20,4 +20,8 @@ public class LasertagConfig {
     public static boolean renderTimer = true;
     public static int lasertargetHitScore = 100;
     public static int playerHitScore = 20;
+    /**
+     * The play time in minutes
+     */
+    public static int playTime = 10;
 }

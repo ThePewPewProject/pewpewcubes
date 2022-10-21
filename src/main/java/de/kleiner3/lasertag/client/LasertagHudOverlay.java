@@ -23,6 +23,11 @@ public class LasertagHudOverlay implements HudRenderCallback {
      */
     public static HashMap<Colors, LinkedList<Tuple<String, Integer>>> teamMap = new HashMap<>();
 
+    public static double progress = 0.0;
+
+    public static int startingIn = -1;
+
+    private static final int progressBarWidth = 100;
     private static final int numColors = Colors.values().length;
     private static final int boxColor = 0x88000000;
     private static final int startY = 10;
@@ -68,6 +73,9 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
         // Get the logical width of the window
         int width = client.getWindow().getScaledWidth();
+        int wMid = width / 2;
+        int height = client.getWindow().getScaledHeight();
+        int hMid = height / 2;
 
         // Draw teams on the left
         for (int i = 0; i < numColors / 2; i++) {
@@ -151,6 +159,27 @@ public class LasertagHudOverlay implements HudRenderCallback {
             // Draw team score
             String scoreString = Integer.toString(teamScore);
             renderer.draw(matrixStack, scoreString, width - boxWidth + textPadding, y + textPadding, 0x00FFFFFF);
+        }
+
+        // Draw progress bar
+        if (progress != 0.0) {
+            int barStart = wMid - (progressBarWidth / 2);
+            int progressWidth = (int)(progressBarWidth * progress);
+
+            // Draw background
+            DrawableHelper.fill(matrixStack, barStart, hMid + 10, barStart + progressBarWidth, hMid + 15, boxColor);
+
+            // Draw progress
+            DrawableHelper.fill(matrixStack, barStart, hMid + 10, barStart + progressWidth, hMid + 15, 0xFFFFFFFF);
+        }
+
+        // Draw starting game in
+        if (startingIn != -1) {
+            if (startingIn == 0) {
+                DrawableHelper.drawCenteredText(matrixStack, renderer, "GO!", wMid, hMid, 0xFFFFFFFF);
+            } else {
+                DrawableHelper.drawCenteredText(matrixStack, renderer, "Starting in " + startingIn, wMid, hMid, 0xFFFFFFFF);
+            }
         }
     }
 }

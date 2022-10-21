@@ -69,4 +69,11 @@ public interface ILasertagGame {
      */
     default public void initSpawnpointCache() {
     }
+
+    /**
+     * @return True if the game is running
+     */
+    default public boolean isRunning() {
+        return false;
+    }
 }
