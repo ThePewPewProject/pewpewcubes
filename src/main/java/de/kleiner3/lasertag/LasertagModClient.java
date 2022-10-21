@@ -6,6 +6,8 @@ import de.kleiner3.lasertag.networking.client.ClientNetworkingHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 
@@ -30,6 +32,15 @@ public class LasertagModClient implements ClientModInitializer {
 
         // ===== Register HUD Overlay =========================
         HudRenderCallback.EVENT.register(new LasertagHudOverlay());
+
+        // ===== Register color providers =====================
+        ColorProviderRegistry.ITEM.register((stack, tintIdx) ->  {
+            if (stack.hasNbt()) {
+                return stack.getNbt().getInt("color");
+            }
+
+            return 0xFFFFFF;
+        }, LasertagMod.LASERTAG_WEAPON);
     }
 
 }
