@@ -8,8 +8,6 @@ import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.types.Colors;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -26,7 +24,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.GameRules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +59,8 @@ public class LasertagMod implements ModInitializer {
 
 
     // Create instances for all items
-    public static final ArrayList<Item> LASERTAG_WEAPONS = new ArrayList<>();
+    // public static final ArrayList<Item> LASERTAG_WEAPONS = new ArrayList<>();
+    public static final Item LASERTAG_WEAPON = new LasertagWeaponItem(new FabricItemSettings().group(LASERTAG_ITEM_GROUP).maxCount(1));
     public static final ArrayList<Item> LASERTAG_VESTS = new ArrayList<>();
 
     // Register all entities
@@ -97,16 +95,17 @@ public class LasertagMod implements ModInitializer {
 
         // ===== Register all items ====================
 
+        Registry.register(Registry.ITEM, new Identifier(ID, "lasertag_weapon"), LASERTAG_WEAPON);
         // For every default color
         for (Colors color : Colors.values()) {
-            // Create new instance of a lasertag weapon
-            LasertagWeaponItem weapon = new LasertagWeaponItem(new FabricItemSettings().group(LASERTAG_ITEM_GROUP).maxCount(1), color);
-
-            // Register the weapon
-            Registry.register(Registry.ITEM, new Identifier(ID, "lasertag_weapon_" + color.name().toLowerCase()), weapon);
-
-            // Save in static lasertag weapons list
-            LASERTAG_WEAPONS.add(weapon);
+//            // Create new instance of a lasertag weapon
+//            LasertagWeaponItem weapon = new LasertagWeaponItem(new FabricItemSettings().group(LASERTAG_ITEM_GROUP).maxCount(1), color);
+//
+//            // Register the weapon
+//            Registry.register(Registry.ITEM, new Identifier(ID, "lasertag_weapon_" + color.name().toLowerCase()), weapon);
+//
+//            // Save in static lasertag weapons list
+//            LASERTAG_WEAPONS.add(weapon);
 
             // Create new instance of a lasertag vest
             LasertagVestItem vest = new LasertagVestItem(ArmorMaterials.LEATHER, new FabricItemSettings().group(LASERTAG_ITEM_GROUP), color);

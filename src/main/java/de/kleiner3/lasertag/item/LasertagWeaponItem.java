@@ -15,8 +15,10 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.RangedWeaponItem;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -40,14 +42,9 @@ import java.util.function.Predicate;
  * @author Étienne Muser
  */
 public class LasertagWeaponItem extends RangedWeaponItem {
-    /**
-     * The color of the weapon
-     */
-    private final Colors color;
 
-    public LasertagWeaponItem(Settings settings, Colors color) {
+    public LasertagWeaponItem(Settings settings) {
         super(settings);
-        this.color = color;
     }
 
     @Override
@@ -61,10 +58,6 @@ public class LasertagWeaponItem extends RangedWeaponItem {
         return LasertagConfig.lasertagWeaponReach;
     }
 
-    public Colors getColor() {
-        return color;
-    }
-
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
         // Apply cooldown
@@ -76,25 +69,28 @@ public class LasertagWeaponItem extends RangedWeaponItem {
         // Get breastplate of the player
         ItemStack breastplate = armorPieces.get(2);
 
+        // Get the item stack
+        var laserweaponStack = playerEntity.getStackInHand(hand);
+
         // Check if player wears vest as breastplate
         if (!(breastplate.getItem() instanceof LasertagVestItem)) {
             playWeaponFailSound(playerEntity);
-            return TypedActionResult.fail(playerEntity.getStackInHand(hand));
+            return TypedActionResult.fail(laserweaponStack);
         }
 
         // Check if vest is of same color as weapon
-        if (!(((LasertagVestItem) breastplate.getItem()).getColor() == this.color)) {
-            playWeaponFailSound(playerEntity);
-            return TypedActionResult.fail(playerEntity.getStackInHand(hand));
+        if (!(((LasertagVestItem) breastplate.getItem()).getColor().getValue() == this.getColor(laserweaponStack))) {
+            //playWeaponFailSound(playerEntity);
+            //return TypedActionResult.fail(laserweaponStack);
         }
 
         if (!world.isClient) {
-            fireWeapon(world, playerEntity, hand);
+            fireWeapon(world, playerEntity, this.getColor(laserweaponStack));
         }
-        return TypedActionResult.success(playerEntity.getStackInHand(hand));
+        return TypedActionResult.success(laserweaponStack);
     }
 
-    private void fireWeapon(World world, PlayerEntity playerEntity, Hand hand) {
+    private void fireWeapon(World world, PlayerEntity playerEntity, int color) {
         playWeaponFireSound(playerEntity);
 
         // Raycast the crosshair
@@ -188,5 +184,15 @@ public class LasertagWeaponItem extends RangedWeaponItem {
         buf.writeDouble(playerEntity.getZ());
 
         ServerEventSending.sendToEveryone((ServerWorld) playerEntity.world, NetworkingConstants.PLAY_WEAPON_FIRED_SOUND, buf);
+    }
+
+    public int getColor(ItemStack stack) {
+        if (!stack.hasNbt()) {
+            return 0;
+        }
+
+        NbtCompound nbt = stack.getNbt();
+
+        return nbt.getInt("color");
     }
 }

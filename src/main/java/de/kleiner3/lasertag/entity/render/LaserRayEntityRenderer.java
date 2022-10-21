@@ -40,9 +40,14 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
     @Override
     public void render(LaserRayEntity laserRayEntity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         long worldTime = laserRayEntity.getWorld().getTime();
-        float[] color = laserRayEntity.getColor().getFloatArray();
+        int color = laserRayEntity.getColor();
+        float[] colorArr = new float[] {
+                ((color >> 16) & 0xFF) / 255.0F,
+                ((color >> 8) & 0xFF) / 255.0F,
+                ((color >> 0) & 0xFF) / 255.0F
+        };
         Vec3d end = laserRayEntity.getEnd().subtract(laserRayEntity.getPos());
-        renderBeam(matrices, vertexConsumers, tickDelta, worldTime, color, end);
+        renderBeam(matrices, vertexConsumers, tickDelta, worldTime, colorArr, end);
     }
 
     /**

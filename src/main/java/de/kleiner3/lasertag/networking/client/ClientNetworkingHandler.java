@@ -77,7 +77,7 @@ public class ClientNetworkingHandler {
             int entityId = buf.readInt();
             UUID uuid = buf.readUuid();
 
-            Colors color = Colors.valueOf(buf.readString());
+            int color = buf.readInt();
 
             client.execute(() -> {
                 LaserRayEntity entity = new LaserRayEntity(client.world, pos, yaw, pitch, color, endPos);

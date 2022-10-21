@@ -24,7 +24,7 @@ public class LaserRayEntity extends ProjectileEntity {
     /**
      * The color of the ray
      */
-    private final Colors color;
+    private final int color;
     /**
      * The end of the laser ray in world coordinates
      */
@@ -34,15 +34,15 @@ public class LaserRayEntity extends ProjectileEntity {
         super(type, world);
 
         // Set default color Teal
-        color = Colors.RED;
+        color = 0xFFFFFFFF;
         System.out.println("WRONG CONSTRUCTOR CALLED!!!");
     }
 
-    public LaserRayEntity(World world, LivingEntity owner, Colors color, HitResult hit) {
+    public LaserRayEntity(World world, LivingEntity owner, int color, HitResult hit) {
         this(world, owner.getEyePos(), owner.getYaw(), owner.getPitch(), color, hit.getPos());
     }
 
-    public LaserRayEntity(World world, Vec3d pos, float yaw, float pitch, Colors color, Vec3d endPos) {
+    public LaserRayEntity(World world, Vec3d pos, float yaw, float pitch, int color, Vec3d endPos) {
         super(LasertagMod.LASER_RAY, world);
 
         this.color = color;
@@ -52,8 +52,8 @@ public class LaserRayEntity extends ProjectileEntity {
         this.setPosition(pos);
     }
 
-    public Colors getColor() {
-        return color;
+    public int getColor() {
+        return this.color;
     }
 
     /**
@@ -97,7 +97,7 @@ public class LaserRayEntity extends ProjectileEntity {
         buf.writeUuid(getUuid());
 
         // Put color
-        buf.writeString(color.name());
+        buf.writeInt(color);
 
         return ServerPlayNetworking.createS2CPacket(NetworkingConstants.LASER_RAY_SPAWNED, buf);
     }
