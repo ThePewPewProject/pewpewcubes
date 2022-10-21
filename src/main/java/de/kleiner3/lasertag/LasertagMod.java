@@ -8,6 +8,8 @@ import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.types.Colors;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -24,6 +26,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.GameRules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +56,7 @@ public class LasertagMod implements ModInitializer {
     public static final Block ARENA_BLOCK_SLAB = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
     public static final Block ARENA_DIVIDER = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
     public static final Block ARENA_PRESSURE_PLATE = new PressurePlateBlock(PressurePlateBlock.ActivationRule.MOBS, AbstractBlock.Settings.of(Material.STONE).requiresTool().noCollision().strength(0.5f));
-    public static final Block LASER_TARGET = new LaserTargetBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f));
+    public static final Block LASER_TARGET = new LaserTargetBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f).luminance(2));
 
     // Create instances for all block entities
 
@@ -97,7 +100,7 @@ public class LasertagMod implements ModInitializer {
         // For every default color
         for (Colors color : Colors.values()) {
             // Create new instance of a lasertag weapon
-            LasertagWeaponItem weapon = new LasertagWeaponItem(new FabricItemSettings().group(LASERTAG_ITEM_GROUP), color);
+            LasertagWeaponItem weapon = new LasertagWeaponItem(new FabricItemSettings().group(LASERTAG_ITEM_GROUP).maxCount(1), color);
 
             // Register the weapon
             Registry.register(Registry.ITEM, new Identifier(ID, "lasertag_weapon_" + color.name().toLowerCase()), weapon);

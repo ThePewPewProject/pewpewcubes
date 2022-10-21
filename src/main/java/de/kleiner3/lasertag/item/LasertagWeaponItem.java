@@ -21,6 +21,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.state.StateManager;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.collection.DefaultedList;
@@ -158,6 +159,10 @@ public class LasertagWeaponItem extends RangedWeaponItem {
     }
 
     private static void playWeaponFailSound(PlayerEntity playerEntity) {
+        if (playerEntity.world.isClient) {
+            return;
+        }
+
         // Create packet byte buffer
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 
@@ -170,6 +175,10 @@ public class LasertagWeaponItem extends RangedWeaponItem {
     }
 
     private static void playWeaponFireSound(PlayerEntity playerEntity) {
+        if (playerEntity.world.isClient) {
+            return;
+        }
+
         // Create packet byte buffer
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 

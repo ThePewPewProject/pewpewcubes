@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.client;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.Tuple;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -10,6 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.server.MinecraftServer;
 
 /**
  * Class to implement the custom overlay for the lasertag game
@@ -77,88 +79,90 @@ public class LasertagHudOverlay implements HudRenderCallback {
         int height = client.getWindow().getScaledHeight();
         int hMid = height / 2;
 
-        // Draw teams on the left
-        for (int i = 0; i < numColors / 2; i++) {
-            // Get the current color
-            Colors teamColor = colors[i];
+        if (LasertagConfig.renderTeamList) {
+            // Draw teams on the left
+            for (int i = 0; i < numColors / 2; i++) {
+                // Get the current color
+                Colors teamColor = colors[i];
 
-            // The team score
-            int teamScore = 0;
+                // The team score
+                int teamScore = 0;
 
-            // The height to start rendering this box at
-            int y = startY + i * (boxHeight + margin);
+                // The height to start rendering this box at
+                int y = startY + i * (boxHeight + margin);
 
-            // Draw the opaque box
-            DrawableHelper.fill(matrixStack, 0, y, boxWidth, y + boxHeight, boxColor);
+                // Draw the opaque box
+                DrawableHelper.fill(matrixStack, 0, y, boxWidth, y + boxHeight, boxColor);
 
-            // Draw team name
-            renderer.draw(matrixStack, teamColor.name(), textPadding, y + textPadding, teamColor.getValue());
+                // Draw team name
+                renderer.draw(matrixStack, teamColor.name(), textPadding, y + textPadding, teamColor.getValue());
 
-            // Draw team members
-            int memberY = y + 2 * textPadding + textHeight + 1;
-            for (Tuple<String, Integer> playerData : teamMap.get(teamColor)) {
-                // Draw player name
-                renderer.draw(matrixStack, playerData.x, textPadding, memberY, 0x00FFFFFF);
+                // Draw team members
+                int memberY = y + 2 * textPadding + textHeight + 1;
+                for (Tuple<String, Integer> playerData : teamMap.get(teamColor)) {
+                    // Draw player name
+                    renderer.draw(matrixStack, playerData.x, textPadding, memberY, 0x00FFFFFF);
 
-                // Get the players score
-                Integer playerScore = playerData.y;
+                    // Get the players score
+                    Integer playerScore = playerData.y;
 
-                // Add the players score to the team score
-                teamScore += playerScore;
+                    // Add the players score to the team score
+                    teamScore += playerScore;
 
-                // Draw the players score
-                String scoreString = Integer.toString(playerScore);
-                renderer.draw(matrixStack, scoreString, boxWidth - textPadding - renderer.getWidth(scoreString), memberY, 0x00FFFFFF);
+                    // Draw the players score
+                    String scoreString = Integer.toString(playerScore);
+                    renderer.draw(matrixStack, scoreString, boxWidth - textPadding - renderer.getWidth(scoreString), memberY, 0x00FFFFFF);
 
-                // Offset to the next line
-                memberY += 2 * textPadding + textHeight - 2;
+                    // Offset to the next line
+                    memberY += 2 * textPadding + textHeight - 2;
+                }
+
+                // Draw team score
+                String scoreString = Integer.toString(teamScore);
+                renderer.draw(matrixStack, scoreString, boxWidth - textPadding - renderer.getWidth(scoreString), y + textPadding, 0x00FFFFFF);
             }
 
-            // Draw team score
-            String scoreString = Integer.toString(teamScore);
-            renderer.draw(matrixStack, scoreString, boxWidth - textPadding - renderer.getWidth(scoreString), y + textPadding, 0x00FFFFFF);
-        }
+            // Draw teams on the right
+            for (int i = numColors / 2, rightIdx = 0; i < numColors; i++, rightIdx++) {
+                // Get the current color
+                Colors teamColor = colors[i];
 
-        // Draw teams on the right
-        for (int i = numColors / 2, rightIdx = 0; i < numColors; i++, rightIdx++) {
-            // Get the current color
-            Colors teamColor = colors[i];
+                // The team score
+                int teamScore = 0;
 
-            // The team score
-            int teamScore = 0;
+                // The height to start rendering this box at
+                int y = startY + rightIdx * (boxHeight + margin);
 
-            // The height to start rendering this box at
-            int y = startY + rightIdx * (boxHeight + margin);
+                // Draw the opaque box
+                DrawableHelper.fill(matrixStack, width - boxWidth, y, width, y + boxHeight, boxColor);
 
-            // Draw the opaque box
-            DrawableHelper.fill(matrixStack, width - boxWidth, y, width, y + boxHeight, boxColor);
+                // Draw team name
+                renderer.draw(matrixStack, teamColor.name(), width - textPadding - renderer.getWidth(teamColor.name()), y + textPadding, teamColor.getValue());
 
-            // Draw team name
-            renderer.draw(matrixStack, teamColor.name(), width - textPadding - renderer.getWidth(teamColor.name()), y + textPadding, teamColor.getValue());
+                // Draw team members
+                int memberY = y + 2 * textPadding + textHeight + 1;
+                for (Tuple<String, Integer> playerData : teamMap.get(teamColor)) {
+                    // Draw player name
+                    renderer.draw(matrixStack, playerData.x, width - textPadding - renderer.getWidth(playerData.x), memberY, 0x00FFFFFF);
 
-            // Draw team members
-            int memberY = y + 2 * textPadding + textHeight + 1;
-            for (Tuple<String, Integer> playerData : teamMap.get(teamColor)) {
-                // Draw player name
-                renderer.draw(matrixStack, playerData.x, width - textPadding - renderer.getWidth(playerData.x), memberY, 0x00FFFFFF);
+                    // Get the players score
+                    Integer playerScore = playerData.y;
 
-                // Get the players score
-                Integer playerScore = playerData.y;
+                    // Add the players score to the team score
+                    teamScore += playerScore;
 
-                // Add the players score to the team score
-                teamScore += playerScore;
+                    // Draw the players score
+                    String scoreString = Integer.toString(playerScore);
+                    renderer.draw(matrixStack, scoreString, width - boxWidth + textPadding, memberY, 0x00FFFFFF);
 
-                // Draw the players score
-                String scoreString = Integer.toString(playerScore);
-                renderer.draw(matrixStack, scoreString, width - boxWidth + textPadding, memberY, 0x00FFFFFF);
+                    // Offset to the next line
+                    memberY += 2 * textPadding + textHeight - 2;
+                }
 
-                // Offset to the next line
-                memberY += 2 * textPadding + textHeight - 2;
+                // Draw team score
+                String scoreString = Integer.toString(teamScore);
+                renderer.draw(matrixStack, scoreString, width - boxWidth + textPadding, y + textPadding, 0x00FFFFFF);
             }
-
-            // Draw team score
-            String scoreString = Integer.toString(teamScore);
-            renderer.draw(matrixStack, scoreString, width - boxWidth + textPadding, y + textPadding, 0x00FFFFFF);
         }
 
         // Draw progress bar
@@ -171,6 +175,9 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
             // Draw progress
             DrawableHelper.fill(matrixStack, barStart, hMid + 10, barStart + progressWidth, hMid + 15, 0xFFFFFFFF);
+
+            // Draw text
+            DrawableHelper.drawCenteredText(matrixStack, renderer, "Scanning for spawn points...", wMid, hMid - 15, 0xFFFFFFFF);
         }
 
         // Draw starting game in

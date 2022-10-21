@@ -4,7 +4,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.ServerCommandSource;
-import org.apache.logging.log4j.core.jmx.Server;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
