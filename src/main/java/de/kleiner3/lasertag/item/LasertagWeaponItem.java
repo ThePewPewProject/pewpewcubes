@@ -82,7 +82,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
         if (!world.isClient) {
             fireWeapon(world, playerEntity, this.getColor(laserweaponStack));
         }
-        return TypedActionResult.success(laserweaponStack);
+        return TypedActionResult.pass(laserweaponStack);
     }
 
     private void fireWeapon(World world, PlayerEntity playerEntity, int color) {
