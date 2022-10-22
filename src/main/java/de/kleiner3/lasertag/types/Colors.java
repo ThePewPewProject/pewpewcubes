@@ -72,5 +72,10 @@ public class Colors {
         public float[] getFloatArray() {
             return new float[]{r / 255.0F, g / 255.0F, b / 255.0F};
         }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }

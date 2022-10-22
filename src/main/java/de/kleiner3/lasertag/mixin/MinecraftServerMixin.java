@@ -148,7 +148,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
 
             // Swap team
             teamMap.get(oldTeamColor).remove(player);
-            teamMap.get(oldTeamColor).add(player);
+            teamMap.get(newTeamColor).add(player);
         }
 
         // Notify about change
