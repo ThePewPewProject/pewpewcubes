@@ -23,14 +23,14 @@ public class LasertagHudOverlay implements HudRenderCallback {
     /**
      * Simplified team map to map players and their score to their teams
      */
-    public static HashMap<Colors, LinkedList<Tuple<String, Integer>>> teamMap = new HashMap<>();
+    public static HashMap<Colors.Color, LinkedList<Tuple<String, Integer>>> teamMap = new HashMap<>();
 
     public static double progress = 0.0;
 
     public static int startingIn = -1;
 
     private static final int progressBarWidth = 100;
-    private static final int numColors = Colors.values().length;
+    private static final int numColors = Colors.colorConfig.size();
     private static final int boxColor = 0x88000000;
     private static final int startY = 10;
     private static final int boxHeight = 65;
@@ -38,10 +38,9 @@ public class LasertagHudOverlay implements HudRenderCallback {
     private static final int margin = 20;
     private static final int textPadding = 1;
     private static final int textHeight = 9;
-    private static final Colors[] colors = Colors.values();
 
     static {
-        for (Colors c : Colors.values()) {
+        for (Colors.Color c : Colors.colorConfig) {
             teamMap.put(c, new LinkedList<>());
         }
 
@@ -83,7 +82,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
             // Draw teams on the left
             for (int i = 0; i < numColors / 2; i++) {
                 // Get the current color
-                Colors teamColor = colors[i];
+                Colors.Color teamColor = Colors.colorConfig.get(i);
 
                 // The team score
                 int teamScore = 0;
@@ -95,7 +94,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
                 DrawableHelper.fill(matrixStack, 0, y, boxWidth, y + boxHeight, boxColor);
 
                 // Draw team name
-                renderer.draw(matrixStack, teamColor.name(), textPadding, y + textPadding, teamColor.getValue());
+                renderer.draw(matrixStack, teamColor.getName(), textPadding, y + textPadding, teamColor.getValue());
 
                 // Draw team members
                 int memberY = y + 2 * textPadding + textHeight + 1;
@@ -125,7 +124,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
             // Draw teams on the right
             for (int i = numColors / 2, rightIdx = 0; i < numColors; i++, rightIdx++) {
                 // Get the current color
-                Colors teamColor = colors[i];
+                Colors.Color teamColor = Colors.colorConfig.get(i);
 
                 // The team score
                 int teamScore = 0;
@@ -137,7 +136,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
                 DrawableHelper.fill(matrixStack, width - boxWidth, y, width, y + boxHeight, boxColor);
 
                 // Draw team name
-                renderer.draw(matrixStack, teamColor.name(), width - textPadding - renderer.getWidth(teamColor.name()), y + textPadding, teamColor.getValue());
+                renderer.draw(matrixStack, teamColor.getName(), width - textPadding - renderer.getWidth(teamColor.getName()), y + textPadding, teamColor.getValue());
 
                 // Draw team members
                 int memberY = y + 2 * textPadding + textHeight + 1;

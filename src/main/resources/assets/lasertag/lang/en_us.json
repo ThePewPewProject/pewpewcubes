@@ -8,17 +8,7 @@
 	"block.lasertag.arena_divider": "Arena Divider",
 	"block.lasertag.lasertarget": "Lasertarget",
 	
-	"item.lasertag.lasertag_weapon_red": "Red Lasertag Weapon",
-	"item.lasertag.lasertag_weapon_green": "Green Lasertag Weapon",
-	"item.lasertag.lasertag_weapon_blue": "Blue Lasertag Weapon",
-	"item.lasertag.lasertag_weapon_teal": "Teal Lasertag Weapon",
-	"item.lasertag.lasertag_weapon_orange": "Orange Lasertag Weapon",
-	"item.lasertag.lasertag_weapon_pink": "Pink Lasertag Weapon",
+	"item.lasertag.lasertag_weapon": "Lasertag Weapon",
 	
-	"item.lasertag.lasertag_vest_red": "Red Lasertag Vest",
-	"item.lasertag.lasertag_vest_green": "Green Lasertag Vest",
-	"item.lasertag.lasertag_vest_blue": "Blue Lasertag Vest",
-	"item.lasertag.lasertag_vest_teal": "Teal Lasertag Vest",
-	"item.lasertag.lasertag_vest_orange": "Orange Lasertag Vest",
-	"item.lasertag.lasertag_vest_pink": "Pink Lasertag Vest"
+	"item.lasertag.lasertag_vest": "Lasertag Vest",
 }

@@ -25,7 +25,7 @@ public interface ILasertagGame {
      * @param color
      * @return
      */
-    default public List<PlayerEntity> getPlayersOfTeam(Colors color) {
+    default public List<PlayerEntity> getPlayersOfTeam(Colors.Color color) {
         return new LinkedList<PlayerEntity>();
     }
 
@@ -35,7 +35,7 @@ public interface ILasertagGame {
      * @param color
      * @param player
      */
-    default public void playerJoinTeam(Colors color, PlayerEntity player) {
+    default public void playerJoinTeam(Colors.Color color, PlayerEntity player) {
     }
 
     /**
@@ -44,7 +44,7 @@ public interface ILasertagGame {
      * @param color
      * @param player
      */
-    default public void playerLeaveTeam(Colors color, PlayerEntity player) {
+    default public void playerLeaveTeam(Colors.Color color, PlayerEntity player) {
     }
 
     /**

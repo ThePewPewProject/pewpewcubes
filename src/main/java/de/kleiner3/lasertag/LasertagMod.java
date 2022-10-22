@@ -59,9 +59,8 @@ public class LasertagMod implements ModInitializer {
 
 
     // Create instances for all items
-    // public static final ArrayList<Item> LASERTAG_WEAPONS = new ArrayList<>();
     public static final Item LASERTAG_WEAPON = new LasertagWeaponItem(new FabricItemSettings().group(LASERTAG_ITEM_GROUP).maxCount(1));
-    public static final ArrayList<Item> LASERTAG_VESTS = new ArrayList<>();
+    public static final Item LASERTAG_VEST = new LasertagVestItem(ArmorMaterials.LEATHER, new FabricItemSettings().group(LASERTAG_ITEM_GROUP));
 
     // Register all entities
     public static final EntityType<LaserRayEntity> LASER_RAY = Registry.register(
@@ -94,28 +93,8 @@ public class LasertagMod implements ModInitializer {
                 new BlockItem(LASER_TARGET, new FabricItemSettings().group(LASERTAG_ITEM_GROUP)));
 
         // ===== Register all items ====================
-
         Registry.register(Registry.ITEM, new Identifier(ID, "lasertag_weapon"), LASERTAG_WEAPON);
-        // For every default color
-        for (Colors color : Colors.values()) {
-//            // Create new instance of a lasertag weapon
-//            LasertagWeaponItem weapon = new LasertagWeaponItem(new FabricItemSettings().group(LASERTAG_ITEM_GROUP).maxCount(1), color);
-//
-//            // Register the weapon
-//            Registry.register(Registry.ITEM, new Identifier(ID, "lasertag_weapon_" + color.name().toLowerCase()), weapon);
-//
-//            // Save in static lasertag weapons list
-//            LASERTAG_WEAPONS.add(weapon);
-
-            // Create new instance of a lasertag vest
-            LasertagVestItem vest = new LasertagVestItem(ArmorMaterials.LEATHER, new FabricItemSettings().group(LASERTAG_ITEM_GROUP), color);
-
-            // Register the vest
-            Registry.register(Registry.ITEM, new Identifier(ID, "lasertag_vest_" + color.name().toLowerCase()), vest);
-
-            // Save in static lasertag vest list
-            LASERTAG_VESTS.add(vest);
-        }
+        Registry.register(Registry.ITEM, new Identifier(ID, "lasertag_vest"), LASERTAG_VEST);
 
         // ===== Register commands =====================
         CommandInitializer.initCommands();

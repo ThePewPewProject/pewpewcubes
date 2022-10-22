@@ -38,12 +38,12 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
 
     @Shadow public abstract boolean isDebugRunning();
 
-    private HashMap<Colors, ArrayList<BlockPos>> spawnpointCache = null;
+    private HashMap<Colors.Color, ArrayList<BlockPos>> spawnpointCache = null;
 
     /**
      * Map every player to their team color
      */
-    private HashMap<Colors, List<PlayerEntity>> teamMap = new HashMap<>();
+    private HashMap<Colors.Color, List<PlayerEntity>> teamMap = new HashMap<>();
 
     private boolean isRunning = false;
 
@@ -56,7 +56,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     private void init(CallbackInfo ci) {
 
         // Initialize team map
-        for (Colors color : Colors.values()) {
+        for (Colors.Color color : Colors.colorConfig) {
             teamMap.put(color, new LinkedList<>());
         }
     }
@@ -77,7 +77,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         }
 
         // Teleport players
-        for (Colors teamColor : Colors.values()) {
+        for (Colors.Color teamColor : Colors.colorConfig) {
             List<PlayerEntity> team = teamMap.get(teamColor);
 
             World world = ((MinecraftServer) (Object) this).getOverworld();
@@ -115,24 +115,24 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     }
 
     @Override
-    public List<PlayerEntity> getPlayersOfTeam(Colors color) {
+    public List<PlayerEntity> getPlayersOfTeam(Colors.Color color) {
         return teamMap.get(color);
     }
 
     @Override
-    public void playerJoinTeam(Colors newTeamColor, PlayerEntity player) {
+    public void playerJoinTeam(Colors.Color newTeamColor, PlayerEntity player) {
         // Check if team is full
         if (teamMap.get(newTeamColor).size() >= LasertagConfig.maxTeamSize) {
             // If is Server
             if (player instanceof ServerPlayerEntity) {
-                ServerEventSending.sendErrorMessageToClient((ServerPlayerEntity) player, "Team " + newTeamColor.name() + " is full.");
+                ServerEventSending.sendErrorMessageToClient((ServerPlayerEntity) player, "Team " + newTeamColor.getName() + " is full.");
             }
             return;
         }
 
         // Check if player is in a team already
-        Colors oldTeamColor = null;
-        for (Colors c : Colors.values()) {
+        Colors.Color oldTeamColor = null;
+        for (Colors.Color c : Colors.colorConfig) {
             if (teamMap.get(c).contains(player)) {
                 oldTeamColor = c;
                 break;
@@ -156,7 +156,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     }
 
     @Override
-    public void playerLeaveTeam(Colors oldTeamColor, PlayerEntity player) {
+    public void playerLeaveTeam(Colors.Color oldTeamColor, PlayerEntity player) {
         // Get the players in the team
         List<PlayerEntity> team = teamMap.get(oldTeamColor);
 
@@ -219,10 +219,10 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
      */
     private void notifyPlayersAboutUpdate() {
         // Create simplified team map
-        final HashMap<Colors, List<Tuple<String, Integer>>> simplifiedTeamMap = new HashMap<>();
+        final HashMap<String, List<Tuple<String, Integer>>> simplifiedTeamMap = new HashMap<>();
 
         // For each color
-        for (Colors c : Colors.values()) {
+        for (Colors.Color c : Colors.colorConfig) {
             // Create a new list of (player name, player score) tuples
             List<Tuple<String, Integer>> playerDatas = new LinkedList<>();
 
@@ -233,7 +233,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             }
 
             // Add the current team to the simplified team map
-            simplifiedTeamMap.put(c, playerDatas);
+            simplifiedTeamMap.put(c.getName(), playerDatas);
         }
 
         // Serialize team map to json
@@ -267,7 +267,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         spawnpointCache = new HashMap<>();
 
         // Initialize team lists
-        for (Colors team : Colors.values()) {
+        for (Colors.Color team : Colors.colorConfig) {
             spawnpointCache.put(team, new ArrayList<>());
         }
 
@@ -279,7 +279,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
 
         // Iterate over blocks and find spawnpoints
         world.fastSearchBlock((block, pos) -> {
-            for (Colors color : Colors.values()) {
+            for (Colors.Color color : Colors.colorConfig) {
                 if (color.getSpawnpointBlock().equals(block)) {
                     var team = spawnpointCache.get(color);
                     synchronized (color) {

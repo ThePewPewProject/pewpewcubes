@@ -41,6 +41,13 @@ public class LasertagModClient implements ClientModInitializer {
 
             return 0xFFFFFF;
         }, LasertagMod.LASERTAG_WEAPON);
+        ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
+            if (stack.hasNbt()) {
+                return stack.getNbt().getInt("color");
+            }
+
+            return 0xFFFFFF;
+        }, LasertagMod.LASERTAG_VEST);
     }
 
 }

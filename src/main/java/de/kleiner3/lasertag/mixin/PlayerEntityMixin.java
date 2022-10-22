@@ -59,9 +59,7 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
         if (!(firedChestplate instanceof LasertagVestItem))
             return;
 
-        // Check that hit player is not in same team as firing player
-        if (((LasertagVestItem) chestplate).getColor() == ((LasertagVestItem) firedChestplate).getColor())
-            return;
+        // TODO: Check that hit player is not in same team as firing player
 
         // Get the server
         MinecraftServer server = player.getServer();

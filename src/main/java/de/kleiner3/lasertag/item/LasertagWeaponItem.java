@@ -6,6 +6,7 @@ import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.types.ILasertagColorable;
 import de.kleiner3.lasertag.util.RaycastUtil;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.EnvType;
@@ -41,7 +42,7 @@ import java.util.function.Predicate;
  *
  * @author Étienne Muser
  */
-public class LasertagWeaponItem extends RangedWeaponItem {
+public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagColorable {
 
     public LasertagWeaponItem(Settings settings) {
         super(settings);
@@ -76,12 +77,6 @@ public class LasertagWeaponItem extends RangedWeaponItem {
         if (!(breastplate.getItem() instanceof LasertagVestItem)) {
             playWeaponFailSound(playerEntity);
             return TypedActionResult.fail(laserweaponStack);
-        }
-
-        // Check if vest is of same color as weapon
-        if (!(((LasertagVestItem) breastplate.getItem()).getColor().getValue() == this.getColor(laserweaponStack))) {
-            //playWeaponFailSound(playerEntity);
-            //return TypedActionResult.fail(laserweaponStack);
         }
 
         if (!world.isClient) {
@@ -184,15 +179,5 @@ public class LasertagWeaponItem extends RangedWeaponItem {
         buf.writeDouble(playerEntity.getZ());
 
         ServerEventSending.sendToEveryone((ServerWorld) playerEntity.world, NetworkingConstants.PLAY_WEAPON_FIRED_SOUND, buf);
-    }
-
-    public int getColor(ItemStack stack) {
-        if (!stack.hasNbt()) {
-            return 0;
-        }
-
-        NbtCompound nbt = stack.getNbt();
-
-        return nbt.getInt("color");
     }
 }
