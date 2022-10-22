@@ -5,15 +5,15 @@ import de.kleiner3.lasertag.item.LasertagVestItem;
 import net.minecraft.util.Identifier;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 
-public class LasertagVestModel extends AnimatedGeoModel<LasertagVestItem> {
+public class LasertagVestLightsModel extends AnimatedGeoModel<LasertagVestItem> {
     @Override
     public Identifier getModelResource(LasertagVestItem object) {
-        return new Identifier(LasertagMod.ID, "geo/lasertag_vest.geo.json");
+        return new Identifier(LasertagMod.ID, "geo/lasertag_vest_lights.geo.json");
     }
 
     @Override
     public Identifier getTextureResource(LasertagVestItem object) {
-        return new Identifier(LasertagMod.ID, "textures/armor/lasertag_vest.png");
+        return new Identifier(LasertagMod.ID, "textures/armor/lasertag_vest_lights.png");
     }
 
     @Override

@@ -9,7 +9,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
 import software.bernie.geckolib3.renderers.geo.GeoArmorRenderer;
-import software.bernie.geckolib3.util.GeoArmorRendererRegistry;
 
 /**
  * Initializes the client side of the mod
@@ -51,6 +50,7 @@ public class LasertagModClient implements ClientModInitializer {
 
         // ===== Register GeckoLib renderers ===================
         GeoArmorRenderer.registerArmorRenderer(new LasertagVestRenderer(), LasertagMod.LASERTAG_VEST);
+
     }
 
 }
