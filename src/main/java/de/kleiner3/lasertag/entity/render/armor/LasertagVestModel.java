@@ -1,0 +1,23 @@
+package de.kleiner3.lasertag.entity.render.armor;
+
+import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.item.LasertagVestItem;
+import net.minecraft.util.Identifier;
+import software.bernie.geckolib3.model.AnimatedGeoModel;
+
+public class LasertagVestModel extends AnimatedGeoModel<LasertagVestItem> {
+    @Override
+    public Identifier getModelResource(LasertagVestItem object) {
+        return new Identifier(LasertagMod.ID, "geo/lasertag_vest.geo.json");
+    }
+
+    @Override
+    public Identifier getTextureResource(LasertagVestItem object) {
+        return new Identifier(LasertagMod.ID, "textures/armor/lasertag_vest.png");
+    }
+
+    @Override
+    public Identifier getAnimationResource(LasertagVestItem animatable) {
+        return new Identifier(LasertagMod.ID, "animations/lasertag_vest_animation.json");
+    }
+}

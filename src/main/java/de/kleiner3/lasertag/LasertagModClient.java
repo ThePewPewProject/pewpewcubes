@@ -2,13 +2,14 @@ package de.kleiner3.lasertag;
 
 import de.kleiner3.lasertag.client.LasertagHudOverlay;
 import de.kleiner3.lasertag.entity.render.LaserRayEntityRenderer;
-import de.kleiner3.lasertag.entity.render.LasertagVestRenderer;
+import de.kleiner3.lasertag.entity.render.armor.LasertagVestRenderer;
 import de.kleiner3.lasertag.networking.client.ClientNetworkingHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
-import net.fabricmc.fabric.impl.client.rendering.ArmorRendererRegistryImpl;
+import software.bernie.geckolib3.renderers.geo.GeoArmorRenderer;
+import software.bernie.geckolib3.util.GeoArmorRendererRegistry;
 
 /**
  * Initializes the client side of the mod
@@ -24,7 +25,6 @@ public class LasertagModClient implements ClientModInitializer {
         EntityRendererRegistry.register(LasertagMod.LASER_RAY, (ctx) -> {
             return new LaserRayEntityRenderer(ctx);
         });
-        ArmorRenderer.register(LasertagVestRenderer.getInstance(), LasertagMod.LASERTAG_VEST);
 
         // ===== Register packet recievers ====================
         ClientNetworkingHandler clientNetworkingHandler = new ClientNetworkingHandler();
@@ -48,6 +48,9 @@ public class LasertagModClient implements ClientModInitializer {
 
             return 0xFFFFFF;
         }, LasertagMod.LASERTAG_VEST);
+
+        // ===== Register GeckoLib renderers ===================
+        GeoArmorRenderer.registerArmorRenderer(new LasertagVestRenderer(), LasertagMod.LASERTAG_VEST);
     }
 
 }
