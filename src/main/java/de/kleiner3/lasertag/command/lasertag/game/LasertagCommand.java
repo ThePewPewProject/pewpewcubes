@@ -3,12 +3,16 @@ package de.kleiner3.lasertag.command.lasertag.game;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.command.suggestions.TeamSuggestionProvider;
+import de.kleiner3.lasertag.types.Colors;
 import net.minecraft.server.command.ServerCommandSource;
 
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
+import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static net.minecraft.server.command.CommandManager.literal;
 import static net.minecraft.server.command.CommandManager.argument;
 
@@ -23,6 +27,7 @@ public class LasertagCommand {
 
         RenderHudSetting.register(cmd);
         StartGame.register(cmd);
+        JoinTeam.register(cmd);
 
         dispatcher.register(cmd);
     }
@@ -69,7 +74,33 @@ public class LasertagCommand {
         }
     }
 
-    private class JoinTeam {}
+    private class JoinTeam {
+        private static int execute(CommandContext<ServerCommandSource> context) {
+            // Get the team
+            var teamName = StringArgumentType.getString(context, "team");
+
+            // Get the server
+            var server = context.getSource().getServer();
+
+            // Get executing player
+            var player = context.getSource().getPlayer();
+
+            // Get team color
+            var teamColor = Colors.colorConfig.get(teamName);
+
+            // Join team
+            server.playerJoinTeam(teamColor, player);
+
+            return Command.SINGLE_SUCCESS;
+        }
+
+        private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+            lab.then(literal("joinTeam")
+                    .then(argument("team", word())
+                            .suggests(TeamSuggestionProvider.getInstance())
+                            .executes(ctx -> execute(ctx))));
+        }
+    }
 
     private class LeaveTeam {}
 }

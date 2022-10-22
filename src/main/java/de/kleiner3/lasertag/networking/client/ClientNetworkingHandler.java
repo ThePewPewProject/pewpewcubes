@@ -101,7 +101,7 @@ public class ClientNetworkingHandler {
                                                    PacketByteBuf buf,
                                                    PacketSender responseSender) {
             LasertagHudOverlay.teamMap = new Gson().fromJson(buf.readString(),
-                    new TypeToken<HashMap<Colors, LinkedList<Tuple<String, Integer>>>>() {
+                    new TypeToken<HashMap<String, LinkedList<Tuple<String, Integer>>>>() {
                     }.getType());
         }
 

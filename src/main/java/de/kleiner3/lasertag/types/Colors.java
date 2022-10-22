@@ -15,15 +15,15 @@ import java.util.LinkedList;
  * @author Étienne Muser
  */
 public class Colors {
-    public static ArrayList<Color> colorConfig = new ArrayList<>();
+    public static HashMap<String, Color> colorConfig = new HashMap<>();
 
     static {
-        colorConfig.add(new Color("Red", 255, 0, 0, Blocks.RED_CONCRETE));
-        colorConfig.add(new Color("Green", 0, 255, 0, Blocks.LIME_CONCRETE));
-        colorConfig.add(new Color("Blue", 0, 0, 255, Blocks.BLUE_CONCRETE));
-        colorConfig.add(new Color("Orange", 255, 128, 0, Blocks.ORANGE_CONCRETE));
-        colorConfig.add(new Color("Teal", 0, 128, 255, Blocks.LIGHT_BLUE_CONCRETE));
-        colorConfig.add(new Color("Pink", 255, 0, 255, Blocks.PINK_CONCRETE));
+        colorConfig.put("Red", new Color("Red", 255, 0, 0, Blocks.RED_CONCRETE));
+        colorConfig.put("Green", new Color("Green", 0, 255, 0, Blocks.LIME_CONCRETE));
+        colorConfig.put("Blue", new Color("Blue", 0, 0, 255, Blocks.BLUE_CONCRETE));
+        colorConfig.put("Orange", new Color("Orange", 255, 128, 0, Blocks.ORANGE_CONCRETE));
+        colorConfig.put("Teal", new Color("Teal", 0, 128, 255, Blocks.LIGHT_BLUE_CONCRETE));
+        colorConfig.put("Pink", new Color("Pink", 255, 0, 255, Blocks.PINK_CONCRETE));
     }
 
     public static class Color {
@@ -38,7 +38,7 @@ public class Colors {
             intValue = this.r << 16 | this.g << 8 | this.b;
         }
 
-        private final String name;
+        private String name;
         private final int intValue;
         private final int r;
         private final int g;
@@ -49,7 +49,6 @@ public class Colors {
         public String getName() {
             return name;
         }
-
         public int getR() {
             return r;
         }

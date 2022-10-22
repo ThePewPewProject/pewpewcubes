@@ -56,7 +56,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     private void init(CallbackInfo ci) {
 
         // Initialize team map
-        for (Colors.Color color : Colors.colorConfig) {
+        for (Colors.Color color : Colors.colorConfig.values()) {
             teamMap.put(color, new LinkedList<>());
         }
     }
@@ -77,7 +77,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         }
 
         // Teleport players
-        for (Colors.Color teamColor : Colors.colorConfig) {
+        for (Colors.Color teamColor : Colors.colorConfig.values()) {
             List<PlayerEntity> team = teamMap.get(teamColor);
 
             World world = ((MinecraftServer) (Object) this).getOverworld();
@@ -132,7 +132,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
 
         // Check if player is in a team already
         Colors.Color oldTeamColor = null;
-        for (Colors.Color c : Colors.colorConfig) {
+        for (Colors.Color c : Colors.colorConfig.values()) {
             if (teamMap.get(c).contains(player)) {
                 oldTeamColor = c;
                 break;
@@ -222,7 +222,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         final HashMap<String, List<Tuple<String, Integer>>> simplifiedTeamMap = new HashMap<>();
 
         // For each color
-        for (Colors.Color c : Colors.colorConfig) {
+        for (Colors.Color c : Colors.colorConfig.values()) {
             // Create a new list of (player name, player score) tuples
             List<Tuple<String, Integer>> playerDatas = new LinkedList<>();
 
@@ -267,7 +267,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         spawnpointCache = new HashMap<>();
 
         // Initialize team lists
-        for (Colors.Color team : Colors.colorConfig) {
+        for (Colors.Color team : Colors.colorConfig.values()) {
             spawnpointCache.put(team, new ArrayList<>());
         }
 
@@ -279,7 +279,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
 
         // Iterate over blocks and find spawnpoints
         world.fastSearchBlock((block, pos) -> {
-            for (Colors.Color color : Colors.colorConfig) {
+            for (Colors.Color color : Colors.colorConfig.values()) {
                 if (color.getSpawnpointBlock().equals(block)) {
                     var team = spawnpointCache.get(color);
                     synchronized (color) {
