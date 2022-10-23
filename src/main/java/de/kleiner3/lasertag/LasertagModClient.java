@@ -8,6 +8,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
+import net.minecraft.entity.player.PlayerEntity;
 import software.bernie.geckolib3.renderers.geo.GeoArmorRenderer;
 
 /**
@@ -34,6 +35,7 @@ public class LasertagModClient implements ClientModInitializer {
 
         // ===== Register color providers =====================
         ColorProviderRegistry.ITEM.register((stack, tintIdx) ->  {
+            // Team color
             if (stack.hasNbt()) {
                 return stack.getNbt().getInt("color");
             }
@@ -41,6 +43,7 @@ public class LasertagModClient implements ClientModInitializer {
             return 0xFFFFFF;
         }, LasertagMod.LASERTAG_WEAPON);
         ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
+            // Team color
             if (stack.hasNbt()) {
                 return stack.getNbt().getInt("color");
             }

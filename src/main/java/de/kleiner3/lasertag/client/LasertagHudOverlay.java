@@ -1,10 +1,14 @@
 package de.kleiner3.lasertag.client;
 
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.LinkedList;
 
 import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.util.DurationUtils;
 import de.kleiner3.lasertag.util.Tuple;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
@@ -19,6 +23,8 @@ import net.minecraft.server.MinecraftServer;
  * @author Étienne Muser
  */
 public class LasertagHudOverlay implements HudRenderCallback {
+
+    public static Duration gameTime = Duration.ofMinutes(LasertagConfig.playTime);
 
     /**
      * Simplified team map to map players and their score to their teams
@@ -100,7 +106,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
                     int memberY = y + 2 * textPadding + textHeight + 1;
                     for (Tuple<String, Integer> playerData : teamMap.get(teamColor.getName())) {
                         // Draw player name
-                        renderer.draw(matrixStack, playerData.x, textPadding, memberY, 0x00FFFFFF);
+                        renderer.draw(matrixStack, playerData.x, textPadding, memberY, 0xFFFFFF);
 
                         // Get the players score
                         Integer playerScore = playerData.y;
@@ -110,7 +116,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
                         // Draw the players score
                         String scoreString = Integer.toString(playerScore);
-                        renderer.draw(matrixStack, scoreString, boxWidth - textPadding - renderer.getWidth(scoreString), memberY, 0x00FFFFFF);
+                        renderer.draw(matrixStack, scoreString, boxWidth - textPadding - renderer.getWidth(scoreString), memberY, 0xFFFFFF);
 
                         // Offset to the next line
                         memberY += 2 * textPadding + textHeight - 2;
@@ -118,7 +124,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
                     // Draw team score
                     String scoreString = Integer.toString(teamScore);
-                    renderer.draw(matrixStack, scoreString, boxWidth - textPadding - renderer.getWidth(scoreString), y + textPadding, 0x00FFFFFF);
+                    renderer.draw(matrixStack, scoreString, boxWidth - textPadding - renderer.getWidth(scoreString), y + textPadding, 0xFFFFFF);
                 } else { // Draw teams on the right
                     // The height to start rendering this box at
                     int y = startY + (i - (numColors / 2)) * (boxHeight + margin);
@@ -133,7 +139,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
                     int memberY = y + 2 * textPadding + textHeight + 1;
                     for (Tuple<String, Integer> playerData : teamMap.get(teamColor.getName())) {
                         // Draw player name
-                        renderer.draw(matrixStack, playerData.x, width - textPadding - renderer.getWidth(playerData.x), memberY, 0x00FFFFFF);
+                        renderer.draw(matrixStack, playerData.x, width - textPadding - renderer.getWidth(playerData.x), memberY, 0xFFFFFF);
 
                         // Get the players score
                         Integer playerScore = playerData.y;
@@ -143,7 +149,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
                         // Draw the players score
                         String scoreString = Integer.toString(playerScore);
-                        renderer.draw(matrixStack, scoreString, width - boxWidth + textPadding, memberY, 0x00FFFFFF);
+                        renderer.draw(matrixStack, scoreString, width - boxWidth + textPadding, memberY, 0xFFFFFF);
 
                         // Offset to the next line
                         memberY += 2 * textPadding + textHeight - 2;
@@ -151,11 +157,16 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
                     // Draw team score
                     String scoreString = Integer.toString(teamScore);
-                    renderer.draw(matrixStack, scoreString, width - boxWidth + textPadding, y + textPadding, 0x00FFFFFF);
+                    renderer.draw(matrixStack, scoreString, width - boxWidth + textPadding, y + textPadding, 0xFFFFFF);
                 }
 
                 ++i;
             }
+        }
+
+        // If game time should be rendered
+        if (LasertagConfig.renderTimer) {
+            DrawableHelper.drawCenteredText(matrixStack, renderer, DurationUtils.toString(gameTime), wMid, 0, 0xFFFFFF);
         }
 
         // Draw progress bar

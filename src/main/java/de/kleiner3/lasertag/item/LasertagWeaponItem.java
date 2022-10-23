@@ -73,6 +73,12 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
         // Get the item stack
         var laserweaponStack = playerEntity.getStackInHand(hand);
 
+        // Check that player is active
+        if (playerEntity.isDeactivated()) {
+            playWeaponFailSound(playerEntity);
+            return TypedActionResult.fail(laserweaponStack);
+        }
+
         // Check if player wears vest as breastplate
         if (!(breastplate.getItem() instanceof LasertagVestItem)) {
             playWeaponFailSound(playerEntity);

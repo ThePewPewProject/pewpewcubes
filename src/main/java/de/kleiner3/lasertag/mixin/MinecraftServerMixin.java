@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.mixin;
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.lasertaggame.GameStats;
 import de.kleiner3.lasertag.lasertaggame.ILasertagGame;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
@@ -23,10 +24,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Interface injection into MinecraftServer to implement the lasertag game
@@ -35,8 +33,9 @@ import java.util.List;
  */
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin implements ILasertagGame {
+    @Shadow public abstract ServerWorld getOverworld();
 
-    @Shadow public abstract boolean isDebugRunning();
+    private GameStats lastGamesStats = null;
 
     private HashMap<Colors.Color, ArrayList<BlockPos>> spawnpointCache = null;
 
@@ -99,6 +98,18 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         // Start game
         isRunning = true;
         new Thread(() -> {
+            // Wait for game start cooldown
+            try {
+                Thread.sleep(LasertagConfig.startTime * 1000);
+            } catch (InterruptedException e) {}
+
+            // Activate every player
+            for (List<PlayerEntity> team : teamMap.values()) {
+                for (PlayerEntity player : team) {
+                    player.setDeactivated(false);
+                }
+            }
+
             for(int i = 0; i < LasertagConfig.playTime; i++) {
                 lasertagTick();
                 try {
@@ -180,11 +191,10 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             if (team.contains(player)) {
                 // Leave the team
                 team.remove(player);
+                notifyPlayersAboutUpdate();
                 return;
             }
         }
-
-        notifyPlayersAboutUpdate();
     }
 
     @Override
@@ -211,7 +221,24 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
      */
     private void lasertagGameOver() {
         isRunning = false;
-        // TODO
+
+        // Deactivate every player
+        for (List<PlayerEntity> team : teamMap.values()) {
+            for (PlayerEntity player : team) {
+                player.setDeactivated(true);
+            }
+        }
+
+        // Calculate stats
+        calcStats();
+
+        // Teleport players back to spawn
+        var spawn = getOverworld().getSpawnPos();
+        for (var team : teamMap.values()) {
+            for (var player : team) {
+                player.requestTeleport(spawn.getX() + 0.5F, spawn.getY(), spawn.getZ() + 0.5F);
+            }
+        }
     }
 
     /**
@@ -307,5 +334,34 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         long stopTime = System.nanoTime();
         double duration = (stopTime - startTime) / 1000000000.0F;
         LasertagMod.LOGGER.info("Spawnpoint search took " + duration + "s.");
+    }
+
+    private void calcStats() {
+        lastGamesStats = new GameStats();
+        for (Colors.Color teamColor : teamMap.keySet()) {
+            var team = teamMap.get(teamColor);
+            int teamScore = 0;
+
+            var playersOfThisTeam = new ArrayList<Tuple<PlayerEntity, Integer>>();
+            for (PlayerEntity player : team) {
+                int playerScore = player.getLasertagScore();
+                var playerScoreTuple = new Tuple<>(player, playerScore);
+                teamScore += playerScore;
+                lastGamesStats.playerScores.add(playerScoreTuple);
+                playersOfThisTeam.add(playerScoreTuple);
+            }
+
+            if (playersOfThisTeam.size() > 0) {
+                lastGamesStats.teamPlayerScores.put(teamColor, playersOfThisTeam);
+            }
+            lastGamesStats.teamScores.add(new Tuple<>(teamColor, teamScore));
+        }
+
+        // Sort stats
+        Collections.sort(lastGamesStats.teamScores, (a, b) -> (a.y - b.y));
+        Collections.sort(lastGamesStats.playerScores, (a, b) -> (a.y - b.y));
+        for (var team : lastGamesStats.teamPlayerScores.values()) {
+            Collections.sort(team, (a, b) -> (a.y - b.y));
+        }
     }
 }

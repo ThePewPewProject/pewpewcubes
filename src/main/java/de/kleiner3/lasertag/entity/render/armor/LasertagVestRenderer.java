@@ -63,10 +63,21 @@ public class LasertagVestRenderer extends GeoArmorRenderer<LasertagVestItem> {
             bodyBone.setPositionZ(contextModel.body.pivotZ);
         }
 
-        var color = ((LasertagVestItem)LasertagMod.LASERTAG_VEST).getColor(itemStack);
+        var color = ((LasertagVestItem) LasertagMod.LASERTAG_VEST).getColor(stack);
         float r = ((color >> 16) & 0xFF) / 255.0F;
         float g = ((color >> 8) & 0xFF) / 255.0F;
         float b = ((color >> 0) & 0xFF) / 255.0F;
+
+        if (entity instanceof PlayerEntity) {
+            PlayerEntity playerEntity = (PlayerEntity) entity;
+
+            if (playerEntity.isDeactivated()) {
+                r = 0;
+                g = 0;
+                b = 0;
+            }
+        }
+
         this.render(lightsModel, (LasertagVestItem) LasertagMod.LASERTAG_VEST, 1.0F, cameo, matrices, vertexConsumers, vertexConsumers.getBuffer(cameo), light, OverlayTexture.DEFAULT_UV, r, g, b, 1.0F);
         matrices.pop();
     }

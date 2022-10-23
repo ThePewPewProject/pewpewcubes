@@ -36,4 +36,17 @@ public interface ILasertagPlayer {
      */
     default public void onHitBy(PlayerEntity player) {
     }
+
+    /**
+     * @return If the player is currently deactivated
+     */
+    default public boolean isDeactivated() {
+        return true;
+    }
+
+    /**
+     * Sets if the player is deactivated
+     * @param deactivated
+     */
+    default public void setDeactivated(boolean deactivated) {}
 }

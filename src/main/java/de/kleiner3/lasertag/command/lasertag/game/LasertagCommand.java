@@ -136,7 +136,7 @@ public class LasertagCommand {
             // Get executing player
             var player = context.getSource().getPlayer();
 
-            // Join team
+            // Leave team
             server.playerLeaveHisTeam(player);
 
             // Clear inventory

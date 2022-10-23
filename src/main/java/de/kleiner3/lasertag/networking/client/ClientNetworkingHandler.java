@@ -1,12 +1,12 @@
 package de.kleiner3.lasertag.networking.client;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.time.Duration;
+import java.util.*;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.client.LasertagHudOverlay;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
@@ -146,12 +146,27 @@ public class ClientNetworkingHandler {
             LasertagHudOverlay.progress = 0.0;
 
             new Thread(() -> {
-                for (LasertagHudOverlay.startingIn = 10; LasertagHudOverlay.startingIn >= 0; --LasertagHudOverlay.startingIn) {
+                for (LasertagHudOverlay.startingIn = LasertagConfig.startTime; LasertagHudOverlay.startingIn >= 0; --LasertagHudOverlay.startingIn) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                     }
                 }
+
+                var timer = new Timer();
+                timer.scheduleAtFixedRate(new TimerTask() {
+                                              @Override
+                                              public void run() {
+                                                  if (LasertagHudOverlay.gameTime.getSeconds() == 0) {
+                                                      timer.cancel();
+                                                      LasertagHudOverlay.gameTime = Duration.ofMinutes(LasertagConfig.playTime);
+                                                      return;
+                                                  }
+
+                                                  LasertagHudOverlay.gameTime = LasertagHudOverlay.gameTime.minusSeconds(1);
+                                              }
+                                          }
+                , 0, 1000);
             }).start();
         }
 

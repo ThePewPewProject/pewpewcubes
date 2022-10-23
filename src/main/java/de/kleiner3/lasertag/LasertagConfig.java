@@ -20,8 +20,18 @@ public class LasertagConfig {
     public static boolean renderTimer = true;
     public static int lasertargetHitScore = 100;
     public static int playerHitScore = 20;
+
+    /**
+     * The time in seconds from when you are teleported into the arena to when the game actually starts in seconds
+     */
+    public static int startTime = 15;
+    /**
+     * The time the player is deactivated after being hit in seconds
+     */
+    public static int deactivateTime = 15;
+
     /**
      * The play time in minutes
      */
-    public static int playTime = 10;
+    public static int playTime = 1;
 }

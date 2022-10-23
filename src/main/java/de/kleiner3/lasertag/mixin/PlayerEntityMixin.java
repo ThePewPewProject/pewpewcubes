@@ -26,6 +26,8 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
      */
     private int score = 0;
 
+    private boolean isDeactivated = true;
+
     @Override
     public int getLasertagScore() {
         return score;
@@ -61,11 +63,34 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
 
         // TODO: Check that hit player is not in same team as firing player
 
+        this.deactivate();
+
         // Get the server
         MinecraftServer server = player.getServer();
         if (server != null) {
             server.onPlayerScored(player, LasertagConfig.playerHitScore);
             ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) player);
         }
+    }
+
+    @Override
+    public boolean isDeactivated() {
+        return isDeactivated;
+    }
+
+    @Override
+    public void setDeactivated(boolean deactivated) {
+        this.isDeactivated = deactivated;
+    }
+
+    private void deactivate() {
+        isDeactivated = true;
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000 * LasertagConfig.deactivateTime);
+            } catch (InterruptedException e) {}
+
+            isDeactivated = false;
+        }).start();
     }
 }
