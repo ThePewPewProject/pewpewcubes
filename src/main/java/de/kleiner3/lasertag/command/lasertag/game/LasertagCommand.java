@@ -7,9 +7,16 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.command.suggestions.TeamSuggestionProvider;
+import de.kleiner3.lasertag.item.LasertagVestItem;
+import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.types.Colors;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.util.collection.DefaultedList;
 
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
 import static com.mojang.brigadier.arguments.StringArgumentType.word;
@@ -25,9 +32,10 @@ public class LasertagCommand {
         var cmd = literal("lasertag")
                 .executes(ctx -> execute(ctx));
 
-        RenderHudSetting.register(cmd);
+        //RenderHudSetting.register(cmd);
         StartGame.register(cmd);
         JoinTeam.register(cmd);
+        LeaveTeam.register(cmd);
 
         dispatcher.register(cmd);
     }
@@ -48,6 +56,7 @@ public class LasertagCommand {
     private class StartGame {
         /**
          * Execute the start lasertag command
+         *
          * @param context
          * @param scanSpawnpoints
          * @return
@@ -59,6 +68,7 @@ public class LasertagCommand {
 
         /**
          * Execute the start lasertag command without searching for spawnpoint blocks
+         *
          * @param context
          * @return
          */
@@ -91,6 +101,22 @@ public class LasertagCommand {
             // Join team
             server.playerJoinTeam(teamColor, player);
 
+            // Get players inventory
+            var inventory = player .getInventory();
+
+            // Clear players inventory
+            inventory.clear();
+
+            // Give player a lasertag vest
+            var vestStack = new ItemStack(LasertagMod.LASERTAG_VEST);
+            ((LasertagVestItem)LasertagMod.LASERTAG_VEST).setColor(vestStack, teamColor.getValue());
+            player.equipStack(EquipmentSlot.CHEST, vestStack);
+
+            // Give player a lasertag weapon
+            var weaponStack = new ItemStack(LasertagMod.LASERTAG_WEAPON);
+            ((LasertagWeaponItem)LasertagMod.LASERTAG_WEAPON).setColor(weaponStack, teamColor.getValue());
+            inventory.setStack(0, weaponStack);
+
             return Command.SINGLE_SUCCESS;
         }
 
@@ -102,5 +128,26 @@ public class LasertagCommand {
         }
     }
 
-    private class LeaveTeam {}
+    private class LeaveTeam {
+        private static int execute(CommandContext<ServerCommandSource> context) {
+            // Get the server
+            var server = context.getSource().getServer();
+
+            // Get executing player
+            var player = context.getSource().getPlayer();
+
+            // Join team
+            server.playerLeaveHisTeam(player);
+
+            // Clear inventory
+            player.getInventory().clear();
+
+            return Command.SINGLE_SUCCESS;
+        }
+
+        private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+            lab.then(literal("leaveTeam")
+                    .executes(ctx -> execute(ctx)));
+        }
+    }
 }

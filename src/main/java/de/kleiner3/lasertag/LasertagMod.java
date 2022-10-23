@@ -23,6 +23,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Rarity;
 import net.minecraft.util.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,8 +60,8 @@ public class LasertagMod implements ModInitializer {
 
 
     // Create instances for all items
-    public static final Item LASERTAG_WEAPON = new LasertagWeaponItem(new FabricItemSettings().group(LASERTAG_ITEM_GROUP).maxCount(1));
-    public static final Item LASERTAG_VEST = new LasertagVestItem(ArmorMaterials.LEATHER, new FabricItemSettings().group(LASERTAG_ITEM_GROUP));
+    public static final Item LASERTAG_WEAPON = new LasertagWeaponItem(new FabricItemSettings().group(LASERTAG_ITEM_GROUP).maxCount(1).rarity(Rarity.EPIC));
+    public static final Item LASERTAG_VEST = new LasertagVestItem(ArmorMaterials.LEATHER, new FabricItemSettings().group(LASERTAG_ITEM_GROUP).rarity(Rarity.EPIC));
 
     // Register all entities
     public static final EntityType<LaserRayEntity> LASER_RAY = Registry.register(
