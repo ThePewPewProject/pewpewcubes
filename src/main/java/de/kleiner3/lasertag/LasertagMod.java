@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag;
 
 import de.kleiner3.lasertag.block.LaserTargetBlock;
+import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.command.CommandInitializer;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.item.LasertagItemGroupBuilder;
@@ -10,11 +11,13 @@ import de.kleiner3.lasertag.types.Colors;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.PressurePlateBlock;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -57,7 +60,11 @@ public class LasertagMod implements ModInitializer {
     public static final Block LASER_TARGET = new LaserTargetBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f).luminance(2));
 
     // Create instances for all block entities
-
+    public static final BlockEntityType<LaserTargetBlockEntity> LASER_TARGET_ENTITY = Registry.register(
+            Registry.BLOCK_ENTITY_TYPE,
+            new Identifier(ID, "lasertarget_entity"),
+            FabricBlockEntityTypeBuilder.create(LaserTargetBlockEntity::new, LASER_TARGET).build()
+    );
 
     // Create instances for all items
     public static final Item LASERTAG_WEAPON = new LasertagWeaponItem(new FabricItemSettings().group(LASERTAG_ITEM_GROUP).maxCount(1).rarity(Rarity.EPIC));

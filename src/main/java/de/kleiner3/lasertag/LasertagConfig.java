@@ -31,7 +31,12 @@ public class LasertagConfig {
     public static int deactivateTime = 15;
 
     /**
+     * The time in seconds a lasertarget will be deactivated for after being hit
+     */
+    public static int lasertargetDeactivatedTime = 10;
+
+    /**
      * The play time in minutes
      */
-    public static int playTime = 1;
+    public static int playTime = 10;
 }

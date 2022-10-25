@@ -117,7 +117,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
 
                 // Cast to lasertarget block and trigger onHit
                 LaserTargetBlock laserTarget = (LaserTargetBlock) block;
-                laserTarget.onHitBy(playerEntity);
+                laserTarget.onHitBy(playerEntity, world.getBlockEntity(blockPos));
                 break;
 
             case ENTITY:
