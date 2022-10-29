@@ -1,8 +1,10 @@
 package de.kleiner3.lasertag.command.lasertag.game;
 
+import com.google.gson.GsonBuilder;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -13,15 +15,15 @@ import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.types.Colors;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.text.Text;
 
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
 import static com.mojang.brigadier.arguments.StringArgumentType.word;
-import static net.minecraft.server.command.CommandManager.literal;
+import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 import static net.minecraft.server.command.CommandManager.argument;
+import static net.minecraft.server.command.CommandManager.literal;
 
 public class LasertagCommand {
     private static int execute(CommandContext<ServerCommandSource> context) {
@@ -36,23 +38,177 @@ public class LasertagCommand {
         StartGame.register(cmd);
         JoinTeam.register(cmd);
         LeaveTeam.register(cmd);
-
-        // TODO: Replace by command group "Settings":
-        RenderHudSetting.register(cmd);
+        LasertagSettings.register(cmd);
 
         dispatcher.register(cmd);
     }
 
-    private class RenderHudSetting {
+    private class LasertagSettings {
         private static int execute(CommandContext<ServerCommandSource> context) {
-            LasertagConfig.getInstance().setRenderTeamList(context.getSource().getServer(), BoolArgumentType.getBool(context, "value"));
+            context.getSource().sendFeedback(Text.literal(new GsonBuilder().setPrettyPrinting().create().toJson(LasertagConfig.getInstance())), false);
             return Command.SINGLE_SUCCESS;
         }
-
         private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
-            lab.then(literal("renderTeamList")
-                    .then(argument("value", bool())
-                            .executes(ctx -> execute(ctx))));
+            var cmd = literal("settings")
+                    .requires(s -> s.hasPermissionLevel(4))
+                    .executes(ctx -> execute(ctx));
+
+            RenderTeamListSetting.register(cmd);
+            RenderTimerSetting.register(cmd);
+            GameDurationSetting.register(cmd);
+            LasertargetHitScoreSetting.register(cmd);
+            PlayerHitScoreSetting.register(cmd);
+            ShowLaserRaysSetting.register(cmd);
+            PreGameCooldownSetting.register(cmd);
+            PlayerDeactivateDurationSetting.register(cmd);
+            LasertargetDeactivateDurationSetting.register(cmd);
+            LasertagWeaponUseCooldownSetting.register(cmd);
+            LasertagWeaponReachSetting.register(cmd);
+
+            lab.then(cmd);
+        }
+
+        private class RenderTeamListSetting {
+            private static int execute(CommandContext<ServerCommandSource> context) {
+                LasertagConfig.getInstance().setRenderTeamList(context.getSource().getServer(), BoolArgumentType.getBool(context, "value"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+                lab.then(literal("renderTeamList")
+                        .then(argument("value", bool())
+                                .executes(ctx -> execute(ctx))));
+            }
+        }
+
+        private class RenderTimerSetting {
+            private static int execute(CommandContext<ServerCommandSource> context) {
+                LasertagConfig.getInstance().setRenderTimer(context.getSource().getServer(), BoolArgumentType.getBool(context, "value"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+                lab.then(literal("renderTimer")
+                        .then(argument("value", bool())
+                                .executes(ctx -> execute(ctx))));
+            }
+        }
+
+        private class GameDurationSetting {
+            private static int execute(CommandContext<ServerCommandSource> context) {
+                LasertagConfig.getInstance().setPlayTime(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "duration"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+                lab.then(literal("gameDuration")
+                        .then(argument("duration", integer(1))
+                                .executes(ctx -> execute(ctx))));
+            }
+        }
+
+        private class LasertargetHitScoreSetting {
+            private static int execute(CommandContext<ServerCommandSource> context) {
+                LasertagConfig.getInstance().setLasertargetHitScore(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "score"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+                lab.then(literal("lasertargetHitScore")
+                        .then(argument("score", integer())
+                                .executes(ctx -> execute(ctx))));
+            }
+        }
+
+        private class PlayerHitScoreSetting {
+            private static int execute(CommandContext<ServerCommandSource> context) {
+                LasertagConfig.getInstance().setPlayerHitScore(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "score"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+                lab.then(literal("playerHitScore")
+                        .then(argument("score", integer())
+                                .executes(ctx -> execute(ctx))));
+            }
+        }
+
+        private class ShowLaserRaysSetting {
+            private static int execute(CommandContext<ServerCommandSource> context) {
+                LasertagConfig.getInstance().setShowLaserRays(context.getSource().getServer(), BoolArgumentType.getBool(context, "value"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+                lab.then(literal("showLaserRays")
+                        .then(argument("value", bool())
+                                .executes(ctx -> execute(ctx))));
+            }
+        }
+
+        private class PreGameCooldownSetting {
+            private static int execute(CommandContext<ServerCommandSource> context) {
+                LasertagConfig.getInstance().setStartTime(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "duration"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+                lab.then(literal("preGameCountdownDuration")
+                        .then(argument("duration", integer(0))
+                                .executes(ctx -> execute(ctx))));
+            }
+        }
+
+        private class PlayerDeactivateDurationSetting {
+            private static int execute(CommandContext<ServerCommandSource> context) {
+                LasertagConfig.getInstance().setDeactivateTime(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "duration"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+                lab.then(literal("playerDeactivateDuration")
+                        .then(argument("duration", integer(0))
+                                .executes(ctx -> execute(ctx))));
+            }
+        }
+
+        private class LasertargetDeactivateDurationSetting {
+            private static int execute(CommandContext<ServerCommandSource> context) {
+                LasertagConfig.getInstance().setLasertargetDeactivatedTime(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "duration"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+                lab.then(literal("lasertargetDeactivateDuration")
+                        .then(argument("duration", integer(0))
+                                .executes(ctx -> execute(ctx))));
+            }
+        }
+
+        private class LasertagWeaponUseCooldownSetting {
+            private static int execute(CommandContext<ServerCommandSource> context) {
+                LasertagConfig.getInstance().setLasertagWeaponCooldown(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "ticks"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+                lab.then(literal("lasertagWeaponUseCooldown")
+                        .then(argument("ticks", integer(0))
+                                .executes(ctx -> execute(ctx))));
+            }
+        }
+
+        private class LasertagWeaponReachSetting {
+            private static int execute(CommandContext<ServerCommandSource> context) {
+                LasertagConfig.getInstance().setLasertagWeaponReach(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "distance"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+                lab.then(literal("lasertagWeaponReach")
+                        .then(argument("distance", integer(0))
+                                .executes(ctx -> execute(ctx))));
+            }
         }
     }
 
@@ -81,6 +237,7 @@ public class LasertagCommand {
 
         private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
             lab.then(literal("startLasertagGame")
+                    .requires(s -> s.hasPermissionLevel(1))
                     .executes(ctx -> execute(ctx))
                     .then(literal("scanSpawnpoints")
                             .executes(ctx -> execute(ctx, true))));

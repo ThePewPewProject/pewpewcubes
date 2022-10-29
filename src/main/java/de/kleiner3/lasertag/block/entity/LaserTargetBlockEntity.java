@@ -107,6 +107,7 @@ public class LaserTargetBlockEntity extends BlockEntity {
     }
 
     private boolean alreadyHit(PlayerEntity p) {
+        // TODO: Player can hit target twice
         var uuid = p.getUuid();
 
         for (int i = 0; i < hitBy.size(); i += 2) {
@@ -117,4 +118,6 @@ public class LaserTargetBlockEntity extends BlockEntity {
 
         return false;
     }
+
+    // TODO: Reset already hit by after game stop
 }
