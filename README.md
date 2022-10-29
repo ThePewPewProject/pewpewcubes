@@ -20,4 +20,4 @@ Meet us on our [Discord Server](https://discord.gg/SPbV8P2kHN) or watch us devel
 
 ## Installation
 
-For an installation guide look no further than [our wiki](https://github.com/efibs/mc-lasertag-mod/wiki/Installation-Guide)
+For an installation guide look no further than [our wiki](https://github.com/efibs/mc-lasertag-mod/wiki/Installation-Guide).
