@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.client;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.*;
 
@@ -7,16 +8,19 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.LasertagHudOverlay;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.util.ConverterUtil;
 import de.kleiner3.lasertag.util.Tuple;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Style;
@@ -48,6 +52,7 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_PLAYER_SCORED_SOUND, Callbacks::handlePlayerScoredSoundEvent);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_STARTED, Callbacks::handleLasertagGameStarted);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PROGRESS, Callbacks::handleProgress);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_SETTINGS_CHANGED, Callbacks::handleLasertagSettingsChanged);
     }
 
     /**
@@ -146,7 +151,7 @@ public class ClientNetworkingHandler {
             LasertagHudOverlay.progress = 0.0;
 
             new Thread(() -> {
-                for (LasertagHudOverlay.startingIn = LasertagConfig.startTime; LasertagHudOverlay.startingIn >= 0; --LasertagHudOverlay.startingIn) {
+                for (LasertagHudOverlay.startingIn = LasertagConfig.getInstance().getStartTime(); LasertagHudOverlay.startingIn >= 0; --LasertagHudOverlay.startingIn) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -159,7 +164,7 @@ public class ClientNetworkingHandler {
                                               public void run() {
                                                   if (LasertagHudOverlay.gameTime.getSeconds() == 0) {
                                                       timer.cancel();
-                                                      LasertagHudOverlay.gameTime = Duration.ofMinutes(LasertagConfig.playTime);
+                                                      LasertagHudOverlay.gameTime = Duration.ofMinutes(LasertagConfig.getInstance().getPlayTime());
                                                       return;
                                                   }
 
@@ -175,6 +180,32 @@ public class ClientNetworkingHandler {
                                           PacketByteBuf buf,
                                           PacketSender responseSender) {
             LasertagHudOverlay.progress = buf.readDouble();
+        }
+
+        public static void handleLasertagSettingsChanged(MinecraftClient client,
+                                          ClientPlayNetworkHandler handler,
+                                          PacketByteBuf buf,
+                                          PacketSender responseSender) {
+            // Read from buffer
+            var methodName = buf.readString();
+            var value = buf.readString();
+
+            // Convert to primitive type
+            var primitive = ConverterUtil.stringToPrimitiveType(value);
+
+            try {
+                // Get correct setter method via reflection
+                var setter = LasertagConfig.class.getMethod(methodName, MinecraftServer.class, primitive.getClass());
+
+                // Invoke setter method
+                setter.invoke(LasertagConfig.getInstance(), null, primitive);
+            } catch (NoSuchMethodException e) {
+                LasertagMod.LOGGER.error("Couldn't update lasertag config on client side. Setter not found: " + e.getMessage());
+            } catch (InvocationTargetException e) {
+                LasertagMod.LOGGER.error("Couldn't update lasertag config on client side. Setter could not be invoked: " + e.getMessage());
+            } catch (IllegalAccessException e) {
+                LasertagMod.LOGGER.error("Couldn't update lasertag config on client side. Setter illegal access: " + e.getMessage());
+            }
         }
     }
 }

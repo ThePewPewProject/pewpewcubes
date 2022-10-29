@@ -24,7 +24,7 @@ import net.minecraft.server.MinecraftServer;
  */
 public class LasertagHudOverlay implements HudRenderCallback {
 
-    public static Duration gameTime = Duration.ofMinutes(LasertagConfig.playTime);
+    public static Duration gameTime = Duration.ofMinutes(LasertagConfig.getInstance().getPlayTime());
 
     /**
      * Simplified team map to map players and their score to their teams
@@ -84,7 +84,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
         int height = client.getWindow().getScaledHeight();
         int hMid = height / 2;
 
-        if (LasertagConfig.renderTeamList) {
+        if (LasertagConfig.getInstance().isRenderTeamList()) {
             // Iteration index
             int i = 0;
             for (Colors.Color teamColor : Colors.colorConfig.values()) {
@@ -165,7 +165,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
         }
 
         // If game time should be rendered
-        if (LasertagConfig.renderTimer) {
+        if (LasertagConfig.getInstance().isRenderTimer()) {
             DrawableHelper.drawCenteredText(matrixStack, renderer, DurationUtils.toString(gameTime), wMid, textPadding, 0xFFFFFF);
         }
 

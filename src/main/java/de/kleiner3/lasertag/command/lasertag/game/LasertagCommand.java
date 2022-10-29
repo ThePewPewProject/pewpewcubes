@@ -37,12 +37,15 @@ public class LasertagCommand {
         JoinTeam.register(cmd);
         LeaveTeam.register(cmd);
 
+        // TODO: Replace by command group "Settings":
+        RenderHudSetting.register(cmd);
+
         dispatcher.register(cmd);
     }
 
     private class RenderHudSetting {
         private static int execute(CommandContext<ServerCommandSource> context) {
-            LasertagConfig.renderTeamList = BoolArgumentType.getBool(context, "value");
+            LasertagConfig.getInstance().setRenderTeamList(context.getSource().getServer(), BoolArgumentType.getBool(context, "value"));
             return Command.SINGLE_SUCCESS;
         }
 

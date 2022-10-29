@@ -68,7 +68,7 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
         // Get the server
         MinecraftServer server = player.getServer();
         if (server != null) {
-            server.onPlayerScored(player, LasertagConfig.playerHitScore);
+            server.onPlayerScored(player, LasertagConfig.getInstance().getPlayerHitScore());
             ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) player);
         }
     }
@@ -87,7 +87,7 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
         isDeactivated = true;
         new Thread(() -> {
             try {
-                Thread.sleep(1000 * LasertagConfig.deactivateTime);
+                Thread.sleep(1000 * LasertagConfig.getInstance().getDeactivateTime());
             } catch (InterruptedException e) {}
 
             isDeactivated = false;

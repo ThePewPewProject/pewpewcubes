@@ -45,14 +45,14 @@ public class LaserTargetBlockEntity extends BlockEntity {
             return;
         }
 
-        server.onPlayerScored(playerEntity, LasertagConfig.lasertargetHitScore);
+        server.onPlayerScored(playerEntity, LasertagConfig.getInstance().getLasertargetHitScore());
         ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) playerEntity);
 
         // Deactivate
         deactivated = true;
         new Thread(() -> {
             try {
-                Thread.sleep(LasertagConfig.lasertargetDeactivatedTime * 1000);
+                Thread.sleep(LasertagConfig.getInstance().getLasertargetDeactivatedTime() * 1000);
             } catch (InterruptedException e) {}
 
             deactivated = false;

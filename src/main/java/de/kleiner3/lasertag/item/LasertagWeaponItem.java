@@ -56,13 +56,13 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
 
     @Override
     public int getRange() {
-        return LasertagConfig.lasertagWeaponReach;
+        return LasertagConfig.getInstance().getLasertagWeaponReach();
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
         // Apply cooldown
-        playerEntity.getItemCooldownManager().set(this, LasertagConfig.lasertagWeaponCooldown);
+        playerEntity.getItemCooldownManager().set(this, LasertagConfig.getInstance().getLasertagWeaponCooldown());
 
         // Get all armor pieces of the player
         DefaultedList<ItemStack> armorPieces = (DefaultedList<ItemStack>) playerEntity.getArmorItems();
@@ -95,7 +95,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
         playWeaponFireSound(playerEntity);
 
         // Raycast the crosshair
-        HitResult hit = RaycastUtil.raycastCrosshair(playerEntity, LasertagConfig.lasertagWeaponReach);
+        HitResult hit = RaycastUtil.raycastCrosshair(playerEntity, LasertagConfig.getInstance().getLasertagWeaponReach());
 
         switch (hit.getType()) {
             // If a block was hit
@@ -140,7 +140,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
         }
 
         // Spawn laser ray entity
-        if (LasertagConfig.showLaserRays) {
+        if (LasertagConfig.getInstance().isShowLaserRays()) {
             LaserRayEntity ray = new LaserRayEntity(world, playerEntity, color, hit);
             world.spawnEntity(ray);
 

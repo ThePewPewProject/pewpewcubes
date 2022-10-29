@@ -14,7 +14,6 @@ public class NetworkingConstants {
 
     // ===== Lasertag game ==========
     public static final Identifier LASERTAG_GAME_TEAM_OR_SCORE_UPDATE = new Identifier(LasertagMod.ID, "lasertag_game_team_or_score_update");
-    // TODO: Send and recieve settings changed
     public static final Identifier LASERTAG_SETTINGS_CHANGED = new Identifier(LasertagMod.ID, "lasertag_settings_changed");
 
 

@@ -100,7 +100,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         new Thread(() -> {
             // Wait for game start cooldown
             try {
-                Thread.sleep(LasertagConfig.startTime * 1000);
+                Thread.sleep(LasertagConfig.getInstance().getStartTime() * 1000);
             } catch (InterruptedException e) {}
 
             // Activate every player
@@ -110,7 +110,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
                 }
             }
 
-            for(int i = 0; i < LasertagConfig.playTime; i++) {
+            for(int i = 0; i < LasertagConfig.getInstance().getPlayTime(); i++) {
                 lasertagTick();
                 try {
                     Thread.sleep(1000 * 60);
@@ -133,7 +133,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     @Override
     public void playerJoinTeam(Colors.Color newTeamColor, PlayerEntity player) {
         // Check if team is full
-        if (teamMap.get(newTeamColor).size() >= LasertagConfig.maxTeamSize) {
+        if (teamMap.get(newTeamColor).size() >= LasertagConfig.getInstance().getMaxTeamSize()) {
             // If is Server
             if (player instanceof ServerPlayerEntity) {
                 ServerEventSending.sendErrorMessageToClient((ServerPlayerEntity) player, "Team " + newTeamColor.getName() + " is full.");
