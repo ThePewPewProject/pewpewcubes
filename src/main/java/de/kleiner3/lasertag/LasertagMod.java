@@ -10,6 +10,7 @@ import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.types.Colors;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -108,5 +109,6 @@ public class LasertagMod implements ModInitializer {
         CommandInitializer.initCommands();
 
         // ===== Listen to events ======================
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> LasertagConfig.syncToPlayer(handler.getPlayer()));
     }
 }

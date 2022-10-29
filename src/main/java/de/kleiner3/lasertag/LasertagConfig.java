@@ -1,18 +1,16 @@
 package de.kleiner3.lasertag;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.util.FileIO;
 import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.dedicated.MinecraftDedicatedServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.io.File;
 import java.io.IOException;
@@ -171,11 +169,30 @@ public class LasertagConfig {
         return instance;
     }
 
+    public static void setInstance(LasertagConfig inst) {
+        instance = inst;
+    }
+
+    public static void syncToPlayer(ServerPlayerEntity player) {
+        // Serialize to json
+        var json = new Gson().toJson(instance);
+
+        // Create packet buffer
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+
+        // Write errorMessage to buffer
+        buf.writeString(json);
+
+        // Send to all clients
+        ServerPlayNetworking.send(player, NetworkingConstants.LASERTAG_SETTINGS_SYNC, buf);
+    }
+
     /**
      * Persist the config changes to the file system.
+     *
      * @param server The server this is executed on. null if on the client
-     * @param key The name of the setter method which executes the persist method
-     * @param value The new value of the setting as a string
+     * @param key    The name of the setter method which executes the persist method
+     * @param value  The new value of the setting as a string
      */
     private static void persist(MinecraftServer server, String key, String value) {
         // Check if this is executed on client

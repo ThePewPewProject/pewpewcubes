@@ -1,18 +1,12 @@
 package de.kleiner3.lasertag.networking.client;
 
-import java.lang.reflect.InvocationTargetException;
-import java.time.Duration;
-import java.util.*;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.LasertagHudOverlay;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
-import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.ConverterUtil;
 import de.kleiner3.lasertag.util.Tuple;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -27,8 +21,10 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.thread.TaskQueue;
-import org.apache.commons.compress.harmony.pack200.NewAttributeBands;
+
+import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
+import java.util.*;
 
 /**
  * Class to handle all networking on the client
@@ -53,6 +49,7 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_STARTED, Callbacks::handleLasertagGameStarted);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PROGRESS, Callbacks::handleProgress);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_SETTINGS_CHANGED, Callbacks::handleLasertagSettingsChanged);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_SETTINGS_SYNC, Callbacks::handleLasertagSettingsSync);
     }
 
     /**
@@ -171,7 +168,7 @@ public class ClientNetworkingHandler {
                                                   LasertagHudOverlay.gameTime = LasertagHudOverlay.gameTime.minusSeconds(1);
                                               }
                                           }
-                , 0, 1000);
+                        , 0, 1000);
             }).start();
         }
 
@@ -183,9 +180,9 @@ public class ClientNetworkingHandler {
         }
 
         public static void handleLasertagSettingsChanged(MinecraftClient client,
-                                          ClientPlayNetworkHandler handler,
-                                          PacketByteBuf buf,
-                                          PacketSender responseSender) {
+                                                         ClientPlayNetworkHandler handler,
+                                                         PacketByteBuf buf,
+                                                         PacketSender responseSender) {
             // Read from buffer
             var methodName = buf.readString();
             var value = buf.readString();
@@ -206,6 +203,17 @@ public class ClientNetworkingHandler {
             } catch (IllegalAccessException e) {
                 LasertagMod.LOGGER.error("Couldn't update lasertag config on client side. Setter illegal access: " + e.getMessage());
             }
+        }
+
+        public static void handleLasertagSettingsSync(MinecraftClient client,
+                                                      ClientPlayNetworkHandler handler,
+                                                      PacketByteBuf buf,
+                                                      PacketSender responseSender) {
+            // Get json string
+            var jsonString = buf.readString();
+
+            // Set config
+            LasertagConfig.setInstance(new Gson().fromJson(jsonString, LasertagConfig.class));
         }
     }
 }
