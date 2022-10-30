@@ -107,10 +107,9 @@ public class LaserTargetBlockEntity extends BlockEntity {
     }
 
     private boolean alreadyHit(PlayerEntity p) {
-        // TODO: Player can hit target twice
         var uuid = p.getUuid();
 
-        for (int i = 0; i < hitBy.size(); i += 2) {
+        for (int i = 0; i < hitBy.size(); ++i) {
             if (hitBy.get(i).equals(new Tuple<>(uuid.getLeastSignificantBits(), uuid.getMostSignificantBits()))) {
                 return true;
             }
