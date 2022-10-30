@@ -22,6 +22,7 @@ import net.minecraft.util.math.Vec3d;
  * @author Étienne Muser
  */
 public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
+    // TODO: Laser ray gets culled when origin is off screen or too far away
 
     public static final Identifier BEAM_TEXTURE = new Identifier("textures/entity/beacon_beam.png");
 

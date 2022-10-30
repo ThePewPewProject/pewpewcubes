@@ -70,7 +70,9 @@ public class LasertagCommand {
 
         private class RenderTeamListSetting {
             private static int execute(CommandContext<ServerCommandSource> context) {
-                LasertagConfig.getInstance().setRenderTeamList(context.getSource().getServer(), BoolArgumentType.getBool(context, "value"));
+                var value = BoolArgumentType.getBool(context, "value");
+                LasertagConfig.getInstance().setRenderTeamList(context.getSource().getServer(), value);
+                context.getSource().getServer().getPlayerManager().broadcast(Text.literal("Lasertag setting renderTeamList is now set to " + value), false);
                 return Command.SINGLE_SUCCESS;
             }
 
@@ -83,7 +85,9 @@ public class LasertagCommand {
 
         private class RenderTimerSetting {
             private static int execute(CommandContext<ServerCommandSource> context) {
-                LasertagConfig.getInstance().setRenderTimer(context.getSource().getServer(), BoolArgumentType.getBool(context, "value"));
+                var value = BoolArgumentType.getBool(context, "value");
+                LasertagConfig.getInstance().setRenderTimer(context.getSource().getServer(), value);
+                context.getSource().getServer().getPlayerManager().broadcast(Text.literal("Lasertag setting renderTimer is now set to " + value), false);
                 return Command.SINGLE_SUCCESS;
             }
 
@@ -96,7 +100,9 @@ public class LasertagCommand {
 
         private class GameDurationSetting {
             private static int execute(CommandContext<ServerCommandSource> context) {
-                LasertagConfig.getInstance().setPlayTime(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "duration"));
+                var value = IntegerArgumentType.getInteger(context, "duration");
+                LasertagConfig.getInstance().setPlayTime(context.getSource().getServer(), value);
+                context.getSource().getServer().getPlayerManager().broadcast(Text.literal("Lasertag setting gameDuration is now set to " + value), false);
                 return Command.SINGLE_SUCCESS;
             }
 
@@ -109,7 +115,9 @@ public class LasertagCommand {
 
         private class LasertargetHitScoreSetting {
             private static int execute(CommandContext<ServerCommandSource> context) {
-                LasertagConfig.getInstance().setLasertargetHitScore(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "score"));
+                var value = IntegerArgumentType.getInteger(context, "score");
+                LasertagConfig.getInstance().setLasertargetHitScore(context.getSource().getServer(), value);
+                context.getSource().getServer().getPlayerManager().broadcast(Text.literal("Lasertag setting lasertargetHitScore is now set to " + value), false);
                 return Command.SINGLE_SUCCESS;
             }
 
@@ -122,7 +130,9 @@ public class LasertagCommand {
 
         private class PlayerHitScoreSetting {
             private static int execute(CommandContext<ServerCommandSource> context) {
-                LasertagConfig.getInstance().setPlayerHitScore(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "score"));
+                var value = IntegerArgumentType.getInteger(context, "score");
+                LasertagConfig.getInstance().setPlayerHitScore(context.getSource().getServer(), value);
+                context.getSource().getServer().getPlayerManager().broadcast(Text.literal("Lasertag setting playerHitScore is now set to " + value), false);
                 return Command.SINGLE_SUCCESS;
             }
 
@@ -135,7 +145,9 @@ public class LasertagCommand {
 
         private class ShowLaserRaysSetting {
             private static int execute(CommandContext<ServerCommandSource> context) {
-                LasertagConfig.getInstance().setShowLaserRays(context.getSource().getServer(), BoolArgumentType.getBool(context, "value"));
+                var value = BoolArgumentType.getBool(context, "value");
+                LasertagConfig.getInstance().setShowLaserRays(context.getSource().getServer(), value);
+                context.getSource().getServer().getPlayerManager().broadcast(Text.literal("Lasertag setting showLaserRays is now set to " + value), false);
                 return Command.SINGLE_SUCCESS;
             }
 
@@ -148,7 +160,9 @@ public class LasertagCommand {
 
         private class PreGameCooldownSetting {
             private static int execute(CommandContext<ServerCommandSource> context) {
-                LasertagConfig.getInstance().setStartTime(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "duration"));
+                var value = IntegerArgumentType.getInteger(context, "duration");
+                LasertagConfig.getInstance().setStartTime(context.getSource().getServer(), value);
+                context.getSource().getServer().getPlayerManager().broadcast(Text.literal("Lasertag setting preGameCooldown is now set to " + value), false);
                 return Command.SINGLE_SUCCESS;
             }
 
@@ -161,7 +175,9 @@ public class LasertagCommand {
 
         private class PlayerDeactivateDurationSetting {
             private static int execute(CommandContext<ServerCommandSource> context) {
-                LasertagConfig.getInstance().setDeactivateTime(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "duration"));
+                var value = IntegerArgumentType.getInteger(context, "duration");
+                LasertagConfig.getInstance().setDeactivateTime(context.getSource().getServer(), value);
+                context.getSource().getServer().getPlayerManager().broadcast(Text.literal("Lasertag setting playerDeactivationDuration is now set to " + value), false);
                 return Command.SINGLE_SUCCESS;
             }
 
@@ -174,7 +190,9 @@ public class LasertagCommand {
 
         private class LasertargetDeactivateDurationSetting {
             private static int execute(CommandContext<ServerCommandSource> context) {
-                LasertagConfig.getInstance().setLasertargetDeactivatedTime(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "duration"));
+                var value = IntegerArgumentType.getInteger(context, "duration");
+                LasertagConfig.getInstance().setLasertargetDeactivatedTime(context.getSource().getServer(), value);
+                context.getSource().getServer().getPlayerManager().broadcast(Text.literal("Lasertag setting lasertargetDeactivatedDuration is now set to " + value), false);
                 return Command.SINGLE_SUCCESS;
             }
 
@@ -187,7 +205,9 @@ public class LasertagCommand {
 
         private class LasertagWeaponUseCooldownSetting {
             private static int execute(CommandContext<ServerCommandSource> context) {
-                LasertagConfig.getInstance().setLasertagWeaponCooldown(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "ticks"));
+                var value = IntegerArgumentType.getInteger(context, "ticks");
+                LasertagConfig.getInstance().setLasertagWeaponCooldown(context.getSource().getServer(), value);
+                context.getSource().getServer().getPlayerManager().broadcast(Text.literal("Lasertag setting lasertagWeaponCooldown is now set to " + value), false);
                 return Command.SINGLE_SUCCESS;
             }
 
@@ -200,7 +220,9 @@ public class LasertagCommand {
 
         private class LasertagWeaponReachSetting {
             private static int execute(CommandContext<ServerCommandSource> context) {
-                LasertagConfig.getInstance().setLasertagWeaponReach(context.getSource().getServer(), IntegerArgumentType.getInteger(context, "distance"));
+                var value = IntegerArgumentType.getInteger(context, "distance");
+                LasertagConfig.getInstance().setLasertagWeaponReach(context.getSource().getServer(), value);
+                context.getSource().getServer().getPlayerManager().broadcast(Text.literal("Lasertag setting lasertagWeaponReach is now set to " + value), false);
                 return Command.SINGLE_SUCCESS;
             }
 
@@ -261,6 +283,9 @@ public class LasertagCommand {
             // Join team
             server.playerJoinTeam(teamColor, player);
 
+            // Notify player in chat
+            player.sendMessage(Text.literal("You joined team " + teamName), true);
+
             return Command.SINGLE_SUCCESS;
         }
 
@@ -285,6 +310,9 @@ public class LasertagCommand {
 
             // Clear inventory
             player.getInventory().clear();
+
+            // Notify player in chat
+            player.sendMessage(Text.literal("You left your team"), true);
 
             return Command.SINGLE_SUCCESS;
         }
