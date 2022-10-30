@@ -21,8 +21,6 @@ import java.io.IOException;
  * @author Étienne Muser
  */
 public class LasertagConfig {
-    // TODO: On player join: send current config to player
-
     // ===== Weapon settings ====================
     /**
      * Weapon cooldown in game ticks

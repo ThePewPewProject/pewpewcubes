@@ -169,6 +169,9 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             teamMap.get(newTeamColor).add(player);
         }
 
+        // Set team on player
+        player.setTeam(newTeamColor);
+
         // Get players inventory
         var inventory = player .getInventory();
 
@@ -202,6 +205,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
 
         // Remove player from his team
         team.remove(player);
+        player.setTeam(null);
 
         // Notify about change
         notifyPlayersAboutUpdate();
@@ -215,6 +219,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             if (team.contains(player)) {
                 // Leave the team
                 team.remove(player);
+                player.setTeam(null);
                 notifyPlayersAboutUpdate();
                 return;
             }
@@ -245,6 +250,8 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
      */
     private void lasertagGameOver() {
         isRunning = false;
+
+        sendGameOverEvent();
 
         // Get world
         World world = ((MinecraftServer) (Object) this).getOverworld();
@@ -310,6 +317,11 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     private void sendGameStartedEvent() {
         ServerWorld world = ((MinecraftServer) (Object) this).getOverworld();
         ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_STARTED, PacketByteBufs.empty());
+    }
+
+    private void sendGameOverEvent() {
+        ServerWorld world = ((MinecraftServer) (Object) this).getOverworld();
+        ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_OVER, PacketByteBufs.empty());
     }
 
     /**

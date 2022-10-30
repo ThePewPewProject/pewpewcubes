@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame;
 
+import de.kleiner3.lasertag.types.Colors;
 import net.minecraft.entity.player.PlayerEntity;
 
 /**
@@ -37,7 +38,16 @@ public interface ILasertagPlayer {
     default public void onHitBy(PlayerEntity player) {
     }
 
-    default public void onDeactivated() {}
+    default public void setTeam(Colors.Color team) {
+    }
 
-    default public void onActivated() {}
+    default public Colors.Color getTeam() {
+        return null;
+    }
+
+    default public void onDeactivated() {
+    }
+
+    default public void onActivated() {
+    }
 }

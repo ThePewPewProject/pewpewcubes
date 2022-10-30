@@ -48,6 +48,7 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_WEAPON_FAILED_SOUND, Callbacks::handleWeaponFailedSoundEvent);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_PLAYER_SCORED_SOUND, Callbacks::handlePlayerScoredSoundEvent);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_STARTED, Callbacks::handleLasertagGameStarted);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_OVER, Callbacks::handleLasertagGameOver);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PROGRESS, Callbacks::handleProgress);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_SETTINGS_CHANGED, Callbacks::handleLasertagSettingsChanged);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_SETTINGS_SYNC, Callbacks::handleLasertagSettingsSync);
@@ -157,21 +158,38 @@ public class ClientNetworkingHandler {
                     }
                 }
 
-                var timer = new Timer();
-                timer.scheduleAtFixedRate(new TimerTask() {
-                                              @Override
-                                              public void run() {
-                                                  if (LasertagHudOverlay.gameTime.getSeconds() == 0) {
-                                                      timer.cancel();
-                                                      LasertagHudOverlay.gameTime = Duration.ofMinutes(LasertagConfig.getInstance().getPlayTime());
-                                                      return;
-                                                  }
+                LasertagHudOverlay.gameTimer = new Timer();
+                LasertagHudOverlay.gameTimer.scheduleAtFixedRate(new TimerTask() {
+                                                                     @Override
+                                                                     public void run() {
+                                                                         if ((LasertagConfig.getInstance().getPlayTime() * 60) - LasertagHudOverlay.gameTime == 0) {
+                                                                             synchronized (LasertagHudOverlay.gameTimer) {
+                                                                                 LasertagHudOverlay.gameTimer.cancel();
+                                                                                 LasertagHudOverlay.gameTimer = null;
+                                                                                 LasertagHudOverlay.gameTime = 0;
+                                                                             }
+                                                                             LasertagHudOverlay.gameTime = LasertagConfig.getInstance().getPlayTime() * 60;
+                                                                             return;
+                                                                         }
 
-                                                  LasertagHudOverlay.gameTime = LasertagHudOverlay.gameTime.minusSeconds(1);
-                                              }
-                                          }
+                                                                         ++LasertagHudOverlay.gameTime;
+                                                                     }
+                                                                 }
                         , 0, 1000);
             }).start();
+        }
+
+        public static void handleLasertagGameOver(MinecraftClient client,
+                                                  ClientPlayNetworkHandler handler,
+                                                  PacketByteBuf buf,
+                                                  PacketSender responseSender) {
+            synchronized (LasertagHudOverlay.gameTimer) {
+                if (LasertagHudOverlay.gameTimer != null) {
+                    LasertagHudOverlay.gameTimer.cancel();
+                    LasertagHudOverlay.gameTimer = null;
+                    LasertagHudOverlay.gameTime = 0;
+                }
+            }
         }
 
         public static void handleProgress(MinecraftClient client,

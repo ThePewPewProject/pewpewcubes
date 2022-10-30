@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Timer;
 
 import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.types.Colors;
@@ -23,8 +24,11 @@ import net.minecraft.server.MinecraftServer;
  * @author Étienne Muser
  */
 public class LasertagHudOverlay implements HudRenderCallback {
-
-    public static Duration gameTime = Duration.ofMinutes(LasertagConfig.getInstance().getPlayTime());
+    /**
+     * The time in seconds that has already elapsed
+     */
+    public static long gameTime = 0;
+    public static Timer gameTimer = null;
 
     /**
      * Simplified team map to map players and their score to their teams
@@ -166,7 +170,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
         // If game time should be rendered
         if (LasertagConfig.getInstance().isRenderTimer()) {
-            DrawableHelper.drawCenteredText(matrixStack, renderer, DurationUtils.toString(gameTime), wMid, textPadding, 0xFFFFFF);
+            DrawableHelper.drawCenteredText(matrixStack, renderer, DurationUtils.toString(Duration.ofSeconds((LasertagConfig.getInstance().getPlayTime() * 60) - gameTime)), wMid, textPadding, 0xFFFFFF);
         }
 
         // Draw progress bar

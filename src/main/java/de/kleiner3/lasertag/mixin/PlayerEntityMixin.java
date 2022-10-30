@@ -5,6 +5,7 @@ import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
+import de.kleiner3.lasertag.types.Colors;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -27,6 +28,7 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
      * The players lasertag score
      */
     private int score = 0;
+    private Colors.Color team = null;
 
     @Override
     public int getLasertagScore() {
@@ -50,21 +52,31 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
         Item chestplate = armor.get(2).getItem();
 
         // check that hit players chestplate is lasertag vest
-        if (!(chestplate instanceof LasertagVestItem))
+        if (!(chestplate instanceof LasertagVestItem)) {
             return;
+        }
 
         // Get firing players chestplate
         DefaultedList<ItemStack> firedArmor = (DefaultedList<ItemStack>) player.getArmorItems();
         Item firedChestplate = firedArmor.get(2).getItem();
 
         // Check that firiedChestplate is lasertag vest
-        if (!(firedChestplate instanceof LasertagVestItem))
+        if (!(firedChestplate instanceof LasertagVestItem)) {
             return;
+        }
 
-        // TODO: Check that hit player is not in same team as firing player
+        // Check that hit player is not in same team as firing player
+        if (team.equals(player.getTeam())) {
+            return;
+        }
+
+        // Check that hit player is not deactivated
+        if (PlayerDeactivatedManager.isDeactivated(((PlayerEntity)(Object)this).getUuid())) {
+            return;
+        }
 
         // Deactivate player
-        PlayerDeactivatedManager.deactivate(((PlayerEntity)(Object)this), player.getWorld());
+        PlayerDeactivatedManager.deactivate(((PlayerEntity) (Object) this), player.getWorld());
 
         // Get the server
         MinecraftServer server = player.getServer();
@@ -74,9 +86,20 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
         }
     }
 
+    @Override
+    public void setTeam(Colors.Color team) {
+        this.team = team;
+    }
+
+    @Override
+    public Colors.Color getTeam() {
+        return this.team;
+    }
+
+    @Override
     public void onDeactivated() {
         // Get players weapon
-        var weaponStack = ((PlayerEntity)(Object)this).getMainHandStack();
+        var weaponStack = ((PlayerEntity) (Object) this).getMainHandStack();
 
         // Set weapon nbt deactivated
         var nbt = weaponStack.getNbt();
@@ -87,9 +110,10 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
         weaponStack.setNbt(nbt);
     }
 
+    @Override
     public void onActivated() {
         // Get players weapon
-        var weaponStack = ((PlayerEntity)(Object)this).getMainHandStack();
+        var weaponStack = ((PlayerEntity) (Object) this).getMainHandStack();
 
         // Set weapon nbt deactivated
         var nbt = weaponStack.getNbt();
