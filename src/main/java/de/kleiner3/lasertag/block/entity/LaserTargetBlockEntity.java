@@ -48,6 +48,9 @@ public class LaserTargetBlockEntity extends BlockEntity {
         server.onPlayerScored(playerEntity, LasertagConfig.getInstance().getLasertargetHitScore());
         ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) playerEntity);
 
+        // Register on server
+        server.registerLasertarget((LaserTargetBlockEntity)(Object)this);
+
         // Deactivate
         deactivated = true;
         new Thread(() -> {

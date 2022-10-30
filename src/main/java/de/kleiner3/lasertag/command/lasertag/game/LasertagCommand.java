@@ -9,23 +9,19 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.LasertagConfig;
-import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.command.suggestions.TeamSuggestionProvider;
-import de.kleiner3.lasertag.item.LasertagVestItem;
-import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.types.Colors;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
-import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
+import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class LasertagCommand {
+    // TODO: Dont allow starting a game or switching/leaving teams while a game is running
     private static int execute(CommandContext<ServerCommandSource> context) {
         return Command.SINGLE_SUCCESS;
     }

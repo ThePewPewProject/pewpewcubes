@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.mixin;
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.lasertaggame.GameStats;
@@ -48,6 +49,8 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
      * Map every player to their team color
      */
     private HashMap<Colors.Color, List<PlayerEntity>> teamMap = new HashMap<>();
+
+    private List<LaserTargetBlockEntity> lasertargetsToReset = new LinkedList<>();
 
     private boolean isRunning = false;
 
@@ -264,9 +267,6 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             }
         }
 
-        // Calculate stats
-        calcStats();
-
         // Teleport players back to spawn
         var spawn = getOverworld().getSpawnPos();
         for (var team : teamMap.values()) {
@@ -274,6 +274,15 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
                 player.requestTeleport(spawn.getX() + 0.5F, spawn.getY(), spawn.getZ() + 0.5F);
             }
         }
+
+        // Reset lasertargets
+        for (var target : lasertargetsToReset) {
+            target.reset();
+        }
+        lasertargetsToReset = new LinkedList<>();
+
+        // Calculate stats
+        calcStats();
     }
 
     /**
@@ -403,5 +412,10 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         for (var team : lastGamesStats.teamPlayerScores.values()) {
             Collections.sort(team, (a, b) -> (a.y - b.y));
         }
+    }
+
+    @Override
+    public void registerLasertarget(LaserTargetBlockEntity target) {
+        lasertargetsToReset.add(target);
     }
 }
