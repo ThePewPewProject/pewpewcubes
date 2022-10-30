@@ -2,6 +2,7 @@ package de.kleiner3.lasertag.entity.render.armor;
 
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.item.LasertagVestItem;
+import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -57,18 +58,19 @@ public class LasertagVestRenderer extends GeoArmorRenderer<LasertagVestItem> {
             bodyBone.setPositionZ(contextModel.body.pivotZ);
         }
 
-        var color = ((LasertagVestItem) LasertagMod.LASERTAG_VEST).getColor(stack);
-        float r = ((color >> 16) & 0xFF) / 255.0F;
-        float g = ((color >> 8) & 0xFF) / 255.0F;
-        float b = ((color >> 0) & 0xFF) / 255.0F;
+        // Default color is black
+        float r = 0;
+        float g = 0;
+        float b = 0;
 
         if (entity instanceof PlayerEntity) {
-            PlayerEntity playerEntity = (PlayerEntity) entity;
+            boolean isDeactivated = PlayerDeactivatedManager.isDeactivated(entity.getUuid());
 
-            if (playerEntity.isDeactivated()) {
-                r = 0;
-                g = 0;
-                b = 0;
+            if (isDeactivated == false) {
+                var color = ((LasertagVestItem) LasertagMod.LASERTAG_VEST).getColor(stack);
+                r = ((color >> 16) & 0xFF) / 255.0F;
+                g = ((color >> 8) & 0xFF) / 255.0F;
+                b = ((color >> 0) & 0xFF) / 255.0F;
             }
         }
 

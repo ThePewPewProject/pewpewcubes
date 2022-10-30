@@ -6,6 +6,7 @@ import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.LasertagHudOverlay;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
+import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.util.ConverterUtil;
 import de.kleiner3.lasertag.util.Tuple;
@@ -50,6 +51,7 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PROGRESS, Callbacks::handleProgress);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_SETTINGS_CHANGED, Callbacks::handleLasertagSettingsChanged);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_SETTINGS_SYNC, Callbacks::handleLasertagSettingsSync);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_DEACTIVATED_STATUS_CHANGED, Callbacks::handlePlayerDeactivatedStatusChanged);
     }
 
     /**
@@ -214,6 +216,18 @@ public class ClientNetworkingHandler {
 
             // Set config
             LasertagConfig.setInstance(new Gson().fromJson(jsonString, LasertagConfig.class));
+        }
+
+        public static void handlePlayerDeactivatedStatusChanged(MinecraftClient client,
+                                                                ClientPlayNetworkHandler handler,
+                                                                PacketByteBuf buf,
+                                                                PacketSender responseSender) {
+            // Read from buffer
+            var uuid = buf.readUuid();
+            var deactivated = buf.readBoolean();
+
+            // Set deactivated status
+            PlayerDeactivatedManager.setDeactivated(uuid, deactivated);
         }
     }
 }

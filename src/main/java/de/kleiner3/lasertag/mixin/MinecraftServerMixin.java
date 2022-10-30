@@ -5,6 +5,7 @@ import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.lasertaggame.GameStats;
 import de.kleiner3.lasertag.lasertaggame.ILasertagGame;
+import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.types.Colors;
@@ -75,11 +76,12 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             initSpawnpointCache();
         }
 
+        // Get world
+        World world = ((MinecraftServer) (Object) this).getOverworld();
+
         // Teleport players
         for (Colors.Color teamColor : Colors.colorConfig.values()) {
             List<PlayerEntity> team = teamMap.get(teamColor);
-
-            World world = ((MinecraftServer) (Object) this).getOverworld();
 
             for (PlayerEntity player : team) {
                 // Get spawnpoints
@@ -106,7 +108,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             // Activate every player
             for (List<PlayerEntity> team : teamMap.values()) {
                 for (PlayerEntity player : team) {
-                    player.setDeactivated(false);
+                    PlayerDeactivatedManager.activate(player.getUuid(), world);
                 }
             }
 
@@ -222,10 +224,13 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     private void lasertagGameOver() {
         isRunning = false;
 
+        // Get world
+        World world = ((MinecraftServer) (Object) this).getOverworld();
+
         // Deactivate every player
         for (List<PlayerEntity> team : teamMap.values()) {
             for (PlayerEntity player : team) {
-                player.setDeactivated(true);
+                PlayerDeactivatedManager.deactivate(player.getUuid(), world, true);
             }
         }
 

@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.item;
 import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.block.LaserTargetBlock;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
+import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.types.Colors;
@@ -74,7 +75,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
         var laserweaponStack = playerEntity.getStackInHand(hand);
 
         // Check that player is active
-        if (playerEntity.isDeactivated()) {
+        if (PlayerDeactivatedManager.isDeactivated(playerEntity.getUuid())) {
             playWeaponFailSound(playerEntity);
             return TypedActionResult.fail(laserweaponStack);
         }

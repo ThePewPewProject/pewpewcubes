@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.mixin;
 import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
+import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -63,7 +64,7 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
 
         // TODO: Check that hit player is not in same team as firing player
 
-        this.deactivate();
+        PlayerDeactivatedManager.deactivate(((PlayerEntity)(Object)this).getUuid(), player.getWorld());
 
         // Get the server
         MinecraftServer server = player.getServer();
@@ -71,26 +72,5 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
             server.onPlayerScored(player, LasertagConfig.getInstance().getPlayerHitScore());
             ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) player);
         }
-    }
-
-    @Override
-    public boolean isDeactivated() {
-        return isDeactivated;
-    }
-
-    @Override
-    public void setDeactivated(boolean deactivated) {
-        this.isDeactivated = deactivated;
-    }
-
-    private void deactivate() {
-        isDeactivated = true;
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000 * LasertagConfig.getInstance().getDeactivateTime());
-            } catch (InterruptedException e) {}
-
-            isDeactivated = false;
-        }).start();
     }
 }
