@@ -21,7 +21,7 @@ public class WorldMixin implements IFastWorldIter {
     /**
      * The length in chunks of a side of the square which is being searched.
      */
-    private static final int EDGE_LENGTH = 63;
+    private static final int EDGE_LENGTH = 31;
 
     /**
      * The number of ChunkSections in a chunk
