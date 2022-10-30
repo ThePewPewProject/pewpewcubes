@@ -5,7 +5,10 @@ import net.minecraft.nbt.NbtCompound;
 
 public interface ILasertagColorable {
     default public void setColor(ItemStack stack, int color) {
-        var nbt = new NbtCompound();
+        var nbt = stack.getNbt();
+        if (nbt == null) {
+            nbt = new NbtCompound();
+        }
         nbt.putInt("color", color);
         stack.setNbt(nbt);
     }

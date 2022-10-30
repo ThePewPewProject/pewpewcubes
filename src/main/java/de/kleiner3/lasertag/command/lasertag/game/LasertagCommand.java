@@ -261,22 +261,6 @@ public class LasertagCommand {
             // Join team
             server.playerJoinTeam(teamColor, player);
 
-            // Get players inventory
-            var inventory = player .getInventory();
-
-            // Clear players inventory
-            inventory.clear();
-
-            // Give player a lasertag vest
-            var vestStack = new ItemStack(LasertagMod.LASERTAG_VEST);
-            ((LasertagVestItem)LasertagMod.LASERTAG_VEST).setColor(vestStack, teamColor.getValue());
-            player.equipStack(EquipmentSlot.CHEST, vestStack);
-
-            // Give player a lasertag weapon
-            var weaponStack = new ItemStack(LasertagMod.LASERTAG_WEAPON);
-            ((LasertagWeaponItem)LasertagMod.LASERTAG_WEAPON).setColor(weaponStack, teamColor.getValue());
-            inventory.setStack(0, weaponStack);
-
             return Command.SINGLE_SUCCESS;
         }
 

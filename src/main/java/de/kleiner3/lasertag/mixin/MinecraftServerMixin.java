@@ -3,6 +3,8 @@ package de.kleiner3.lasertag.mixin;
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.item.LasertagVestItem;
+import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.lasertaggame.GameStats;
 import de.kleiner3.lasertag.lasertaggame.ILasertagGame;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
@@ -12,7 +14,9 @@ import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.Tuple;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -109,6 +113,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             for (List<PlayerEntity> team : teamMap.values()) {
                 for (PlayerEntity player : team) {
                     PlayerDeactivatedManager.activate(player.getUuid(), world);
+                    player.onActivated();
                 }
             }
 
@@ -163,6 +168,23 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             teamMap.get(oldTeamColor).remove(player);
             teamMap.get(newTeamColor).add(player);
         }
+
+        // Get players inventory
+        var inventory = player .getInventory();
+
+        // Clear players inventory
+        inventory.clear();
+
+        // Give player a lasertag vest
+        var vestStack = new ItemStack(LasertagMod.LASERTAG_VEST);
+        ((LasertagVestItem)LasertagMod.LASERTAG_VEST).setColor(vestStack, newTeamColor.getValue());
+        player.equipStack(EquipmentSlot.CHEST, vestStack);
+
+        // Give player a lasertag weapon
+        var weaponStack = new ItemStack(LasertagMod.LASERTAG_WEAPON);
+        ((LasertagWeaponItem)LasertagMod.LASERTAG_WEAPON).setColor(weaponStack, newTeamColor.getValue());
+        ((LasertagWeaponItem)LasertagMod.LASERTAG_WEAPON).setDeactivated(weaponStack, true);
+        inventory.setStack(0, weaponStack);
 
         // Notify about change
         notifyPlayersAboutUpdate();
@@ -230,7 +252,8 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         // Deactivate every player
         for (List<PlayerEntity> team : teamMap.values()) {
             for (PlayerEntity player : team) {
-                PlayerDeactivatedManager.deactivate(player.getUuid(), world, true);
+                PlayerDeactivatedManager.deactivate(player, world, true);
+                player.onDeactivated();
             }
         }
 

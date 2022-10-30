@@ -22,9 +22,7 @@ public class LasertagModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         // ===== Register entity renderers ====================
-        EntityRendererRegistry.register(LasertagMod.LASER_RAY, (ctx) -> {
-            return new LaserRayEntityRenderer(ctx);
-        });
+        EntityRendererRegistry.register(LasertagMod.LASER_RAY, (ctx) -> new LaserRayEntityRenderer(ctx));
 
         // ===== Register packet recievers ====================
         ClientNetworkingHandler clientNetworkingHandler = new ClientNetworkingHandler();
@@ -34,10 +32,17 @@ public class LasertagModClient implements ClientModInitializer {
         HudRenderCallback.EVENT.register(new LasertagHudOverlay());
 
         // ===== Register color providers =====================
-        ColorProviderRegistry.ITEM.register((stack, tintIdx) ->  {
+        ColorProviderRegistry.ITEM.register((stack, tintIdx) -> {
             // Team color
             if (stack.hasNbt()) {
-                return stack.getNbt().getInt("color");
+                var nbt = stack.getNbt();
+
+                if (nbt.contains("deactivated") && nbt.getBoolean("deactivated")) {
+                    return 0x000000;
+                }
+                if (nbt.contains("color")) {
+                    return nbt.getInt("color");
+                }
             }
 
             return 0xFFFFFF;

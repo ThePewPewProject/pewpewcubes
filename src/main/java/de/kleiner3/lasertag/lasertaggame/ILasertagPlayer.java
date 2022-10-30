@@ -36,4 +36,8 @@ public interface ILasertagPlayer {
      */
     default public void onHitBy(PlayerEntity player) {
     }
+
+    default public void onDeactivated() {}
+
+    default public void onActivated() {}
 }

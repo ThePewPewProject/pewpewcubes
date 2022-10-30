@@ -8,6 +8,7 @@ import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
@@ -26,8 +27,6 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
      * The players lasertag score
      */
     private int score = 0;
-
-    private boolean isDeactivated = true;
 
     @Override
     public int getLasertagScore() {
@@ -64,7 +63,8 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
 
         // TODO: Check that hit player is not in same team as firing player
 
-        PlayerDeactivatedManager.deactivate(((PlayerEntity)(Object)this).getUuid(), player.getWorld());
+        // Deactivate player
+        PlayerDeactivatedManager.deactivate(((PlayerEntity)(Object)this), player.getWorld());
 
         // Get the server
         MinecraftServer server = player.getServer();
@@ -72,5 +72,31 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
             server.onPlayerScored(player, LasertagConfig.getInstance().getPlayerHitScore());
             ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) player);
         }
+    }
+
+    public void onDeactivated() {
+        // Get players weapon
+        var weaponStack = ((PlayerEntity)(Object)this).getMainHandStack();
+
+        // Set weapon nbt deactivated
+        var nbt = weaponStack.getNbt();
+        if (nbt == null) {
+            nbt = new NbtCompound();
+        }
+        nbt.putBoolean("deactivated", true);
+        weaponStack.setNbt(nbt);
+    }
+
+    public void onActivated() {
+        // Get players weapon
+        var weaponStack = ((PlayerEntity)(Object)this).getMainHandStack();
+
+        // Set weapon nbt deactivated
+        var nbt = weaponStack.getNbt();
+        if (nbt == null) {
+            nbt = new NbtCompound();
+        }
+        nbt.putBoolean("deactivated", false);
+        weaponStack.setNbt(nbt);
     }
 }

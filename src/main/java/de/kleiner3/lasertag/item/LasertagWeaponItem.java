@@ -6,26 +6,17 @@ import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.types.ILasertagColorable;
 import de.kleiner3.lasertag.util.RaycastUtil;
 import io.netty.buffer.Unpooled;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.RangedWeaponItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.collection.DefaultedList;
@@ -33,7 +24,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.function.Predicate;
@@ -86,10 +76,19 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
             return TypedActionResult.fail(laserweaponStack);
         }
 
-        if (!world.isClient) {
+        if (world.isClient == false) {
             fireWeapon(world, playerEntity, this.getColor(laserweaponStack));
         }
         return TypedActionResult.pass(laserweaponStack);
+    }
+
+    public void setDeactivated(ItemStack stack, boolean deactivated) {
+        var nbt = stack.getNbt();
+        if (nbt == null) {
+            nbt = new NbtCompound();
+        }
+        nbt.putBoolean("deactivated", deactivated);
+        stack.setNbt(nbt);
     }
 
     private void fireWeapon(World world, PlayerEntity playerEntity, int color) {

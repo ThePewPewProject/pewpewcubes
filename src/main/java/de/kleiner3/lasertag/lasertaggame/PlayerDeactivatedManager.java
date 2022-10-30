@@ -4,6 +4,7 @@ import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
@@ -35,9 +36,12 @@ public class PlayerDeactivatedManager {
         deactivatedMap.put(uuid, deactivated);
     }
 
-    public static void deactivate(UUID uuid, World world) {
+    public static void deactivate(PlayerEntity player, World world) {
+        var uuid = player.getUuid();
+
         // Deactivate player
         deactivatedMap.put(uuid, true);
+        player.onDeactivated();
         sendDeactivatedToClients(world, uuid, true);
 
         new Thread(() -> {
@@ -47,6 +51,7 @@ public class PlayerDeactivatedManager {
 
             // Reactivate player
             deactivatedMap.put(uuid, false);
+            player.onActivated();
             sendDeactivatedToClients(world, uuid, false);
         }).start();
     }
@@ -56,12 +61,13 @@ public class PlayerDeactivatedManager {
         sendDeactivatedToClients(world, uuid, false);
     }
 
-    public static void deactivate(UUID uuid, World world, boolean forever) {
+    public static void deactivate(PlayerEntity player, World world, boolean forever) {
         if (forever == true) {
+            var uuid = player.getUuid();
             deactivatedMap.put(uuid, true);
             sendDeactivatedToClients(world, uuid, true);
         } else {
-            deactivate(uuid, world);
+            deactivate(player, world);
         }
     }
 
