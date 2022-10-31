@@ -15,6 +15,7 @@ import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.Tuple;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -87,6 +88,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         World world = ((MinecraftServer) (Object) this).getOverworld();
 
         // Teleport players
+        // TODO: Give Error message and abort if a player is in a team without spawnpoints
         for (Colors.Color teamColor : Colors.colorConfig.values()) {
             List<PlayerEntity> team = teamMap.get(teamColor);
 
@@ -285,10 +287,41 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         calcStats();
     }
 
+    public void syncTeamsAndScoresToPlayer(ServerPlayerEntity player) {
+        var simplifiedTeamMap = buildSimplifiedTeamMap();
+
+        // Serialize team map to json
+        String messagesString = new Gson().toJson(simplifiedTeamMap);
+
+        // Create packet buffer
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+
+        // Write team map string to buffer
+        buf.writeString(messagesString);
+
+        ServerPlayNetworking.send(player, NetworkingConstants.LASERTAG_GAME_TEAM_OR_SCORE_UPDATE, buf);
+    }
+
     /**
      * Notifies every player of this world about a team or score update
      */
     private void notifyPlayersAboutUpdate() {
+        var simplifiedTeamMap = buildSimplifiedTeamMap();
+
+        // Serialize team map to json
+        String messagesString = new Gson().toJson(simplifiedTeamMap);
+
+        // Create packet buffer
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+
+        // Write team map string to buffer
+        buf.writeString(messagesString);
+
+        // Send to all clients
+        ServerEventSending.sendToEveryone(((MinecraftServer) (Object) this).getOverworld(), NetworkingConstants.LASERTAG_GAME_TEAM_OR_SCORE_UPDATE, buf);
+    }
+
+    private HashMap<String, List<Tuple<String, Integer>>> buildSimplifiedTeamMap() {
         // Create simplified team map
         final HashMap<String, List<Tuple<String, Integer>>> simplifiedTeamMap = new HashMap<>();
 
@@ -307,17 +340,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             simplifiedTeamMap.put(c.getName(), playerDatas);
         }
 
-        // Serialize team map to json
-        String messagesString = new Gson().toJson(simplifiedTeamMap);
-
-        // Create packet buffer
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-
-        // Write team map string to buffer
-        buf.writeString(messagesString);
-
-        // Send to all clients
-        ServerEventSending.sendToEveryone(((MinecraftServer) (Object) this).getOverworld(), NetworkingConstants.LASERTAG_GAME_TEAM_OR_SCORE_UPDATE, buf);
+        return simplifiedTeamMap;
     }
 
     /**

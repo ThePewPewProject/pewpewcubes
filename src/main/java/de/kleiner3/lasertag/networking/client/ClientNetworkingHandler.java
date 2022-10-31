@@ -8,8 +8,10 @@ import de.kleiner3.lasertag.client.LasertagHudOverlay;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
+import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.ConverterUtil;
 import de.kleiner3.lasertag.util.Tuple;
+import de.kleiner3.lasertag.util.serialize.ColorConfigDeserializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -52,6 +54,7 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PROGRESS, Callbacks::handleProgress);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_SETTINGS_CHANGED, Callbacks::handleLasertagSettingsChanged);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_SETTINGS_SYNC, Callbacks::handleLasertagSettingsSync);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_TEAMS_SYNC, Callbacks::handleLasertagTeamsSync);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_DEACTIVATED_STATUS_CHANGED, Callbacks::handlePlayerDeactivatedStatusChanged);
     }
 
@@ -234,6 +237,21 @@ public class ClientNetworkingHandler {
 
             // Set config
             LasertagConfig.setInstance(new Gson().fromJson(jsonString, LasertagConfig.class));
+        }
+
+        public static void handleLasertagTeamsSync(MinecraftClient client,
+                                                      ClientPlayNetworkHandler handler,
+                                                      PacketByteBuf buf,
+                                                      PacketSender responseSender) {
+            // Get json string
+            var jsonString = buf.readString();
+
+            // get gson builder
+            var gsonBuilder = ColorConfigDeserializer.getDeserializer();
+
+            // Parse
+            Colors.colorConfig = gsonBuilder.create().fromJson(jsonString, new TypeToken<HashMap<String, Colors.Color>>() {
+            }.getType());
         }
 
         public static void handlePlayerDeactivatedStatusChanged(MinecraftClient client,

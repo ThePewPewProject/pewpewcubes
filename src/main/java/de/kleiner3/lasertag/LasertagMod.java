@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
@@ -110,7 +111,13 @@ public class LasertagMod implements ModInitializer {
         CommandInitializer.initCommands();
 
         // ===== Listen to events ======================
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> LasertagConfig.syncToPlayer(handler.getPlayer()));
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            LasertagConfig.syncToPlayer(handler.getPlayer());
+            Colors.syncTeamsToClient(handler.getPlayer());
+            server.syncTeamsAndScoresToPlayer(handler.getPlayer());
+        });
         // TODO: Reset HUD on disconnect/leave world
     }
+
+    public static final String configFolderPath = FabricLoader.getInstance().getConfigDir() + "\\lasertag";
 }

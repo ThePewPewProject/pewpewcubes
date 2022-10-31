@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.Timer;
 
 import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.DurationUtils;
 import de.kleiner3.lasertag.util.Tuple;
@@ -95,6 +96,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
                 // The team score
                 int teamScore = 0;
 
+                // TODO: On server with custom teams: custom teams dont get rendered properly
                 // Draw teams on the left
                 if (i < numColors / 2) {
                     // The height to start rendering this box at

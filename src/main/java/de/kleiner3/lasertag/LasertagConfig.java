@@ -225,7 +225,7 @@ public class LasertagConfig {
     }
 
     // Get path to lasertag config file
-    private static String lasertagConfigFilePath = FabricLoader.getInstance().getConfigDir() + "\\lasertagConfig.json";
+    private static String lasertagConfigFilePath = LasertagMod.configFolderPath + "\\lasertagConfig.json";
 
     // Create file object
     private static File lasertagConfigFile = new File(lasertagConfigFilePath);
@@ -258,6 +258,12 @@ public class LasertagConfig {
 
             // Log that default config is being used
             LasertagMod.LOGGER.info("Default lasertag config is being used.");
+        }
+
+        // Create directory if not exists
+        var dir = new File(LasertagMod.configFolderPath);
+        if (dir.exists() == false) {
+            dir.mkdir();
         }
 
         // If config file doesn't exist

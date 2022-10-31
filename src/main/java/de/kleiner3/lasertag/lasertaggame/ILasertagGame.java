@@ -6,6 +6,7 @@ import java.util.List;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.types.Colors;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
  * Interface to provide methods for a lasertag game
@@ -79,5 +80,8 @@ public interface ILasertagGame {
     }
 
     default public void registerLasertarget(LaserTargetBlockEntity target) {
+    }
+
+    default public void syncTeamsAndScoresToPlayer(ServerPlayerEntity player) {
     }
 }
