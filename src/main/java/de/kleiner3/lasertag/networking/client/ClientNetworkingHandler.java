@@ -180,6 +180,8 @@ public class ClientNetworkingHandler {
                                                                  }
                         , 0, 1000);
             }).start();
+
+            LasertagHudOverlay.shouldRenderNameTags = false;
         }
 
         public static void handleLasertagGameOver(MinecraftClient client,
@@ -193,6 +195,8 @@ public class ClientNetworkingHandler {
                     LasertagHudOverlay.gameTime = 0;
                 }
             }
+
+            LasertagHudOverlay.shouldRenderNameTags = true;
         }
 
         public static void handleProgress(MinecraftClient client,
@@ -240,9 +244,9 @@ public class ClientNetworkingHandler {
         }
 
         public static void handleLasertagTeamsSync(MinecraftClient client,
-                                                      ClientPlayNetworkHandler handler,
-                                                      PacketByteBuf buf,
-                                                      PacketSender responseSender) {
+                                                   ClientPlayNetworkHandler handler,
+                                                   PacketByteBuf buf,
+                                                   PacketSender responseSender) {
             // Get json string
             var jsonString = buf.readString();
 

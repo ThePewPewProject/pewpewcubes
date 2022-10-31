@@ -120,6 +120,4 @@ public class LaserTargetBlockEntity extends BlockEntity {
 
         return false;
     }
-
-    // TODO: Reset already hit by after game stop
 }

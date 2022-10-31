@@ -25,6 +25,7 @@ import net.minecraft.server.MinecraftServer;
  * @author Étienne Muser
  */
 public class LasertagHudOverlay implements HudRenderCallback {
+    public static boolean shouldRenderNameTags = true;
     /**
      * The time in seconds that has already elapsed
      */
@@ -96,7 +97,6 @@ public class LasertagHudOverlay implements HudRenderCallback {
                 // The team score
                 int teamScore = 0;
 
-                // TODO: On server with custom teams: custom teams dont get rendered properly
                 // Draw teams on the left
                 if (i < numColors / 2) {
                     // The height to start rendering this box at

@@ -10,6 +10,7 @@
     "fastiter.WorldMixin"
   ],
   "client": [
+    "LivingEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

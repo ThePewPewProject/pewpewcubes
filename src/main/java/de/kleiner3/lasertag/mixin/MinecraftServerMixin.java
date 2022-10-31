@@ -322,6 +322,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     }
 
     private HashMap<String, List<Tuple<String, Integer>>> buildSimplifiedTeamMap() {
+        // TODO: Crashes the game when trying to join team in LAN World
         // Create simplified team map
         final HashMap<String, List<Tuple<String, Integer>>> simplifiedTeamMap = new HashMap<>();
 
