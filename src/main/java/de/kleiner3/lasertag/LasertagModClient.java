@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag;
 
 import de.kleiner3.lasertag.client.LasertagHudOverlay;
+import de.kleiner3.lasertag.command.ClientCommandInitializer;
 import de.kleiner3.lasertag.entity.render.LaserRayEntityRenderer;
 import de.kleiner3.lasertag.entity.render.armor.LasertagVestRenderer;
 import de.kleiner3.lasertag.networking.client.ClientNetworkingHandler;
@@ -8,7 +9,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
-import net.minecraft.entity.player.PlayerEntity;
 import software.bernie.geckolib3.renderers.geo.GeoArmorRenderer;
 
 /**
@@ -59,6 +59,8 @@ public class LasertagModClient implements ClientModInitializer {
         // ===== Register GeckoLib renderers ===================
         GeoArmorRenderer.registerArmorRenderer(new LasertagVestRenderer(), LasertagMod.LASERTAG_VEST);
 
+        // ===== Register commands =====================
+        ClientCommandInitializer.initCommands();
     }
 
 }

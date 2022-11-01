@@ -9,8 +9,12 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.client.screen.LasertagCreditsScreen;
 import de.kleiner3.lasertag.command.suggestions.TeamSuggestionProvider;
 import de.kleiner3.lasertag.types.Colors;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientCommandSource;
+import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -30,7 +34,6 @@ public class LasertagCommand {
         var cmd = literal("lasertag")
                 .executes(ctx -> execute(ctx));
 
-        //RenderHudSetting.register(cmd);
         StartGame.register(cmd);
         JoinTeam.register(cmd);
         LeaveTeam.register(cmd);
