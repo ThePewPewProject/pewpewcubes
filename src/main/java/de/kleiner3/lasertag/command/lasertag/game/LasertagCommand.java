@@ -44,6 +44,7 @@ public class LasertagCommand {
             context.getSource().sendFeedback(Text.literal(new GsonBuilder().setPrettyPrinting().create().toJson(LasertagConfig.getInstance())), false);
             return Command.SINGLE_SUCCESS;
         }
+
         private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
             var cmd = literal("settings")
                     .requires(s -> s.hasPermissionLevel(4))

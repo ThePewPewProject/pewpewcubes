@@ -144,8 +144,11 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
 
     @Override
     public void playerJoinTeam(Colors.Color newTeamColor, PlayerEntity player) {
+        // Get new team
+        var newTeam = teamMap.get(newTeamColor);
+
         // Check if team is full
-        if (teamMap.get(newTeamColor).size() >= LasertagConfig.getInstance().getMaxTeamSize()) {
+        if (newTeam.size() >= LasertagConfig.getInstance().getMaxTeamSize()) {
             // If is Server
             if (player instanceof ServerPlayerEntity) {
                 ServerEventSending.sendErrorMessageToClient((ServerPlayerEntity) player, "Team " + newTeamColor.getName() + " is full.");
@@ -164,14 +167,14 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
 
         // If player has no team
         if (oldTeamColor == null) {
-            teamMap.get(newTeamColor).add(player);
+            newTeam.add(player);
         } else {
             // If player tries to join his team again
             if (newTeamColor == oldTeamColor) return;
 
             // Swap team
             teamMap.get(oldTeamColor).remove(player);
-            teamMap.get(newTeamColor).add(player);
+            newTeam.add(player);
         }
 
         // Set team on player

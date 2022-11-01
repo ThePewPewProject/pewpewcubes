@@ -17,6 +17,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * Enumeration of all available lasertag colors
@@ -29,6 +30,8 @@ public class Colors {
     public static HashMap<String, Color> colorConfig = null;
 
     static {
+        // TODO: Color config leaks over into singleplayer from servers
+        // TODO: Catch that teams must be unique
         // TODO: Make color config reloadable by command
 
         var colorConfigFile = new File(colorConfigFilePath);
@@ -139,6 +142,22 @@ public class Colors {
         public String toString() {
             return teamName + " (" + r + ", " + g + ", " + b + ")";
         }
+
+
+        // ===== Auto Generated =====
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Color color = (Color) o;
+            return r == color.r && g == color.g && b == color.b && teamName.equals(color.teamName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(teamName, r, g, b);
+        }
+        // ==========================
     }
 
     public static void syncTeamsToClient(ServerPlayerEntity player) {

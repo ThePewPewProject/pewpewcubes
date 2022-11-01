@@ -24,6 +24,8 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin implements ILasertagPlayer {
 
+    // TODO: Sometimes players don't get deactivated on join. Last observerd: Acc1 and Acc2: Join server, play a game, leave server. Acc1: Go into singleplayer, open World to LAN. Acc2: Restart game, join LAN World, join team. Acc2 isn't deactivated.
+
     /**
      * The players lasertag score
      */
