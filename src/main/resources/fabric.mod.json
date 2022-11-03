@@ -9,8 +9,8 @@
     "Étienne Muser aka Der_fbs aka fibs",
 	"Kevin Janzen aka ZaboKev aka K e v",
 	"Timon Maier aka _Timon aka Dr. Diarrhö",
-	"Robert Senin aka Sogeking_1024"
-	
+	"Robert Senin aka Sogeking_1024",
+	"Aaron Werner aka Sol Astrum"
   ],
   "contact": {
     "homepage": "https://discord.gg/SPbV8P2kHN",
@@ -24,17 +24,28 @@
   "entrypoints": {
     "main": [
       "de.kleiner3.lasertag.LasertagMod"
-    ]
+    ],
+	"client": [
+	  "de.kleiner3.lasertag.LasertagModClient"
+	]
   },
   "mixins": [
     "lasertag.mixins.json"
   ],
+  "custom": {
+	"loom:injected_interfaces": {
+		"net/minecraft/server/MinecraftServer": ["de/kleiner3/lasertag/lasertaggame/ILasertagGame"],
+		"net/minecraft/entity/player/PlayerEntity": ["de/kleiner3/lasertag/lasertaggame/ILasertagPlayer"],
+        "net/minecraft/world/World": ["de/kleiner3/lasertag/util/fastiter/IFastWorldIter"]
+    }
+  },
 
   "depends": {
     "fabricloader": ">=0.14.9",
     "minecraft": "~1.19",
 	"fabric-api": "*",
-    "java": ">=17"
+    "java": ">=17",
+    "geckolib3": ">=3.1.26"
   },
   "suggests": {
     "sodium": "*",
