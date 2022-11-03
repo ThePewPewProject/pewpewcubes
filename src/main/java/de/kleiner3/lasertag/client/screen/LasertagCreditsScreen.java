@@ -6,14 +6,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.logging.LogUtils;
 import de.kleiner3.lasertag.LasertagMod;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.screen.CreditsScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.NarratorManager;
@@ -25,7 +23,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.random.Random;
 import org.lwjgl.glfw.GLFW;
-import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,7 +30,9 @@ import java.io.Reader;
 import java.util.List;
 
 /**
+ * The lasertag credits screen - Heavily inspired by the standard Minecraft credits screen
  *
+ * @author Étienne Muser
  */
 public class LasertagCreditsScreen extends Screen {
     private static final Identifier MINECRAFT_TITLE_TEXTURE = new Identifier("textures/gui/title/minecraft.png"); // TODO: Replace by our banner
@@ -192,7 +191,6 @@ public class LasertagCreditsScreen extends Screen {
         int i = this.width;
         float f = -this.time * 0.5f;
         float g = (float)this.height - 0.5f * this.time;
-        float h = 0.015625f;
         float j = this.time / this.baseSpeed;
         float k = j * 0.02f;
         float l = (float)(this.creditsHeight + this.height + this.height + 24) / this.baseSpeed;

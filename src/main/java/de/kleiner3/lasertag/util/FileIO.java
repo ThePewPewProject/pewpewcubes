@@ -8,7 +8,13 @@ import java.io.*;
  * @author Étienne Muser
  */
 public class FileIO {
-    public static String readAllFile(File file) throws IOException{
+    /**
+     * Read whole files contents
+     * @param file The file to read
+     * @return The files contents
+     * @throws IOException
+     */
+    public static String readAllFile(File file) throws IOException {
         // Create string builder
         var builder = new StringBuilder();
 
@@ -27,6 +33,12 @@ public class FileIO {
         return builder.toString();
     }
 
+    /**
+     * Write a string to a file
+     * @param file The file to write to
+     * @param content The content to write
+     * @throws IOException
+     */
     public static void writeAllFile(File file, String content) throws IOException {
         try (var os = new FileOutputStream(file)) {
             try (var bw = new BufferedWriter(new OutputStreamWriter(os))) {

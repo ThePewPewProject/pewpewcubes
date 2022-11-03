@@ -19,6 +19,11 @@ import software.bernie.geckolib3.core.util.Color;
 import software.bernie.geckolib3.renderers.geo.GeoArmorRenderer;
 import software.bernie.geckolib3.util.GeoUtils;
 
+/**
+ * Renderer for the lasertag vest
+ *
+ * @author Étienne Muser
+ */
 public class LasertagVestRenderer extends GeoArmorRenderer<LasertagVestItem> {
 
     private static final LasertagVestModel VEST_MODEL = new LasertagVestModel();
@@ -63,6 +68,7 @@ public class LasertagVestRenderer extends GeoArmorRenderer<LasertagVestItem> {
         float g = 0;
         float b = 0;
 
+        // If player is activated
         if (entity instanceof PlayerEntity) {
             boolean isDeactivated = PlayerDeactivatedManager.isDeactivated(entity.getUuid());
 

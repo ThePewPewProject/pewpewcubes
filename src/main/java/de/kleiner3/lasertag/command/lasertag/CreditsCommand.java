@@ -8,6 +8,11 @@ import de.kleiner3.lasertag.client.screen.LasertagCreditsScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientCommandSource;
 
+/**
+ * The command to display the credits for our mod
+ *
+ * @author Étienne Muser
+ */
 public class CreditsCommand {
     private static int execute(CommandContext<ClientCommandSource> context) {
             var client = MinecraftClient.getInstance();

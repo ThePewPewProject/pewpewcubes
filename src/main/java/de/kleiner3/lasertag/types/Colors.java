@@ -1,6 +1,5 @@
 package de.kleiner3.lasertag.types;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
@@ -25,8 +24,14 @@ import java.util.Objects;
  * @author Étienne Muser
  */
 public class Colors {
+    /**
+     * The path to the team config file
+     */
     private static final String colorConfigFilePath = LasertagMod.configFolderPath + "\\teamConfig.json";
 
+    /**
+     * The actual in-memory team config
+     */
     public static HashMap<String, Color> colorConfig = null;
 
     static {
@@ -34,8 +39,10 @@ public class Colors {
         // TODO: Catch that teams must be unique
         // TODO: Make color config reloadable by command
 
+        // Get config file
         var colorConfigFile = new File(colorConfigFilePath);
 
+        // If the config file exists
         if (colorConfigFile.exists()) {
             try {
                 // Read config file
@@ -93,6 +100,9 @@ public class Colors {
         }
     }
 
+    /**
+     * The color class
+     */
     public static class Color {
         public Color(String name, int r, int g, int b, Block spawnpointBlock) {
             this.teamName = name;
@@ -126,14 +136,27 @@ public class Colors {
             return b;
         }
 
+        /**
+         * Get the spawnpoint block type of this team
+         * @return
+         */
         public Block getSpawnpointBlock() {
             return spawnpointBlock;
         }
 
+        /**
+         * Get the integer color value with bits distributed like:
+         * RRRRRRRRGGGGGGGGBBBBBBBB
+         * @return
+         */
         public int getValue() {
             return this.r << 16 | this.g << 8 | this.b;
         }
 
+        /**
+         * Get the color values as normalized float array
+         * @return
+         */
         public float[] getFloatArray() {
             return new float[]{r / 255.0F, g / 255.0F, b / 255.0F};
         }

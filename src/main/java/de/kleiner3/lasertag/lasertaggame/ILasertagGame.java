@@ -79,9 +79,17 @@ public interface ILasertagGame {
         return false;
     }
 
+    /**
+     * Register a lasertarget to be reset after game
+     * @param target
+     */
     default public void registerLasertarget(LaserTargetBlockEntity target) {
     }
 
+    /**
+     * Synchronize the teams and scores to a player
+     * @param player
+     */
     default public void syncTeamsAndScoresToPlayer(ServerPlayerEntity player) {
     }
 }

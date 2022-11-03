@@ -8,10 +8,21 @@ import net.minecraft.util.registry.Registry;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
+/**
+ * Util to get a deserializer for the ColorConfig class
+ *
+ * @author Étienne Muser
+ */
 public class ColorConfigDeserializer {
+    /**
+     * Build a GsonBuilder for the ColorConfig
+     * @return The GsonBuilder designed for the ColorConfig
+     */
     public static GsonBuilder getDeserializer() {
+        // Create builder
         var gsonBuilder = new GsonBuilder();
 
+        // Create deserializer for HashMap
         var deserializer = new JsonDeserializer<HashMap<String, Colors.Color>>() {
             @Override
             public HashMap<String, Colors.Color> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
@@ -47,6 +58,7 @@ public class ColorConfigDeserializer {
             }
         };
 
+        // Register deserializer for HashMap
         gsonBuilder.registerTypeAdapter(HashMap.class, deserializer);
 
         return gsonBuilder;

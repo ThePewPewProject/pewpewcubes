@@ -11,6 +11,11 @@ import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Suggestion provider for the teams
+ *
+ * @author Étienne Muser
+ */
 public class TeamSuggestionProvider implements SuggestionProvider<ServerCommandSource> {
     private static TeamSuggestionProvider instance = null;
 

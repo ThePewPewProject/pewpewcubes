@@ -38,16 +38,30 @@ public interface ILasertagPlayer {
     default public void onHitBy(PlayerEntity player) {
     }
 
+    /**
+     * Set the players team
+     * @param team
+     */
     default public void setTeam(Colors.Color team) {
     }
 
+    /**
+     * Get the players team
+     * @return
+     */
     default public Colors.Color getTeam() {
         return null;
     }
 
+    /**
+     * Called when the player is deactivated
+     */
     default public void onDeactivated() {
     }
 
+    /**
+     * Called when the player gets activated
+     */
     default public void onActivated() {
     }
 }

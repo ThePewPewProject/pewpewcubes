@@ -12,6 +12,11 @@ import net.minecraft.world.World;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * Manages which player is currently deactivated
+ *
+ * @author Étienne Muser
+ */
 public class PlayerDeactivatedManager {
     private static HashMap<UUID, Boolean> deactivatedMap = new HashMap<>();
 
@@ -36,6 +41,11 @@ public class PlayerDeactivatedManager {
         deactivatedMap.put(uuid, deactivated);
     }
 
+    /**
+     * Deactivates a player, activates him again after the configured time
+     * @param player
+     * @param world
+     */
     public static void deactivate(PlayerEntity player, World world) {
         var uuid = player.getUuid();
 
@@ -56,11 +66,22 @@ public class PlayerDeactivatedManager {
         }).start();
     }
 
+    /**
+     * Activates the player referenced by uuid
+     * @param uuid
+     * @param world
+     */
     public static void activate(UUID uuid, World world) {
         deactivatedMap.put(uuid, false);
         sendDeactivatedToClients(world, uuid, false);
     }
 
+    /**
+     * Deactivates a given player
+     * @param player The player to deactivate
+     * @param world The world he is in
+     * @param forever Bool if he should be deactivated without reactivation count down
+     */
     public static void deactivate(PlayerEntity player, World world, boolean forever) {
         if (forever == true) {
             var uuid = player.getUuid();

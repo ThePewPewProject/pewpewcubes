@@ -1,14 +1,6 @@
 package de.kleiner3.lasertag.client;
 
-import java.time.Duration;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Timer;
-
 import de.kleiner3.lasertag.LasertagConfig;
-import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.DurationUtils;
 import de.kleiner3.lasertag.util.Tuple;
@@ -17,7 +9,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.server.MinecraftServer;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Timer;
 
 /**
  * Class to implement the custom overlay for the lasertag game

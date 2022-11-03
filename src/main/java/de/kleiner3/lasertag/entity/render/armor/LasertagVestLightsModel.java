@@ -5,6 +5,11 @@ import de.kleiner3.lasertag.item.LasertagVestItem;
 import net.minecraft.util.Identifier;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 
+/**
+ * Model for the lasertag vests lights
+ *
+ * @author Étienne Muser
+ */
 public class LasertagVestLightsModel extends AnimatedGeoModel<LasertagVestItem> {
     @Override
     public Identifier getModelResource(LasertagVestItem object) {

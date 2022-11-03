@@ -361,7 +361,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     }
 
     /**
-     * Initializes the spawnpoint cache. Searches a 63 x 63 chunk area for spawnpoint blocks specified by the team color.
+     * Initializes the spawnpoint cache. Searches a 31 x 31 chunk area for spawnpoint blocks specified by the team color.
      * This method is computationally intensive, don't call too often or when responsiveness is important. The call of this method blocks the server from ticking!
      */
     public void initSpawnpointCache() {
