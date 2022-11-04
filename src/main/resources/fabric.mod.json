@@ -17,7 +17,7 @@
     "sources": "https://github.com/efibs/mc-lasertag-mod"
   },
 
-  "license": "",
+  "license": "GPL-3.0 license",
   "icon": "assets/lasertag/icon.png",
 
   "environment": "*",
@@ -39,6 +39,8 @@
         "net/minecraft/world/World": ["de/kleiner3/lasertag/util/fastiter/IFastWorldIter"]
     }
   },
+
+  "accessWidener" : "lasertag.accesswidener",
 
   "depends": {
     "fabricloader": ">=0.14.9",

@@ -1,4 +1,5 @@
 {
+
 	"itemGroup.lasertag.lasertag_item_group": "Lasertag",
 	
 	"block.lasertag.arena_block": "Arena Block",
@@ -9,6 +10,7 @@
 	"block.lasertag.lasertarget": "Lasertarget",
 	
 	"item.lasertag.lasertag_weapon": "Lasertag Weapon",
-	
-	"item.lasertag.lasertag_vest": "Lasertag Vest"
+	"item.lasertag.lasertag_vest": "Lasertag Vest",
+
+	"generator.lasertag.void_world": "Nothing but Void"
 }
