@@ -86,7 +86,7 @@ public class LasertagVestRenderer extends GeoArmorRenderer<LasertagVestItem> {
 
     @Override
     public Color getRenderColor(LasertagVestItem animatable, float partialTicks, MatrixStack stack, @Nullable VertexConsumerProvider renderTypeBuffer, @Nullable VertexConsumer vertexBuilder, int packedLightIn) {
-        if (modelProvider == LIGHTS_MODEL) {
+        if (getGeoModelProvider() == LIGHTS_MODEL) {
             var color = animatable.getColor(itemStack);
             return Color.ofOpaque(color);
         }
