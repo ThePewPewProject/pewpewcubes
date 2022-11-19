@@ -27,6 +27,7 @@ import java.util.List;
  */
 public class LasertagVestItem extends ArmorItem implements ILasertagColorable, IAnimatable {
 
+    // TODO: This is deprecated
     private final AnimationFactory factory = new AnimationFactory(this);
 
     public LasertagVestItem(ArmorMaterial armorMaterial, Settings settings) {
@@ -42,6 +43,7 @@ public class LasertagVestItem extends ArmorItem implements ILasertagColorable, I
 
         // Always loop the animation but later on in this method we'll decide whether or
         // not to actually play it
+        // TODO: This is deprecated
         event.getController().setAnimation(new AnimationBuilder().addAnimation("idle", true));
 
         // If the living entity is an armorstand just play the animation nonstop
