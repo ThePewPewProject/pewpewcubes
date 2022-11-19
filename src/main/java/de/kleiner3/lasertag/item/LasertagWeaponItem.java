@@ -147,10 +147,10 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
             // Despawn ray after 100ms
             new Thread(() -> {
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                 }
-                ray.discard();
+                ray.discard(); // TODO: ConcurrentModificationException?
             }).start();
         }
     }

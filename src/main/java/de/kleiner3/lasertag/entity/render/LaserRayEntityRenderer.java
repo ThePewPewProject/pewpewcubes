@@ -62,7 +62,7 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
      * @param end             The end position of the ray relative to its start position
      */
     private static void renderBeam(MatrixStack matrices, VertexConsumerProvider vertexConsumers, float tickDelta, long worldTime, float[] color, Vec3d end) {
-        renderBeam(matrices, vertexConsumers, BEAM_TEXTURE, tickDelta, worldTime, end, color, 0.025f, 0.03125f);
+        renderBeam(matrices, vertexConsumers, BEAM_TEXTURE, tickDelta, worldTime, end, color, 0.0125f, 0.015625f);
     }
 
     /**
