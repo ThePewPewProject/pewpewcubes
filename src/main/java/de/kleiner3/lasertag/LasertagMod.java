@@ -9,7 +9,6 @@ import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.worldgen.chunkgen.JungleArenaChunkGenerator;
-import de.kleiner3.lasertag.worldgen.chunkgen.VoidChunkGenerator;
 import de.kleiner3.lasertag.worldgen.structure.StructureResourceManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
@@ -39,8 +38,6 @@ import net.minecraft.util.Rarity;
 import net.minecraft.util.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.InputStream;
 
 /**
  * This class initializes the mod.
@@ -126,7 +123,6 @@ public class LasertagMod implements ModInitializer {
         // TODO: Reset HUD on disconnect/leave world
 
         // ===== Register chunk generators =============
-        Registry.register(Registry.CHUNK_GENERATOR, new Identifier(ID, "void_chunk_generator"), VoidChunkGenerator.CODEC);
         Registry.register(Registry.CHUNK_GENERATOR, new Identifier(ID, "jungle_arena_chunk_generator"), JungleArenaChunkGenerator.CODEC);
 
         // ===== Register resource manager =============

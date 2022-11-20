@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.mixin;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.worldgen.chunkgen.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.BuiltinRegistries;
@@ -18,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(WorldPresets.Registrar.class)
 public abstract class WorldPresetsMixin {
-    private static final RegistryKey<WorldPreset> JUNGLE_ARENA = RegistryKey.of(Registry.WORLD_PRESET_KEY, new Identifier("lasertag", "jungle_arena"));
+    private static final RegistryKey<WorldPreset> JUNGLE_ARENA = RegistryKey.of(Registry.WORLD_PRESET_KEY, new Identifier(LasertagMod.ID, "jungle_arena"));
 
     @Shadow
     protected abstract RegistryEntry<WorldPreset> register(RegistryKey<WorldPreset> key, DimensionOptions dimensionOptions);
