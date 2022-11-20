@@ -8,12 +8,17 @@ import de.kleiner3.lasertag.item.LasertagItemGroupBuilder;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.worldgen.chunkgen.JungleArenaChunkGenerator;
+import de.kleiner3.lasertag.worldgen.chunkgen.VoidChunkGenerator;
+import de.kleiner3.lasertag.worldgen.structure.StructureResourceManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -27,11 +32,15 @@ import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
 
 /**
  * This class initializes the mod.
@@ -115,7 +124,33 @@ public class LasertagMod implements ModInitializer {
             server.syncTeamsAndScoresToPlayer(handler.getPlayer());
         });
         // TODO: Reset HUD on disconnect/leave world
+
+        // ===== Register chunk generators =============
+        Registry.register(Registry.CHUNK_GENERATOR, new Identifier(ID, "void_chunk_generator"), VoidChunkGenerator.CODEC);
+        Registry.register(Registry.CHUNK_GENERATOR, new Identifier(ID, "jungle_arena_chunk_generator"), JungleArenaChunkGenerator.CODEC);
+
+        // ===== Register resource manager =============
+        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+            @Override
+            public Identifier getFabricId() {
+                return new Identifier(ID, "lasertag_structure_resource_manager");
+            }
+
+            @Override
+            public void reload(ResourceManager manager) {
+                var resources = manager.findResources("structures", path -> path.getPath().endsWith(".nbt"));
+                for(var entry : resources.entrySet()) {
+                    if (entry.getKey().getNamespace().equals(ID) == false) {
+                        continue;
+                    }
+
+                    STRUCTURE_RESOURCE_MANAGER.put(entry.getKey(), entry.getValue());
+                }
+            }
+        });
     }
 
     public static final String configFolderPath = FabricLoader.getInstance().getConfigDir() + "\\lasertag";
+
+    public static final StructureResourceManager STRUCTURE_RESOURCE_MANAGER = new StructureResourceManager();
 }
