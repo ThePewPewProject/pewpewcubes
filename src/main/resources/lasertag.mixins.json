@@ -8,7 +8,8 @@
 	"PlayerEntityMixin",
 	"PlayerManagerMixin",
     "fastiter.WorldMixin",
-    "WorldPresetsMixin"
+    "WorldPresetsMixin",
+    "ServerWorldMixin"
   ],
   "client": [
     "LivingEntityRendererMixin"
