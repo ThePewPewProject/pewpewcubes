@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.worldgen.chunkgen;
 
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.resource.ResourceManagers;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.nbt.NbtCompound;
@@ -46,7 +47,6 @@ import java.util.concurrent.Executor;
  * @author Étienne Muser
  */
 public abstract class ArenaChunkGenerator extends ChunkGenerator {
-    // TODO: Set world spawn to 0, 0, 0
     // TODO: Set difficulty to peaceful
 
     private StructureTemplate structureTemplate;
@@ -65,7 +65,7 @@ public abstract class ArenaChunkGenerator extends ChunkGenerator {
         super(structureSetRegistry, Optional.empty(), biome);
 
         // Read nbt file
-        var resource = LasertagMod.STRUCTURE_RESOURCE_MANAGER.get(nbtFileId);
+        var resource = ResourceManagers.STRUCTURE_RESOURCE_MANAGER.get(nbtFileId);
 
         if (resource == null) {
             LasertagMod.LOGGER.error("Arena nbt file not in resource manager.");

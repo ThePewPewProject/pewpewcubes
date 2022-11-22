@@ -8,11 +8,11 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
  *
  * @author Étienne Muser
  */
-public class CommandInitializer {
+public class Commands {
     /**
      * Init server side commands
      */
-    public static void initCommands() {
+    public static void register() {
         CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> {
             LasertagCommand.register(dispatcher);
         }));

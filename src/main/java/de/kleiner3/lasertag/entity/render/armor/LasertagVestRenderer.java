@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.entity.render.armor;
 
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.item.Items;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import net.minecraft.client.render.OverlayTexture;
@@ -73,14 +74,14 @@ public class LasertagVestRenderer extends GeoArmorRenderer<LasertagVestItem> {
             boolean isDeactivated = PlayerDeactivatedManager.isDeactivated(entity.getUuid());
 
             if (isDeactivated == false) {
-                var color = ((LasertagVestItem) LasertagMod.LASERTAG_VEST).getColor(stack);
+                var color = ((LasertagVestItem) Items.LASERTAG_VEST).getColor(stack);
                 r = ((color >> 16) & 0xFF) / 255.0F;
                 g = ((color >> 8) & 0xFF) / 255.0F;
                 b = ((color >> 0) & 0xFF) / 255.0F;
             }
         }
 
-        this.render(lightsModel, (LasertagVestItem) LasertagMod.LASERTAG_VEST, 1.0F, cameo, matrices, vertexConsumers, vertexConsumers.getBuffer(cameo), light, OverlayTexture.DEFAULT_UV, r, g, b, 1.0F);
+        this.render(lightsModel, (LasertagVestItem) Items.LASERTAG_VEST, 1.0F, cameo, matrices, vertexConsumers, vertexConsumers.getBuffer(cameo), light, OverlayTexture.DEFAULT_UV, r, g, b, 1.0F);
         matrices.pop();
     }
 

@@ -42,7 +42,7 @@ public class LaserRayEntity extends ProjectileEntity {
     }
 
     public LaserRayEntity(World world, Vec3d pos, float yaw, float pitch, int color, Vec3d endPos) {
-        super(LasertagMod.LASER_RAY, world);
+        super(Entities.LASER_RAY, world);
 
         this.color = color;
         this.end = endPos;

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
+import de.kleiner3.lasertag.item.Items;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.lasertaggame.GameStats;
@@ -187,14 +188,14 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         inventory.clear();
 
         // Give player a lasertag vest
-        var vestStack = new ItemStack(LasertagMod.LASERTAG_VEST);
-        ((LasertagVestItem)LasertagMod.LASERTAG_VEST).setColor(vestStack, newTeamColor.getValue());
+        var vestStack = new ItemStack(Items.LASERTAG_VEST);
+        ((LasertagVestItem)Items.LASERTAG_VEST).setColor(vestStack, newTeamColor.getValue());
         player.equipStack(EquipmentSlot.CHEST, vestStack);
 
         // Give player a lasertag weapon
-        var weaponStack = new ItemStack(LasertagMod.LASERTAG_WEAPON);
-        ((LasertagWeaponItem)LasertagMod.LASERTAG_WEAPON).setColor(weaponStack, newTeamColor.getValue());
-        ((LasertagWeaponItem)LasertagMod.LASERTAG_WEAPON).setDeactivated(weaponStack, true);
+        var weaponStack = new ItemStack(Items.LASERTAG_WEAPON);
+        ((LasertagWeaponItem)Items.LASERTAG_WEAPON).setColor(weaponStack, newTeamColor.getValue());
+        ((LasertagWeaponItem)Items.LASERTAG_WEAPON).setDeactivated(weaponStack, true);
         inventory.setStack(0, weaponStack);
 
         // Notify about change

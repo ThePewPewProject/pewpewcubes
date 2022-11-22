@@ -2,6 +2,7 @@ package de.kleiner3.lasertag.block.entity;
 
 import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.entity.Entities;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.util.Tuple;
 import net.minecraft.block.BlockState;
@@ -31,7 +32,7 @@ public class LaserTargetBlockEntity extends BlockEntity {
     private boolean deactivated = false;
 
     public LaserTargetBlockEntity(BlockPos pos, BlockState state) {
-        super(LasertagMod.LASER_TARGET_ENTITY, pos, state);
+        super(Entities.LASER_TARGET_ENTITY, pos, state);
     }
 
     public void onHitBy(MinecraftServer server, PlayerEntity playerEntity) {
