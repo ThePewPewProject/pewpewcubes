@@ -14,7 +14,7 @@ public interface ILasertagColorable {
      * @param stack The ItemStack to set the color of
      * @param color The color/team to set it to
      */
-    default public void setColor(ItemStack stack, int color) {
+    default void setColor(ItemStack stack, int color) {
         var nbt = stack.getNbt();
         if (nbt == null) {
             nbt = new NbtCompound();
@@ -28,7 +28,7 @@ public interface ILasertagColorable {
      * @param stack
      * @return
      */
-    default public int getColor(ItemStack stack) {
+    default int getColor(ItemStack stack) {
         if (!stack.hasNbt()) {
             return 0xFFFFFF;
         }

@@ -73,7 +73,7 @@ public class LasertagVestRenderer extends GeoArmorRenderer<LasertagVestItem> {
         if (entity instanceof PlayerEntity) {
             boolean isDeactivated = PlayerDeactivatedManager.isDeactivated(entity.getUuid());
 
-            if (isDeactivated == false) {
+            if (!isDeactivated) {
                 var color = ((LasertagVestItem) Items.LASERTAG_VEST).getColor(stack);
                 r = ((color >> 16) & 0xFF) / 255.0F;
                 g = ((color >> 8) & 0xFF) / 255.0F;

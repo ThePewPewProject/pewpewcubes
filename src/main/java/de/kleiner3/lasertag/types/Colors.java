@@ -83,12 +83,12 @@ public class Colors {
                 var dir = new File(LasertagMod.configFolderPath);
 
                 // Create directory if not exists
-                if (dir.exists() == false) {
+                if (!dir.exists()) {
                     dir.mkdir();
                 }
 
                 // Create file if not exists
-                if (colorConfigFile.exists() == false) {
+                if (!colorConfigFile.exists()) {
                     colorConfigFile.createNewFile();
                 }
 
@@ -113,7 +113,7 @@ public class Colors {
             this.spawnpointBlock = spawnpointBlock;
         }
 
-        private String teamName;
+        private final String teamName;
         private final int r;
         private final int g;
         private final int b;

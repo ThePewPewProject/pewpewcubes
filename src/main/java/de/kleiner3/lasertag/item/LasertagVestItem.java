@@ -64,7 +64,7 @@ public class LasertagVestItem extends ArmorItem implements ILasertagColorable, I
 
         // Make sure the player is wearing all the armor. If they are, continue playing
         // the animation, otherwise stop
-        boolean isWearingAll = armorList.containsAll(Arrays.asList(Items.LASERTAG_VEST));
+        boolean isWearingAll = armorList.contains(Items.LASERTAG_VEST);
         return isWearingAll ? PlayState.CONTINUE : PlayState.STOP;
     }
 

@@ -18,7 +18,7 @@ public interface ILasertagGame {
     /**
      * Start the lasertag game
      */
-    default public void startGame(boolean scanSpawnpoints) {
+    default void startGame(boolean scanSpawnpoints) {
     }
 
     /**
@@ -27,7 +27,7 @@ public interface ILasertagGame {
      * @param color
      * @return
      */
-    default public List<PlayerEntity> getPlayersOfTeam(Colors.Color color) {
+    default List<PlayerEntity> getPlayersOfTeam(Colors.Color color) {
         return new LinkedList<PlayerEntity>();
     }
 
@@ -37,7 +37,7 @@ public interface ILasertagGame {
      * @param color
      * @param player
      */
-    default public void playerJoinTeam(Colors.Color color, PlayerEntity player) {
+    default void playerJoinTeam(Colors.Color color, PlayerEntity player) {
     }
 
     /**
@@ -46,7 +46,7 @@ public interface ILasertagGame {
      * @param color
      * @param player
      */
-    default public void playerLeaveTeam(Colors.Color color, PlayerEntity player) {
+    default void playerLeaveTeam(Colors.Color color, PlayerEntity player) {
     }
 
     /**
@@ -55,7 +55,7 @@ public interface ILasertagGame {
      * @param player
      * @param score
      */
-    default public void onPlayerScored(PlayerEntity player, int score) {
+    default void onPlayerScored(PlayerEntity player, int score) {
     }
 
     /**
@@ -63,19 +63,19 @@ public interface ILasertagGame {
      *
      * @param player
      */
-    default public void playerLeaveHisTeam(PlayerEntity player) {
+    default void playerLeaveHisTeam(PlayerEntity player) {
     }
 
     /**
      * Seraches the world for the spawnpoint blocks and caches them
      */
-    default public void initSpawnpointCache() {
+    default void initSpawnpointCache() {
     }
 
     /**
      * @return True if the game is running
      */
-    default public boolean isRunning() {
+    default boolean isRunning() {
         return false;
     }
 
@@ -83,13 +83,13 @@ public interface ILasertagGame {
      * Register a lasertarget to be reset after game
      * @param target
      */
-    default public void registerLasertarget(LaserTargetBlockEntity target) {
+    default void registerLasertarget(LaserTargetBlockEntity target) {
     }
 
     /**
      * Synchronize the teams and scores to a player
      * @param player
      */
-    default public void syncTeamsAndScoresToPlayer(ServerPlayerEntity player) {
+    default void syncTeamsAndScoresToPlayer(ServerPlayerEntity player) {
     }
 }

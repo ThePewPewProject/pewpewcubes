@@ -223,10 +223,10 @@ public class LasertagConfig {
     }
 
     // Get path to lasertag config file
-    private static String lasertagConfigFilePath = LasertagMod.configFolderPath + "\\lasertagConfig.json";
+    private static final String lasertagConfigFilePath = LasertagMod.configFolderPath + "\\lasertagConfig.json";
 
     // Create file object
-    private static File lasertagConfigFile = new File(lasertagConfigFilePath);
+    private static final File lasertagConfigFile = new File(lasertagConfigFilePath);
 
     private static LasertagConfig instance = null;
 
@@ -260,12 +260,12 @@ public class LasertagConfig {
 
         // Create directory if not exists
         var dir = new File(LasertagMod.configFolderPath);
-        if (dir.exists() == false) {
+        if (!dir.exists()) {
             dir.mkdir();
         }
 
         // If config file doesn't exist
-        if (lasertagConfigFile.exists() == false) {
+        if (!lasertagConfigFile.exists()) {
             // Log that lasertag config file is being created
             LasertagMod.LOGGER.info("Lasertag config file is being created in '" + lasertagConfigFilePath + "'");
 

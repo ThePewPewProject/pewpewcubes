@@ -84,7 +84,6 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
         matrices.push();
 
         float beamSpinProgress = (float) Math.floorMod(worldTime, 40) + tickDelta;
-        ;
         float h = MathHelper.fractionalPart(beamSpinProgress * 0.2f - (float) MathHelper.floor(beamSpinProgress * 0.1f));
         float colorR = color[0];
         float colorG = color[1];

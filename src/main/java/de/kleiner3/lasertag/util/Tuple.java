@@ -23,11 +23,9 @@ public class Tuple<A, B> {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Tuple)) {
+        if (!(obj instanceof Tuple other)) {
             return false;
         }
-
-        var other = (Tuple)obj;
 
         return x.equals(other.x) && y.equals(other.y);
     }

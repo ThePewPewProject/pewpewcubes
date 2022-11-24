@@ -50,7 +50,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     /**
      * Map every player to their team color
      */
-    private HashMap<Colors.Color, List<PlayerEntity>> teamMap = new HashMap<>();
+    private final HashMap<Colors.Color, List<PlayerEntity>> teamMap = new HashMap<>();
 
     private List<LaserTargetBlockEntity> lasertargetsToReset = new LinkedList<>();
 
@@ -112,7 +112,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         new Thread(() -> {
             // Wait for game start cooldown
             try {
-                Thread.sleep(LasertagConfig.getInstance().getStartTime() * 1000);
+                Thread.sleep(LasertagConfig.getInstance().getStartTime() * 1000L);
             } catch (InterruptedException e) {}
 
             // Activate every player

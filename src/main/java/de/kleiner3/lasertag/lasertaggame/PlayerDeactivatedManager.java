@@ -18,7 +18,7 @@ import java.util.UUID;
  * @author Étienne Muser
  */
 public class PlayerDeactivatedManager {
-    private static HashMap<UUID, Boolean> deactivatedMap = new HashMap<>();
+    private static final HashMap<UUID, Boolean> deactivatedMap = new HashMap<>();
 
 
     /**
@@ -26,7 +26,7 @@ public class PlayerDeactivatedManager {
      */
     public static boolean isDeactivated(UUID uuid) {
         // If not already in map
-        if (deactivatedMap.containsKey(uuid) == false) {
+        if (!deactivatedMap.containsKey(uuid)) {
             deactivatedMap.put(uuid, true);
         }
 
@@ -56,7 +56,7 @@ public class PlayerDeactivatedManager {
 
         new Thread(() -> {
             try {
-                Thread.sleep(1000 * LasertagConfig.getInstance().getDeactivateTime());
+                Thread.sleep(1000L * LasertagConfig.getInstance().getDeactivateTime());
             } catch (InterruptedException e) {}
 
             // Reactivate player
@@ -83,7 +83,7 @@ public class PlayerDeactivatedManager {
      * @param forever Bool if he should be deactivated without reactivation count down
      */
     public static void deactivate(PlayerEntity player, World world, boolean forever) {
-        if (forever == true) {
+        if (forever) {
             var uuid = player.getUuid();
             deactivatedMap.put(uuid, true);
             sendDeactivatedToClients(world, uuid, true);
@@ -93,8 +93,7 @@ public class PlayerDeactivatedManager {
     }
 
     private static void sendDeactivatedToClients(World world, UUID uuid, boolean deactivated) {
-        if (world instanceof ServerWorld) {
-            ServerWorld serverWorld = (ServerWorld) world;
+        if (world instanceof ServerWorld serverWorld) {
 
             PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 

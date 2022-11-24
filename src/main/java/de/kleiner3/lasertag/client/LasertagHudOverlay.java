@@ -168,7 +168,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
         // If game time should be rendered
         if (LasertagConfig.getInstance().isRenderTimer()) {
-            DrawableHelper.drawCenteredText(matrixStack, renderer, DurationUtils.toString(Duration.ofSeconds((LasertagConfig.getInstance().getPlayTime() * 60) - gameTime)), wMid, textPadding, 0xFFFFFF);
+            DrawableHelper.drawCenteredText(matrixStack, renderer, DurationUtils.toString(Duration.ofSeconds((LasertagConfig.getInstance().getPlayTime() * 60L) - gameTime)), wMid, textPadding, 0xFFFFFF);
         }
 
         // Draw progress bar

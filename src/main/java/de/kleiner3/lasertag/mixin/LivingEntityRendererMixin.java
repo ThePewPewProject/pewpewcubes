@@ -20,7 +20,7 @@ public abstract class LivingEntityRendererMixin {
      */
     @Inject(method = "hasLabel", at = @At("HEAD"), cancellable = true)
     private void onHasLabel(CallbackInfoReturnable<Boolean> cir) {
-        if (LasertagHudOverlay.shouldRenderNameTags == false) {
+        if (!LasertagHudOverlay.shouldRenderNameTags) {
             cir.setReturnValue(false);
             cir.cancel();
         }

@@ -164,13 +164,13 @@ public class ClientNetworkingHandler {
                 LasertagHudOverlay.gameTimer.scheduleAtFixedRate(new TimerTask() {
                                                                      @Override
                                                                      public void run() {
-                                                                         if ((LasertagConfig.getInstance().getPlayTime() * 60) - LasertagHudOverlay.gameTime == 0) {
+                                                                         if ((LasertagConfig.getInstance().getPlayTime() * 60L) - LasertagHudOverlay.gameTime == 0) {
                                                                              synchronized (LasertagHudOverlay.gameTimer) {
                                                                                  LasertagHudOverlay.gameTimer.cancel();
                                                                                  LasertagHudOverlay.gameTimer = null;
                                                                                  LasertagHudOverlay.gameTime = 0;
                                                                              }
-                                                                             LasertagHudOverlay.gameTime = LasertagConfig.getInstance().getPlayTime() * 60;
+                                                                             LasertagHudOverlay.gameTime = LasertagConfig.getInstance().getPlayTime() * 60L;
                                                                              return;
                                                                          }
 

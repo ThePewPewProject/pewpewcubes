@@ -14,5 +14,5 @@ public interface IIter {
      * @param block The current block
      * @param pos The BlockPos of the current block
      */
-    public void doIter(Block block, BlockPos pos);
+    void doIter(Block block, BlockPos pos);
 }

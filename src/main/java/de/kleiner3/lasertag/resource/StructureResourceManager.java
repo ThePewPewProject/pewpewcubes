@@ -15,7 +15,7 @@ import java.util.Map;
  * @author Étienne Muser
  */
 public class StructureResourceManager implements SimpleSynchronousResourceReloadListener {
-    private Map<Identifier, Resource> structureResources = new HashMap<>();
+    private final Map<Identifier, Resource> structureResources = new HashMap<>();
 
     public Resource get(Identifier id) {
         return structureResources.get(id);
@@ -30,7 +30,7 @@ public class StructureResourceManager implements SimpleSynchronousResourceReload
     public void reload(ResourceManager manager) {
         var resources = manager.findResources("structures", path -> path.getPath().endsWith(".nbt"));
         for(var entry : resources.entrySet()) {
-            if (entry.getKey().getNamespace().equals(LasertagMod.ID) == false) {
+            if (!entry.getKey().getNamespace().equals(LasertagMod.ID)) {
                 continue;
             }
 

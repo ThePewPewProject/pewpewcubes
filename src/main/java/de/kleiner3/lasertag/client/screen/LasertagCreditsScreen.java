@@ -116,7 +116,7 @@ public class LasertagCreditsScreen extends Screen {
     }
 
     private void load(String id, LasertagCreditsScreen.CreditsReader reader) {
-        try (BufferedReader reader2 = this.client.getResourceManager().openAsReader(new Identifier("lasertag", id));){
+        try (BufferedReader reader2 = this.client.getResourceManager().openAsReader(new Identifier("lasertag", id))){
             reader.read(reader2);
         }
         catch (Exception exception) {
@@ -227,8 +227,8 @@ public class LasertagCreditsScreen extends Screen {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.enableBlend();
         this.drawWithOutline(i, j, (x, y) -> {
-            this.drawTexture(matrices, x + 0, (int)y, 0, 0, 155, 44);
-            this.drawTexture(matrices, x + 155, (int)y, 0, 45, 155, 44);
+            this.drawTexture(matrices, x, y, 0, 0, 155, 44);
+            this.drawTexture(matrices, x + 155, y, 0, 45, 155, 44);
         });
         RenderSystem.disableBlend();
         int k = j + 100;
@@ -268,7 +268,7 @@ public class LasertagCreditsScreen extends Screen {
 
     @FunctionalInterface
     @Environment(value= EnvType.CLIENT)
-    static interface CreditsReader {
-        public void read(Reader var1) throws IOException;
+    interface CreditsReader {
+        void read(Reader var1) throws IOException;
     }
 }

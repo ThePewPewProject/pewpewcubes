@@ -50,13 +50,13 @@ public class LaserTargetBlockEntity extends BlockEntity {
         ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) playerEntity);
 
         // Register on server
-        server.registerLasertarget((LaserTargetBlockEntity)(Object)this);
+        server.registerLasertarget(this);
 
         // Deactivate
         deactivated = true;
         new Thread(() -> {
             try {
-                Thread.sleep(LasertagConfig.getInstance().getLasertargetDeactivatedTime() * 1000);
+                Thread.sleep(LasertagConfig.getInstance().getLasertargetDeactivatedTime() * 1000L);
             } catch (InterruptedException e) {}
 
             deactivated = false;
