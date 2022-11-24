@@ -51,13 +51,6 @@ public class LasertagHudOverlay implements HudRenderCallback {
         for (Colors.Color c : Colors.colorConfig.values()) {
             teamMap.put(c.getName(), new LinkedList<>());
         }
-
-//		teamMap.get(Colors.RED).add(new Tuple<String, Integer>("TEST1", 300));
-//		teamMap.get(Colors.RED).add(new Tuple<String, Integer>("TEST2", 300));
-//		teamMap.get(Colors.RED).add(new Tuple<String, Integer>("TEST3", 300));
-//		teamMap.get(Colors.RED).add(new Tuple<String, Integer>("TEST4", 300));
-//		teamMap.get(Colors.RED).add(new Tuple<String, Integer>("TEST5", 300));
-//		teamMap.get(Colors.RED).add(new Tuple<String, Integer>("TEST6", 300));
     }
 
     /**
@@ -108,10 +101,10 @@ public class LasertagHudOverlay implements HudRenderCallback {
                     int memberY = y + 2 * textPadding + textHeight + 1;
                     for (Tuple<String, Integer> playerData : teamMap.get(teamColor.getName())) {
                         // Draw player name
-                        renderer.draw(matrixStack, playerData.x, textPadding, memberY, 0xFFFFFF);
+                        renderer.draw(matrixStack, playerData.x(), textPadding, memberY, 0xFFFFFF);
 
                         // Get the players score
-                        Integer playerScore = playerData.y;
+                        Integer playerScore = playerData.y();
 
                         // Add the players score to the team score
                         teamScore += playerScore;
@@ -141,10 +134,10 @@ public class LasertagHudOverlay implements HudRenderCallback {
                     int memberY = y + 2 * textPadding + textHeight + 1;
                     for (Tuple<String, Integer> playerData : teamMap.get(teamColor.getName())) {
                         // Draw player name
-                        renderer.draw(matrixStack, playerData.x, width - textPadding - renderer.getWidth(playerData.x), memberY, 0xFFFFFF);
+                        renderer.draw(matrixStack, playerData.x(), width - textPadding - renderer.getWidth(playerData.x()), memberY, 0xFFFFFF);
 
                         // Get the players score
-                        Integer playerScore = playerData.y;
+                        Integer playerScore = playerData.y();
 
                         // Add the players score to the team score
                         teamScore += playerScore;

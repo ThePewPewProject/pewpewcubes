@@ -1,6 +1,5 @@
 package de.kleiner3.lasertag.entity;
 
-import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;

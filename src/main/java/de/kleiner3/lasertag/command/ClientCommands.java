@@ -13,8 +13,6 @@ public class ClientCommands {
      * Init client side commands
      */
     public static void register() {
-        ClientCommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess) -> {
-            CreditsCommand.register(dispatcher);
-        }));
+        ClientCommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess) -> CreditsCommand.register(dispatcher)));
     }
 }

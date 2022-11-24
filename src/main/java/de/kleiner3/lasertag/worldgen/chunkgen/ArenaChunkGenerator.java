@@ -72,7 +72,7 @@ public abstract class ArenaChunkGenerator extends ChunkGenerator {
             return;
         }
 
-        NbtCompound nbt = null;
+        NbtCompound nbt;
         try {
             nbt = NbtIo.readCompressed(resource.getInputStream());
         } catch (IOException e) {

@@ -22,7 +22,7 @@ public class FileIO {
         try (var is = new FileInputStream(file)) {
             // Create buffered reader
             try (var br = new BufferedReader(new InputStreamReader(is))) {
-                String line = null;
+                String line;
                 // Read every line
                 while((line = br.readLine()) != null) {
                     builder.append(line);

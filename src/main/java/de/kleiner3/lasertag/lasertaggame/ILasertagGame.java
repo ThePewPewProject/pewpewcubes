@@ -28,7 +28,7 @@ public interface ILasertagGame {
      * @return
      */
     default List<PlayerEntity> getPlayersOfTeam(Colors.Color color) {
-        return new LinkedList<PlayerEntity>();
+        return new LinkedList<>();
     }
 
     /**

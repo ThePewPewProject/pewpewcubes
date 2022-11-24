@@ -116,7 +116,7 @@ public class LasertagCreditsScreen extends Screen {
     }
 
     private void load(String id, LasertagCreditsScreen.CreditsReader reader) {
-        try (BufferedReader reader2 = this.client.getResourceManager().openAsReader(new Identifier("lasertag", id))){
+        try (BufferedReader reader2 = this.client.getResourceManager().openAsReader(new Identifier(LasertagMod.ID, id))){
             reader.read(reader2);
         }
         catch (Exception exception) {
@@ -126,17 +126,17 @@ public class LasertagCreditsScreen extends Screen {
 
     private void readPoem(Reader reader) throws IOException {
         int i;
-        Object string;
+        String line;
         BufferedReader bufferedReader = new BufferedReader(reader);
         Random random = Random.create(8124371L);
-        while ((string = bufferedReader.readLine()) != null) {
-            string = ((String)string).replaceAll("PLAYERNAME", this.client.getSession().getUsername());
-            while ((i = ((String)string).indexOf(OBFUSCATION_PLACEHOLDER)) != -1) {
-                String string2 = ((String)string).substring(0, i);
-                String string3 = ((String)string).substring(i + OBFUSCATION_PLACEHOLDER.length());
-                string = string2 + Formatting.WHITE + Formatting.OBFUSCATED + "XXXXXXXX".substring(0, random.nextInt(4) + 3) + string3;
+        while ((line = bufferedReader.readLine()) != null) {
+            line = line.replaceAll("PLAYERNAME", this.client.getSession().getUsername());
+            while ((i = line.indexOf(OBFUSCATION_PLACEHOLDER)) != -1) {
+                String string2 = line.substring(0, i);
+                String string3 = line.substring(i + OBFUSCATION_PLACEHOLDER.length());
+                line = string2 + Formatting.WHITE + Formatting.OBFUSCATED + "XXXXXXXX".substring(0, random.nextInt(4) + 3) + string3;
             }
-            this.addText((String)string);
+            this.addText(line);
             this.addEmptyLine();
         }
         for (i = 0; i < 8; ++i) {

@@ -1,6 +1,5 @@
 package de.kleiner3.lasertag.item;
 
-import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.types.ILasertagColorable;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -11,13 +10,14 @@ import net.minecraft.item.Item;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import software.bernie.geckolib3.core.builder.ILoopType;
 import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,8 +27,7 @@ import java.util.List;
  */
 public class LasertagVestItem extends ArmorItem implements ILasertagColorable, IAnimatable {
 
-    // TODO: This is deprecated
-    private final AnimationFactory factory = new AnimationFactory(this);
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     public LasertagVestItem(ArmorMaterial armorMaterial, Settings settings) {
         super(armorMaterial, EquipmentSlot.CHEST, settings);
@@ -43,8 +42,7 @@ public class LasertagVestItem extends ArmorItem implements ILasertagColorable, I
 
         // Always loop the animation but later on in this method we'll decide whether or
         // not to actually play it
-        // TODO: This is deprecated
-        event.getController().setAnimation(new AnimationBuilder().addAnimation("idle", true));
+        event.getController().setAnimation(new AnimationBuilder().addAnimation("idle", ILoopType.EDefaultLoopTypes.LOOP));
 
         // If the living entity is an armorstand just play the animation nonstop
         if (livingEntity instanceof ArmorStandEntity) {

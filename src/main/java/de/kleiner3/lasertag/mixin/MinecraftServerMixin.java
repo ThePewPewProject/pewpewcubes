@@ -435,10 +435,10 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         }
 
         // Sort stats
-        Collections.sort(lastGamesStats.teamScores, (a, b) -> (a.y - b.y));
-        Collections.sort(lastGamesStats.playerScores, (a, b) -> (a.y - b.y));
+        lastGamesStats.teamScores.sort(Comparator.comparingInt(Tuple::y));
+        lastGamesStats.playerScores.sort(Comparator.comparingInt(Tuple::y));
         for (var team : lastGamesStats.teamPlayerScores.values()) {
-            Collections.sort(team, (a, b) -> (a.y - b.y));
+            team.sort(Comparator.comparingInt(Tuple::y));
         }
     }
 

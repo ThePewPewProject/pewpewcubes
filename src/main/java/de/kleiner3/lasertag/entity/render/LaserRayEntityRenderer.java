@@ -90,17 +90,17 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
         float colorB = color[2];
         matrices.push();
         matrices.multiply(rot);
-        float m = 0.0f;
+        float m;
         float n = innerRadius;
         float o = innerRadius;
-        float p = 0.0f;
+        float p;
         float q = -innerRadius;
-        float r = 0.0f;
-        float s = 0.0f;
+        float r;
+        float s;
         float t = -innerRadius;
         float w = -1.0f + h;
         float x = (float) length * (0.5f / innerRadius) + w;
-        renderBeamLayer(matrices, vertexConsumers.getBuffer(RenderLayer.getBeaconBeam(textureId, false)), colorR, colorG, colorB, 1.0f, length, 0.0f, n, o, 0.0f, q, 0.0f, 0.0f, t, 0.0f, 1.0f, x, w);
+        renderBeamLayer(matrices, vertexConsumers.getBuffer(RenderLayer.getBeaconBeam(textureId, false)), colorR, colorG, colorB, 1.0f, length, 0.0f, n, o, 0.0f, q, 0.0f, 0.0f, t, x, w);
         matrices.pop();
         matrices.multiply(rot);
         m = -outerRadius;
@@ -113,7 +113,7 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
         t = outerRadius;
         w = -1.0f + h;
         x = (float) length + w;
-        renderBeamLayer(matrices, vertexConsumers.getBuffer(RenderLayer.getBeaconBeam(textureId, true)), colorR, colorG, colorB, 0.125f, length, m, n, o, p, q, r, s, t, 0.0f, 1.0f, x, w);
+        renderBeamLayer(matrices, vertexConsumers.getBuffer(RenderLayer.getBeaconBeam(textureId, true)), colorR, colorG, colorB, 0.125f, length, m, n, o, p, q, r, s, t, x, w);
         matrices.pop();
     }
 
@@ -135,26 +135,24 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
      * @param z3
      * @param x4
      * @param z4
-     * @param u1
-     * @param u2
      * @param v1
      * @param v2
      */
-    private static void renderBeamLayer(MatrixStack matrices, VertexConsumer vertices, float red, float green, float blue, float alpha, double length, float x1, float z1, float x2, float z2, float x3, float z3, float x4, float z4, float u1, float u2, float v1, float v2) {
+    private static void renderBeamLayer(MatrixStack matrices, VertexConsumer vertices, float red, float green, float blue, float alpha, double length, float x1, float z1, float x2, float z2, float x3, float z3, float x4, float z4, float v1, float v2) {
         MatrixStack.Entry entry = matrices.peek();
         Matrix4f matrix4f = entry.getPositionMatrix();
         Matrix3f matrix3f = entry.getNormalMatrix();
-        renderBeamFace(matrix4f, matrix3f, vertices, red, green, blue, alpha, length, x1, z1, x2, z2, u1, u2, v1, v2);
-        renderBeamFace(matrix4f, matrix3f, vertices, red, green, blue, alpha, length, x4, z4, x3, z3, u1, u2, v1, v2);
-        renderBeamFace(matrix4f, matrix3f, vertices, red, green, blue, alpha, length, x2, z2, x4, z4, u1, u2, v1, v2);
-        renderBeamFace(matrix4f, matrix3f, vertices, red, green, blue, alpha, length, x3, z3, x1, z1, u1, u2, v1, v2);
+        renderBeamFace(matrix4f, matrix3f, vertices, red, green, blue, alpha, length, x1, z1, x2, z2, v1, v2);
+        renderBeamFace(matrix4f, matrix3f, vertices, red, green, blue, alpha, length, x4, z4, x3, z3, v1, v2);
+        renderBeamFace(matrix4f, matrix3f, vertices, red, green, blue, alpha, length, x2, z2, x4, z4, v1, v2);
+        renderBeamFace(matrix4f, matrix3f, vertices, red, green, blue, alpha, length, x3, z3, x1, z1, v1, v2);
     }
 
-    private static void renderBeamFace(Matrix4f positionMatrix, Matrix3f normalMatrix, VertexConsumer vertices, float red, float green, float blue, float alpha, double length, float x1, float z1, float x2, float z2, float u1, float u2, float v1, float v2) {
-        renderBeamVertex(positionMatrix, normalMatrix, vertices, red, green, blue, alpha, length, x1, z1, u2, v1);
-        renderBeamVertex(positionMatrix, normalMatrix, vertices, red, green, blue, alpha, 0, x1, z1, u2, v2);
-        renderBeamVertex(positionMatrix, normalMatrix, vertices, red, green, blue, alpha, 0, x2, z2, u1, v2);
-        renderBeamVertex(positionMatrix, normalMatrix, vertices, red, green, blue, alpha, length, x2, z2, u1, v1);
+    private static void renderBeamFace(Matrix4f positionMatrix, Matrix3f normalMatrix, VertexConsumer vertices, float red, float green, float blue, float alpha, double length, float x1, float z1, float x2, float z2, float v1, float v2) {
+        renderBeamVertex(positionMatrix, normalMatrix, vertices, red, green, blue, alpha, length, x1, z1, (float) 1.0, v1);
+        renderBeamVertex(positionMatrix, normalMatrix, vertices, red, green, blue, alpha, 0, x1, z1, (float) 1.0, v2);
+        renderBeamVertex(positionMatrix, normalMatrix, vertices, red, green, blue, alpha, 0, x2, z2, (float) 0.0, v2);
+        renderBeamVertex(positionMatrix, normalMatrix, vertices, red, green, blue, alpha, length, x2, z2, (float) 0.0, v1);
     }
 
     /**

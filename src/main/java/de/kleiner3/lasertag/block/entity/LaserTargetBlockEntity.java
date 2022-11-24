@@ -1,10 +1,8 @@
 package de.kleiner3.lasertag.block.entity;
 
 import de.kleiner3.lasertag.LasertagConfig;
-import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.entity.Entities;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import de.kleiner3.lasertag.util.Tuple;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,15 +18,14 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 public class LaserTargetBlockEntity extends BlockEntity {
 
     /**
      * Represents the uuids of the players who hit the target already.
-     * x := uuid.LSB
-     * y := uuid.MSB
      */
-    private List<Tuple<Long, Long>> hitBy = new ArrayList<>();
+    private List<UUID> hitBy = new LinkedList<>();
     private boolean deactivated = false;
 
     public LaserTargetBlockEntity(BlockPos pos, BlockState state) {
@@ -63,8 +60,7 @@ public class LaserTargetBlockEntity extends BlockEntity {
         }).start();
 
         // Add player to the players who hit the target
-        var uuid = playerEntity.getUuid();
-        hitBy.add(new Tuple<>(uuid.getLeastSignificantBits(), uuid.getMostSignificantBits()));
+        hitBy.add(playerEntity.getUuid());
     }
 
     @Override
@@ -73,8 +69,8 @@ public class LaserTargetBlockEntity extends BlockEntity {
 
         var hitByFlattened = new LinkedList<Long>();
         for (var uuid : hitBy) {
-            hitByFlattened.add(uuid.x);
-            hitByFlattened.add(uuid.y);
+            hitByFlattened.add(uuid.getMostSignificantBits());
+            hitByFlattened.add(uuid.getLeastSignificantBits());
         }
         nbt.putLongArray("hitBy", hitByFlattened);
 
@@ -88,7 +84,7 @@ public class LaserTargetBlockEntity extends BlockEntity {
         var hitByFlattened = nbt.getLongArray("hitBy");
         hitBy = new ArrayList<>();
         for(int i = 0; i < hitByFlattened.length; i += 2) {
-            hitBy.add(new Tuple(hitByFlattened[i], hitByFlattened[i+1]));
+            hitBy.add(new UUID(hitByFlattened[i], hitByFlattened[i+1]));
         }
 
         deactivated = nbt.getBoolean("deactivated");
@@ -107,14 +103,14 @@ public class LaserTargetBlockEntity extends BlockEntity {
 
     public void reset() {
         deactivated = false;
-        hitBy = new ArrayList<>();
+        hitBy = new LinkedList<>();
     }
 
     private boolean alreadyHit(PlayerEntity p) {
         var uuid = p.getUuid();
 
-        for (int i = 0; i < hitBy.size(); ++i) {
-            if (hitBy.get(i).equals(new Tuple<>(uuid.getLeastSignificantBits(), uuid.getMostSignificantBits()))) {
+        for (var playerUuid : hitBy) {
+            if (playerUuid.equals(uuid)) {
                 return true;
             }
         }

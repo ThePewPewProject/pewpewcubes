@@ -1,6 +1,5 @@
 package de.kleiner3.lasertag.entity.render.armor;
 
-import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.item.Items;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;

@@ -10,6 +10,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
  */
 public class EntityRenderers {
     public static void register() {
-        EntityRendererRegistry.register(Entities.LASER_RAY, (ctx) -> new LaserRayEntityRenderer(ctx));
+        EntityRendererRegistry.register(Entities.LASER_RAY, LaserRayEntityRenderer::new);
     }
 }

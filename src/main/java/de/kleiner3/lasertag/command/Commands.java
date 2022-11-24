@@ -13,8 +13,6 @@ public class Commands {
      * Init server side commands
      */
     public static void register() {
-        CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> {
-            LasertagCommand.register(dispatcher);
-        }));
+        CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> LasertagCommand.register(dispatcher)));
     }
 }

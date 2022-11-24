@@ -27,13 +27,14 @@ import static net.minecraft.server.command.CommandManager.literal;
  */
 public class LasertagCommand {
     // TODO: Dont allow starting a game or switching/leaving teams while a game is running
+    @SuppressWarnings("SameReturnValue")
     private static int execute(CommandContext<ServerCommandSource> context) {
         return Command.SINGLE_SUCCESS;
     }
 
     public static void register(CommandDispatcher dispatcher) {
         var cmd = literal("lasertag")
-                .executes(ctx -> execute(ctx));
+                .executes(LasertagCommand::execute);
 
         StartGame.register(cmd);
         JoinTeam.register(cmd);
@@ -43,7 +44,8 @@ public class LasertagCommand {
         dispatcher.register(cmd);
     }
 
-    private class LasertagSettings {
+    private static class LasertagSettings {
+        @SuppressWarnings("SameReturnValue")
         private static int execute(CommandContext<ServerCommandSource> context) {
             context.getSource().sendFeedback(Text.literal(new GsonBuilder().setPrettyPrinting().create().toJson(LasertagConfig.getInstance())), false);
             return Command.SINGLE_SUCCESS;
@@ -52,7 +54,7 @@ public class LasertagCommand {
         private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
             var cmd = literal("settings")
                     .requires(s -> s.hasPermissionLevel(4))
-                    .executes(ctx -> execute(ctx));
+                    .executes(LasertagSettings::execute);
 
             RenderTeamListSetting.register(cmd);
             RenderTimerSetting.register(cmd);
@@ -70,6 +72,7 @@ public class LasertagCommand {
         }
 
         private class RenderTeamListSetting {
+            @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = BoolArgumentType.getBool(context, "value");
                 LasertagConfig.getInstance().setRenderTeamList(context.getSource().getServer(), value);
@@ -80,11 +83,12 @@ public class LasertagCommand {
             private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
                 lab.then(literal("renderTeamList")
                         .then(argument("value", bool())
-                                .executes(ctx -> execute(ctx))));
+                                .executes(RenderTeamListSetting::execute)));
             }
         }
 
         private class RenderTimerSetting {
+            @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = BoolArgumentType.getBool(context, "value");
                 LasertagConfig.getInstance().setRenderTimer(context.getSource().getServer(), value);
@@ -95,11 +99,12 @@ public class LasertagCommand {
             private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
                 lab.then(literal("renderTimer")
                         .then(argument("value", bool())
-                                .executes(ctx -> execute(ctx))));
+                                .executes(RenderTimerSetting::execute)));
             }
         }
 
         private class GameDurationSetting {
+            @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "duration");
                 LasertagConfig.getInstance().setPlayTime(context.getSource().getServer(), value);
@@ -110,11 +115,12 @@ public class LasertagCommand {
             private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
                 lab.then(literal("gameDuration")
                         .then(argument("duration", integer(1))
-                                .executes(ctx -> execute(ctx))));
+                                .executes(GameDurationSetting::execute)));
             }
         }
 
         private class LasertargetHitScoreSetting {
+            @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "score");
                 LasertagConfig.getInstance().setLasertargetHitScore(context.getSource().getServer(), value);
@@ -125,11 +131,12 @@ public class LasertagCommand {
             private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
                 lab.then(literal("lasertargetHitScore")
                         .then(argument("score", integer())
-                                .executes(ctx -> execute(ctx))));
+                                .executes(LasertargetHitScoreSetting::execute)));
             }
         }
 
         private class PlayerHitScoreSetting {
+            @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "score");
                 LasertagConfig.getInstance().setPlayerHitScore(context.getSource().getServer(), value);
@@ -140,11 +147,12 @@ public class LasertagCommand {
             private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
                 lab.then(literal("playerHitScore")
                         .then(argument("score", integer())
-                                .executes(ctx -> execute(ctx))));
+                                .executes(PlayerHitScoreSetting::execute)));
             }
         }
 
         private class ShowLaserRaysSetting {
+            @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = BoolArgumentType.getBool(context, "value");
                 LasertagConfig.getInstance().setShowLaserRays(context.getSource().getServer(), value);
@@ -155,11 +163,12 @@ public class LasertagCommand {
             private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
                 lab.then(literal("showLaserRays")
                         .then(argument("value", bool())
-                                .executes(ctx -> execute(ctx))));
+                                .executes(ShowLaserRaysSetting::execute)));
             }
         }
 
         private class PreGameCooldownSetting {
+            @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "duration");
                 LasertagConfig.getInstance().setStartTime(context.getSource().getServer(), value);
@@ -170,11 +179,12 @@ public class LasertagCommand {
             private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
                 lab.then(literal("preGameCountdownDuration")
                         .then(argument("duration", integer(0))
-                                .executes(ctx -> execute(ctx))));
+                                .executes(PreGameCooldownSetting::execute)));
             }
         }
 
         private class PlayerDeactivateDurationSetting {
+            @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "duration");
                 LasertagConfig.getInstance().setDeactivateTime(context.getSource().getServer(), value);
@@ -185,11 +195,12 @@ public class LasertagCommand {
             private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
                 lab.then(literal("playerDeactivateDuration")
                         .then(argument("duration", integer(0))
-                                .executes(ctx -> execute(ctx))));
+                                .executes(PlayerDeactivateDurationSetting::execute)));
             }
         }
 
         private class LasertargetDeactivateDurationSetting {
+            @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "duration");
                 LasertagConfig.getInstance().setLasertargetDeactivatedTime(context.getSource().getServer(), value);
@@ -200,11 +211,12 @@ public class LasertagCommand {
             private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
                 lab.then(literal("lasertargetDeactivateDuration")
                         .then(argument("duration", integer(0))
-                                .executes(ctx -> execute(ctx))));
+                                .executes(LasertargetDeactivateDurationSetting::execute)));
             }
         }
 
         private class LasertagWeaponUseCooldownSetting {
+            @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "ticks");
                 LasertagConfig.getInstance().setLasertagWeaponCooldown(context.getSource().getServer(), value);
@@ -215,11 +227,13 @@ public class LasertagCommand {
             private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
                 lab.then(literal("lasertagWeaponUseCooldown")
                         .then(argument("ticks", integer(0))
-                                .executes(ctx -> execute(ctx))));
+                                .executes(LasertagWeaponUseCooldownSetting::execute)));
             }
         }
 
+        @SuppressWarnings("SameReturnValue")
         private class LasertagWeaponReachSetting {
+            @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "distance");
                 LasertagConfig.getInstance().setLasertagWeaponReach(context.getSource().getServer(), value);
@@ -230,12 +244,12 @@ public class LasertagCommand {
             private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
                 lab.then(literal("lasertagWeaponReach")
                         .then(argument("distance", integer(0))
-                                .executes(ctx -> execute(ctx))));
+                                .executes(LasertagWeaponReachSetting::execute)));
             }
         }
     }
 
-    private class StartGame {
+    private static class StartGame {
         /**
          * Execute the start lasertag command
          *
@@ -243,6 +257,7 @@ public class LasertagCommand {
          * @param scanSpawnpoints
          * @return
          */
+        @SuppressWarnings("SameReturnValue")
         private static int execute(CommandContext<ServerCommandSource> context, boolean scanSpawnpoints) {
             context.getSource().getServer().startGame(scanSpawnpoints);
             return Command.SINGLE_SUCCESS;
@@ -261,13 +276,14 @@ public class LasertagCommand {
         private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
             lab.then(literal("startLasertagGame")
                     .requires(s -> s.hasPermissionLevel(1))
-                    .executes(ctx -> execute(ctx))
+                    .executes(StartGame::execute)
                     .then(literal("scanSpawnpoints")
                             .executes(ctx -> execute(ctx, true))));
         }
     }
 
-    private class JoinTeam {
+    private static class JoinTeam {
+        @SuppressWarnings("SameReturnValue")
         private static int execute(CommandContext<ServerCommandSource> context) {
             // TODO: Add error messages when team not found
 
@@ -297,11 +313,12 @@ public class LasertagCommand {
             lab.then(literal("joinTeam")
                     .then(argument("team", word())
                             .suggests(TeamSuggestionProvider.getInstance())
-                            .executes(ctx -> execute(ctx))));
+                            .executes(JoinTeam::execute)));
         }
     }
 
-    private class LeaveTeam {
+    private static class LeaveTeam {
+        @SuppressWarnings("SameReturnValue")
         private static int execute(CommandContext<ServerCommandSource> context) {
             // Get the server
             var server = context.getSource().getServer();
@@ -323,7 +340,7 @@ public class LasertagCommand {
 
         private static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
             lab.then(literal("leaveTeam")
-                    .executes(ctx -> execute(ctx)));
+                    .executes(LeaveTeam::execute));
         }
     }
 }

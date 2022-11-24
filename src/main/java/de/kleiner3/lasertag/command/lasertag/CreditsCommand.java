@@ -15,28 +15,28 @@ import net.minecraft.client.network.ClientCommandSource;
  */
 public class CreditsCommand {
     private static int execute(CommandContext<ClientCommandSource> context) {
-            var client = MinecraftClient.getInstance();
+        var client = MinecraftClient.getInstance();
 
-            if (client == null) {
-                return Command.SINGLE_SUCCESS;
+        if (client == null) {
+            return -1;
+        }
+
+        // Workaround: setScreen(null) in ChatScreen gets triggered after command execution
+        new Thread(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
             }
 
-            // Workaround: setScreen(null) in ChatScreen gets triggered after command execution
-            new Thread(() -> {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                }
-
-                client.execute(() -> client.setScreen(new LasertagCreditsScreen()));
-            }).start();
+            client.execute(() -> client.setScreen(new LasertagCreditsScreen()));
+        }).start();
 
         return Command.SINGLE_SUCCESS;
     }
 
     public static void register(CommandDispatcher dispatcher) {
         var cmd = LiteralArgumentBuilder.<ClientCommandSource>literal("lasertagCredits")
-                .executes(ctx -> execute(ctx));
+                .executes(CreditsCommand::execute);
 
         dispatcher.register(cmd);
     }
