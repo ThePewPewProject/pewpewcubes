@@ -26,7 +26,8 @@ public class LasertagHudOverlay implements HudRenderCallback {
      * The time in seconds that has already elapsed
      */
     public static long gameTime = 0;
-    public static Timer gameTimer = null;
+    public static Timer gameTimer = new Timer();
+    public static final Object gameTimerLock = new Object();
 
     /**
      * Simplified team map to map players and their score to their teams
@@ -101,10 +102,10 @@ public class LasertagHudOverlay implements HudRenderCallback {
                     int memberY = y + 2 * textPadding + textHeight + 1;
                     for (Tuple<String, Integer> playerData : teamMap.get(teamColor.getName())) {
                         // Draw player name
-                        renderer.draw(matrixStack, playerData.x(), textPadding, memberY, 0xFFFFFF);
+                        renderer.draw(matrixStack, playerData.x, textPadding, memberY, 0xFFFFFF);
 
                         // Get the players score
-                        Integer playerScore = playerData.y();
+                        Integer playerScore = playerData.y;
 
                         // Add the players score to the team score
                         teamScore += playerScore;
@@ -134,10 +135,10 @@ public class LasertagHudOverlay implements HudRenderCallback {
                     int memberY = y + 2 * textPadding + textHeight + 1;
                     for (Tuple<String, Integer> playerData : teamMap.get(teamColor.getName())) {
                         // Draw player name
-                        renderer.draw(matrixStack, playerData.x(), width - textPadding - renderer.getWidth(playerData.x()), memberY, 0xFFFFFF);
+                        renderer.draw(matrixStack, playerData.x, width - textPadding - renderer.getWidth(playerData.x), memberY, 0xFFFFFF);
 
                         // Get the players score
-                        Integer playerScore = playerData.y();
+                        Integer playerScore = playerData.y;
 
                         // Add the players score to the team score
                         teamScore += playerScore;

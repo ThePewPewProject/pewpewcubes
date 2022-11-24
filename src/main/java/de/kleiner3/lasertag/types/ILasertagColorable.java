@@ -25,8 +25,8 @@ public interface ILasertagColorable {
 
     /**
      * Get the color/team of the ItemStack
-     * @param stack
-     * @return
+     * @param stack The item stack to get the color of
+     * @return The int value of the color
      */
     default int getColor(ItemStack stack) {
         if (!stack.hasNbt()) {

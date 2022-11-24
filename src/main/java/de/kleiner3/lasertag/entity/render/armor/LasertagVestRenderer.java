@@ -76,7 +76,7 @@ public class LasertagVestRenderer extends GeoArmorRenderer<LasertagVestItem> {
                 var color = ((LasertagVestItem) Items.LASERTAG_VEST).getColor(stack);
                 r = ((color >> 16) & 0xFF) / 255.0F;
                 g = ((color >> 8) & 0xFF) / 255.0F;
-                b = ((color >> 0) & 0xFF) / 255.0F;
+                b = ((color) & 0xFF) / 255.0F;
             }
         }
 

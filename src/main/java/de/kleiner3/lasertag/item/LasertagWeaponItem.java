@@ -146,7 +146,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
             new Thread(() -> {
                 try {
                     Thread.sleep(50);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                 }
                 ray.discard(); // TODO: ConcurrentModificationException?
             }).start();

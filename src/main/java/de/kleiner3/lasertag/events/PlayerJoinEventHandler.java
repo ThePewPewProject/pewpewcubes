@@ -12,7 +12,7 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
  * @author Étienne Muser
  */
 public class PlayerJoinEventHandler {
-    public static void onPlayerJoin(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
+    public static void onPlayerJoin(ServerPlayNetworkHandler handler, PacketSender ignoredSender, MinecraftServer server) {
         LasertagConfig.syncToPlayer(handler.getPlayer());
         Colors.syncTeamsToClient(handler.getPlayer());
         server.syncTeamsAndScoresToPlayer(handler.getPlayer());

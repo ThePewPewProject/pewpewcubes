@@ -25,7 +25,7 @@ public interface ILasertagPlayer {
     /**
      * Increase the players score by the given amount
      *
-     * @param score
+     * @param score The amount
      */
     default void increaseScore(int score) {
     }
@@ -33,21 +33,21 @@ public interface ILasertagPlayer {
     /**
      * Called when this player got hit by another player
      *
-     * @param player
+     * @param player The player who hit this player
      */
     default void onHitBy(PlayerEntity player) {
     }
 
     /**
      * Set the players team
-     * @param team
+     * @param team The color of the team
      */
     default void setTeam(Colors.Color team) {
     }
 
     /**
      * Get the players team
-     * @return
+     * @return The color of the players team
      */
     default Colors.Color getTeam() {
         return null;

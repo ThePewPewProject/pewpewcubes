@@ -7,7 +7,14 @@ package de.kleiner3.lasertag.util;
  * @param <B> The type of the right element
  * @author Étienne Muser
  */
-public record Tuple<A, B>(A x, B y) {
+public class Tuple<A, B> {
+    public A x;
+    public B y;
+
+    public Tuple(A x, B y) {
+        this.x = x;
+        this.y = y;
+    }
 
     @Override
     public String toString() {

@@ -54,7 +54,7 @@ public class LaserTargetBlockEntity extends BlockEntity {
         new Thread(() -> {
             try {
                 Thread.sleep(LasertagConfig.getInstance().getLasertargetDeactivatedTime() * 1000L);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException ignored) {}
 
             deactivated = false;
         }).start();

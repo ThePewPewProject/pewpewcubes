@@ -12,7 +12,7 @@ public class FileIO {
      * Read whole files contents
      * @param file The file to read
      * @return The files contents
-     * @throws IOException
+     * @throws IOException By File IO
      */
     public static String readAllFile(File file) throws IOException {
         // Create string builder
@@ -37,7 +37,7 @@ public class FileIO {
      * Write a string to a file
      * @param file The file to write to
      * @param content The content to write
-     * @throws IOException
+     * @throws IOException By File IO
      */
     public static void writeAllFile(File file, String content) throws IOException {
         try (var os = new FileOutputStream(file)) {

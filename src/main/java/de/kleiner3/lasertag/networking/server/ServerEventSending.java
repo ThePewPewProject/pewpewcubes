@@ -21,8 +21,8 @@ public class ServerEventSending {
     /**
      * Send an error message to the specified client
      *
-     * @param client
-     * @param errorMessage
+     * @param client The ServerPlayerEntity to send the error message to
+     * @param errorMessage The error message to send
      */
     public static void sendErrorMessageToClient(ServerPlayerEntity client, String errorMessage) {
         // Create packet buffer
@@ -38,9 +38,9 @@ public class ServerEventSending {
     /**
      * Sends a PacketByteBuf to every player in the given world
      *
-     * @param world
-     * @param id
-     * @param buf
+     * @param world The world where the players are in
+     * @param id The identifier of the event to send
+     * @param buf The data to send
      */
     public static void sendToEveryone(ServerWorld world, Identifier id, PacketByteBuf buf) {
         // Get all players
@@ -55,7 +55,7 @@ public class ServerEventSending {
     /**
      * Sends the player scored sound event to the client
      *
-     * @param client
+     * @param client The ServerPlayerEntity to send the event to
      */
     public static void sendPlayerScoredSoundEvent(ServerPlayerEntity client) {
         ServerPlayNetworking.send(client, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND, PacketByteBufs.empty());

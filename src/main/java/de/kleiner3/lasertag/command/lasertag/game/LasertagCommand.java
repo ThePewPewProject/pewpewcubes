@@ -28,11 +28,11 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class LasertagCommand {
     // TODO: Dont allow starting a game or switching/leaving teams while a game is running
     @SuppressWarnings("SameReturnValue")
-    private static int execute(CommandContext<ServerCommandSource> context) {
+    private static int execute(CommandContext<ServerCommandSource> ignoredContext) {
         return Command.SINGLE_SUCCESS;
     }
 
-    public static void register(CommandDispatcher dispatcher) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         var cmd = literal("lasertag")
                 .executes(LasertagCommand::execute);
 
@@ -71,7 +71,7 @@ public class LasertagCommand {
             lab.then(cmd);
         }
 
-        private class RenderTeamListSetting {
+        private static class RenderTeamListSetting {
             @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = BoolArgumentType.getBool(context, "value");
@@ -87,7 +87,7 @@ public class LasertagCommand {
             }
         }
 
-        private class RenderTimerSetting {
+        private static class RenderTimerSetting {
             @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = BoolArgumentType.getBool(context, "value");
@@ -103,7 +103,7 @@ public class LasertagCommand {
             }
         }
 
-        private class GameDurationSetting {
+        private static class GameDurationSetting {
             @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "duration");
@@ -119,7 +119,7 @@ public class LasertagCommand {
             }
         }
 
-        private class LasertargetHitScoreSetting {
+        private static class LasertargetHitScoreSetting {
             @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "score");
@@ -135,7 +135,7 @@ public class LasertagCommand {
             }
         }
 
-        private class PlayerHitScoreSetting {
+        private static class PlayerHitScoreSetting {
             @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "score");
@@ -151,7 +151,7 @@ public class LasertagCommand {
             }
         }
 
-        private class ShowLaserRaysSetting {
+        private static class ShowLaserRaysSetting {
             @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = BoolArgumentType.getBool(context, "value");
@@ -167,7 +167,7 @@ public class LasertagCommand {
             }
         }
 
-        private class PreGameCooldownSetting {
+        private static class PreGameCooldownSetting {
             @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "duration");
@@ -183,7 +183,7 @@ public class LasertagCommand {
             }
         }
 
-        private class PlayerDeactivateDurationSetting {
+        private static class PlayerDeactivateDurationSetting {
             @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "duration");
@@ -199,7 +199,7 @@ public class LasertagCommand {
             }
         }
 
-        private class LasertargetDeactivateDurationSetting {
+        private static class LasertargetDeactivateDurationSetting {
             @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "duration");
@@ -215,7 +215,7 @@ public class LasertagCommand {
             }
         }
 
-        private class LasertagWeaponUseCooldownSetting {
+        private static class LasertagWeaponUseCooldownSetting {
             @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "ticks");
@@ -232,7 +232,7 @@ public class LasertagCommand {
         }
 
         @SuppressWarnings("SameReturnValue")
-        private class LasertagWeaponReachSetting {
+        private static class LasertagWeaponReachSetting {
             @SuppressWarnings("SameReturnValue")
             private static int execute(CommandContext<ServerCommandSource> context) {
                 var value = IntegerArgumentType.getInteger(context, "distance");
@@ -253,9 +253,9 @@ public class LasertagCommand {
         /**
          * Execute the start lasertag command
          *
-         * @param context
-         * @param scanSpawnpoints
-         * @return
+         * @param context The CommandContext
+         * @param scanSpawnpoints Bool if the world should be scanned for the spawnpoint blocks again
+         * @return Return code
          */
         @SuppressWarnings("SameReturnValue")
         private static int execute(CommandContext<ServerCommandSource> context, boolean scanSpawnpoints) {
@@ -266,8 +266,8 @@ public class LasertagCommand {
         /**
          * Execute the start lasertag command without searching for spawnpoint blocks
          *
-         * @param context
-         * @return
+         * @param context The CommandContext
+         * @return Return code
          */
         private static int execute(CommandContext<ServerCommandSource> context) {
             return execute(context, false);

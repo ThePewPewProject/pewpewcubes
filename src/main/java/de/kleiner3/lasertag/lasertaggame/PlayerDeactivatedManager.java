@@ -35,7 +35,7 @@ public class PlayerDeactivatedManager {
 
     /**
      * Sets if the player is deactivated
-     * @param deactivated
+     * @param deactivated If the player is deactivated
      */
     public static void setDeactivated(UUID uuid, boolean deactivated) {
         deactivatedMap.put(uuid, deactivated);
@@ -43,8 +43,8 @@ public class PlayerDeactivatedManager {
 
     /**
      * Deactivates a player, activates him again after the configured time
-     * @param player
-     * @param world
+     * @param player The player to deactivate
+     * @param world The world which the player is in
      */
     public static void deactivate(PlayerEntity player, World world) {
         var uuid = player.getUuid();
@@ -57,7 +57,7 @@ public class PlayerDeactivatedManager {
         new Thread(() -> {
             try {
                 Thread.sleep(1000L * LasertagConfig.getInstance().getDeactivateTime());
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException ignored) {}
 
             // Reactivate player
             deactivatedMap.put(uuid, false);
@@ -68,8 +68,8 @@ public class PlayerDeactivatedManager {
 
     /**
      * Activates the player referenced by uuid
-     * @param uuid
-     * @param world
+     * @param uuid The uuid of the player to activate
+     * @param world The world which the player is in
      */
     public static void activate(UUID uuid, World world) {
         deactivatedMap.put(uuid, false);

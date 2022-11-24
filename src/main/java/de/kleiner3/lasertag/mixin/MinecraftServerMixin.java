@@ -59,7 +59,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     /**
      * Inject into constructor of MinecraftServer
      *
-     * @param ci
+     * @param ci The CallbackInfo
      */
     @Inject(method = "<init>", at = @At("TAIL"))
     private void init(CallbackInfo ci) {
@@ -113,7 +113,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             // Wait for game start cooldown
             try {
                 Thread.sleep(LasertagConfig.getInstance().getStartTime() * 1000L);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException ignored) {}
 
             // Activate every player
             for (List<PlayerEntity> team : teamMap.values()) {
@@ -123,15 +123,23 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
                 }
             }
 
-            for(int i = 0; i < LasertagConfig.getInstance().getPlayTime(); i++) {
-                lasertagTick();
-                try {
-                    Thread.sleep(1000 * 60);
-                } catch (InterruptedException e) {
-                }
-            }
+            // Start game tick timer
+            gameTickTimer = new Timer();
+            gameTickTimer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    ++tickNo;
+                    lasertagTick();
 
-            lasertagGameOver();
+                    if (tickNo == LasertagConfig.getInstance().getPlayTime()) {
+                        gameTickTimer.cancel();
+                        gameTickTimer = null;
+                        tickNo = -1;
+
+                        lasertagGameOver();
+                    }
+                }
+            }, 0, 1000 * 60);
         }).start();
 
         // Notify players
@@ -203,24 +211,6 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     }
 
     @Override
-    public void playerLeaveTeam(Colors.Color oldTeamColor, PlayerEntity player) {
-        // Get the players in the team
-        List<PlayerEntity> team = teamMap.get(oldTeamColor);
-
-        // Check if player is in the team he claims to be
-        if (!team.contains(player)) {
-            return;
-        }
-
-        // Remove player from his team
-        team.remove(player);
-        player.setTeam(null);
-
-        // Notify about change
-        notifyPlayersAboutUpdate();
-    }
-
-    @Override
     public void playerLeaveHisTeam(PlayerEntity player) {
         // For each team
         for (List<PlayerEntity> team : teamMap.values()) {
@@ -251,6 +241,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
      * This method is called every minute when the game is running
      */
     private void lasertagTick() {
+        LasertagMod.LOGGER.info("Tick " + tickNo);
         // TODO
     }
 
@@ -274,10 +265,9 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         }
 
         // Teleport players back to spawn
-        var spawn = getOverworld().getSpawnPos();
         for (var team : teamMap.values()) {
             for (var player : team) {
-                player.requestTeleport(spawn.getX() + 0.5F, spawn.getY(), spawn.getZ() + 0.5F);
+                player.requestTeleport(0.5F, 1, 0.5F);
             }
         }
 
@@ -435,10 +425,10 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         }
 
         // Sort stats
-        lastGamesStats.teamScores.sort(Comparator.comparingInt(Tuple::y));
-        lastGamesStats.playerScores.sort(Comparator.comparingInt(Tuple::y));
+        lastGamesStats.teamScores.sort(Comparator.comparingInt(t -> t.y));
+        lastGamesStats.playerScores.sort(Comparator.comparingInt(t -> t.y));
         for (var team : lastGamesStats.teamPlayerScores.values()) {
-            team.sort(Comparator.comparingInt(Tuple::y));
+            team.sort(Comparator.comparingInt(t -> t.y));
         }
     }
 
@@ -446,4 +436,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     public void registerLasertarget(LaserTargetBlockEntity target) {
         lasertargetsToReset.add(target);
     }
+
+    private int tickNo = -1;
+    private Timer gameTickTimer = null;
 }

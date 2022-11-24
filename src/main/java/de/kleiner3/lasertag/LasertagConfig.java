@@ -28,7 +28,7 @@ public class LasertagConfig {
     private boolean showLaserRays = true;
 
     // ===== General game settings ==============
-    private int maxTeamSize = 6;
+    private final int maxTeamSize = 6;
     private boolean renderTeamList = true;
     private boolean renderTimer = true;
     private int lasertargetHitScore = 100;
@@ -82,11 +82,6 @@ public class LasertagConfig {
 
     public int getMaxTeamSize() {
         return maxTeamSize;
-    }
-
-    public void setMaxTeamSize(MinecraftServer s, Integer maxTeamSize) {
-        this.maxTeamSize = maxTeamSize;
-        persist(s, "setMaxTeamSize", Integer.toString(maxTeamSize));
     }
 
     public boolean isRenderTeamList() {
@@ -233,9 +228,7 @@ public class LasertagConfig {
     private LasertagConfig() {
     }
 
-    /**
-     * Initialize lasertag game settings from file
-     */
+    // Initialize lasertag game settings from file
     static {
         try {
             // Read config file

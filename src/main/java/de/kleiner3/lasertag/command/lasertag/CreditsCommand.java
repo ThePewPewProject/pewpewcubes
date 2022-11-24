@@ -7,6 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.client.screen.LasertagCreditsScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientCommandSource;
+import net.minecraft.command.CommandSource;
 
 /**
  * The command to display the credits for our mod
@@ -14,7 +15,7 @@ import net.minecraft.client.network.ClientCommandSource;
  * @author Étienne Muser
  */
 public class CreditsCommand {
-    private static int execute(CommandContext<ClientCommandSource> context) {
+    private static int execute(CommandContext<ClientCommandSource> ignoredContext) {
         var client = MinecraftClient.getInstance();
 
         if (client == null) {
@@ -25,7 +26,7 @@ public class CreditsCommand {
         new Thread(() -> {
             try {
                 Thread.sleep(500);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
             }
 
             client.execute(() -> client.setScreen(new LasertagCreditsScreen()));

@@ -22,8 +22,8 @@ public abstract class PlayerManagerMixin {
     /**
      * Inject into method remove() at the end of the method
      *
-     * @param player
-     * @param ci
+     * @param player The player who is removed
+     * @param ci The CallbackInfo
      */
     @Inject(method = "remove", at = @At("TAIL"))
     private void onPlayerRemoved(ServerPlayerEntity player, CallbackInfo ci) {
