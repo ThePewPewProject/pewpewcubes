@@ -7,9 +7,11 @@ import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.item.Items;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.item.LasertagWeaponItem;
-import de.kleiner3.lasertag.lasertaggame.GameStats;
 import de.kleiner3.lasertag.lasertaggame.ILasertagGame;
+import de.kleiner3.lasertag.lasertaggame.ITickable;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
+import de.kleiner3.lasertag.lasertaggame.statistics.StatsCalculator;
+import de.kleiner3.lasertag.lasertaggame.timing.GameTickTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.types.Colors;
@@ -27,12 +29,14 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Interface injection into MinecraftServer to implement the lasertag game
@@ -40,11 +44,7 @@ import java.util.*;
  * @author Étienne Muser
  */
 @Mixin(MinecraftServer.class)
-public abstract class MinecraftServerMixin implements ILasertagGame {
-    @Shadow public abstract ServerWorld getOverworld();
-
-    private GameStats lastGamesStats = null;
-
+public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     private HashMap<Colors.Color, ArrayList<BlockPos>> spawnpointCache = null;
 
     /**
@@ -52,9 +52,13 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
      */
     private final HashMap<Colors.Color, List<PlayerEntity>> teamMap = new HashMap<>();
 
+    private final StatsCalculator statsCalculator = new StatsCalculator(teamMap);
+
     private List<LaserTargetBlockEntity> lasertargetsToReset = new LinkedList<>();
 
     private boolean isRunning = false;
+
+    private ScheduledExecutorService gameTickTimer = null;
 
     /**
      * Inject into constructor of MinecraftServer
@@ -69,6 +73,8 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             teamMap.put(color, new LinkedList<>());
         }
     }
+
+    //region ILasertagGame
 
     @Override
     public void startGame(boolean scanSpawnpoints) {
@@ -109,11 +115,10 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
 
         // Start game
         isRunning = true;
-        new Thread(() -> {
-            // Wait for game start cooldown
-            try {
-                Thread.sleep(LasertagConfig.getInstance().getStartTime() * 1000L);
-            } catch (InterruptedException ignored) {}
+
+        var preGameDelayTimer = Executors.newSingleThreadScheduledExecutor();
+        var preGameDelay = LasertagConfig.getInstance().getStartTime();
+        preGameDelayTimer.schedule(() -> {
 
             // Activate every player
             for (List<PlayerEntity> team : teamMap.values()) {
@@ -124,23 +129,10 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             }
 
             // Start game tick timer
-            gameTickTimer = new Timer();
-            gameTickTimer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    ++tickNo;
-                    lasertagTick();
+            gameTickTimer = Executors.newSingleThreadScheduledExecutor();
+            gameTickTimer.scheduleAtFixedRate(new GameTickTimerTask(this), 0, 1, TimeUnit.MINUTES);
 
-                    if (tickNo == LasertagConfig.getInstance().getPlayTime()) {
-                        gameTickTimer.cancel();
-                        gameTickTimer = null;
-                        tickNo = -1;
-
-                        lasertagGameOver();
-                    }
-                }
-            }, 0, 1000 * 60);
-        }).start();
+        }, preGameDelay, TimeUnit.SECONDS);
 
         // Notify players
         sendGameStartedEvent();
@@ -190,20 +182,20 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         player.setTeam(newTeamColor);
 
         // Get players inventory
-        var inventory = player .getInventory();
+        var inventory = player.getInventory();
 
         // Clear players inventory
         inventory.clear();
 
         // Give player a lasertag vest
         var vestStack = new ItemStack(Items.LASERTAG_VEST);
-        ((LasertagVestItem)Items.LASERTAG_VEST).setColor(vestStack, newTeamColor.getValue());
+        ((LasertagVestItem) Items.LASERTAG_VEST).setColor(vestStack, newTeamColor.getValue());
         player.equipStack(EquipmentSlot.CHEST, vestStack);
 
         // Give player a lasertag weapon
         var weaponStack = new ItemStack(Items.LASERTAG_WEAPON);
-        ((LasertagWeaponItem)Items.LASERTAG_WEAPON).setColor(weaponStack, newTeamColor.getValue());
-        ((LasertagWeaponItem)Items.LASERTAG_WEAPON).setDeactivated(weaponStack, true);
+        ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setColor(weaponStack, newTeamColor.getValue());
+        ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setDeactivated(weaponStack, true);
         inventory.setStack(0, weaponStack);
 
         // Notify about change
@@ -237,13 +229,50 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         return isRunning;
     }
 
+    @Override
+    public void syncTeamsAndScoresToPlayer(ServerPlayerEntity player) {
+        var simplifiedTeamMap = buildSimplifiedTeamMap();
+
+        // Serialize team map to json
+        String messagesString = new Gson().toJson(simplifiedTeamMap);
+
+        // Create packet buffer
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+
+        // Write team map string to buffer
+        buf.writeString(messagesString);
+
+        ServerPlayNetworking.send(player, NetworkingConstants.LASERTAG_GAME_TEAM_OR_SCORE_UPDATE, buf);
+    }
+
+    @Override
+    public void registerLasertarget(LaserTargetBlockEntity target) {
+        lasertargetsToReset.add(target);
+    }
+
+    //endregion
+
+    //region ITickable
+
     /**
      * This method is called every minute when the game is running
      */
-    private void lasertagTick() {
-        LasertagMod.LOGGER.info("Tick " + tickNo);
+    @Override
+    public void doTick() {
+        System.out.println("Tick");
         // TODO
     }
+
+    @Override
+    public void endTick() {
+        gameTickTimer.shutdown();
+        gameTickTimer = null;
+        lasertagGameOver();
+    }
+
+    //endregion
+
+    //region Private methods
 
     /**
      * This method is called when the game ends
@@ -278,22 +307,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         lasertargetsToReset = new LinkedList<>();
 
         // Calculate stats
-        calcStats();
-    }
-
-    public void syncTeamsAndScoresToPlayer(ServerPlayerEntity player) {
-        var simplifiedTeamMap = buildSimplifiedTeamMap();
-
-        // Serialize team map to json
-        String messagesString = new Gson().toJson(simplifiedTeamMap);
-
-        // Create packet buffer
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-
-        // Write team map string to buffer
-        buf.writeString(messagesString);
-
-        ServerPlayNetworking.send(player, NetworkingConstants.LASERTAG_GAME_TEAM_OR_SCORE_UPDATE, buf);
+        statsCalculator.calcStats();
     }
 
     /**
@@ -355,7 +369,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
      * Initializes the spawnpoint cache. Searches a 31 x 31 chunk area for spawnpoint blocks specified by the team color.
      * This method is computationally intensive, don't call too often or when responsiveness is important. The call of this method blocks the server from ticking!
      */
-    public void initSpawnpointCache() {
+    private void initSpawnpointCache() {
 
         // Initialize cache
         spawnpointCache = new HashMap<>();
@@ -392,7 +406,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 
             // Write progress to buffer
-            buf.writeDouble((double)currChunk / (double)maxChunk);
+            buf.writeDouble((double) currChunk / (double) maxChunk);
 
             ServerEventSending.sendToEveryone(world, NetworkingConstants.PROGRESS, buf);
         });
@@ -403,40 +417,5 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         LasertagMod.LOGGER.info("Spawnpoint search took " + duration + "s.");
     }
 
-    private void calcStats() {
-        lastGamesStats = new GameStats();
-        for (Colors.Color teamColor : teamMap.keySet()) {
-            var team = teamMap.get(teamColor);
-            int teamScore = 0;
-
-            var playersOfThisTeam = new ArrayList<Tuple<PlayerEntity, Integer>>();
-            for (PlayerEntity player : team) {
-                int playerScore = player.getLasertagScore();
-                var playerScoreTuple = new Tuple<>(player, playerScore);
-                teamScore += playerScore;
-                lastGamesStats.playerScores.add(playerScoreTuple);
-                playersOfThisTeam.add(playerScoreTuple);
-            }
-
-            if (playersOfThisTeam.size() > 0) {
-                lastGamesStats.teamPlayerScores.put(teamColor, playersOfThisTeam);
-            }
-            lastGamesStats.teamScores.add(new Tuple<>(teamColor, teamScore));
-        }
-
-        // Sort stats
-        lastGamesStats.teamScores.sort(Comparator.comparingInt(t -> t.y));
-        lastGamesStats.playerScores.sort(Comparator.comparingInt(t -> t.y));
-        for (var team : lastGamesStats.teamPlayerScores.values()) {
-            team.sort(Comparator.comparingInt(t -> t.y));
-        }
-    }
-
-    @Override
-    public void registerLasertarget(LaserTargetBlockEntity target) {
-        lasertargetsToReset.add(target);
-    }
-
-    private int tickNo = -1;
-    private Timer gameTickTimer = null;
+    //endregion
 }

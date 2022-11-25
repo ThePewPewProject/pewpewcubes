@@ -13,7 +13,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Timer;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Class to implement the custom overlay for the lasertag game
@@ -26,7 +26,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
      * The time in seconds that has already elapsed
      */
     public static long gameTime = 0;
-    public static Timer gameTimer = new Timer();
+    public static ScheduledExecutorService gameTimer;
     public static final Object gameTimerLock = new Object();
 
     /**

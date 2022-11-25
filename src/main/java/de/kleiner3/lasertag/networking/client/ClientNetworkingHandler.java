@@ -7,6 +7,7 @@ import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.LasertagHudOverlay;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
+import de.kleiner3.lasertag.lasertaggame.timing.PreGameCountDownTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.ConverterUtil;
@@ -27,6 +28,8 @@ import net.minecraft.util.math.Vec3d;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class to handle all networking on the client
@@ -156,8 +159,8 @@ public class ClientNetworkingHandler {
             LasertagHudOverlay.shouldRenderNameTags = false;
 
             // Start pregame count down timer
-            preGameCountDownTimer = new Timer();
-            preGameCountDownTimer.scheduleAtFixedRate(new PreGameCountDownTimerTask(), 1000, 1000);
+            var preGameCountDownTimer = Executors.newSingleThreadScheduledExecutor();
+            preGameCountDownTimer.scheduleAtFixedRate(new PreGameCountDownTimerTask(preGameCountDownTimer), 1, 1, TimeUnit.SECONDS);
         }
 
         public static void handleLasertagGameOver(MinecraftClient ignoredClient,
@@ -166,7 +169,7 @@ public class ClientNetworkingHandler {
                                                   PacketSender ignoredResponseSender) {
             synchronized (LasertagHudOverlay.gameTimerLock) {
                 if (LasertagHudOverlay.gameTimer != null) {
-                    LasertagHudOverlay.gameTimer.cancel();
+                    LasertagHudOverlay.gameTimer.shutdown();
                     LasertagHudOverlay.gameTimer = null;
                     LasertagHudOverlay.gameTime = 0;
                 }
@@ -244,45 +247,6 @@ public class ClientNetworkingHandler {
 
             // Set deactivated status
             PlayerDeactivatedManager.setDeactivated(uuid, deactivated);
-        }
-
-        private static Timer preGameCountDownTimer = null;
-
-        private static class PreGameCountDownTimerTask extends TimerTask {
-
-            @Override
-            public void run() {
-                --LasertagHudOverlay.startingIn;
-
-                if (LasertagHudOverlay.startingIn == 0) {
-                    // Start game count down timer
-                    LasertagHudOverlay.gameTimer = new Timer();
-                    LasertagHudOverlay.gameTimer.scheduleAtFixedRate(new GameCountDownTimerTask(), 1000, 1000);
-
-                    return;
-                }
-
-                if (LasertagHudOverlay.startingIn == -1) {
-                    preGameCountDownTimer.cancel();
-                    preGameCountDownTimer = null;
-                }
-            }
-        }
-
-        private static class GameCountDownTimerTask extends TimerTask {
-
-            @Override
-            public void run() {
-                ++LasertagHudOverlay.gameTime;
-
-                if ((LasertagConfig.getInstance().getPlayTime() * 60L) - LasertagHudOverlay.gameTime == 0) {
-                    synchronized (LasertagHudOverlay.gameTimerLock) {
-                        LasertagHudOverlay.gameTimer.cancel();
-                        LasertagHudOverlay.gameTimer = null;
-                        LasertagHudOverlay.gameTime = 0;
-                    }
-                }
-            }
         }
     }
 }

@@ -11,6 +11,8 @@ import net.minecraft.world.World;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Manages which player is currently deactivated
@@ -54,16 +56,12 @@ public class PlayerDeactivatedManager {
         player.onDeactivated();
         sendDeactivatedToClients(world, uuid, true);
 
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000L * LasertagConfig.getInstance().getDeactivateTime());
-            } catch (InterruptedException ignored) {}
-
-            // Reactivate player
+        // Reactivate player after configured amount of time
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
             deactivatedMap.put(uuid, false);
             player.onActivated();
             sendDeactivatedToClients(world, uuid, false);
-        }).start();
+        }, LasertagConfig.getInstance().getDeactivateTime(), TimeUnit.SECONDS);
     }
 
     /**

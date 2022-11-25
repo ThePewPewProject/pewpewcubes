@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class LaserTargetBlockEntity extends BlockEntity {
 
@@ -51,13 +53,11 @@ public class LaserTargetBlockEntity extends BlockEntity {
 
         // Deactivate
         deactivated = true;
-        new Thread(() -> {
-            try {
-                Thread.sleep(LasertagConfig.getInstance().getLasertargetDeactivatedTime() * 1000L);
-            } catch (InterruptedException ignored) {}
 
+        // Reactivate after configured amount of seconds
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
             deactivated = false;
-        }).start();
+        }, LasertagConfig.getInstance().getLasertargetDeactivatedTime(), TimeUnit.SECONDS);
 
         // Add player to the players who hit the target
         hitBy.add(playerEntity.getUuid());

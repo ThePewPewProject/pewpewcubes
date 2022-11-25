@@ -26,6 +26,8 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 /**
@@ -142,14 +144,10 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
             LaserRayEntity ray = new LaserRayEntity(world, playerEntity, color, hit);
             world.spawnEntity(ray);
 
-            // Despawn ray after 100ms
-            new Thread(() -> {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignored) {
-                }
-                ray.discard(); // TODO: ConcurrentModificationException?
-            }).start();
+            // Despawn ray after 50ms
+            Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+                world.getServer().execute(ray::discard);
+            }, 50, TimeUnit.MILLISECONDS);
         }
     }
 

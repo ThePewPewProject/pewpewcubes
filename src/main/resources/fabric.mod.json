@@ -35,6 +35,7 @@
   "custom": {
 	"loom:injected_interfaces": {
 		"net/minecraft/server/MinecraftServer": ["de/kleiner3/lasertag/lasertaggame/ILasertagGame"],
+        "net/minecraft/server/MinecraftServer": ["de/kleiner3/lasertag/lasertaggame/ITickable"],
 		"net/minecraft/entity/player/PlayerEntity": ["de/kleiner3/lasertag/lasertaggame/ILasertagPlayer"],
         "net/minecraft/world/World": ["de/kleiner3/lasertag/util/fastiter/IFastWorldIter"]
     }

@@ -120,7 +120,7 @@ public class WorldMixin implements IFastWorldIter {
         // Wait for threadpool to finish
         try {
             executor.shutdown();
-            executor.awaitTermination(30, TimeUnit.SECONDS);
+            var ignored = executor.awaitTermination(30, TimeUnit.SECONDS);
         } catch (InterruptedException ignored) {
         }
     }

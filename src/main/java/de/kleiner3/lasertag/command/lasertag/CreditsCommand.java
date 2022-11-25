@@ -7,7 +7,9 @@ import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.client.screen.LasertagCreditsScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientCommandSource;
-import net.minecraft.command.CommandSource;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The command to display the credits for our mod
@@ -23,14 +25,9 @@ public class CreditsCommand {
         }
 
         // Workaround: setScreen(null) in ChatScreen gets triggered after command execution
-        new Thread(() -> {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException ignored) {
-            }
-
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
             client.execute(() -> client.setScreen(new LasertagCreditsScreen()));
-        }).start();
+        }, 250, TimeUnit.MILLISECONDS);
 
         return Command.SINGLE_SUCCESS;
     }

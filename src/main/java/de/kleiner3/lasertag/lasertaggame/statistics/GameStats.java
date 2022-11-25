@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.lasertaggame;
+package de.kleiner3.lasertag.lasertaggame.statistics;
 
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.Tuple;
