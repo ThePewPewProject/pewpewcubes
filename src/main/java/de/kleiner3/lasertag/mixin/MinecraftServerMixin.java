@@ -225,7 +225,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     }
 
     @Override
-    public boolean isRunning() {
+    public boolean isLasertagGameRunning() {
         return isRunning;
     }
 

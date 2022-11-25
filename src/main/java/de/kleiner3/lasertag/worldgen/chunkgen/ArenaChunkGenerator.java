@@ -68,7 +68,7 @@ public abstract class ArenaChunkGenerator extends ChunkGenerator {
         var resource = ResourceManagers.STRUCTURE_RESOURCE_MANAGER.get(nbtFileId);
 
         if (resource == null) {
-            LasertagMod.LOGGER.error("Arena nbt file not in resource manager.");
+            LasertagMod.LOGGER.warn("Arena nbt file not in resource manager.");
             return;
         }
 

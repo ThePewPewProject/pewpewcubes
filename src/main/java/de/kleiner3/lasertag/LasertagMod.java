@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
  * @author Étienne Muser
  */
 public class LasertagMod implements ModInitializer {
-    // TODO: This mod somehow disables command line input
-
     /**
      * The mod id of this mod
      */

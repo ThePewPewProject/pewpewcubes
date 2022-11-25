@@ -60,7 +60,7 @@ public interface ILasertagGame {
     /**
      * @return True if the game is running
      */
-    default boolean isRunning() {
+    default boolean isLasertagGameRunning() {
         return false;
     }
 
