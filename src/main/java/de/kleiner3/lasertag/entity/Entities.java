@@ -19,15 +19,21 @@ import net.minecraft.util.registry.Registry;
  */
 public class Entities {
     // Create instances for all block entities
-    public static final BlockEntityType<LaserTargetBlockEntity> LASER_TARGET_ENTITY = Registry.register(
-            Registry.BLOCK_ENTITY_TYPE,
-            new Identifier(LasertagMod.ID, "lasertarget_entity"),
-            FabricBlockEntityTypeBuilder.create(LaserTargetBlockEntity::new, Blocks.LASER_TARGET).build()
-    );
+    public static BlockEntityType<LaserTargetBlockEntity> LASER_TARGET_ENTITY;
 
     // Register all entities
-    public static final EntityType<LaserRayEntity> LASER_RAY = Registry.register(
-            Registry.ENTITY_TYPE,
-            new Identifier(LasertagMod.ID, "laser_ray_entity"),
-            FabricEntityTypeBuilder.<LaserRayEntity>create(SpawnGroup.MISC, LaserRayEntity::new).dimensions(EntityDimensions.fixed(.1F, .1F)).build());
+    public static EntityType<LaserRayEntity> LASER_RAY;
+
+    public static void register() {
+        LASER_RAY = Registry.register(
+                Registry.ENTITY_TYPE,
+                new Identifier(LasertagMod.ID, "laser_ray_entity"),
+                FabricEntityTypeBuilder.<LaserRayEntity>create(SpawnGroup.MISC, LaserRayEntity::new).dimensions(EntityDimensions.fixed(.1F, .1F)).build());
+
+        LASER_TARGET_ENTITY = Registry.register(
+                Registry.BLOCK_ENTITY_TYPE,
+                new Identifier(LasertagMod.ID, "lasertarget_entity"),
+                FabricBlockEntityTypeBuilder.create(LaserTargetBlockEntity::new, Blocks.LASER_TARGET).build()
+        );
+    }
 }

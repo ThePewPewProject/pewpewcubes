@@ -2,6 +2,7 @@ package de.kleiner3.lasertag;
 
 import de.kleiner3.lasertag.block.Blocks;
 import de.kleiner3.lasertag.command.Commands;
+import de.kleiner3.lasertag.entity.Entities;
 import de.kleiner3.lasertag.events.EventListeners;
 import de.kleiner3.lasertag.item.Items;
 import de.kleiner3.lasertag.resource.ResourceManagers;
@@ -39,6 +40,9 @@ public class LasertagMod implements ModInitializer {
 
         // Register all items
         Items.register();
+
+        // Register all entities
+        Entities.register();
 
         // Register commands
         Commands.register();
