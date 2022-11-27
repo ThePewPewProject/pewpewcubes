@@ -38,6 +38,7 @@ public class LasertagSettingsCommand {
         LasertargetDeactivationDurationSettingCommand.register(cmd);
         LasertagWeaponUseCooldownSettingCommand.register(cmd);
         LasertagWeaponReachSettingCommand.register(cmd);
+        // TODO: statistic file commands
 
         lab.then(cmd);
     }

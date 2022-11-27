@@ -7,6 +7,8 @@ import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.LasertagHudOverlay;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
+import de.kleiner3.lasertag.lasertaggame.statistics.GameStats;
+import de.kleiner3.lasertag.lasertaggame.statistics.WebStatisticsVisualizer;
 import de.kleiner3.lasertag.lasertaggame.timing.PreGameCountDownTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.types.Colors;
@@ -15,6 +17,7 @@ import de.kleiner3.lasertag.util.Tuple;
 import de.kleiner3.lasertag.util.serialize.ColorConfigDeserializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.mightypork.rpack.utils.DesktopApi;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
@@ -26,6 +29,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -58,6 +65,7 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_SETTINGS_SYNC, Callbacks::handleLasertagSettingsSync);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_TEAMS_SYNC, Callbacks::handleLasertagTeamsSync);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_DEACTIVATED_STATUS_CHANGED, Callbacks::handlePlayerDeactivatedStatusChanged);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_STATISTICS, Callbacks::handleGameStatisticsIncoming);
     }
 
     /**
@@ -247,6 +255,57 @@ public class ClientNetworkingHandler {
 
             // Set deactivated status
             PlayerDeactivatedManager.setDeactivated(uuid, deactivated);
+        }
+
+        public static void handleGameStatisticsIncoming(MinecraftClient client,
+                                                        ClientPlayNetworkHandler ignoredHandler,
+                                                        PacketByteBuf buf,
+                                                        PacketSender ignoredResponseSender) {
+            // Read from buffer
+            var json = buf.readString();
+
+            // Unpack json
+            var stats = new Gson().fromJson(json, GameStats.class);
+
+            // If should generate file
+            if (LasertagConfig.getInstance().getGenerateStatsFile()) {
+
+                // Generate file
+                var generatedFilePath = WebStatisticsVisualizer.build(stats);
+
+                // If generation failed
+                if (generatedFilePath == null) {
+                    var msg = "Failed to generate statistics file.";
+
+                    LasertagMod.LOGGER.error(msg);
+                    client.player.sendMessage(Text.translatable(msg)
+                            .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
+
+                    return;
+                }
+
+                // If should automatically open file
+                if (LasertagConfig.getInstance().getAutoOpenStatsFile()) {
+
+                    try {
+                        DesktopApi.open(new File(generatedFilePath));
+                    } catch (Exception e) {
+
+                        // Log error
+                        LasertagMod.LOGGER.error("Failed to open statistics from '" + generatedFilePath + "': " + e.getMessage());
+
+                        // Notify player
+                        client.player.sendMessage(Text.translatable("Failed to open statistics from " + generatedFilePath)
+                                .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
+                    }
+
+                } else {
+
+                    // Notify player about generation of file
+                    client.player.sendMessage(Text.translatable("Game statistics saved to " + generatedFilePath)
+                            .fillStyle(Style.EMPTY.withColor(Formatting.WHITE)), false);
+                }
+            }
         }
     }
 }

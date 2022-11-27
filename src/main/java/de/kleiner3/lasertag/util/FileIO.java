@@ -1,6 +1,10 @@
 package de.kleiner3.lasertag.util;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
 
 /**
  * Helper methods for file IO
@@ -15,18 +19,28 @@ public class FileIO {
      * @throws IOException By File IO
      */
     public static String readAllFile(File file) throws IOException {
+        // Create input stream
+        try (var is = new FileInputStream(file)) {
+            return readAllFile(is);
+        }
+    }
+
+    /**
+     * Read whole files contents
+     * @param is The InputStream of the file to read
+     * @return The files contents
+     * @throws IOException By File IO
+     */
+    public static String readAllFile(InputStream is) throws IOException {
         // Create string builder
         var builder = new StringBuilder();
 
-        // Create input stream
-        try (var is = new FileInputStream(file)) {
-            // Create buffered reader
-            try (var br = new BufferedReader(new InputStreamReader(is))) {
-                String line;
-                // Read every line
-                while((line = br.readLine()) != null) {
-                    builder.append(line);
-                }
+        // Create buffered reader
+        try (var br = new BufferedReader(new InputStreamReader(is))) {
+            String line;
+            // Read every line
+            while((line = br.readLine()) != null) {
+                builder.append(line);
             }
         }
 
@@ -45,5 +59,32 @@ public class FileIO {
                 bw.write(content);
             }
         }
+    }
+
+    /**
+     * Deletes a directory and its contents
+     * @param directory The path to the directory
+     * @throws IOException By File IO
+     */
+    public static void deleteDirectory(Path directory) throws IOException {
+        Files.walk(directory).forEach(p -> p.toFile().delete());
+    }
+
+    /**
+     * Creates a file and the directories leading to it if necessary
+     * @param target The path to the file to be created
+     * @return The created file
+     * @throws IOException By File IO
+     */
+    public static File createNewFile(String target) throws IOException {
+        var idx = target.lastIndexOf(File.separatorChar);
+
+        var path = target.substring(0, idx);
+
+        // Create path
+        Files.createDirectories(Paths.get(path));
+
+        // Create file
+        return Files.createFile(Paths.get(target)).toFile();
     }
 }

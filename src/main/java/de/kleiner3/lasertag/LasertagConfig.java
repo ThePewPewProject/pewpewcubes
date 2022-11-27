@@ -55,6 +55,16 @@ public class LasertagConfig {
      */
     private int playTime = 10;
 
+    /**
+     * Flag if a game statistics file should be generated
+     */
+    private boolean generateStatsFile = true;
+
+    /**
+     * Flag if the game statistics file should be automatically opened after the game
+     */
+    private boolean autoOpenStatsFile = true;
+
     //endregion
 
     //region Getter and setter
@@ -160,6 +170,24 @@ public class LasertagConfig {
     public void setPlayTime(MinecraftServer s, Integer playTime) {
         this.playTime = playTime;
         persist(s, "setPlayTime", Integer.toString(playTime));
+    }
+
+    public boolean getGenerateStatsFile() {
+        return generateStatsFile;
+    }
+
+    public void setGenerateStatsFile(MinecraftServer s, Boolean generateStatsFile) {
+        this.generateStatsFile = generateStatsFile;
+        persist(s, "setGenerateStatsFile", Boolean.toString(generateStatsFile));
+    }
+
+    public boolean getAutoOpenStatsFile() {
+        return autoOpenStatsFile;
+    }
+
+    public void setAutoOpenStatsFile(MinecraftServer s, Boolean autoOpenStatsFile) {
+        this.autoOpenStatsFile = autoOpenStatsFile;
+        persist(s, "setAutoOpenStatsFile", Boolean.toString(autoOpenStatsFile));
     }
 
     //endregion

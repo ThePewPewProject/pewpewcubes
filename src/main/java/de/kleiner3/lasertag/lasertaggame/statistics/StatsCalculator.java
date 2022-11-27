@@ -29,19 +29,19 @@ public class StatsCalculator {
             var team = teamMap.get(teamColor);
             int teamScore = 0;
 
-            var playersOfThisTeam = new ArrayList<Tuple<PlayerEntity, Integer>>();
+            var playersOfThisTeam = new ArrayList<Tuple<String, Integer>>();
             for (PlayerEntity player : team) {
                 int playerScore = player.getLasertagScore();
-                var playerScoreTuple = new Tuple<>(player, playerScore);
+                var playerScoreTuple = new Tuple<>(player.getDisplayName().getString(), playerScore);
                 teamScore += playerScore;
                 lastGamesStats.playerScores.add(playerScoreTuple);
                 playersOfThisTeam.add(playerScoreTuple);
             }
 
             if (playersOfThisTeam.size() > 0) {
-                lastGamesStats.teamPlayerScores.put(teamColor, playersOfThisTeam);
+                lastGamesStats.teamPlayerScores.put(teamColor.getName(), playersOfThisTeam);
+                lastGamesStats.teamScores.add(new Tuple<>(teamColor.getName(), teamScore));
             }
-            lastGamesStats.teamScores.add(new Tuple<>(teamColor, teamScore));
         }
 
         // Sort stats

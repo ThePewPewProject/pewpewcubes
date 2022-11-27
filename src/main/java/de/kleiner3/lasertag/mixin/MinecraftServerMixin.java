@@ -10,12 +10,15 @@ import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.lasertaggame.ILasertagGame;
 import de.kleiner3.lasertag.lasertaggame.ITickable;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
+import de.kleiner3.lasertag.lasertaggame.statistics.GameStats;
 import de.kleiner3.lasertag.lasertaggame.statistics.StatsCalculator;
+import de.kleiner3.lasertag.lasertaggame.statistics.WebStatisticsVisualizer;
 import de.kleiner3.lasertag.lasertaggame.timing.GameTickTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.Tuple;
+import de.kleiner3.lasertag.util.serialize.LasertagColorSerializer;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -29,6 +32,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -45,6 +49,9 @@ import java.util.concurrent.TimeUnit;
  */
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
+    @Shadow
+    public abstract ServerWorld getOverworld();
+
     private HashMap<Colors.Color, ArrayList<BlockPos>> spawnpointCache = null;
 
     /**
@@ -283,7 +290,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         sendGameOverEvent();
 
         // Get world
-        World world = ((MinecraftServer) (Object) this).getOverworld();
+        World world = getOverworld();
 
         // Deactivate every player
         for (List<PlayerEntity> team : teamMap.values()) {
@@ -308,6 +315,25 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
         // Calculate stats
         statsCalculator.calcStats();
+
+        // Create packet
+        var buf = new PacketByteBuf(Unpooled.buffer());
+
+        // Get last games stats
+        var stats = statsCalculator.getLastGamesStats();
+
+        // Get gson builder
+        var gsonBuilder = LasertagColorSerializer.getSerializer();
+
+        // To json
+        var jsonString = gsonBuilder.create().toJson(stats, GameStats.class);
+
+        // Write to buffer
+        buf.writeString(jsonString);
+
+        // Send statistics to clients
+        ServerEventSending.sendToEveryone(getOverworld(), NetworkingConstants.GAME_STATISTICS, buf);
+
     }
 
     /**
