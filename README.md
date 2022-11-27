@@ -1,5 +1,8 @@
 # Minecraft Lasertag mod
 
+![GitHub license](https://img.shields.io/github/license/efibs/mc-lasertag-mod.svg)
+![GitHub release](https://img.shields.io/github/release/efibs/mc-lasertag-mod.svg)
+
 ## About the mod
 
 This mod is supposed to be a sort of a minigame inside of minecraft. It is not supposed to be a mod with any kind of progression. All items added are not craftable in survival.
