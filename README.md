@@ -1,5 +1,7 @@
 # Minecraft Lasertag mod
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f880f41edc12467aa47c9ebf9dad8dba)](https://app.codacy.com/gh/efibs/mc-lasertag-mod?utm_source=github.com&utm_medium=referral&utm_content=efibs/mc-lasertag-mod&utm_campaign=Badge_Grade_Settings)
+
 ![GitHub license](https://img.shields.io/github/license/efibs/mc-lasertag-mod.svg)
 ![GitHub release](https://img.shields.io/github/release/efibs/mc-lasertag-mod.svg)
 
