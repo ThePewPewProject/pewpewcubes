@@ -1,7 +1,13 @@
 # Minecraft Lasertag mod
 
-![GitHub license](https://img.shields.io/github/license/efibs/mc-lasertag-mod.svg)
-![GitHub release](https://img.shields.io/github/release/efibs/mc-lasertag-mod.svg)
+![GitHub license](https://img.shields.io/github/license/efibs/mc-lasertag-mod?style=flat-square)
+![GitHub all releases](https://img.shields.io/github/downloads/efibs/mc-lasertag-mod/total?style=flat-square)
+
+![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/efibs/mc-lasertag-mod?label=Code%20Climate&style=flat-square)
+![Codacy grade](https://img.shields.io/codacy/grade/d507c6ff34ea4467902df213999d1667?label=Codacy&style=flat-square)
+[![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/efibs/mc-lasertag-mod?label=Codefactor&style=flat-square)](https://www.codefactor.io/repository/github/efibs/mc-lasertag-mod)
+[![Scrutinizer code quality (GitHub/Bitbucket)](https://img.shields.io/scrutinizer/quality/g/efibs/mc-lasertag-mod?label=Scrutinizer&style=flat-square)](https://scrutinizer-ci.com/g/efibs/mc-lasertag-mod/?branch=main)
+
 
 ## About the mod
 
