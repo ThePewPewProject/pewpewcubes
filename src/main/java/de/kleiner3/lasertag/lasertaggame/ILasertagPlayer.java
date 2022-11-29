@@ -64,4 +64,8 @@ public interface ILasertagPlayer {
      */
     default void onActivated() {
     }
+
+    default String getLasertagUsername() {
+        return null;
+    }
 }

@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame.statistics;
 
+import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.Tuple;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,11 +16,11 @@ import java.util.List;
  * @author Étienne Muser
  */
 public class StatsCalculator {
-    private final HashMap<Colors.Color, List<PlayerEntity>> teamMap;
+    private final HashMap<Colors.Color, ? extends List<? extends ILasertagPlayer>> teamMap;
 
     private GameStats lastGamesStats;
 
-    public StatsCalculator(HashMap<Colors.Color, List<PlayerEntity>> teamMap) {
+    public StatsCalculator(HashMap<Colors.Color, ? extends List<? extends ILasertagPlayer>> teamMap) {
         this.teamMap = teamMap;
     }
 
@@ -30,9 +31,9 @@ public class StatsCalculator {
             int teamScore = 0;
 
             var playersOfThisTeam = new ArrayList<Tuple<String, Integer>>();
-            for (PlayerEntity player : team) {
+            for (var player : team) {
                 int playerScore = player.getLasertagScore();
-                var playerScoreTuple = new Tuple<>(player.getDisplayName().getString(), playerScore);
+                var playerScoreTuple = new Tuple<>(player.getLasertagUsername(), playerScore);
                 teamScore += playerScore;
                 lastGamesStats.playerScores.add(playerScoreTuple);
                 playersOfThisTeam.add(playerScoreTuple);
@@ -45,10 +46,10 @@ public class StatsCalculator {
         }
 
         // Sort stats
-        lastGamesStats.teamScores.sort(Comparator.comparingInt(t -> t.y));
-        lastGamesStats.playerScores.sort(Comparator.comparingInt(t -> t.y));
+        lastGamesStats.teamScores.sort(Comparator.<Tuple<String, Integer>>comparingInt(t -> t.y).reversed());
+        lastGamesStats.playerScores.sort(Comparator.<Tuple<String, Integer>>comparingInt(t -> t.y).reversed());
         for (var team : lastGamesStats.teamPlayerScores.values()) {
-            team.sort(Comparator.comparingInt(t -> t.y));
+            team.sort(Comparator.<Tuple<String, Integer>>comparingInt(t -> t.y).reversed());
         }
     }
 

@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '1.0-SNAPSHOT'
 	id 'maven-publish'
+	id 'java'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -19,9 +20,13 @@ repositories {
 
 	// GeckoLib
 	maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+
+	mavenCentral()
 }
 
 dependencies {
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
@@ -84,4 +89,11 @@ publishing {
 
 loom {
 	accessWidenerPath = file("src/main/resources/lasertag.accesswidener")
+}
+
+test {
+	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
 }

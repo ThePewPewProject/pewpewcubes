@@ -133,6 +133,11 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
         weaponStack.setNbt(nbt);
     }
 
+    @Override
+    public String getLasertagUsername() {
+        return ((PlayerEntity)(Object)this).getDisplayName().getString();
+    }
+
     @Inject(method = "findRespawnPosition", at = @At("HEAD"), cancellable = true)
     private static void onFindRespawnPoint(ServerWorld world, BlockPos pos, float angle, boolean forced, boolean alive, CallbackInfoReturnable<Optional<Vec3d>> cir) {
         // TODO: Only if is in arena
