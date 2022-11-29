@@ -28,7 +28,22 @@ import java.util.Base64;
  * @author Étienne Muser
  */
 public class WebStatisticsVisualizer {
-    private static final Path TARGET_PATH = Path.of(FabricLoader.getInstance().getGameDir().toString(), "lasertag_last_games_stats");
+    private static final Path TARGET_PATH;
+
+    // Initialize target path
+    static {
+        Path target;
+
+        // I have to use try/catch because for some reason FabricLoader dosn't support checking if it is initialized correctly
+        try {
+            target = Path.of(FabricLoader.getInstance().getGameDir().toString(), "lasertag_last_games_stats");
+        } catch (IllegalStateException ignored) {
+            target = Path.of(System.getProperty("user.dir"), "build");
+        }
+
+        TARGET_PATH = target;
+    }
+
     private static final Identifier REPLACE_ID = new Identifier(LasertagMod.ID, "statistics_go_here");
 
     public static String build(GameStats stats) {
@@ -38,9 +53,13 @@ public class WebStatisticsVisualizer {
         // Get web page template from resource manager
         var template = ResourceManagers.WEB_RESOURCE_MANAGER.getWebSite(new Identifier("web/statistics_template"));
 
+        // Check
+        if (template == null) {
+            return null;
+        }
+
         // Build web page
         for (var fileTuple : template) {
-            var copyToPath = Path.of(TARGET_PATH.toString(), fileTuple.x.getPath());
 
             // if it is the html file
             if (fileTuple.x.getPath().endsWith(".html")) {
@@ -56,12 +75,11 @@ public class WebStatisticsVisualizer {
                 fileContents = buildHtml(fileContents, stats);
 
                 // Write file
-                resultPath = Path.of(TARGET_PATH.toString(), fileTuple.x.getPath()).toString();;
+                resultPath = Path.of(TARGET_PATH.toString(), fileTuple.x.getPath()).toString();
                 try {
-                    // Create file (File should not exist as the whole directory got deleted earlier)
-                    var file = FileIO.createNewFile(resultPath);
+                    var ignored = FileIO.createNewFile(resultPath);
 
-                    FileIO.writeAllFile(file, fileContents);
+                    Files.writeString(Path.of(resultPath), fileContents);
                 } catch (IOException ex) {
                     LasertagMod.LOGGER.error("Exception in WebStatisticsVisualizer.build:", ex);
                     return null;
@@ -71,6 +89,8 @@ public class WebStatisticsVisualizer {
             }
 
             try {
+                var copyToPath = Path.of(TARGET_PATH.toString(), fileTuple.x.getPath());
+
                 var ignored = FileIO.createNewFile(copyToPath.toString());
 
                 Files.copy(fileTuple.y.getInputStream(), copyToPath, StandardCopyOption.REPLACE_EXISTING);

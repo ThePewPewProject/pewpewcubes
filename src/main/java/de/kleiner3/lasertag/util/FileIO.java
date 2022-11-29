@@ -1,6 +1,9 @@
 package de.kleiner3.lasertag.util;
 
+import net.minecraft.structure.StrongholdGenerator;
+
 import java.io.*;
+import java.net.StandardSocketOptions;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -68,6 +71,14 @@ public class FileIO {
      * @throws IOException By File IO
      */
     public static File createNewFile(String target) throws IOException {
+        // Get path of target
+        var targetPath = Paths.get(target);
+
+        // If already exists
+        if (Files.exists(targetPath)) {
+            return new File(target);
+        }
+
         var idx = target.lastIndexOf(File.separatorChar);
 
         var path = target.substring(0, idx);
@@ -76,6 +87,6 @@ public class FileIO {
         Files.createDirectories(Paths.get(path));
 
         // Create file
-        return Files.createFile(Paths.get(target)).toFile();
+        return Files.createFile(targetPath).toFile();
     }
 }
