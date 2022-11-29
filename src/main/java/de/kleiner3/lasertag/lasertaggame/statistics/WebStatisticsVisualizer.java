@@ -35,16 +35,6 @@ public class WebStatisticsVisualizer {
         // The path to the generated index.html file
         String resultPath = null;
 
-        // Check if targetPath already exists
-        if (TARGET_PATH.toFile().exists()) {
-            // Delete old
-            try {
-                FileIO.deleteDirectory(TARGET_PATH);
-            } catch (IOException ex) {
-                LasertagMod.LOGGER.error("Failed to delete old statistics file.", ex);
-            }
-        }
-
         // Get web page template from resource manager
         var template = ResourceManagers.WEB_RESOURCE_MANAGER.getWebSite(new Identifier("web/statistics_template"));
 

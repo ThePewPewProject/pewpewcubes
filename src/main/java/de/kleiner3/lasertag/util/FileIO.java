@@ -62,15 +62,6 @@ public class FileIO {
     }
 
     /**
-     * Deletes a directory and its contents
-     * @param directory The path to the directory
-     * @throws IOException By File IO
-     */
-    public static void deleteDirectory(Path directory) throws IOException {
-        Files.walk(directory).forEach(p -> p.toFile().delete());
-    }
-
-    /**
      * Creates a file and the directories leading to it if necessary
      * @param target The path to the file to be created
      * @return The created file
