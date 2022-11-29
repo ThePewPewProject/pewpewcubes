@@ -25,9 +25,7 @@ public class CreditsCommand {
         }
 
         // Workaround: setScreen(null) in ChatScreen gets triggered after command execution
-        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
-            client.execute(() -> client.setScreen(new LasertagCreditsScreen()));
-        }, 250, TimeUnit.MILLISECONDS);
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> client.execute(() -> client.setScreen(new LasertagCreditsScreen())), 250, TimeUnit.MILLISECONDS);
 
         return Command.SINGLE_SUCCESS;
     }

@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DummyResourceManager extends WebResourceManager {
+public class DummyWebResourceManager extends WebResourceManager {
 
     @Override
     public List<Tuple<Identifier, Resource>> getWebSite(Identifier ignored) {

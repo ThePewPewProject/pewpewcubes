@@ -1,13 +1,8 @@
 package de.kleiner3.lasertag.util;
 
-import net.minecraft.structure.StrongholdGenerator;
-
 import java.io.*;
-import java.net.StandardSocketOptions;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Comparator;
 
 /**
  * Helper methods for file IO

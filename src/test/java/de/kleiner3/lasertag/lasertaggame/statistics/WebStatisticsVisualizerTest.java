@@ -1,21 +1,14 @@
 package de.kleiner3.lasertag.lasertaggame.statistics;
 
-import de.kleiner3.lasertag.dummy.DummyResourceManager;
-import de.kleiner3.lasertag.resource.ResourceManagers;
+import de.kleiner3.lasertag.dummy.DummyWebResourceManager;
 import de.kleiner3.lasertag.util.Tuple;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class WebStatisticsVisualizerTest {
-
-    @BeforeAll
-    static void setup() {
-        ResourceManagers.WEB_RESOURCE_MANAGER = new DummyResourceManager();
-    }
 
     @Test
     void buildTest() {
@@ -47,7 +40,7 @@ class WebStatisticsVisualizerTest {
         stats.teamScores.add(new Tuple<>("Orange", 900));
         stats.teamScores.add(new Tuple<>("Pink", 600));
 
-        var result = WebStatisticsVisualizer.build(stats);
+        var result = WebStatisticsVisualizer.build(stats, new DummyWebResourceManager());
 
         assertNotNull(result);
     }

@@ -1,10 +1,8 @@
 package de.kleiner3.lasertag.lasertaggame.statistics;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonParser;
-import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.resource.ResourceManagers;
+import de.kleiner3.lasertag.resource.WebResourceManager;
 import de.kleiner3.lasertag.util.FileIO;
 import de.kleiner3.lasertag.util.serialize.PlayerInfoDto;
 import de.kleiner3.lasertag.util.serialize.ProfileTextureDto;
@@ -14,7 +12,6 @@ import net.minecraft.util.Identifier;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -46,12 +43,12 @@ public class WebStatisticsVisualizer {
 
     private static final Identifier REPLACE_ID = new Identifier(LasertagMod.ID, "statistics_go_here");
 
-    public static String build(GameStats stats) {
+    public static String build(GameStats stats, WebResourceManager resourceManager) {
         // The path to the generated index.html file
         String resultPath = null;
 
         // Get web page template from resource manager
-        var template = ResourceManagers.WEB_RESOURCE_MANAGER.getWebSite(new Identifier("web/statistics_template"));
+        var template = resourceManager.getWebSite(new Identifier("web/statistics_template"));
 
         // Check
         if (template == null) {
@@ -64,7 +61,7 @@ public class WebStatisticsVisualizer {
             // if it is the html file
             if (fileTuple.x.getPath().endsWith(".html")) {
                 // Read the file
-                String fileContents = null;
+                String fileContents;
                 try {
                     fileContents = FileIO.readAllFile(fileTuple.y.getInputStream());
                 } catch (IOException ex) {
@@ -114,7 +111,7 @@ public class WebStatisticsVisualizer {
         buildTeamByPlayersScores(builder, stats);
 
         // Find and replace
-        return html.replaceAll("#" + REPLACE_ID.toString() + "#", builder.toString());
+        return html.replaceAll("#" + REPLACE_ID + "#", builder.toString());
     }
 
     private static void buildTeamScores(StringBuilder builder, GameStats stats) {

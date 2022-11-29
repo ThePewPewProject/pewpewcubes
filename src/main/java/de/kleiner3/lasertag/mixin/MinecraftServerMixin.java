@@ -12,7 +12,6 @@ import de.kleiner3.lasertag.lasertaggame.ITickable;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.lasertaggame.statistics.GameStats;
 import de.kleiner3.lasertag.lasertaggame.statistics.StatsCalculator;
-import de.kleiner3.lasertag.lasertaggame.statistics.WebStatisticsVisualizer;
 import de.kleiner3.lasertag.lasertaggame.timing.GameTickTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;

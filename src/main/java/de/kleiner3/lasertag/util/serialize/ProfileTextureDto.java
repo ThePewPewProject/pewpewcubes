@@ -13,7 +13,7 @@ public class ProfileTextureDto {
     public String profileName;
     public HashMap<String, TextureObject> textures;
 
-    public class TextureObject {
+    public static class TextureObject {
         public String url;
     }
 }

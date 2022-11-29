@@ -11,6 +11,7 @@ import de.kleiner3.lasertag.lasertaggame.statistics.GameStats;
 import de.kleiner3.lasertag.lasertaggame.statistics.WebStatisticsVisualizer;
 import de.kleiner3.lasertag.lasertaggame.timing.PreGameCountDownTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
+import de.kleiner3.lasertag.resource.ResourceManagers;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.ConverterUtil;
 import de.kleiner3.lasertag.util.Tuple;
@@ -29,10 +30,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -271,7 +269,7 @@ public class ClientNetworkingHandler {
             if (LasertagConfig.getInstance().getGenerateStatsFile()) {
 
                 // Generate file
-                var generatedFilePath = WebStatisticsVisualizer.build(stats);
+                var generatedFilePath = WebStatisticsVisualizer.build(stats, ResourceManagers.WEB_RESOURCE_MANAGER);
 
                 // If generation failed
                 if (generatedFilePath == null) {

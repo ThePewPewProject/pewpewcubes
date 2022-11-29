@@ -21,7 +21,7 @@ import java.util.Map;
 public class WebResourceManager implements SimpleSynchronousResourceReloadListener {
     private static final String[] fileEndings = new String[] { ".html", ".js", ".css", ".png", ".svg", ".jgp", "htm", ".ts", ".ico"};
 
-    private static Map<Identifier, List<Tuple<Identifier, Resource>>> resourcesMap = new HashMap<>();
+    private static final Map<Identifier, List<Tuple<Identifier, Resource>>> resourcesMap = new HashMap<>();
 
     @Override
     public Identifier getFabricId() {

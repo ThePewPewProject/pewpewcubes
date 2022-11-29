@@ -145,9 +145,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
             world.spawnEntity(ray);
 
             // Despawn ray after 50ms
-            Executors.newSingleThreadScheduledExecutor().schedule(() -> {
-                world.getServer().execute(ray::discard);
-            }, 50, TimeUnit.MILLISECONDS);
+            Executors.newSingleThreadScheduledExecutor().schedule(() -> world.getServer().execute(ray::discard), 50, TimeUnit.MILLISECONDS);
         }
     }
 

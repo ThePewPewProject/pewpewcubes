@@ -10,7 +10,7 @@ public class SessionPlayerProfileDto {
     public String name;
     public PropertyDto[] properties;
 
-    public class PropertyDto {
+    public static class PropertyDto {
         public String name;
         public String value;
     }

@@ -11,8 +11,7 @@ import net.minecraft.resource.ResourceType;
 public class ResourceManagers {
     public static final StructureResourceManager STRUCTURE_RESOURCE_MANAGER = new StructureResourceManager();
 
-    // Public non final because of unit tests
-    public static WebResourceManager WEB_RESOURCE_MANAGER = new WebResourceManager();
+    public static final WebResourceManager WEB_RESOURCE_MANAGER = new WebResourceManager();
 
     public static void register() {
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(STRUCTURE_RESOURCE_MANAGER);

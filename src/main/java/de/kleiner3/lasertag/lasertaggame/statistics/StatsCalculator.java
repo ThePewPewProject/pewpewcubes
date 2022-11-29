@@ -3,7 +3,6 @@ package de.kleiner3.lasertag.lasertaggame.statistics;
 import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.Tuple;
-import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.ArrayList;
 import java.util.Comparator;
