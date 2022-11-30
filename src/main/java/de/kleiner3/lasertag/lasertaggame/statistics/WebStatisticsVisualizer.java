@@ -154,48 +154,32 @@ public class WebStatisticsVisualizer {
     }
 
     private static void buildTableRow(StringBuilder builder, int place, String nameHtml, int score) {
-        builder.append(         "<tr>" +
-                                    "<th scope=\"row\">" +
-                                        place +
-                                    "</th>" +
-                                    "<td>" +
-                                        nameHtml +
-                                    "</td>" +
-                                    "<td>" +
-                                        score +
-                                    "</td>" +
-                                "</tr>");
+        builder.append("<tr><th scope=\"row\">");
+        builder.append(place);
+        builder.append("</th><td>");
+        builder.append(nameHtml);
+        builder.append("</td><td>");
+        builder.append(score);
+        builder.append("</td></tr>");
     }
 
     private static void buildTableHeader(StringBuilder builder, String tableTitle, String nameColHeader) {
-        builder.append("<div class=\"container py-5\">" +
-                            "<h5 class=\"h5\">" + tableTitle + "</h5>" +
-                            "<table class=\"table text-light\">" +
-                                "<col width=\"15%\"/>" +
-                                "<thead>" +
-                                    "<tr>" +
-                                        "<th scope=\"col\">#</th>" +
-                                        "<th scope=\"col\">" + nameColHeader + "</th>" +
-                                        "<th scope=\"col\">Score</th>" +
-                                    "</tr>" +
-                                "</thead>" +
-                                "<tbody>");
+        builder.append("<div class=\"container py-5\"><h5 class=\"h5\">");
+        builder.append(tableTitle);
+        builder.append("</h5><table class=\"table text-light\"><col width=\"15%\"/><thead><tr><th scope=\"col\">#</th><th scope=\"col\">");
+        builder.append(nameColHeader);
+        builder.append("</th><th scope=\"col\">Score</th></tr></thead><tbody>");
     }
 
     private static void buildTableEnd(StringBuilder builder) {
-        builder.append(         "</tbody>" +
-                            "</table>" +
-                        "</div>");
+        builder.append("</tbody></table></div>");
     }
 
     private static String getSkinNameHtml(String playerName) {
         try {
             var skinUrl = getSkinUrlFromPlayerName(playerName);
 
-            return  "<div class=\"face-container\">" +
-                        "<img src='" + skinUrl + "'>" +
-                    "</div>\n\n" +
-                    playerName;
+            return  "<div class=\"face-container\"><img src='" + skinUrl + "'></div>\n\n" + playerName;
 
         } catch (Exception ignored) {
             return "<div class=\"face-container\"></div>" + playerName;
