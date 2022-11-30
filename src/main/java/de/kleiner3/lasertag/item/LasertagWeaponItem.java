@@ -26,6 +26,8 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 /**
@@ -76,7 +78,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
             return TypedActionResult.fail(laserweaponStack);
         }
 
-        if (world.isClient == false) {
+        if (!world.isClient) {
             fireWeapon(world, playerEntity, this.getColor(laserweaponStack));
         }
         return TypedActionResult.pass(laserweaponStack);
@@ -111,12 +113,11 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
                 net.minecraft.block.Block block = blockState.getBlock();
 
                 // If hit block is not a lasertarget block
-                if (!(block instanceof LaserTargetBlock)) {
+                if (!(block instanceof LaserTargetBlock laserTarget)) {
                     break;
                 }
 
                 // Cast to lasertarget block and trigger onHit
-                LaserTargetBlock laserTarget = (LaserTargetBlock) block;
                 laserTarget.onHitBy(playerEntity, world.getBlockEntity(blockPos));
                 break;
 
@@ -128,11 +129,10 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
                 Entity hitEntity = entityHit.getEntity();
 
                 // Check that hit entity is a player
-                if (!(hitEntity instanceof PlayerEntity))
+                if (!(hitEntity instanceof PlayerEntity hitPlayer))
                     break;
 
                 // Cast to player and trigger onHit
-                PlayerEntity hitPlayer = (PlayerEntity) hitEntity;
                 hitPlayer.onHitBy(playerEntity);
                 break;
             case MISS:
@@ -144,14 +144,8 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
             LaserRayEntity ray = new LaserRayEntity(world, playerEntity, color, hit);
             world.spawnEntity(ray);
 
-            // Despawn ray after 100ms
-            new Thread(() -> {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                }
-                ray.discard();
-            }).start();
+            // Despawn ray after 50ms
+            Executors.newSingleThreadScheduledExecutor().schedule(() -> world.getServer().execute(ray::discard), 50, TimeUnit.MILLISECONDS);
         }
     }
 

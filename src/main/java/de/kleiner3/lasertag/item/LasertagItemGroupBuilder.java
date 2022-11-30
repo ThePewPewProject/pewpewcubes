@@ -25,7 +25,7 @@ public class LasertagItemGroupBuilder {
         return new ItemGroup(ItemGroup.GROUPS.length - 1, String.format("%s.%s", identifier.getNamespace(), identifier.getPath())) {
             @Override
             public ItemStack createIcon() {
-                var stack = new ItemStack(LasertagMod.LASERTAG_WEAPON);
+                var stack = new ItemStack(Items.LASERTAG_WEAPON);
                 var nbt = new NbtCompound();
                 nbt.putInt("color", 0xFF0000);
                 stack.setNbt(nbt);

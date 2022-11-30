@@ -116,7 +116,7 @@ public class LasertagCreditsScreen extends Screen {
     }
 
     private void load(String id, LasertagCreditsScreen.CreditsReader reader) {
-        try (BufferedReader reader2 = this.client.getResourceManager().openAsReader(new Identifier("lasertag", id));){
+        try (BufferedReader reader2 = this.client.getResourceManager().openAsReader(new Identifier(LasertagMod.ID, id))){
             reader.read(reader2);
         }
         catch (Exception exception) {
@@ -126,17 +126,17 @@ public class LasertagCreditsScreen extends Screen {
 
     private void readPoem(Reader reader) throws IOException {
         int i;
-        Object string;
+        String line;
         BufferedReader bufferedReader = new BufferedReader(reader);
         Random random = Random.create(8124371L);
-        while ((string = bufferedReader.readLine()) != null) {
-            string = ((String)string).replaceAll("PLAYERNAME", this.client.getSession().getUsername());
-            while ((i = ((String)string).indexOf(OBFUSCATION_PLACEHOLDER)) != -1) {
-                String string2 = ((String)string).substring(0, i);
-                String string3 = ((String)string).substring(i + OBFUSCATION_PLACEHOLDER.length());
-                string = string2 + Formatting.WHITE + Formatting.OBFUSCATED + "XXXXXXXX".substring(0, random.nextInt(4) + 3) + string3;
+        while ((line = bufferedReader.readLine()) != null) {
+            line = line.replaceAll("PLAYERNAME", this.client.getSession().getUsername());
+            while ((i = line.indexOf(OBFUSCATION_PLACEHOLDER)) != -1) {
+                String string2 = line.substring(0, i);
+                String string3 = line.substring(i + OBFUSCATION_PLACEHOLDER.length());
+                line = string2 + Formatting.WHITE + Formatting.OBFUSCATED + "XXXXXXXX".substring(0, random.nextInt(4) + 3) + string3;
             }
-            this.addText((String)string);
+            this.addText(line);
             this.addEmptyLine();
         }
         for (i = 0; i < 8; ++i) {
@@ -227,8 +227,8 @@ public class LasertagCreditsScreen extends Screen {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.enableBlend();
         this.drawWithOutline(i, j, (x, y) -> {
-            this.drawTexture(matrices, x + 0, (int)y, 0, 0, 155, 44);
-            this.drawTexture(matrices, x + 155, (int)y, 0, 45, 155, 44);
+            this.drawTexture(matrices, x, y, 0, 0, 155, 44);
+            this.drawTexture(matrices, x + 155, y, 0, 45, 155, 44);
         });
         RenderSystem.disableBlend();
         int k = j + 100;
@@ -268,7 +268,7 @@ public class LasertagCreditsScreen extends Screen {
 
     @FunctionalInterface
     @Environment(value= EnvType.CLIENT)
-    static interface CreditsReader {
-        public void read(Reader var1) throws IOException;
+    interface CreditsReader {
+        void read(Reader var1) throws IOException;
     }
 }

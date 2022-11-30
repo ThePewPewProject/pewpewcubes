@@ -1,0 +1,31 @@
+body {
+    background-image: url(../img/bg.png);
+    background-size:cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+tr:nth-child(even) {
+    background-color: rgba(161, 161, 161, 0.331);
+}
+
+table {
+    table-layout: fixed;
+}
+
+.face-container {
+    width: 24px;
+    height: 24px;
+    overflow: hidden;
+    display: inline-block;
+    margin: 0;
+    vertical-align: bottom;
+}
+
+.face-container img {
+    width: 192px;
+    height: auto;
+    margin: -24px 0 0 -24px;
+    image-rendering: pixelated;
+}

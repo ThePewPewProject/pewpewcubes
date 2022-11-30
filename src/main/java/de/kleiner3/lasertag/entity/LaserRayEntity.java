@@ -1,6 +1,5 @@
 package de.kleiner3.lasertag.entity;
 
-import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -42,7 +41,7 @@ public class LaserRayEntity extends ProjectileEntity {
     }
 
     public LaserRayEntity(World world, Vec3d pos, float yaw, float pitch, int color, Vec3d endPos) {
-        super(LasertagMod.LASER_RAY, world);
+        super(Entities.LASER_RAY, world);
 
         this.color = color;
         this.end = endPos;

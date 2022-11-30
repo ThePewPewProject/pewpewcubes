@@ -17,7 +17,7 @@
     "sources": "https://github.com/efibs/mc-lasertag-mod"
   },
 
-  "license": "",
+  "license": "GPL-3.0 license",
   "icon": "assets/lasertag/icon.png",
 
   "environment": "*",
@@ -34,18 +34,20 @@
   ],
   "custom": {
 	"loom:injected_interfaces": {
-		"net/minecraft/server/MinecraftServer": ["de/kleiner3/lasertag/lasertaggame/ILasertagGame"],
+		"net/minecraft/server/MinecraftServer": ["de/kleiner3/lasertag/lasertaggame/ILasertagGame", "de/kleiner3/lasertag/lasertaggame/ITickable"],
 		"net/minecraft/entity/player/PlayerEntity": ["de/kleiner3/lasertag/lasertaggame/ILasertagPlayer"],
         "net/minecraft/world/World": ["de/kleiner3/lasertag/util/fastiter/IFastWorldIter"]
     }
   },
+
+  "accessWidener" : "lasertag.accesswidener",
 
   "depends": {
     "fabricloader": ">=0.14.9",
     "minecraft": "~1.19",
 	"fabric-api": "*",
     "java": ">=17",
-    "geckolib3": ">=3.1.26"
+    "geckolib3": ">=3.1.37"
   },
   "suggests": {
     "sodium": "*",

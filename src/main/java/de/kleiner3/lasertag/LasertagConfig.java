@@ -19,6 +19,8 @@ import java.io.IOException;
  * @author Étienne Muser
  */
 public class LasertagConfig {
+    //region Properties
+
     // ===== Weapon settings ====================
     /**
      * Weapon cooldown in game ticks
@@ -28,7 +30,7 @@ public class LasertagConfig {
     private boolean showLaserRays = true;
 
     // ===== General game settings ==============
-    private int maxTeamSize = 6;
+    private final int maxTeamSize = 6;
     private boolean renderTeamList = true;
     private boolean renderTimer = true;
     private int lasertargetHitScore = 100;
@@ -52,6 +54,20 @@ public class LasertagConfig {
      * The play time in minutes
      */
     private int playTime = 10;
+
+    /**
+     * Flag if a game statistics file should be generated
+     */
+    private boolean generateStatsFile = true;
+
+    /**
+     * Flag if the game statistics file should be automatically opened after the game
+     */
+    private boolean autoOpenStatsFile = true;
+
+    //endregion
+
+    //region Getter and setter
 
     public int getLasertagWeaponCooldown() {
         return lasertagWeaponCooldown;
@@ -82,11 +98,6 @@ public class LasertagConfig {
 
     public int getMaxTeamSize() {
         return maxTeamSize;
-    }
-
-    public void setMaxTeamSize(MinecraftServer s, Integer maxTeamSize) {
-        this.maxTeamSize = maxTeamSize;
-        persist(s, "setMaxTeamSize", Integer.toString(maxTeamSize));
     }
 
     public boolean isRenderTeamList() {
@@ -161,6 +172,33 @@ public class LasertagConfig {
         persist(s, "setPlayTime", Integer.toString(playTime));
     }
 
+    public boolean getGenerateStatsFile() {
+        return generateStatsFile;
+    }
+
+    public void setGenerateStatsFile(MinecraftServer s, Boolean generateStatsFile) {
+        this.generateStatsFile = generateStatsFile;
+        persist(s, "setGenerateStatsFile", Boolean.toString(generateStatsFile));
+    }
+
+    public boolean getAutoOpenStatsFile() {
+        return autoOpenStatsFile;
+    }
+
+    public void setAutoOpenStatsFile(MinecraftServer s, Boolean autoOpenStatsFile) {
+        this.autoOpenStatsFile = autoOpenStatsFile;
+        persist(s, "setAutoOpenStatsFile", Boolean.toString(autoOpenStatsFile));
+    }
+
+    //endregion
+
+    //region Instance
+
+    private LasertagConfig() {
+    }
+
+    private static LasertagConfig instance = null;
+
     public static LasertagConfig getInstance() {
         return instance;
     }
@@ -168,6 +206,10 @@ public class LasertagConfig {
     public static void setInstance(LasertagConfig inst) {
         instance = inst;
     }
+
+    //endregion
+
+    //region Synchronization
 
     public static void syncToPlayer(ServerPlayerEntity player) {
         // Serialize to json
@@ -182,6 +224,10 @@ public class LasertagConfig {
         // Send to all clients
         ServerPlayNetworking.send(player, NetworkingConstants.LASERTAG_SETTINGS_SYNC, buf);
     }
+
+    //endregion
+
+    //region Persistance
 
     /**
      * Persist the config changes to the file system.
@@ -223,19 +269,12 @@ public class LasertagConfig {
     }
 
     // Get path to lasertag config file
-    private static String lasertagConfigFilePath = LasertagMod.configFolderPath + "\\lasertagConfig.json";
+    private static final String lasertagConfigFilePath = LasertagMod.configFolderPath + "\\lasertagConfig.json";
 
     // Create file object
-    private static File lasertagConfigFile = new File(lasertagConfigFilePath);
+    private static final File lasertagConfigFile = new File(lasertagConfigFilePath);
 
-    private static LasertagConfig instance = null;
-
-    private LasertagConfig() {
-    }
-
-    /**
-     * Initialize lasertag game settings from file
-     */
+    // Initialize lasertag game settings from file
     static {
         try {
             // Read config file
@@ -258,26 +297,32 @@ public class LasertagConfig {
             LasertagMod.LOGGER.info("Default lasertag config is being used.");
         }
 
-        // Create directory if not exists
-        var dir = new File(LasertagMod.configFolderPath);
-        if (dir.exists() == false) {
-            dir.mkdir();
-        }
+        try {
+            // Create directory if not exists
+            var dir = new File(LasertagMod.configFolderPath);
+            if (!dir.exists()) {
+                if (!dir.mkdir()) {
+                    throw new IOException("Make directory for lasertag config file failed!");
+                }
+            }
 
-        // If config file doesn't exist
-        if (lasertagConfigFile.exists() == false) {
-            // Log that lasertag config file is being created
-            LasertagMod.LOGGER.info("Lasertag config file is being created in '" + lasertagConfigFilePath + "'");
+            // If config file doesn't exist
+            if (!lasertagConfigFile.exists()) {
+                // Log that lasertag config file is being created
+                LasertagMod.LOGGER.info("Lasertag config file is being created in '" + lasertagConfigFilePath + "'");
 
-            try {
                 // Create new file
-                lasertagConfigFile.createNewFile();
+                if (!lasertagConfigFile.createNewFile()) {
+                    throw new IOException("Creation of file for lasertag config file failed!");
+                }
 
                 persistUnsafe();
-            } catch (IOException e) {
-                // Log that creation of new file failed
-                LasertagMod.LOGGER.warn("Creation of new lasertag config file in '" + lasertagConfigFilePath + "' failed: " + e.getMessage());
             }
+        } catch (IOException e) {
+            // Log that creation of new file failed
+            LasertagMod.LOGGER.warn("Creation of new lasertag config file in '" + lasertagConfigFilePath + "' failed: " + e.getMessage());
         }
     }
+
+    //endregion
 }

@@ -33,12 +33,9 @@ public class ColorConfigDeserializer {
                 var jsonObject = jsonElement.getAsJsonObject();
 
                 // For every key in the json object
-                for (var key : jsonObject.keySet()) {
+                for (var teamName : jsonObject.keySet()) {
                     // Get the team of this key
-                    var teamObject = jsonObject.get(key).getAsJsonObject();
-
-                    // The key is the team name
-                    var teamName = key;
+                    var teamObject = jsonObject.get(teamName).getAsJsonObject();
 
                     // Get RGB
                     var r = teamObject.get("red").getAsInt();

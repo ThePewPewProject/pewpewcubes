@@ -8,13 +8,11 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
  *
  * @author Étienne Muser
  */
-public class ClientCommandInitializer {
+public class ClientCommands {
     /**
      * Init client side commands
      */
-    public static void initCommands() {
-        ClientCommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess) -> {
-            CreditsCommand.register(dispatcher);
-        }));
+    public static void register() {
+        ClientCommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess) -> CreditsCommand.register(dispatcher)));
     }
 }

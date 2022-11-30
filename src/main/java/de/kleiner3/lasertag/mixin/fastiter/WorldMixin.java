@@ -60,11 +60,10 @@ public class WorldMixin implements IFastWorldIter {
                 final var sections = chunk.getSectionArray();
 
                 // For every section
-                for (int idx = 0; idx < NUM_SECTIONS; idx++) {
+                for (int secIdx = 0; secIdx < NUM_SECTIONS; secIdx++) {
                     // Get the section
-                    final int secIdx = idx;
                     final var section = sections[secIdx];
-                    final int secBaseY = (idx - 4) * 16;
+                    final int secBaseY = (secIdx - 4) * 16;
 
                     // For every block in the section
                     for (int sx = 0; sx < 16; sx++) {
@@ -96,33 +95,33 @@ public class WorldMixin implements IFastWorldIter {
 
             // Go next in spiral
             switch (leg) {
-                case 0:
+                case 0 -> {
                     ++x;
                     if (x == layer) ++leg;
-                    break;
-                case 1:
+                }
+                case 1 -> {
                     ++z;
                     if (z == layer) ++leg;
-                    break;
-                case 2:
+                }
+                case 2 -> {
                     --x;
                     if (-x == layer) ++leg;
-                    break;
-                case 3:
+                }
+                case 3 -> {
                     --z;
                     if (-z == layer) {
                         leg = 0;
                         ++layer;
                     }
-                    break;
+                }
             }
         }
 
         // Wait for threadpool to finish
         try {
             executor.shutdown();
-            executor.awaitTermination(30, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
+            var ignored = executor.awaitTermination(30, TimeUnit.SECONDS);
+        } catch (InterruptedException ignored) {
         }
     }
 

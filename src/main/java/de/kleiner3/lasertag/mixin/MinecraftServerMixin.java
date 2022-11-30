@@ -4,15 +4,20 @@ import com.google.gson.Gson;
 import de.kleiner3.lasertag.LasertagConfig;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
+import de.kleiner3.lasertag.item.Items;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.item.LasertagWeaponItem;
-import de.kleiner3.lasertag.lasertaggame.GameStats;
 import de.kleiner3.lasertag.lasertaggame.ILasertagGame;
+import de.kleiner3.lasertag.lasertaggame.ITickable;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
+import de.kleiner3.lasertag.lasertaggame.statistics.GameStats;
+import de.kleiner3.lasertag.lasertaggame.statistics.StatsCalculator;
+import de.kleiner3.lasertag.lasertaggame.timing.GameTickTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.Tuple;
+import de.kleiner3.lasertag.util.serialize.LasertagColorSerializer;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -32,6 +37,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Interface injection into MinecraftServer to implement the lasertag game
@@ -39,26 +47,29 @@ import java.util.*;
  * @author Étienne Muser
  */
 @Mixin(MinecraftServer.class)
-public abstract class MinecraftServerMixin implements ILasertagGame {
-    @Shadow public abstract ServerWorld getOverworld();
-
-    private GameStats lastGamesStats = null;
+public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
+    @Shadow
+    public abstract ServerWorld getOverworld();
 
     private HashMap<Colors.Color, ArrayList<BlockPos>> spawnpointCache = null;
 
     /**
      * Map every player to their team color
      */
-    private HashMap<Colors.Color, List<PlayerEntity>> teamMap = new HashMap<>();
+    private final HashMap<Colors.Color, List<PlayerEntity>> teamMap = new HashMap<>();
+
+    private final StatsCalculator statsCalculator = new StatsCalculator(teamMap);
 
     private List<LaserTargetBlockEntity> lasertargetsToReset = new LinkedList<>();
 
     private boolean isRunning = false;
 
+    private ScheduledExecutorService gameTickTimer = null;
+
     /**
      * Inject into constructor of MinecraftServer
      *
-     * @param ci
+     * @param ci The CallbackInfo
      */
     @Inject(method = "<init>", at = @At("TAIL"))
     private void init(CallbackInfo ci) {
@@ -68,6 +79,8 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             teamMap.put(color, new LinkedList<>());
         }
     }
+
+    //region ILasertagGame
 
     @Override
     public void startGame(boolean scanSpawnpoints) {
@@ -108,11 +121,10 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
 
         // Start game
         isRunning = true;
-        new Thread(() -> {
-            // Wait for game start cooldown
-            try {
-                Thread.sleep(LasertagConfig.getInstance().getStartTime() * 1000);
-            } catch (InterruptedException e) {}
+
+        var preGameDelayTimer = Executors.newSingleThreadScheduledExecutor();
+        var preGameDelay = LasertagConfig.getInstance().getStartTime();
+        preGameDelayTimer.schedule(() -> {
 
             // Activate every player
             for (List<PlayerEntity> team : teamMap.values()) {
@@ -122,16 +134,11 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
                 }
             }
 
-            for(int i = 0; i < LasertagConfig.getInstance().getPlayTime(); i++) {
-                lasertagTick();
-                try {
-                    Thread.sleep(1000 * 60);
-                } catch (InterruptedException e) {
-                }
-            }
+            // Start game tick timer
+            gameTickTimer = Executors.newSingleThreadScheduledExecutor();
+            gameTickTimer.scheduleAtFixedRate(new GameTickTimerTask(this), 0, 1, TimeUnit.MINUTES);
 
-            lasertagGameOver();
-        }).start();
+        }, preGameDelay, TimeUnit.SECONDS);
 
         // Notify players
         sendGameStartedEvent();
@@ -181,39 +188,21 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         player.setTeam(newTeamColor);
 
         // Get players inventory
-        var inventory = player .getInventory();
+        var inventory = player.getInventory();
 
         // Clear players inventory
         inventory.clear();
 
         // Give player a lasertag vest
-        var vestStack = new ItemStack(LasertagMod.LASERTAG_VEST);
-        ((LasertagVestItem)LasertagMod.LASERTAG_VEST).setColor(vestStack, newTeamColor.getValue());
+        var vestStack = new ItemStack(Items.LASERTAG_VEST);
+        ((LasertagVestItem) Items.LASERTAG_VEST).setColor(vestStack, newTeamColor.getValue());
         player.equipStack(EquipmentSlot.CHEST, vestStack);
 
         // Give player a lasertag weapon
-        var weaponStack = new ItemStack(LasertagMod.LASERTAG_WEAPON);
-        ((LasertagWeaponItem)LasertagMod.LASERTAG_WEAPON).setColor(weaponStack, newTeamColor.getValue());
-        ((LasertagWeaponItem)LasertagMod.LASERTAG_WEAPON).setDeactivated(weaponStack, true);
+        var weaponStack = new ItemStack(Items.LASERTAG_WEAPON);
+        ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setColor(weaponStack, newTeamColor.getValue());
+        ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setDeactivated(weaponStack, true);
         inventory.setStack(0, weaponStack);
-
-        // Notify about change
-        notifyPlayersAboutUpdate();
-    }
-
-    @Override
-    public void playerLeaveTeam(Colors.Color oldTeamColor, PlayerEntity player) {
-        // Get the players in the team
-        List<PlayerEntity> team = teamMap.get(oldTeamColor);
-
-        // Check if player is in the team he claims to be
-        if (!team.contains(player)) {
-            return;
-        }
-
-        // Remove player from his team
-        team.remove(player);
-        player.setTeam(null);
 
         // Notify about change
         notifyPlayersAboutUpdate();
@@ -242,54 +231,11 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
     }
 
     @Override
-    public boolean isRunning() {
+    public boolean isLasertagGameRunning() {
         return isRunning;
     }
 
-    /**
-     * This method is called every minute when the game is running
-     */
-    private void lasertagTick() {
-        // TODO
-    }
-
-    /**
-     * This method is called when the game ends
-     */
-    private void lasertagGameOver() {
-        isRunning = false;
-
-        sendGameOverEvent();
-
-        // Get world
-        World world = ((MinecraftServer) (Object) this).getOverworld();
-
-        // Deactivate every player
-        for (List<PlayerEntity> team : teamMap.values()) {
-            for (PlayerEntity player : team) {
-                PlayerDeactivatedManager.deactivate(player, world, true);
-                player.onDeactivated();
-            }
-        }
-
-        // Teleport players back to spawn
-        var spawn = getOverworld().getSpawnPos();
-        for (var team : teamMap.values()) {
-            for (var player : team) {
-                player.requestTeleport(spawn.getX() + 0.5F, spawn.getY(), spawn.getZ() + 0.5F);
-            }
-        }
-
-        // Reset lasertargets
-        for (var target : lasertargetsToReset) {
-            target.reset();
-        }
-        lasertargetsToReset = new LinkedList<>();
-
-        // Calculate stats
-        calcStats();
-    }
-
+    @Override
     public void syncTeamsAndScoresToPlayer(ServerPlayerEntity player) {
         var simplifiedTeamMap = buildSimplifiedTeamMap();
 
@@ -303,6 +249,90 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         buf.writeString(messagesString);
 
         ServerPlayNetworking.send(player, NetworkingConstants.LASERTAG_GAME_TEAM_OR_SCORE_UPDATE, buf);
+    }
+
+    @Override
+    public void registerLasertarget(LaserTargetBlockEntity target) {
+        lasertargetsToReset.add(target);
+    }
+
+    //endregion
+
+    //region ITickable
+
+    /**
+     * This method is called every minute when the game is running
+     */
+    @Override
+    public void doTick() {
+        System.out.println("Tick");
+        // TODO
+    }
+
+    @Override
+    public void endTick() {
+        gameTickTimer.shutdown();
+        gameTickTimer = null;
+        lasertagGameOver();
+    }
+
+    //endregion
+
+    //region Private methods
+
+    /**
+     * This method is called when the game ends
+     */
+    private void lasertagGameOver() {
+        isRunning = false;
+
+        sendGameOverEvent();
+
+        // Get world
+        World world = getOverworld();
+
+        // Deactivate every player
+        for (List<PlayerEntity> team : teamMap.values()) {
+            for (PlayerEntity player : team) {
+                PlayerDeactivatedManager.deactivate(player, world, true);
+                player.onDeactivated();
+            }
+        }
+
+        // Teleport players back to spawn
+        for (var team : teamMap.values()) {
+            for (var player : team) {
+                player.requestTeleport(0.5F, 1, 0.5F);
+            }
+        }
+
+        // Reset lasertargets
+        for (var target : lasertargetsToReset) {
+            target.reset();
+        }
+        lasertargetsToReset = new LinkedList<>();
+
+        // Calculate stats
+        statsCalculator.calcStats();
+
+        // Create packet
+        var buf = new PacketByteBuf(Unpooled.buffer());
+
+        // Get last games stats
+        var stats = statsCalculator.getLastGamesStats();
+
+        // Get gson builder
+        var gsonBuilder = LasertagColorSerializer.getSerializer();
+
+        // To json
+        var jsonString = gsonBuilder.create().toJson(stats, GameStats.class);
+
+        // Write to buffer
+        buf.writeString(jsonString);
+
+        // Send statistics to clients
+        ServerEventSending.sendToEveryone(getOverworld(), NetworkingConstants.GAME_STATISTICS, buf);
+
     }
 
     /**
@@ -364,7 +394,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
      * Initializes the spawnpoint cache. Searches a 31 x 31 chunk area for spawnpoint blocks specified by the team color.
      * This method is computationally intensive, don't call too often or when responsiveness is important. The call of this method blocks the server from ticking!
      */
-    public void initSpawnpointCache() {
+    private void initSpawnpointCache() {
 
         // Initialize cache
         spawnpointCache = new HashMap<>();
@@ -401,7 +431,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
             PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 
             // Write progress to buffer
-            buf.writeDouble((double)currChunk / (double)maxChunk);
+            buf.writeDouble((double) currChunk / (double) maxChunk);
 
             ServerEventSending.sendToEveryone(world, NetworkingConstants.PROGRESS, buf);
         });
@@ -412,37 +442,5 @@ public abstract class MinecraftServerMixin implements ILasertagGame {
         LasertagMod.LOGGER.info("Spawnpoint search took " + duration + "s.");
     }
 
-    private void calcStats() {
-        lastGamesStats = new GameStats();
-        for (Colors.Color teamColor : teamMap.keySet()) {
-            var team = teamMap.get(teamColor);
-            int teamScore = 0;
-
-            var playersOfThisTeam = new ArrayList<Tuple<PlayerEntity, Integer>>();
-            for (PlayerEntity player : team) {
-                int playerScore = player.getLasertagScore();
-                var playerScoreTuple = new Tuple<>(player, playerScore);
-                teamScore += playerScore;
-                lastGamesStats.playerScores.add(playerScoreTuple);
-                playersOfThisTeam.add(playerScoreTuple);
-            }
-
-            if (playersOfThisTeam.size() > 0) {
-                lastGamesStats.teamPlayerScores.put(teamColor, playersOfThisTeam);
-            }
-            lastGamesStats.teamScores.add(new Tuple<>(teamColor, teamScore));
-        }
-
-        // Sort stats
-        Collections.sort(lastGamesStats.teamScores, (a, b) -> (a.y - b.y));
-        Collections.sort(lastGamesStats.playerScores, (a, b) -> (a.y - b.y));
-        for (var team : lastGamesStats.teamPlayerScores.values()) {
-            Collections.sort(team, (a, b) -> (a.y - b.y));
-        }
-    }
-
-    @Override
-    public void registerLasertarget(LaserTargetBlockEntity target) {
-        lasertargetsToReset.add(target);
-    }
+    //endregion
 }

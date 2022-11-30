@@ -11,6 +11,8 @@ import net.minecraft.world.World;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Manages which player is currently deactivated
@@ -18,7 +20,7 @@ import java.util.UUID;
  * @author Étienne Muser
  */
 public class PlayerDeactivatedManager {
-    private static HashMap<UUID, Boolean> deactivatedMap = new HashMap<>();
+    private static final HashMap<UUID, Boolean> deactivatedMap = new HashMap<>();
 
 
     /**
@@ -26,7 +28,7 @@ public class PlayerDeactivatedManager {
      */
     public static boolean isDeactivated(UUID uuid) {
         // If not already in map
-        if (deactivatedMap.containsKey(uuid) == false) {
+        if (!deactivatedMap.containsKey(uuid)) {
             deactivatedMap.put(uuid, true);
         }
 
@@ -35,7 +37,7 @@ public class PlayerDeactivatedManager {
 
     /**
      * Sets if the player is deactivated
-     * @param deactivated
+     * @param deactivated If the player is deactivated
      */
     public static void setDeactivated(UUID uuid, boolean deactivated) {
         deactivatedMap.put(uuid, deactivated);
@@ -43,8 +45,8 @@ public class PlayerDeactivatedManager {
 
     /**
      * Deactivates a player, activates him again after the configured time
-     * @param player
-     * @param world
+     * @param player The player to deactivate
+     * @param world The world which the player is in
      */
     public static void deactivate(PlayerEntity player, World world) {
         var uuid = player.getUuid();
@@ -54,22 +56,18 @@ public class PlayerDeactivatedManager {
         player.onDeactivated();
         sendDeactivatedToClients(world, uuid, true);
 
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000 * LasertagConfig.getInstance().getDeactivateTime());
-            } catch (InterruptedException e) {}
-
-            // Reactivate player
+        // Reactivate player after configured amount of time
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
             deactivatedMap.put(uuid, false);
             player.onActivated();
             sendDeactivatedToClients(world, uuid, false);
-        }).start();
+        }, LasertagConfig.getInstance().getDeactivateTime(), TimeUnit.SECONDS);
     }
 
     /**
      * Activates the player referenced by uuid
-     * @param uuid
-     * @param world
+     * @param uuid The uuid of the player to activate
+     * @param world The world which the player is in
      */
     public static void activate(UUID uuid, World world) {
         deactivatedMap.put(uuid, false);
@@ -83,7 +81,7 @@ public class PlayerDeactivatedManager {
      * @param forever Bool if he should be deactivated without reactivation count down
      */
     public static void deactivate(PlayerEntity player, World world, boolean forever) {
-        if (forever == true) {
+        if (forever) {
             var uuid = player.getUuid();
             deactivatedMap.put(uuid, true);
             sendDeactivatedToClients(world, uuid, true);
@@ -93,8 +91,7 @@ public class PlayerDeactivatedManager {
     }
 
     private static void sendDeactivatedToClients(World world, UUID uuid, boolean deactivated) {
-        if (world instanceof ServerWorld) {
-            ServerWorld serverWorld = (ServerWorld) world;
+        if (world instanceof ServerWorld serverWorld) {
 
             PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 

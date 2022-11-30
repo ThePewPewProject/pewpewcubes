@@ -34,14 +34,5 @@ bin/
 
 run/
 
-logs/
-resourcepacks/
-saves/
-config/
 .fabric/
-data/
-mods/
-options.txt
-usercache.json
-crash-reports/
 servertesting/

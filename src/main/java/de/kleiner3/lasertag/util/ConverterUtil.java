@@ -16,7 +16,7 @@ public class ConverterUtil {
         // Try to convert to int
         try {
             return Integer.parseInt(value);
-        } catch (NumberFormatException ex) {}
+        } catch (NumberFormatException ignored) {}
 
         // Convert to boolean
         return Boolean.parseBoolean(value);

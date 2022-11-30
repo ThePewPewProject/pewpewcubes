@@ -7,7 +7,9 @@
 	"MinecraftServerMixin",
 	"PlayerEntityMixin",
 	"PlayerManagerMixin",
-    "fastiter.WorldMixin"
+    "fastiter.WorldMixin",
+    "WorldPresetsMixin",
+    "ServerWorldMixin"
   ],
   "client": [
     "LivingEntityRendererMixin"

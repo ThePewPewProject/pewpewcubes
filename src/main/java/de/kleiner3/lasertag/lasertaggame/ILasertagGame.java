@@ -18,78 +18,63 @@ public interface ILasertagGame {
     /**
      * Start the lasertag game
      */
-    default public void startGame(boolean scanSpawnpoints) {
+    default void startGame(boolean scanSpawnpoints) {
     }
 
     /**
      * Get all players currently assigned to the team of the given color
      *
-     * @param color
-     * @return
+     * @param color The color to get the players of
+     * @return The list of all players in this team
      */
-    default public List<PlayerEntity> getPlayersOfTeam(Colors.Color color) {
-        return new LinkedList<PlayerEntity>();
+    default List<PlayerEntity> getPlayersOfTeam(Colors.Color color) {
+        return new LinkedList<>();
     }
 
     /**
      * Add a player to the team of the given color
      *
-     * @param color
-     * @param player
+     * @param color The color of the team to join
+     * @param player The player to join the team
      */
-    default public void playerJoinTeam(Colors.Color color, PlayerEntity player) {
-    }
-
-    /**
-     * Remove a player from the team of the given color
-     *
-     * @param color
-     * @param player
-     */
-    default public void playerLeaveTeam(Colors.Color color, PlayerEntity player) {
+    default void playerJoinTeam(Colors.Color color, PlayerEntity player) {
     }
 
     /**
      * Called when a player scored points
      *
-     * @param player
-     * @param score
+     * @param player The player who scored
+     * @param score The score he scored
      */
-    default public void onPlayerScored(PlayerEntity player, int score) {
+    default void onPlayerScored(PlayerEntity player, int score) {
     }
 
     /**
      * Force remove a player from his team
      *
-     * @param player
+     * @param player The player to leave his team
      */
-    default public void playerLeaveHisTeam(PlayerEntity player) {
-    }
-
-    /**
-     * Seraches the world for the spawnpoint blocks and caches them
-     */
-    default public void initSpawnpointCache() {
+    default void playerLeaveHisTeam(PlayerEntity player) {
     }
 
     /**
      * @return True if the game is running
      */
-    default public boolean isRunning() {
+    default boolean isLasertagGameRunning() {
         return false;
     }
 
     /**
      * Register a lasertarget to be reset after game
-     * @param target
+     * @param target The lasertarget block entity to register
      */
-    default public void registerLasertarget(LaserTargetBlockEntity target) {
+    default void registerLasertarget(LaserTargetBlockEntity target) {
     }
 
     /**
      * Synchronize the teams and scores to a player
-     * @param player
+     * @param player The player to synchronize to
      */
-    default public void syncTeamsAndScoresToPlayer(ServerPlayerEntity player) {
+    default void syncTeamsAndScoresToPlayer(ServerPlayerEntity player) {
     }
 }

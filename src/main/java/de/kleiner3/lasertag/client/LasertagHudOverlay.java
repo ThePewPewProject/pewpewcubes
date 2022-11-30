@@ -13,7 +13,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Timer;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Class to implement the custom overlay for the lasertag game
@@ -26,7 +26,8 @@ public class LasertagHudOverlay implements HudRenderCallback {
      * The time in seconds that has already elapsed
      */
     public static long gameTime = 0;
-    public static Timer gameTimer = null;
+    public static ScheduledExecutorService gameTimer;
+    public static final Object gameTimerLock = new Object();
 
     /**
      * Simplified team map to map players and their score to their teams
@@ -51,13 +52,6 @@ public class LasertagHudOverlay implements HudRenderCallback {
         for (Colors.Color c : Colors.colorConfig.values()) {
             teamMap.put(c.getName(), new LinkedList<>());
         }
-
-//		teamMap.get(Colors.RED).add(new Tuple<String, Integer>("TEST1", 300));
-//		teamMap.get(Colors.RED).add(new Tuple<String, Integer>("TEST2", 300));
-//		teamMap.get(Colors.RED).add(new Tuple<String, Integer>("TEST3", 300));
-//		teamMap.get(Colors.RED).add(new Tuple<String, Integer>("TEST4", 300));
-//		teamMap.get(Colors.RED).add(new Tuple<String, Integer>("TEST5", 300));
-//		teamMap.get(Colors.RED).add(new Tuple<String, Integer>("TEST6", 300));
     }
 
     /**
@@ -168,7 +162,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
         // If game time should be rendered
         if (LasertagConfig.getInstance().isRenderTimer()) {
-            DrawableHelper.drawCenteredText(matrixStack, renderer, DurationUtils.toString(Duration.ofSeconds((LasertagConfig.getInstance().getPlayTime() * 60) - gameTime)), wMid, textPadding, 0xFFFFFF);
+            DrawableHelper.drawCenteredText(matrixStack, renderer, DurationUtils.toString(Duration.ofSeconds((LasertagConfig.getInstance().getPlayTime() * 60L) - gameTime)), wMid, textPadding, 0xFFFFFF);
         }
 
         // Draw progress bar

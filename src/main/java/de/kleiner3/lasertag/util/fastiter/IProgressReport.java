@@ -11,5 +11,5 @@ public interface IProgressReport {
      * @param curr The chunk that has just finished
      * @param max The maximum number of chunks being iterated in this run
      */
-    public void onProgress(int curr, int max);
+    void onProgress(int curr, int max);
 }

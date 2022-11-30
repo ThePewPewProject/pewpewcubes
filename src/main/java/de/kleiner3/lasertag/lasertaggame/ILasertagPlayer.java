@@ -12,56 +12,60 @@ public interface ILasertagPlayer {
     /**
      * @return The lasertag score of the player
      */
-    default public int getLasertagScore() {
+    default int getLasertagScore() {
         return -1;
     }
 
     /**
      * Reset the players lasertag score to 0
      */
-    default public void resetLasertagScore() {
+    default void resetLasertagScore() {
     }
 
     /**
      * Increase the players score by the given amount
      *
-     * @param score
+     * @param score The amount
      */
-    default public void increaseScore(int score) {
+    default void increaseScore(int score) {
     }
 
     /**
      * Called when this player got hit by another player
      *
-     * @param player
+     * @param player The player who hit this player
      */
-    default public void onHitBy(PlayerEntity player) {
+    default void onHitBy(PlayerEntity player) {
     }
 
     /**
      * Set the players team
-     * @param team
+     * @param team The color of the team
      */
-    default public void setTeam(Colors.Color team) {
+    default void setTeam(Colors.Color team) {
     }
 
     /**
      * Get the players team
-     * @return
+     * @return The color of the players team
      */
-    default public Colors.Color getTeam() {
+    default Colors.Color getTeam() {
         return null;
     }
 
     /**
      * Called when the player is deactivated
      */
-    default public void onDeactivated() {
+    default void onDeactivated() {
     }
 
     /**
      * Called when the player gets activated
      */
-    default public void onActivated() {
+    default void onActivated() {
+    }
+
+    default String getLasertagUsername() {
+        return null;
     }
 }

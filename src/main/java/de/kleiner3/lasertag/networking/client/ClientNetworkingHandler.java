@@ -7,13 +7,18 @@ import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.LasertagHudOverlay;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
+import de.kleiner3.lasertag.lasertaggame.statistics.GameStats;
+import de.kleiner3.lasertag.lasertaggame.statistics.WebStatisticsVisualizer;
+import de.kleiner3.lasertag.lasertaggame.timing.PreGameCountDownTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
+import de.kleiner3.lasertag.resource.ResourceManagers;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.ConverterUtil;
 import de.kleiner3.lasertag.util.Tuple;
 import de.kleiner3.lasertag.util.serialize.ColorConfigDeserializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.mightypork.rpack.utils.DesktopApi;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
@@ -25,8 +30,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class to handle all networking on the client
@@ -55,6 +63,7 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_SETTINGS_SYNC, Callbacks::handleLasertagSettingsSync);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_TEAMS_SYNC, Callbacks::handleLasertagTeamsSync);
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_DEACTIVATED_STATUS_CHANGED, Callbacks::handlePlayerDeactivatedStatusChanged);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_STATISTICS, Callbacks::handleGameStatisticsIncoming);
     }
 
     /**
@@ -62,11 +71,11 @@ public class ClientNetworkingHandler {
      *
      * @author Étienne Muser
      */
-    private class Callbacks {
+    private static class Callbacks {
         public static void handleLaserRaySpawned(MinecraftClient client,
-                                                 ClientPlayNetworkHandler handler,
+                                                 ClientPlayNetworkHandler ignoredHandler,
                                                  PacketByteBuf buf,
-                                                 PacketSender responseSender) {
+                                                 PacketSender ignoredResponseSender) {
             double x = buf.readDouble();
             double y = buf.readDouble();
             double z = buf.readDouble();
@@ -96,26 +105,26 @@ public class ClientNetworkingHandler {
         }
 
         public static void handleErrorMessage(MinecraftClient client,
-                                              ClientPlayNetworkHandler handler,
+                                              ClientPlayNetworkHandler ignoredHandler,
                                               PacketByteBuf buf,
-                                              PacketSender responseSender) {
+                                              PacketSender ignoredResponseSender) {
             client.player.sendMessage(Text.translatable(buf.readString())
                     .fillStyle(Style.EMPTY.withColor(Formatting.RED)), true);
         }
 
-        public static void handleTeamOrScoreUpdate(MinecraftClient client,
-                                                   ClientPlayNetworkHandler handler,
+        public static void handleTeamOrScoreUpdate(MinecraftClient ignoredClient,
+                                                   ClientPlayNetworkHandler ignoredHandler,
                                                    PacketByteBuf buf,
-                                                   PacketSender responseSender) {
+                                                   PacketSender ignoredResponseSender) {
             LasertagHudOverlay.teamMap = new Gson().fromJson(buf.readString(),
                     new TypeToken<HashMap<String, LinkedList<Tuple<String, Integer>>>>() {
                     }.getType());
         }
 
         public static void handleWeaponFiredSoundEvent(MinecraftClient client,
-                                                       ClientPlayNetworkHandler handler,
+                                                       ClientPlayNetworkHandler ignoredHandler,
                                                        PacketByteBuf buf,
-                                                       PacketSender responseSender) {
+                                                       PacketSender ignoredResponseSender) {
             // Get position of sound event
             double x = buf.readDouble();
             double y = buf.readDouble();
@@ -126,9 +135,9 @@ public class ClientNetworkingHandler {
         }
 
         public static void handleWeaponFailedSoundEvent(MinecraftClient client,
-                                                        ClientPlayNetworkHandler handler,
+                                                        ClientPlayNetworkHandler ignoredHandler,
                                                         PacketByteBuf buf,
-                                                        PacketSender responseSender) {
+                                                        PacketSender ignoredResponseSender) {
             // Get position of sound event
             double x = buf.readDouble();
             double y = buf.readDouble();
@@ -139,57 +148,34 @@ public class ClientNetworkingHandler {
         }
 
         public static void handlePlayerScoredSoundEvent(MinecraftClient client,
-                                                        ClientPlayNetworkHandler handler,
-                                                        PacketByteBuf buf,
-                                                        PacketSender responseSender) {
+                                                        ClientPlayNetworkHandler ignoredHandler,
+                                                        PacketByteBuf ignoredBuf,
+                                                        PacketSender ignoredResponseSender) {
             // Execute sound playing on main thread to avoid weird exceptions
             client.execute(() -> client.player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F, 1.0F));
         }
 
-        public static void handleLasertagGameStarted(MinecraftClient client,
-                                                     ClientPlayNetworkHandler handler,
-                                                     PacketByteBuf buf,
-                                                     PacketSender responseSender) {
+        public static void handleLasertagGameStarted(MinecraftClient ignoredClient,
+                                                     ClientPlayNetworkHandler ignoredHandler,
+                                                     PacketByteBuf ignoredBuf,
+                                                     PacketSender ignoredResponseSender) {
+            // TODO: Assert that this method does nothing if game is already running
             LasertagHudOverlay.progress = 0.0;
-
-            new Thread(() -> {
-                for (LasertagHudOverlay.startingIn = LasertagConfig.getInstance().getStartTime(); LasertagHudOverlay.startingIn >= 0; --LasertagHudOverlay.startingIn) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                    }
-                }
-
-                LasertagHudOverlay.gameTimer = new Timer();
-                LasertagHudOverlay.gameTimer.scheduleAtFixedRate(new TimerTask() {
-                                                                     @Override
-                                                                     public void run() {
-                                                                         if ((LasertagConfig.getInstance().getPlayTime() * 60) - LasertagHudOverlay.gameTime == 0) {
-                                                                             synchronized (LasertagHudOverlay.gameTimer) {
-                                                                                 LasertagHudOverlay.gameTimer.cancel();
-                                                                                 LasertagHudOverlay.gameTimer = null;
-                                                                                 LasertagHudOverlay.gameTime = 0;
-                                                                             }
-                                                                             LasertagHudOverlay.gameTime = LasertagConfig.getInstance().getPlayTime() * 60;
-                                                                             return;
-                                                                         }
-
-                                                                         ++LasertagHudOverlay.gameTime;
-                                                                     }
-                                                                 }
-                        , 0, 1000);
-            }).start();
-
+            LasertagHudOverlay.startingIn = LasertagConfig.getInstance().getStartTime();
             LasertagHudOverlay.shouldRenderNameTags = false;
+
+            // Start pregame count down timer
+            var preGameCountDownTimer = Executors.newSingleThreadScheduledExecutor();
+            preGameCountDownTimer.scheduleAtFixedRate(new PreGameCountDownTimerTask(preGameCountDownTimer), 1, 1, TimeUnit.SECONDS);
         }
 
-        public static void handleLasertagGameOver(MinecraftClient client,
-                                                  ClientPlayNetworkHandler handler,
-                                                  PacketByteBuf buf,
-                                                  PacketSender responseSender) {
-            synchronized (LasertagHudOverlay.gameTimer) {
+        public static void handleLasertagGameOver(MinecraftClient ignoredClient,
+                                                  ClientPlayNetworkHandler ignoredHandler,
+                                                  PacketByteBuf ignoredBuf,
+                                                  PacketSender ignoredResponseSender) {
+            synchronized (LasertagHudOverlay.gameTimerLock) {
                 if (LasertagHudOverlay.gameTimer != null) {
-                    LasertagHudOverlay.gameTimer.cancel();
+                    LasertagHudOverlay.gameTimer.shutdown();
                     LasertagHudOverlay.gameTimer = null;
                     LasertagHudOverlay.gameTime = 0;
                 }
@@ -198,17 +184,17 @@ public class ClientNetworkingHandler {
             LasertagHudOverlay.shouldRenderNameTags = true;
         }
 
-        public static void handleProgress(MinecraftClient client,
-                                          ClientPlayNetworkHandler handler,
+        public static void handleProgress(MinecraftClient ignoredClient,
+                                          ClientPlayNetworkHandler ignoredHandler,
                                           PacketByteBuf buf,
-                                          PacketSender responseSender) {
+                                          PacketSender ignoredResponseSender) {
             LasertagHudOverlay.progress = buf.readDouble();
         }
 
-        public static void handleLasertagSettingsChanged(MinecraftClient client,
-                                                         ClientPlayNetworkHandler handler,
+        public static void handleLasertagSettingsChanged(MinecraftClient ignoredClient,
+                                                         ClientPlayNetworkHandler ignoredHandler,
                                                          PacketByteBuf buf,
-                                                         PacketSender responseSender) {
+                                                         PacketSender ignoredResponseSender) {
             // Read from buffer
             var methodName = buf.readString();
             var value = buf.readString();
@@ -231,10 +217,10 @@ public class ClientNetworkingHandler {
             }
         }
 
-        public static void handleLasertagSettingsSync(MinecraftClient client,
-                                                      ClientPlayNetworkHandler handler,
+        public static void handleLasertagSettingsSync(MinecraftClient ignoredClient,
+                                                      ClientPlayNetworkHandler ignoredHandler,
                                                       PacketByteBuf buf,
-                                                      PacketSender responseSender) {
+                                                      PacketSender ignoredResponseSender) {
             // Get json string
             var jsonString = buf.readString();
 
@@ -242,10 +228,10 @@ public class ClientNetworkingHandler {
             LasertagConfig.setInstance(new Gson().fromJson(jsonString, LasertagConfig.class));
         }
 
-        public static void handleLasertagTeamsSync(MinecraftClient client,
-                                                   ClientPlayNetworkHandler handler,
+        public static void handleLasertagTeamsSync(MinecraftClient ignoredClient,
+                                                   ClientPlayNetworkHandler ignoredHandler,
                                                    PacketByteBuf buf,
-                                                   PacketSender responseSender) {
+                                                   PacketSender ignoredResponseSender) {
             // Get json string
             var jsonString = buf.readString();
 
@@ -257,16 +243,67 @@ public class ClientNetworkingHandler {
             }.getType());
         }
 
-        public static void handlePlayerDeactivatedStatusChanged(MinecraftClient client,
-                                                                ClientPlayNetworkHandler handler,
+        public static void handlePlayerDeactivatedStatusChanged(MinecraftClient ignoredClient,
+                                                                ClientPlayNetworkHandler ignoredHandler,
                                                                 PacketByteBuf buf,
-                                                                PacketSender responseSender) {
+                                                                PacketSender ignoredResponseSender) {
             // Read from buffer
             var uuid = buf.readUuid();
             var deactivated = buf.readBoolean();
 
             // Set deactivated status
             PlayerDeactivatedManager.setDeactivated(uuid, deactivated);
+        }
+
+        public static void handleGameStatisticsIncoming(MinecraftClient client,
+                                                        ClientPlayNetworkHandler ignoredHandler,
+                                                        PacketByteBuf buf,
+                                                        PacketSender ignoredResponseSender) {
+            // Read from buffer
+            var json = buf.readString();
+
+            // Unpack json
+            var stats = new Gson().fromJson(json, GameStats.class);
+
+            // If should generate file
+            if (LasertagConfig.getInstance().getGenerateStatsFile()) {
+
+                // Generate file
+                var generatedFilePath = WebStatisticsVisualizer.build(stats, ResourceManagers.WEB_RESOURCE_MANAGER);
+
+                // If generation failed
+                if (generatedFilePath == null) {
+                    var msg = "Failed to generate statistics file.";
+
+                    LasertagMod.LOGGER.error(msg);
+                    client.player.sendMessage(Text.translatable(msg)
+                            .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
+
+                    return;
+                }
+
+                // If should automatically open file
+                if (LasertagConfig.getInstance().getAutoOpenStatsFile()) {
+
+                    try {
+                        DesktopApi.open(new File(generatedFilePath));
+                    } catch (Exception e) {
+
+                        // Log error
+                        LasertagMod.LOGGER.error("Failed to open statistics from '" + generatedFilePath + "': " + e.getMessage());
+
+                        // Notify player
+                        client.player.sendMessage(Text.translatable("Failed to open statistics from " + generatedFilePath)
+                                .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
+                    }
+
+                } else {
+
+                    // Notify player about generation of file
+                    client.player.sendMessage(Text.translatable("Game statistics saved to " + generatedFilePath)
+                            .fillStyle(Style.EMPTY.withColor(Formatting.WHITE)), false);
+                }
+            }
         }
     }
 }

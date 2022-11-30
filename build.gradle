@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '1.0-SNAPSHOT'
 	id 'maven-publish'
+	id 'java'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -19,9 +20,13 @@ repositories {
 
 	// GeckoLib
 	maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+
+	mavenCentral()
 }
 
 dependencies {
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
@@ -36,7 +41,7 @@ dependencies {
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
 	// GeckoLib
-	modImplementation 'software.bernie.geckolib:geckolib-fabric-1.19:3.1.29'
+	modImplementation 'software.bernie.geckolib:geckolib-fabric-1.19:3.1.37'
 }
 
 processResources {
@@ -79,5 +84,16 @@ publishing {
 		// Notice: This block does NOT have the same function as the block in the top level.
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
+	}
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/lasertag.accesswidener")
+}
+
+test {
+	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
 	}
 }

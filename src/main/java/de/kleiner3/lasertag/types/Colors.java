@@ -83,13 +83,17 @@ public class Colors {
                 var dir = new File(LasertagMod.configFolderPath);
 
                 // Create directory if not exists
-                if (dir.exists() == false) {
-                    dir.mkdir();
+                if (!dir.exists()) {
+                    if (!dir.mkdir()) {
+                        throw new IOException("Make directory for color config failed!");
+                    }
                 }
 
                 // Create file if not exists
-                if (colorConfigFile.exists() == false) {
-                    colorConfigFile.createNewFile();
+                if (!colorConfigFile.exists()) {
+                    if (!colorConfigFile.createNewFile()) {
+                        throw new IOException("Creation of file for color config failed!");
+                    }
                 }
 
                 // Write to file
@@ -113,7 +117,7 @@ public class Colors {
             this.spawnpointBlock = spawnpointBlock;
         }
 
-        private String teamName;
+        private final String teamName;
         private final int r;
         private final int g;
         private final int b;
@@ -138,7 +142,7 @@ public class Colors {
 
         /**
          * Get the spawnpoint block type of this team
-         * @return
+         * @return The spawnpoint block
          */
         public Block getSpawnpointBlock() {
             return spawnpointBlock;
@@ -147,7 +151,7 @@ public class Colors {
         /**
          * Get the integer color value with bits distributed like:
          * RRRRRRRRGGGGGGGGBBBBBBBB
-         * @return
+         * @return The int value of this color
          */
         public int getValue() {
             return this.r << 16 | this.g << 8 | this.b;
@@ -155,7 +159,7 @@ public class Colors {
 
         /**
          * Get the color values as normalized float array
-         * @return
+         * @return The normalized float array
          */
         public float[] getFloatArray() {
             return new float[]{r / 255.0F, g / 255.0F, b / 255.0F};
