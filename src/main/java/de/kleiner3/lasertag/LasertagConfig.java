@@ -227,7 +227,7 @@ public class LasertagConfig {
 
     //endregion
 
-    //region Persistance
+    //region Persistence
 
     /**
      * Persist the config changes to the file system.
