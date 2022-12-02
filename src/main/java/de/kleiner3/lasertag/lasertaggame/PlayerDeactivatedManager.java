@@ -63,7 +63,7 @@ public class PlayerDeactivatedManager {
             deactivatedMap.put(uuid, false);
             player.onActivated();
             sendDeactivatedToClients(world, uuid, false);
-        }, (int)LasertagSettingsManager.get(SettingNames.DEACTIVATE_TIME), TimeUnit.SECONDS);
+        }, (long)LasertagSettingsManager.get(SettingNames.DEACTIVATE_TIME), TimeUnit.SECONDS);
     }
 
     /**

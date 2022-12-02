@@ -163,7 +163,7 @@ public class ClientNetworkingHandler {
                                                      PacketSender ignoredResponseSender) {
             // TODO: Assert that this method does nothing if game is already running
             LasertagHudOverlay.progress = 0.0;
-            LasertagHudOverlay.startingIn = (int)LasertagSettingsManager.get(SettingNames.START_TIME);
+            LasertagHudOverlay.startingIn = (int)(long)LasertagSettingsManager.get(SettingNames.START_TIME);
             LasertagHudOverlay.shouldRenderNameTags = false;
 
             // Start pregame count down timer

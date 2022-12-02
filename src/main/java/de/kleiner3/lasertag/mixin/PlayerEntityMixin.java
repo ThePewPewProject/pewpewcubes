@@ -91,7 +91,7 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
         // Get the server
         MinecraftServer server = player.getServer();
         if (server != null) {
-            server.onPlayerScored(player, (int)LasertagSettingsManager.get(SettingNames.PLAYER_HIT_SCORE));
+            server.onPlayerScored(player, (int)(long)LasertagSettingsManager.get(SettingNames.PLAYER_HIT_SCORE));
             ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) player);
         }
     }

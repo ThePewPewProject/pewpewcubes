@@ -50,13 +50,13 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
 
     @Override
     public int getRange() {
-        return (int)LasertagSettingsManager.get(SettingNames.WEAPON_REACH);
+        return (int)(long)LasertagSettingsManager.get(SettingNames.WEAPON_REACH);
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
         // Apply cooldown
-        playerEntity.getItemCooldownManager().set(this, (int)LasertagSettingsManager.get(SettingNames.WEAPON_COOLDOWN));
+        playerEntity.getItemCooldownManager().set(this, (int)(long)LasertagSettingsManager.get(SettingNames.WEAPON_COOLDOWN));
 
         // Get all armor pieces of the player
         DefaultedList<ItemStack> armorPieces = (DefaultedList<ItemStack>) playerEntity.getArmorItems();

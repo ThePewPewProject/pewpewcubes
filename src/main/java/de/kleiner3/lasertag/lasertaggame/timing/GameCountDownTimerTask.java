@@ -16,7 +16,7 @@ public class GameCountDownTimerTask extends TimerTask {
     public void run() {
         ++LasertagHudOverlay.gameTime;
 
-        if (((int)LasertagSettingsManager.get(SettingNames.PLAY_TIME) * 60L) - LasertagHudOverlay.gameTime == 0) {
+        if (((long)LasertagSettingsManager.get(SettingNames.PLAY_TIME) * 60L) - LasertagHudOverlay.gameTime == 0) {
             synchronized (LasertagHudOverlay.gameTimerLock) {
                 LasertagHudOverlay.gameTimer.shutdown();
                 LasertagHudOverlay.gameTimer = null;

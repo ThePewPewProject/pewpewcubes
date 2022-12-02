@@ -43,7 +43,7 @@ public class LaserTargetBlockEntity extends BlockEntity {
             return;
         }
 
-        server.onPlayerScored(playerEntity, (int)LasertagSettingsManager.get(SettingNames.LASERTARGET_HIT_SCORE));
+        server.onPlayerScored(playerEntity, (int)(long)LasertagSettingsManager.get(SettingNames.LASERTARGET_HIT_SCORE));
         ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) playerEntity);
 
         // Register on server
@@ -55,7 +55,7 @@ public class LaserTargetBlockEntity extends BlockEntity {
         // Reactivate after configured amount of seconds
         Executors.newSingleThreadScheduledExecutor().schedule(() -> {
             deactivated = false;
-        }, (int)LasertagSettingsManager.get(SettingNames.LASERTARGET_DEACTIVATE_TIME), TimeUnit.SECONDS);
+        }, (long)LasertagSettingsManager.get(SettingNames.LASERTARGET_DEACTIVATE_TIME), TimeUnit.SECONDS);
 
         // Add player to the players who hit the target
         hitBy.add(playerEntity.getUuid());

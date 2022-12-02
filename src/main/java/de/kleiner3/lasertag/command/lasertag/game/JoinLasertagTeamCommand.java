@@ -37,7 +37,11 @@ public class JoinLasertagTeamCommand {
 
         // Join team
         // TODO: Give error message when team is full
-        server.playerJoinTeam(teamColor, player);
+        try {
+            server.playerJoinTeam(teamColor, player);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
 
         // Notify player in chat
         player.sendMessage(Text.literal("You joined team " + teamName), true);

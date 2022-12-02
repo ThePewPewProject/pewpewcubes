@@ -124,7 +124,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         isRunning = true;
 
         var preGameDelayTimer = Executors.newSingleThreadScheduledExecutor();
-        var preGameDelay = (int)LasertagSettingsManager.get(SettingNames.START_TIME);
+        var preGameDelay = (long)LasertagSettingsManager.get(SettingNames.START_TIME);
         preGameDelayTimer.schedule(() -> {
 
             // Activate every player
@@ -156,7 +156,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         var newTeam = teamMap.get(newTeamColor);
 
         // Check if team is full
-        if (newTeam.size() >= (int)LasertagSettingsManager.get(SettingNames.MAX_TEAM_SIZE)) {
+        if (newTeam.size() >= (long)LasertagSettingsManager.get(SettingNames.MAX_TEAM_SIZE)) {
             // If is Server
             if (player instanceof ServerPlayerEntity) {
                 ServerEventSending.sendErrorMessageToClient((ServerPlayerEntity) player, "Team " + newTeamColor.getName() + " is full.");

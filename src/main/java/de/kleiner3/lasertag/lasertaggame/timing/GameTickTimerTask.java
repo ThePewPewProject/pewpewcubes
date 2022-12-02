@@ -25,7 +25,7 @@ public class GameTickTimerTask extends TimerTask {
         ++tickNo;
         game.doTick();
 
-        if (tickNo == (int)LasertagSettingsManager.get(SettingNames.PLAY_TIME)) {
+        if (tickNo == (long)LasertagSettingsManager.get(SettingNames.PLAY_TIME)) {
             tickNo = -1;
 
             game.endTick();
