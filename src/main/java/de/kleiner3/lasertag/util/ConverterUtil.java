@@ -15,7 +15,7 @@ public class ConverterUtil {
     public static Object stringToPrimitiveType(String value) {
         // Try to convert to int
         try {
-            return Integer.parseInt(value);
+            return Long.parseLong(value);
         } catch (NumberFormatException ignored) {}
 
         // Convert to boolean
