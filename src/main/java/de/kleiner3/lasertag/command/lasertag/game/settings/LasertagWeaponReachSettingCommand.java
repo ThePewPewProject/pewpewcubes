@@ -4,7 +4,8 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.settings.SettingNames;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -21,7 +22,7 @@ public class LasertagWeaponReachSettingCommand {
     @SuppressWarnings("SameReturnValue")
     private static int execute(CommandContext<ServerCommandSource> context) {
         var value = IntegerArgumentType.getInteger(context, "distance");
-        LasertagConfig.getInstance().setLasertagWeaponReach(context.getSource().getServer(), value);
+        LasertagSettingsManager.set(context.getSource().getServer(), SettingNames.WEAPON_REACH, value);
         context.getSource().getServer().getPlayerManager().broadcast(Text.literal("Lasertag setting lasertagWeaponReach is now set to " + value), false);
         return Command.SINGLE_SUCCESS;
     }

@@ -1,10 +1,9 @@
 package de.kleiner3.lasertag.command.lasertag.game.settings;
 
-import com.google.gson.GsonBuilder;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.settings.LasertagSettingsManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -18,7 +17,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class LasertagSettingsCommand {
     @SuppressWarnings("SameReturnValue")
     private static int execute(CommandContext<ServerCommandSource> context) {
-        context.getSource().sendFeedback(Text.literal(new GsonBuilder().setPrettyPrinting().create().toJson(LasertagConfig.getInstance())), false);
+        context.getSource().sendFeedback(Text.literal(LasertagSettingsManager.get()), false);
         return Command.SINGLE_SUCCESS;
     }
 

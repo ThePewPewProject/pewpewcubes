@@ -1,8 +1,9 @@
 package de.kleiner3.lasertag.block.entity;
 
-import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.entity.Entities;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
+import de.kleiner3.lasertag.settings.SettingNames;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,10 +16,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -45,7 +43,7 @@ public class LaserTargetBlockEntity extends BlockEntity {
             return;
         }
 
-        server.onPlayerScored(playerEntity, LasertagConfig.getInstance().getLasertargetHitScore());
+        server.onPlayerScored(playerEntity, (int)LasertagSettingsManager.get(SettingNames.LASERTARGET_HIT_SCORE));
         ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) playerEntity);
 
         // Register on server
@@ -57,7 +55,7 @@ public class LaserTargetBlockEntity extends BlockEntity {
         // Reactivate after configured amount of seconds
         Executors.newSingleThreadScheduledExecutor().schedule(() -> {
             deactivated = false;
-        }, LasertagConfig.getInstance().getLasertargetDeactivatedTime(), TimeUnit.SECONDS);
+        }, (int)LasertagSettingsManager.get(SettingNames.LASERTARGET_DEACTIVATE_TIME), TimeUnit.SECONDS);
 
         // Add player to the players who hit the target
         hitBy.add(playerEntity.getUuid());

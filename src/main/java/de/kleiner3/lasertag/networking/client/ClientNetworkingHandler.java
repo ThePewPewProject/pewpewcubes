@@ -2,7 +2,7 @@ package de.kleiner3.lasertag.networking.client;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.LasertagHudOverlay;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
@@ -12,6 +12,8 @@ import de.kleiner3.lasertag.lasertaggame.statistics.WebStatisticsVisualizer;
 import de.kleiner3.lasertag.lasertaggame.timing.PreGameCountDownTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.resource.ResourceManagers;
+import de.kleiner3.lasertag.settings.LasertagSettingsMap;
+import de.kleiner3.lasertag.settings.SettingNames;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.ConverterUtil;
 import de.kleiner3.lasertag.util.Tuple;
@@ -161,7 +163,7 @@ public class ClientNetworkingHandler {
                                                      PacketSender ignoredResponseSender) {
             // TODO: Assert that this method does nothing if game is already running
             LasertagHudOverlay.progress = 0.0;
-            LasertagHudOverlay.startingIn = LasertagConfig.getInstance().getStartTime();
+            LasertagHudOverlay.startingIn = (int)LasertagSettingsManager.get(SettingNames.START_TIME);
             LasertagHudOverlay.shouldRenderNameTags = false;
 
             // Start pregame count down timer
@@ -196,25 +198,13 @@ public class ClientNetworkingHandler {
                                                          PacketByteBuf buf,
                                                          PacketSender ignoredResponseSender) {
             // Read from buffer
-            var methodName = buf.readString();
+            var settingsName = buf.readString();
             var value = buf.readString();
 
             // Convert to primitive type
             var primitive = ConverterUtil.stringToPrimitiveType(value);
 
-            try {
-                // Get correct setter method via reflection
-                var setter = LasertagConfig.class.getMethod(methodName, MinecraftServer.class, primitive.getClass());
-
-                // Invoke setter method
-                setter.invoke(LasertagConfig.getInstance(), null, primitive);
-            } catch (NoSuchMethodException e) {
-                LasertagMod.LOGGER.error("Couldn't update lasertag config on client side. Setter not found: " + e.getMessage());
-            } catch (InvocationTargetException e) {
-                LasertagMod.LOGGER.error("Couldn't update lasertag config on client side. Setter could not be invoked: " + e.getMessage());
-            } catch (IllegalAccessException e) {
-                LasertagMod.LOGGER.error("Couldn't update lasertag config on client side. Setter illegal access: " + e.getMessage());
-            }
+            LasertagSettingsManager.set(null, settingsName, primitive);
         }
 
         public static void handleLasertagSettingsSync(MinecraftClient ignoredClient,
@@ -225,7 +215,7 @@ public class ClientNetworkingHandler {
             var jsonString = buf.readString();
 
             // Set config
-            LasertagConfig.setInstance(new Gson().fromJson(jsonString, LasertagConfig.class));
+            LasertagSettingsManager.set(jsonString);
         }
 
         public static void handleLasertagTeamsSync(MinecraftClient ignoredClient,
@@ -266,7 +256,7 @@ public class ClientNetworkingHandler {
             var stats = new Gson().fromJson(json, GameStats.class);
 
             // If should generate file
-            if (LasertagConfig.getInstance().getGenerateStatsFile()) {
+            if ((boolean)LasertagSettingsManager.get(SettingNames.GEN_STATS_FILE)) {
 
                 // Generate file
                 var generatedFilePath = WebStatisticsVisualizer.build(stats, ResourceManagers.WEB_RESOURCE_MANAGER);
@@ -283,7 +273,7 @@ public class ClientNetworkingHandler {
                 }
 
                 // If should automatically open file
-                if (LasertagConfig.getInstance().getAutoOpenStatsFile()) {
+                if ((boolean)LasertagSettingsManager.get(SettingNames.AUTO_OPEN_STATS_FILE)) {
 
                     try {
                         DesktopApi.open(new File(generatedFilePath));

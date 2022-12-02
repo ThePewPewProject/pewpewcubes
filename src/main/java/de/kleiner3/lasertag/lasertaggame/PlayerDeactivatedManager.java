@@ -1,8 +1,9 @@
 package de.kleiner3.lasertag.lasertaggame;
 
-import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
+import de.kleiner3.lasertag.settings.SettingNames;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
@@ -10,6 +11,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 
 import java.util.HashMap;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +63,7 @@ public class PlayerDeactivatedManager {
             deactivatedMap.put(uuid, false);
             player.onActivated();
             sendDeactivatedToClients(world, uuid, false);
-        }, LasertagConfig.getInstance().getDeactivateTime(), TimeUnit.SECONDS);
+        }, (int)LasertagSettingsManager.get(SettingNames.DEACTIVATE_TIME), TimeUnit.SECONDS);
     }
 
     /**

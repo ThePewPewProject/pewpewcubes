@@ -1,7 +1,8 @@
 package de.kleiner3.lasertag.lasertaggame.timing;
 
-import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.lasertaggame.ITickable;
+import de.kleiner3.lasertag.settings.SettingNames;
 
 import java.util.TimerTask;
 
@@ -24,7 +25,7 @@ public class GameTickTimerTask extends TimerTask {
         ++tickNo;
         game.doTick();
 
-        if (tickNo == LasertagConfig.getInstance().getPlayTime()) {
+        if (tickNo == (int)LasertagSettingsManager.get(SettingNames.PLAY_TIME)) {
             tickNo = -1;
 
             game.endTick();

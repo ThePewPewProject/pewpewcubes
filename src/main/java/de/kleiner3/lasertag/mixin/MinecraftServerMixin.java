@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.mixin;
 
 import com.google.gson.Gson;
-import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.item.Items;
@@ -15,6 +15,7 @@ import de.kleiner3.lasertag.lasertaggame.statistics.StatsCalculator;
 import de.kleiner3.lasertag.lasertaggame.timing.GameTickTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
+import de.kleiner3.lasertag.settings.SettingNames;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.Tuple;
 import de.kleiner3.lasertag.util.serialize.LasertagColorSerializer;
@@ -123,7 +124,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         isRunning = true;
 
         var preGameDelayTimer = Executors.newSingleThreadScheduledExecutor();
-        var preGameDelay = LasertagConfig.getInstance().getStartTime();
+        var preGameDelay = (int)LasertagSettingsManager.get(SettingNames.START_TIME);
         preGameDelayTimer.schedule(() -> {
 
             // Activate every player
@@ -155,7 +156,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         var newTeam = teamMap.get(newTeamColor);
 
         // Check if team is full
-        if (newTeam.size() >= LasertagConfig.getInstance().getMaxTeamSize()) {
+        if (newTeam.size() >= (int)LasertagSettingsManager.get(SettingNames.MAX_TEAM_SIZE)) {
             // If is Server
             if (player instanceof ServerPlayerEntity) {
                 ServerEventSending.sendErrorMessageToClient((ServerPlayerEntity) player, "Team " + newTeamColor.getName() + " is full.");

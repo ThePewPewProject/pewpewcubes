@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.client;
 
-import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.settings.SettingNames;
 import de.kleiner3.lasertag.types.Colors;
 import de.kleiner3.lasertag.util.DurationUtils;
 import de.kleiner3.lasertag.util.Tuple;
@@ -80,7 +81,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
         int height = client.getWindow().getScaledHeight();
         int hMid = height / 2;
 
-        if (LasertagConfig.getInstance().isRenderTeamList()) {
+        if ((boolean)LasertagSettingsManager.get(SettingNames.RENDER_TEAM_LIST)) {
             // Iteration index
             int i = 0;
             for (Colors.Color teamColor : Colors.colorConfig.values()) {
@@ -161,8 +162,8 @@ public class LasertagHudOverlay implements HudRenderCallback {
         }
 
         // If game time should be rendered
-        if (LasertagConfig.getInstance().isRenderTimer()) {
-            DrawableHelper.drawCenteredText(matrixStack, renderer, DurationUtils.toString(Duration.ofSeconds((LasertagConfig.getInstance().getPlayTime() * 60L) - gameTime)), wMid, textPadding, 0xFFFFFF);
+        if ((boolean)LasertagSettingsManager.get(SettingNames.RENDER_TIMER)) {
+            DrawableHelper.drawCenteredText(matrixStack, renderer, DurationUtils.toString(Duration.ofSeconds(((long)LasertagSettingsManager.get(SettingNames.PLAY_TIME) * 60L) - gameTime)), wMid, textPadding, 0xFFFFFF);
         }
 
         // Draw progress bar

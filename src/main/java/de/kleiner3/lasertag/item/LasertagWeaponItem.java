@@ -1,11 +1,12 @@
 package de.kleiner3.lasertag.item;
 
-import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.block.LaserTargetBlock;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
+import de.kleiner3.lasertag.settings.SettingNames;
 import de.kleiner3.lasertag.types.ILasertagColorable;
 import de.kleiner3.lasertag.util.RaycastUtil;
 import io.netty.buffer.Unpooled;
@@ -49,13 +50,13 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
 
     @Override
     public int getRange() {
-        return LasertagConfig.getInstance().getLasertagWeaponReach();
+        return (int)LasertagSettingsManager.get(SettingNames.WEAPON_REACH);
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
         // Apply cooldown
-        playerEntity.getItemCooldownManager().set(this, LasertagConfig.getInstance().getLasertagWeaponCooldown());
+        playerEntity.getItemCooldownManager().set(this, (int)LasertagSettingsManager.get(SettingNames.WEAPON_COOLDOWN));
 
         // Get all armor pieces of the player
         DefaultedList<ItemStack> armorPieces = (DefaultedList<ItemStack>) playerEntity.getArmorItems();
@@ -97,7 +98,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
         playWeaponFireSound(playerEntity);
 
         // Raycast the crosshair
-        HitResult hit = RaycastUtil.raycastCrosshair(playerEntity, LasertagConfig.getInstance().getLasertagWeaponReach());
+        HitResult hit = RaycastUtil.raycastCrosshair(playerEntity, getRange());
 
         switch (hit.getType()) {
             // If a block was hit
@@ -140,7 +141,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
         }
 
         // Spawn laser ray entity
-        if (LasertagConfig.getInstance().isShowLaserRays()) {
+        if ((boolean)LasertagSettingsManager.get(SettingNames.SHOW_LASER_RAYS)) {
             LaserRayEntity ray = new LaserRayEntity(world, playerEntity, color, hit);
             world.spawnEntity(ray);
 

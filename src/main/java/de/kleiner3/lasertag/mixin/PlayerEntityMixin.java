@@ -1,10 +1,11 @@
 package de.kleiner3.lasertag.mixin;
 
-import de.kleiner3.lasertag.LasertagConfig;
+import de.kleiner3.lasertag.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
+import de.kleiner3.lasertag.settings.SettingNames;
 import de.kleiner3.lasertag.types.Colors;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -90,7 +91,7 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
         // Get the server
         MinecraftServer server = player.getServer();
         if (server != null) {
-            server.onPlayerScored(player, LasertagConfig.getInstance().getPlayerHitScore());
+            server.onPlayerScored(player, (int)LasertagSettingsManager.get(SettingNames.PLAYER_HIT_SCORE));
             ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) player);
         }
     }
