@@ -5,8 +5,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.client.screen.LasertagCreditsScreen;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientCommandSource;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * @author Étienne Muser
  */
 public class CreditsCommand {
-    private static int execute(CommandContext<ClientCommandSource> ignoredContext) {
+    private static int execute(CommandContext<FabricClientCommandSource> ignoredContext) {
         var client = MinecraftClient.getInstance();
 
         if (client == null) {
@@ -30,8 +30,8 @@ public class CreditsCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    public static void register(CommandDispatcher dispatcher) {
-        var cmd = LiteralArgumentBuilder.<ClientCommandSource>literal("lasertagCredits")
+    public static void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
+        var cmd = LiteralArgumentBuilder.<FabricClientCommandSource>literal("lasertagCredits")
                 .executes(CreditsCommand::execute);
 
         dispatcher.register(cmd);

@@ -36,8 +36,7 @@ public class LasertagSettingsManager {
     }
 
     public static void set(String newSettingsJson) {
-        var newSettings = LasertagSettingsMap.fromJson(newSettingsJson);
-        settings = newSettings;
+        settings = LasertagSettingsMap.fromJson(newSettingsJson);
     }
 
     public static void syncToPlayer(ServerPlayerEntity player) {

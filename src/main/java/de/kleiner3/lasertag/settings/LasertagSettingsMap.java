@@ -17,7 +17,7 @@ import java.util.Set;
  * @author Étienne Muser
  */
 public class LasertagSettingsMap implements Map<String, Object> {
-    private HashMap<String, Object> hashMap;
+    private final HashMap<String, Object> hashMap;
 
     public LasertagSettingsMap() {
         hashMap = new HashMap<>();
