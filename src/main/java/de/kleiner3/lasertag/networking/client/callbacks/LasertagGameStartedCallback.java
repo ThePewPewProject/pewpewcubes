@@ -1,6 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
-import de.kleiner3.lasertag.client.LasertagHudOverlay;
+import de.kleiner3.lasertag.client.hud.LasertagHudOverlay;
 import de.kleiner3.lasertag.lasertaggame.timing.PreGameCountDownTimerTask;
 import de.kleiner3.lasertag.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.settings.SettingNames;
@@ -22,9 +22,9 @@ public class LasertagGameStartedCallback implements ClientPlayNetworking.PlayCha
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
         // TODO: Assert that this method does nothing if game is already running
-        LasertagHudOverlay.progress = 0.0;
-        LasertagHudOverlay.startingIn = (int)(long) LasertagSettingsManager.get(SettingNames.START_TIME);
-        LasertagHudOverlay.shouldRenderNameTags = false;
+        LasertagHudOverlay.renderData.progress = 0.0;
+        LasertagHudOverlay.renderData.startingIn = (int)(long) LasertagSettingsManager.get(SettingNames.START_TIME);
+        LasertagHudOverlay.renderData.shouldRenderNameTags = false;
 
         // Start pregame count down timer
         var preGameCountDownTimer = Executors.newSingleThreadScheduledExecutor();

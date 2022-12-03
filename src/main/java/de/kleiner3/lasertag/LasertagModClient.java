@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag;
 
 import de.kleiner3.lasertag.client.ColorProviders;
-import de.kleiner3.lasertag.client.HudRenderers;
+import de.kleiner3.lasertag.client.hud.HudRenderers;
 import de.kleiner3.lasertag.command.ClientCommands;
 import de.kleiner3.lasertag.entity.render.EntityRenderers;
 import de.kleiner3.lasertag.entity.render.armor.ArmorRenderers;
