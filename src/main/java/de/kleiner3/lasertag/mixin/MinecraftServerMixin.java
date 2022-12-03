@@ -102,7 +102,6 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         World world = ((MinecraftServer) (Object) this).getOverworld();
 
         // Teleport players
-        // TODO: Give Error message and abort if a player is in a team without spawnpoints
         for (Colors.Color teamColor : Colors.colorConfig.values()) {
             List<PlayerEntity> team = teamMap.get(teamColor);
 
@@ -356,7 +355,6 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     }
 
     private HashMap<String, List<Tuple<String, Integer>>> buildSimplifiedTeamMap() {
-        // TODO: Crashes the game when trying to join team in LAN World
         // Create simplified team map
         final HashMap<String, List<Tuple<String, Integer>>> simplifiedTeamMap = new HashMap<>();
 

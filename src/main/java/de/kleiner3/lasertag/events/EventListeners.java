@@ -10,6 +10,5 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 public class EventListeners {
     public static void register() {
         ServerPlayConnectionEvents.JOIN.register(PlayerJoinEventHandler::onPlayerJoin);
-        // TODO: Reset HUD on disconnect/leave world
     }
 }

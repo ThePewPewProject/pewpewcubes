@@ -32,13 +32,11 @@ public abstract class PlayerManagerMixin {
 
     @Inject(method = "onPlayerConnect", at = @At("TAIL"))
     private void onPlayerJoined(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
-        // TODO: Only if is in arena
         player.requestTeleport(0.5, 1, 0.5);
     }
 
     @Inject(method = "respawnPlayer", at = @At("HEAD"))
     private void onRespawn(ServerPlayerEntity player, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir) {
-        // TODO: Only if is in arena
         player.setSpawnPoint(((PlayerManager)(Object)this).getServer().getOverworld().getRegistryKey(), BlockPos.ORIGIN, 0.0F, true, false);
     }
 }

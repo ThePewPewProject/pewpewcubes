@@ -21,8 +21,6 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class JoinLasertagTeamCommand {
     @SuppressWarnings("SameReturnValue")
     private static int execute(CommandContext<ServerCommandSource> context) {
-        // TODO: Add error messages when team not found
-
         // Get the team
         var teamName = StringArgumentType.getString(context, "team");
 
@@ -36,12 +34,7 @@ public class JoinLasertagTeamCommand {
         var teamColor = Colors.colorConfig.get(teamName);
 
         // Join team
-        // TODO: Give error message when team is full
-        try {
-            server.playerJoinTeam(teamColor, player);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
+        server.playerJoinTeam(teamColor, player);
 
         // Notify player in chat
         player.sendMessage(Text.literal("You joined team " + teamName), true);

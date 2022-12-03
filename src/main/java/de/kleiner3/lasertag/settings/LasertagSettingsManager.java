@@ -124,7 +124,7 @@ public class LasertagSettingsManager {
                 LasertagMod.LOGGER.info("Default lasertag config is being used.");
 
                 // Create config file
-                var configFile = FileIO.createNewFile(lasertagConfigFilePath);
+                var ignored = FileIO.createNewFile(lasertagConfigFilePath);
 
                 // Write to config file
                 persistUnsafe();
