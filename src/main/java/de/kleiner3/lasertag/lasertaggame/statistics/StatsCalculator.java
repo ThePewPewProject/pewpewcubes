@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.lasertaggame.statistics;
 
 import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
-import de.kleiner3.lasertag.types.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
 import de.kleiner3.lasertag.util.Tuple;
 
 import java.util.ArrayList;

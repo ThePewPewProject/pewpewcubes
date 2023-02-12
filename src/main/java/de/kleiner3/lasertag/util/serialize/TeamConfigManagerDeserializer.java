@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.util.serialize;
 
 import com.google.gson.*;
-import de.kleiner3.lasertag.types.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 

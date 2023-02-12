@@ -2,7 +2,7 @@ package de.kleiner3.lasertag.lasertaggame.statistics;
 
 import de.kleiner3.lasertag.dummy.PlayerDummy;
 import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
-import de.kleiner3.lasertag.types.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;

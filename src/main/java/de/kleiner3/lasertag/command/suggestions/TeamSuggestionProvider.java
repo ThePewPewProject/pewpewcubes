@@ -5,7 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import de.kleiner3.lasertag.types.TeamConfigManager;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
 import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.concurrent.CompletableFuture;

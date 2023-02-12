@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.types;
+package de.kleiner3.lasertag.lasertaggame.teammanagement;
 
 import com.google.gson.reflect.TypeToken;
 import de.kleiner3.lasertag.LasertagMod;

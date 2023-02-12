@@ -1,6 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame;
 
-import de.kleiner3.lasertag.types.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
 import net.minecraft.entity.player.PlayerEntity;
 
 /**

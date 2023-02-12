@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
-import de.kleiner3.lasertag.types.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 

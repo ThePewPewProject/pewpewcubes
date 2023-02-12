@@ -1,8 +1,8 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
 import com.google.gson.reflect.TypeToken;
-import de.kleiner3.lasertag.types.TeamConfigManager;
-import de.kleiner3.lasertag.types.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
 import de.kleiner3.lasertag.util.serialize.TeamConfigManagerDeserializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;

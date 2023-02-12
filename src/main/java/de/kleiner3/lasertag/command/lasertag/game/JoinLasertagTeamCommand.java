@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.command.suggestions.TeamSuggestionProvider;
-import de.kleiner3.lasertag.types.TeamConfigManager;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 

@@ -6,7 +6,7 @@ import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.settings.SettingNames;
-import de.kleiner3.lasertag.types.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

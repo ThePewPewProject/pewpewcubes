@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.events;
 
 import de.kleiner3.lasertag.settings.LasertagSettingsManager;
-import de.kleiner3.lasertag.types.TeamConfigManager;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;

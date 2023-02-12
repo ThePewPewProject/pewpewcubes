@@ -2,8 +2,8 @@ package de.kleiner3.lasertag.client.hud;
 
 import de.kleiner3.lasertag.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.settings.SettingNames;
-import de.kleiner3.lasertag.types.TeamConfigManager;
-import de.kleiner3.lasertag.types.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
 import de.kleiner3.lasertag.util.DurationUtils;
 import de.kleiner3.lasertag.util.Tuple;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
