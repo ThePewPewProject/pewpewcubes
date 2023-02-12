@@ -70,7 +70,7 @@ public class LasertagVestItem extends ArmorItem implements ILasertagColorable, I
     // AnimationData
     @Override
     public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController(this, "controller", 20, this::predicate));
+        data.addAnimationController(new AnimationController<LasertagVestItem>(this, "controller", 20, this::predicate));
     }
 
     @Override
