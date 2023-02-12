@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.util.serialize;
 
 import com.google.gson.*;
-import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.types.TeamDto;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -9,25 +9,25 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 
 /**
- * Util to get a deserializer for the ColorConfig class
+ * Util to get a deserializer for the TeamConfigManager class
  *
  * @author Étienne Muser
  */
-public class ColorConfigDeserializer {
+public class TeamConfigManagerDeserializer {
     /**
-     * Build a GsonBuilder for the ColorConfig
-     * @return The GsonBuilder designed for the ColorConfig
+     * Build a GsonBuilder for the TeamConfigManager
+     * @return The GsonBuilder designed for the TeamConfigManager
      */
     public static GsonBuilder getDeserializer() {
         // Create builder
         var gsonBuilder = new GsonBuilder();
 
         // Create deserializer for HashMap
-        var deserializer = new JsonDeserializer<HashMap<String, Colors.Color>>() {
+        var deserializer = new JsonDeserializer<HashMap<String, TeamDto>>() {
             @Override
-            public HashMap<String, Colors.Color> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+            public HashMap<String, TeamDto> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
                 // Create new hashmap
-                var config = new HashMap<String, Colors.Color>();
+                var config = new HashMap<String, TeamDto>();
 
                 // Get dictionary json object
                 var jsonObject = jsonElement.getAsJsonObject();
@@ -45,10 +45,10 @@ public class ColorConfigDeserializer {
                     // Get id of spawnpoint block
                     var spawnpointBlockId = new Identifier(teamObject.get("spawnpointBlock").getAsString());
 
-                    // Create color
-                    var color = new Colors.Color(teamName, r, g, b, Registry.BLOCK.get(spawnpointBlockId));
+                    // Create team
+                    var teamDto = new TeamDto(teamName, r, g, b, Registry.BLOCK.get(spawnpointBlockId));
 
-                    config.put(teamName, color);
+                    config.put(teamName, teamDto);
                 }
 
                 return config;

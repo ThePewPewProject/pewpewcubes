@@ -4,15 +4,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 
 /**
- * Interface for Items that are assigned to a lasertag team/color
+ * Interface for Items that are assigned to a lasertag team
  *
  * @author Étienne Muser
  */
 public interface ILasertagColorable {
     /**
-     * Set the lasertag color/team via nbt data
+     * Set the color via nbt data
      * @param stack The ItemStack to set the color of
-     * @param color The color/team to set it to
+     * @param color The color to set it to
      */
     default void setColor(ItemStack stack, int color) {
         var nbt = stack.getNbt();
@@ -24,7 +24,7 @@ public interface ILasertagColorable {
     }
 
     /**
-     * Get the color/team of the ItemStack
+     * Get the color of the ItemStack
      * @param stack The item stack to get the color of
      * @return The int value of the color
      */

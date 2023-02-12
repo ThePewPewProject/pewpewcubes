@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.command.suggestions.TeamSuggestionProvider;
-import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.types.TeamConfigManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -30,11 +30,11 @@ public class JoinLasertagTeamCommand {
         // Get executing player
         var player = context.getSource().getPlayer();
 
-        // Get team color
-        var teamColor = Colors.colorConfig.get(teamName);
+        // Get team
+        var teamDto = TeamConfigManager.teamConfig.get(teamName);
 
         // Join team
-        server.playerJoinTeam(teamColor, player);
+        server.playerJoinTeam(teamDto, player);
 
         // Notify player in chat
         player.sendMessage(Text.literal("You joined team " + teamName), true);

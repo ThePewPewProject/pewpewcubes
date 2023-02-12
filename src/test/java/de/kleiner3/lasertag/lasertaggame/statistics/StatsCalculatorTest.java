@@ -2,7 +2,7 @@ package de.kleiner3.lasertag.lasertaggame.statistics;
 
 import de.kleiner3.lasertag.dummy.PlayerDummy;
 import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
-import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.types.TeamDto;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -16,21 +16,21 @@ class StatsCalculatorTest {
     @Test
     void calcStatsInOrder() {
         // Build game stats object
-        var stats = new HashMap<Colors.Color, List<ILasertagPlayer>>();
+        var stats = new HashMap<TeamDto, List<ILasertagPlayer>>();
 
         var players = new LinkedList<ILasertagPlayer>();
         players.add(new PlayerDummy("Erster", 100));
         players.add(new PlayerDummy("Zweiter", 80));
         players.add(new PlayerDummy("Dritter", 67));
 
-        stats.put(new Colors.Color("Red", 255, 0, 0, null), players);
+        stats.put(new TeamDto("Red", 255, 0, 0, null), players);
 
         players = new LinkedList<>();
         players.add(new PlayerDummy("Erster", 50));
         players.add(new PlayerDummy("Zweiter", 40));
         players.add(new PlayerDummy("Dritter", 5));
 
-        stats.put(new Colors.Color("Green", 255, 0, 0, null), players);
+        stats.put(new TeamDto("Green", 255, 0, 0, null), players);
 
         var calculator = new StatsCalculator(stats);
         calculator.calcStats();
@@ -51,21 +51,21 @@ class StatsCalculatorTest {
     @Test
     void calcStatsOutOfOrder() {
         // Build game stats object
-        var stats = new HashMap<Colors.Color, List<ILasertagPlayer>>();
+        var stats = new HashMap<TeamDto, List<ILasertagPlayer>>();
 
         var players = new LinkedList<ILasertagPlayer>();
         players.add(new PlayerDummy("Dritter", 5));
         players.add(new PlayerDummy("Erster", 50));
         players.add(new PlayerDummy("Zweiter", 40));
 
-        stats.put(new Colors.Color("Green", 255, 0, 0, null), players);
+        stats.put(new TeamDto("Green", 255, 0, 0, null), players);
 
         players = new LinkedList<>();
         players.add(new PlayerDummy("Zweiter", 80));
         players.add(new PlayerDummy("Erster", 100));
         players.add(new PlayerDummy("Dritter", 67));
 
-        stats.put(new Colors.Color("Red", 255, 0, 0, null), players);
+        stats.put(new TeamDto("Red", 255, 0, 0, null), players);
 
         var calculator = new StatsCalculator(stats);
         calculator.calcStats();
@@ -86,12 +86,12 @@ class StatsCalculatorTest {
     @Test
     void calcStatsSingleEntry() {
         // Build game stats object
-        var stats = new HashMap<Colors.Color, List<ILasertagPlayer>>();
+        var stats = new HashMap<TeamDto, List<ILasertagPlayer>>();
 
         var players = new LinkedList<ILasertagPlayer>();
         players.add(new PlayerDummy("Erster", 50));
 
-        stats.put(new Colors.Color("Green", 255, 0, 0, null), players);
+        stats.put(new TeamDto("Green", 255, 0, 0, null), players);
 
         var calculator = new StatsCalculator(stats);
         calculator.calcStats();
@@ -106,7 +106,7 @@ class StatsCalculatorTest {
     @Test
     void calcStatsNoEntry() {
         // Build game stats object
-        var stats = new HashMap<Colors.Color, List<ILasertagPlayer>>();
+        var stats = new HashMap<TeamDto, List<ILasertagPlayer>>();
 
         var calculator = new StatsCalculator(stats);
         calculator.calcStats();

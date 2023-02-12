@@ -6,7 +6,7 @@ import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.settings.SettingNames;
-import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.types.TeamDto;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -35,7 +35,7 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
      * The players lasertag score
      */
     private int score = 0;
-    private Colors.Color team = null;
+    private TeamDto team = null;
 
     @Override
     public int getLasertagScore() {
@@ -94,12 +94,12 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
     }
 
     @Override
-    public void setTeam(Colors.Color team) {
+    public void setTeam(TeamDto team) {
         this.team = team;
     }
 
     @Override
-    public Colors.Color getTeam() {
+    public TeamDto getTeam() {
         return this.team;
     }
 

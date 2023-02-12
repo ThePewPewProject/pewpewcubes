@@ -1,6 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame;
 
-import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.types.TeamDto;
 import net.minecraft.entity.player.PlayerEntity;
 
 /**
@@ -40,16 +40,16 @@ public interface ILasertagPlayer {
 
     /**
      * Set the players team
-     * @param team The color of the team
+     * @param teamDto The  team
      */
-    default void setTeam(Colors.Color team) {
+    default void setTeam(TeamDto teamDto) {
     }
 
     /**
      * Get the players team
-     * @return The color of the players team
+     * @return The players team
      */
-    default Colors.Color getTeam() {
+    default TeamDto getTeam() {
         return null;
     }
 

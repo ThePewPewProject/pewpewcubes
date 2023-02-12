@@ -2,7 +2,8 @@ package de.kleiner3.lasertag.client.hud;
 
 import de.kleiner3.lasertag.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.settings.SettingNames;
-import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.types.TeamConfigManager;
+import de.kleiner3.lasertag.types.TeamDto;
 import de.kleiner3.lasertag.util.DurationUtils;
 import de.kleiner3.lasertag.util.Tuple;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -111,33 +112,33 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
         // Iteration index
         int i = 0;
-        for (Colors.Color teamColor : Colors.colorConfig.values()) {
+        for (TeamDto teamDto : TeamConfigManager.teamConfig.values()) {
 
             // Draw teams on the left
-            if (i < LasertagHudRenderConfig.numColors / 2) {
+            if (i < LasertagHudRenderConfig.numTeams / 2) {
                 // The height to start rendering this box at
                 int y = LasertagHudRenderConfig.startY + i * (LasertagHudRenderConfig.boxHeight + LasertagHudRenderConfig.margin);
 
-                renderTeam(renderer, matrices, teamColor, 0, y);
+                renderTeam(renderer, matrices, teamDto, 0, y);
             } else { // Draw teams on the right
                 // The height to start rendering this box at
-                int y = LasertagHudRenderConfig.startY + (i - (LasertagHudRenderConfig.numColors / 2)) * (LasertagHudRenderConfig.boxHeight + LasertagHudRenderConfig.margin);
+                int y = LasertagHudRenderConfig.startY + (i - (LasertagHudRenderConfig.numTeams / 2)) * (LasertagHudRenderConfig.boxHeight + LasertagHudRenderConfig.margin);
 
-                renderTeam(renderer, matrices, teamColor, renderData.width - LasertagHudRenderConfig.boxWidth, y);
+                renderTeam(renderer, matrices, teamDto, renderData.width - LasertagHudRenderConfig.boxWidth, y);
             }
 
             ++i;
         }
     }
 
-    private void renderTeam(TextRenderer renderer, MatrixStack matrices, Colors.Color team, int x, int y) {
+    private void renderTeam(TextRenderer renderer, MatrixStack matrices, TeamDto team, int x, int y) {
         var teamScore = 0;
 
         // Draw the opaque box
         DrawableHelper.fill(matrices, x, y, x + LasertagHudRenderConfig.boxWidth, y + LasertagHudRenderConfig.boxHeight, LasertagHudRenderConfig.boxColor);
 
         // Draw team name
-        renderer.draw(matrices, team.getName(), x + LasertagHudRenderConfig.textPadding, y + LasertagHudRenderConfig.textPadding, team.getValue());
+        renderer.draw(matrices, team.getName(), x + LasertagHudRenderConfig.textPadding, y + LasertagHudRenderConfig.textPadding, team.getColor().getValue());
 
         // Draw team members
         int memberY = y + 2 * LasertagHudRenderConfig.textPadding + LasertagHudRenderConfig.textHeight + 1;

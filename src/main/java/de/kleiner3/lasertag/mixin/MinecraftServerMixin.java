@@ -16,9 +16,10 @@ import de.kleiner3.lasertag.lasertaggame.timing.GameTickTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.settings.SettingNames;
-import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.types.TeamConfigManager;
+import de.kleiner3.lasertag.types.TeamDto;
 import de.kleiner3.lasertag.util.Tuple;
-import de.kleiner3.lasertag.util.serialize.LasertagColorSerializer;
+import de.kleiner3.lasertag.util.serialize.TeamDtoSerializer;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -52,12 +53,12 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     @Shadow
     public abstract ServerWorld getOverworld();
 
-    private HashMap<Colors.Color, ArrayList<BlockPos>> spawnpointCache = null;
+    private HashMap<TeamDto, ArrayList<BlockPos>> spawnpointCache = null;
 
     /**
-     * Map every player to their team color
+     * Map every player to their team
      */
-    private final HashMap<Colors.Color, List<PlayerEntity>> teamMap = new HashMap<>();
+    private final HashMap<TeamDto, List<PlayerEntity>> teamMap = new HashMap<>();
 
     private final StatsCalculator statsCalculator = new StatsCalculator(teamMap);
 
@@ -76,8 +77,8 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     private void init(CallbackInfo ci) {
 
         // Initialize team map
-        for (Colors.Color color : Colors.colorConfig.values()) {
-            teamMap.put(color, new LinkedList<>());
+        for (TeamDto teamDto : TeamConfigManager.teamConfig.values()) {
+            teamMap.put(teamDto, new LinkedList<>());
         }
     }
 
@@ -102,12 +103,12 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         World world = ((MinecraftServer) (Object) this).getOverworld();
 
         // Teleport players
-        for (Colors.Color teamColor : Colors.colorConfig.values()) {
-            List<PlayerEntity> team = teamMap.get(teamColor);
+        for (TeamDto teamDto : TeamConfigManager.teamConfig.values()) {
+            List<PlayerEntity> team = teamMap.get(teamDto);
 
             for (PlayerEntity player : team) {
                 // Get spawnpoints
-                List<BlockPos> spawnpoints = spawnpointCache.get(teamColor);
+                List<BlockPos> spawnpoints = spawnpointCache.get(teamDto);
 
                 // If there are spawnpoints for this team
                 if (spawnpoints.size() > 0) {
@@ -145,47 +146,49 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     }
 
     @Override
-    public List<PlayerEntity> getPlayersOfTeam(Colors.Color color) {
-        return teamMap.get(color);
+    public List<PlayerEntity> getPlayersOfTeam(TeamDto teamDto) {
+        return teamMap.get(teamDto);
     }
 
     @Override
-    public void playerJoinTeam(Colors.Color newTeamColor, PlayerEntity player) {
+    public void playerJoinTeam(TeamDto newTeamDto, PlayerEntity player) {
         // Get new team
-        var newTeam = teamMap.get(newTeamColor);
+        var newTeam = teamMap.get(newTeamDto);
 
         // Check if team is full
         if (newTeam.size() >= (long)LasertagSettingsManager.get(SettingNames.MAX_TEAM_SIZE)) {
             // If is Server
             if (player instanceof ServerPlayerEntity) {
-                ServerEventSending.sendErrorMessageToClient((ServerPlayerEntity) player, "Team " + newTeamColor.getName() + " is full.");
+                ServerEventSending.sendErrorMessageToClient((ServerPlayerEntity) player, "Team " + newTeamDto.getName() + " is full.");
             }
             return;
         }
 
         // Check if player is in a team already
-        Colors.Color oldTeamColor = null;
-        for (Colors.Color c : Colors.colorConfig.values()) {
-            if (teamMap.get(c).contains(player)) {
-                oldTeamColor = c;
+        TeamDto oldTeamDto = null;
+        for (TeamDto t : TeamConfigManager.teamConfig.values()) {
+            if (teamMap.get(t).contains(player)) {
+                oldTeamDto = t;
                 break;
             }
         }
 
         // If player has no team
-        if (oldTeamColor == null) {
+        if (oldTeamDto == null) {
             newTeam.add(player);
         } else {
             // If player tries to join his team again
-            if (newTeamColor == oldTeamColor) return;
+            if (newTeamDto == oldTeamDto) {
+                return;
+            }
 
             // Swap team
-            teamMap.get(oldTeamColor).remove(player);
+            teamMap.get(oldTeamDto).remove(player);
             newTeam.add(player);
         }
 
         // Set team on player
-        player.setTeam(newTeamColor);
+        player.setTeam(newTeamDto);
 
         // Get players inventory
         var inventory = player.getInventory();
@@ -195,12 +198,12 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
         // Give player a lasertag vest
         var vestStack = new ItemStack(Items.LASERTAG_VEST);
-        ((LasertagVestItem) Items.LASERTAG_VEST).setColor(vestStack, newTeamColor.getValue());
+        ((LasertagVestItem) Items.LASERTAG_VEST).setColor(vestStack, newTeamDto.getColor().getValue());
         player.equipStack(EquipmentSlot.CHEST, vestStack);
 
         // Give player a lasertag weapon
         var weaponStack = new ItemStack(Items.LASERTAG_WEAPON);
-        ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setColor(weaponStack, newTeamColor.getValue());
+        ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setColor(weaponStack, newTeamDto.getColor().getValue());
         ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setDeactivated(weaponStack, true);
         inventory.setStack(0, weaponStack);
 
@@ -322,7 +325,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         var stats = statsCalculator.getLastGamesStats();
 
         // Get gson builder
-        var gsonBuilder = LasertagColorSerializer.getSerializer();
+        var gsonBuilder = TeamDtoSerializer.getSerializer();
 
         // To json
         var jsonString = gsonBuilder.create().toJson(stats, GameStats.class);
@@ -358,19 +361,19 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         // Create simplified team map
         final HashMap<String, List<Tuple<String, Integer>>> simplifiedTeamMap = new HashMap<>();
 
-        // For each color
-        for (Colors.Color c : Colors.colorConfig.values()) {
+        // For each team
+        for (TeamDto t : TeamConfigManager.teamConfig.values()) {
             // Create a new list of (player name, player score) tuples
             List<Tuple<String, Integer>> playerDatas = new LinkedList<>();
 
             // For every player in the team
-            for (PlayerEntity player : teamMap.get(c)) {
+            for (PlayerEntity player : teamMap.get(t)) {
                 // Add his name and score to the list
                 playerDatas.add(new Tuple<>(player.getDisplayName().getString(), player.getLasertagScore()));
             }
 
             // Add the current team to the simplified team map
-            simplifiedTeamMap.put(c.getName(), playerDatas);
+            simplifiedTeamMap.put(t.getName(), playerDatas);
         }
 
         return simplifiedTeamMap;
@@ -390,7 +393,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     }
 
     /**
-     * Initializes the spawnpoint cache. Searches a 31 x 31 chunk area for spawnpoint blocks specified by the team color.
+     * Initializes the spawnpoint cache. Searches a 31 x 31 chunk area for spawnpoint blocks specified by the team.
      * This method is computationally intensive, don't call too often or when responsiveness is important. The call of this method blocks the server from ticking!
      */
     private void initSpawnpointCache() {
@@ -399,7 +402,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         spawnpointCache = new HashMap<>();
 
         // Initialize team lists
-        for (Colors.Color team : Colors.colorConfig.values()) {
+        for (TeamDto team : TeamConfigManager.teamConfig.values()) {
             spawnpointCache.put(team, new ArrayList<>());
         }
 
@@ -411,10 +414,10 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
         // Iterate over blocks and find spawnpoints
         world.fastSearchBlock((block, pos) -> {
-            for (Colors.Color color : Colors.colorConfig.values()) {
-                if (color.getSpawnpointBlock().equals(block)) {
-                    var team = spawnpointCache.get(color);
-                    synchronized (color) {
+            for (TeamDto teamDto : TeamConfigManager.teamConfig.values()) {
+                if (teamDto.getSpawnpointBlock().equals(block)) {
+                    var team = spawnpointCache.get(teamDto);
+                    synchronized (teamDto) {
                         team.add(pos);
                     }
                     break;

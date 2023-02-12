@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
-import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.types.TeamDto;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -22,22 +22,22 @@ public interface ILasertagGame {
     }
 
     /**
-     * Get all players currently assigned to the team of the given color
+     * Get all players currently assigned to the given team
      *
-     * @param color The color to get the players of
+     * @param teamDto The team to get the players of
      * @return The list of all players in this team
      */
-    default List<PlayerEntity> getPlayersOfTeam(Colors.Color color) {
+    default List<PlayerEntity> getPlayersOfTeam(TeamDto teamDto) {
         return new LinkedList<>();
     }
 
     /**
-     * Add a player to the team of the given color
+     * Add a player to the given team
      *
-     * @param color The color of the team to join
+     * @param teamDto The team to join
      * @param player The player to join the team
      */
-    default void playerJoinTeam(Colors.Color color, PlayerEntity player) {
+    default void playerJoinTeam(TeamDto teamDto, PlayerEntity player) {
     }
 
     /**

@@ -1,8 +1,9 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
 import com.google.gson.reflect.TypeToken;
-import de.kleiner3.lasertag.types.Colors;
-import de.kleiner3.lasertag.util.serialize.ColorConfigDeserializer;
+import de.kleiner3.lasertag.types.TeamConfigManager;
+import de.kleiner3.lasertag.types.TeamDto;
+import de.kleiner3.lasertag.util.serialize.TeamConfigManagerDeserializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -23,12 +24,12 @@ public class LasertagTeamsSyncCallback implements ClientPlayNetworking.PlayChann
         var jsonString = buf.readString();
 
         // get gson builder
-        var gsonBuilder = ColorConfigDeserializer.getDeserializer();
+        var gsonBuilder = TeamConfigManagerDeserializer.getDeserializer();
 
         // Parse
-        Colors.colorConfig = gsonBuilder
+        TeamConfigManager.teamConfig = gsonBuilder
                 .create()
                 .fromJson(jsonString,
-                        new TypeToken<HashMap<String, Colors.Color>>() {}.getType());
+                        new TypeToken<HashMap<String, TeamDto>>() {}.getType());
     }
 }

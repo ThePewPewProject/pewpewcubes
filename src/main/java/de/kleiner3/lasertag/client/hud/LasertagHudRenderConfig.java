@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.client.hud;
 
-import de.kleiner3.lasertag.types.Colors;
+import de.kleiner3.lasertag.types.TeamConfigManager;
+import de.kleiner3.lasertag.types.TeamDto;
 import de.kleiner3.lasertag.util.Tuple;
 
 import java.util.HashMap;
@@ -38,7 +39,7 @@ public class LasertagHudRenderConfig {
 
     // Constants
     public static final int progressBarWidth = 100;
-    public static final int numColors = Colors.colorConfig.size();
+    public static final int numTeams = TeamConfigManager.teamConfig.size();
     public static final int boxColor = 0x88000000;
     public static final int startY = 10;
     public static final int boxHeight = 65;
@@ -48,8 +49,8 @@ public class LasertagHudRenderConfig {
     public static final int textHeight = 9;
 
     LasertagHudRenderConfig() {
-        for (Colors.Color c : Colors.colorConfig.values()) {
-            teamMap.put(c.getName(), new LinkedList<>());
+        for (TeamDto t : TeamConfigManager.teamConfig.values()) {
+            teamMap.put(t.getName(), new LinkedList<>());
         }
     }
 }
