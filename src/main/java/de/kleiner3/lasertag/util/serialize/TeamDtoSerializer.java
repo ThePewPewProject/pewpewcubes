@@ -27,12 +27,12 @@ public class TeamDtoSerializer {
                 var jsonObject = new JsonObject();
 
                 // Add RGB
-                jsonObject.addProperty("red", teamDto.getColor().getR());
-                jsonObject.addProperty("green", teamDto.getColor().getG());
-                jsonObject.addProperty("blue", teamDto.getColor().getB());
+                jsonObject.addProperty("red", teamDto.color().r());
+                jsonObject.addProperty("green", teamDto.color().g());
+                jsonObject.addProperty("blue", teamDto.color().b());
 
                 // Add spawnpoint block
-                jsonObject.addProperty("spawnpointBlock", Registry.BLOCK.getId(teamDto.getSpawnpointBlock()).toString());
+                jsonObject.addProperty("spawnpointBlock", Registry.BLOCK.getId(teamDto.spawnpointBlock()).toString());
 
                 return jsonObject;
             }

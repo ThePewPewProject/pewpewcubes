@@ -50,7 +50,7 @@ public class LasertagHudRenderConfig {
 
     LasertagHudRenderConfig() {
         for (TeamDto t : TeamConfigManager.teamConfig.values()) {
-            teamMap.put(t.getName(), new LinkedList<>());
+            teamMap.put(t.name(), new LinkedList<>());
         }
     }
 }

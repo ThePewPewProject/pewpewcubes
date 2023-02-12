@@ -138,11 +138,11 @@ public class LasertagHudOverlay implements HudRenderCallback {
         DrawableHelper.fill(matrices, x, y, x + LasertagHudRenderConfig.boxWidth, y + LasertagHudRenderConfig.boxHeight, LasertagHudRenderConfig.boxColor);
 
         // Draw team name
-        renderer.draw(matrices, team.getName(), x + LasertagHudRenderConfig.textPadding, y + LasertagHudRenderConfig.textPadding, team.getColor().getValue());
+        renderer.draw(matrices, team.name(), x + LasertagHudRenderConfig.textPadding, y + LasertagHudRenderConfig.textPadding, team.color().getValue());
 
         // Draw team members
         int memberY = y + 2 * LasertagHudRenderConfig.textPadding + LasertagHudRenderConfig.textHeight + 1;
-        for (Tuple<String, Integer> playerData : renderData.teamMap.get(team.getName())) {
+        for (Tuple<String, Integer> playerData : renderData.teamMap.get(team.name())) {
             // Draw player name
             renderer.draw(matrices, playerData.x, x + LasertagHudRenderConfig.textPadding, memberY, 0xFFFFFF);
 

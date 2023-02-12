@@ -39,8 +39,8 @@ public class StatsCalculator {
             }
 
             if (playersOfThisTeam.size() > 0) {
-                lastGamesStats.teamPlayerScores.put(teamDto.getName(), playersOfThisTeam);
-                lastGamesStats.teamScores.add(new Tuple<>(teamDto.getName(), teamScore));
+                lastGamesStats.teamPlayerScores.put(teamDto.name(), playersOfThisTeam);
+                lastGamesStats.teamScores.add(new Tuple<>(teamDto.name(), teamScore));
             }
         }
 

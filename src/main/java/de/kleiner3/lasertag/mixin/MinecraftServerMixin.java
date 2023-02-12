@@ -159,7 +159,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         if (newTeam.size() >= (long)LasertagSettingsManager.get(SettingNames.MAX_TEAM_SIZE)) {
             // If is Server
             if (player instanceof ServerPlayerEntity) {
-                ServerEventSending.sendErrorMessageToClient((ServerPlayerEntity) player, "Team " + newTeamDto.getName() + " is full.");
+                ServerEventSending.sendErrorMessageToClient((ServerPlayerEntity) player, "Team " + newTeamDto.name() + " is full.");
             }
             return;
         }
@@ -198,12 +198,12 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
         // Give player a lasertag vest
         var vestStack = new ItemStack(Items.LASERTAG_VEST);
-        ((LasertagVestItem) Items.LASERTAG_VEST).setColor(vestStack, newTeamDto.getColor().getValue());
+        ((LasertagVestItem) Items.LASERTAG_VEST).setColor(vestStack, newTeamDto.color().getValue());
         player.equipStack(EquipmentSlot.CHEST, vestStack);
 
         // Give player a lasertag weapon
         var weaponStack = new ItemStack(Items.LASERTAG_WEAPON);
-        ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setColor(weaponStack, newTeamDto.getColor().getValue());
+        ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setColor(weaponStack, newTeamDto.color().getValue());
         ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setDeactivated(weaponStack, true);
         inventory.setStack(0, weaponStack);
 
@@ -373,7 +373,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
             }
 
             // Add the current team to the simplified team map
-            simplifiedTeamMap.put(t.getName(), playerDatas);
+            simplifiedTeamMap.put(t.name(), playerDatas);
         }
 
         return simplifiedTeamMap;
@@ -415,7 +415,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         // Iterate over blocks and find spawnpoints
         world.fastSearchBlock((block, pos) -> {
             for (TeamDto teamDto : TeamConfigManager.teamConfig.values()) {
-                if (teamDto.getSpawnpointBlock().equals(block)) {
+                if (teamDto.spawnpointBlock().equals(block)) {
                     var team = spawnpointCache.get(teamDto);
                     synchronized (teamDto) {
                         team.add(pos);
