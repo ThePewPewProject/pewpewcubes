@@ -51,7 +51,7 @@
     "minecraft": "~1.19",
 	"fabric-api": "*",
     "java": ">=17",
-    "geckolib3": ">=3.1.37"
+    "geckolib3": ">=3.1.38"
   },
   "suggests": {
     "sodium": "*",
