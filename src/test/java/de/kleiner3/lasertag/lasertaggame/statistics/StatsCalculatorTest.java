@@ -37,15 +37,15 @@ class StatsCalculatorTest {
 
         var calcedStats = calculator.getLastGamesStats();
 
-        assertEquals(247, calcedStats.teamScores.get(0).y);
-        assertEquals(100, calcedStats.playerScores.get(0).y);
-        assertEquals(80, calcedStats.playerScores.get(1).y);
-        assertEquals(67, calcedStats.playerScores.get(2).y);
+        assertEquals(247, calcedStats.teamScores.get(0).y());
+        assertEquals(100, calcedStats.playerScores.get(0).y());
+        assertEquals(80, calcedStats.playerScores.get(1).y());
+        assertEquals(67, calcedStats.playerScores.get(2).y());
 
-        assertEquals(95, calcedStats.teamScores.get(1).y);
-        assertEquals(50, calcedStats.playerScores.get(3).y);
-        assertEquals(40, calcedStats.playerScores.get(4).y);
-        assertEquals(5, calcedStats.playerScores.get(5).y);
+        assertEquals(95, calcedStats.teamScores.get(1).y());
+        assertEquals(50, calcedStats.playerScores.get(3).y());
+        assertEquals(40, calcedStats.playerScores.get(4).y());
+        assertEquals(5, calcedStats.playerScores.get(5).y());
     }
 
     @Test
@@ -72,15 +72,15 @@ class StatsCalculatorTest {
 
         var calcedStats = calculator.getLastGamesStats();
 
-        assertEquals(247, calcedStats.teamScores.get(0).y);
-        assertEquals(100, calcedStats.playerScores.get(0).y);
-        assertEquals(80, calcedStats.playerScores.get(1).y);
-        assertEquals(67, calcedStats.playerScores.get(2).y);
+        assertEquals(247, calcedStats.teamScores.get(0).y());
+        assertEquals(100, calcedStats.playerScores.get(0).y());
+        assertEquals(80, calcedStats.playerScores.get(1).y());
+        assertEquals(67, calcedStats.playerScores.get(2).y());
 
-        assertEquals(95, calcedStats.teamScores.get(1).y);
-        assertEquals(50, calcedStats.playerScores.get(3).y);
-        assertEquals(40, calcedStats.playerScores.get(4).y);
-        assertEquals(5, calcedStats.playerScores.get(5).y);
+        assertEquals(95, calcedStats.teamScores.get(1).y());
+        assertEquals(50, calcedStats.playerScores.get(3).y());
+        assertEquals(40, calcedStats.playerScores.get(4).y());
+        assertEquals(5, calcedStats.playerScores.get(5).y());
     }
 
     @Test
@@ -98,9 +98,9 @@ class StatsCalculatorTest {
 
         var calcedStats = calculator.getLastGamesStats();
 
-        assertEquals(50, calcedStats.teamScores.get(0).y);
-        assertEquals(50, calcedStats.playerScores.get(0).y);
-        assertEquals(50, calcedStats.teamPlayerScores.get("Green").get(0).y);
+        assertEquals(50, calcedStats.teamScores.get(0).y());
+        assertEquals(50, calcedStats.playerScores.get(0).y());
+        assertEquals(50, calcedStats.teamPlayerScores.get("Green").get(0).y());
     }
 
     @Test

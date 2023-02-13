@@ -1,9 +1,9 @@
 package de.kleiner3.lasertag.lasertaggame;
 
-import de.kleiner3.lasertag.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import de.kleiner3.lasertag.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;

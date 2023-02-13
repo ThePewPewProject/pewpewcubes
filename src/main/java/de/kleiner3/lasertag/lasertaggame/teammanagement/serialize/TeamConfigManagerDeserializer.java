@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.util.serialize;
+package de.kleiner3.lasertag.lasertaggame.teammanagement.serialize;
 
 import com.google.gson.*;
 import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;

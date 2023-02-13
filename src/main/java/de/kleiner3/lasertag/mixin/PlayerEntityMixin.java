@@ -1,11 +1,11 @@
 package de.kleiner3.lasertag.mixin;
 
-import de.kleiner3.lasertag.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import de.kleiner3.lasertag.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
 import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;

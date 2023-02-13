@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.util;
+package de.kleiner3.lasertag.common.util;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -21,7 +21,6 @@ public class RaycastUtil {
      * @return The HitResult of the raycast
      */
     public static HitResult raycastCrosshair(PlayerEntity playerEntity, int maxDistance) {
-        // TODO: Hits blocks without collision box (e.g. Grass)
 
         // Get the cameras position to start the raycasting from
         Vec3d startPos = playerEntity.getCameraPosVec(1.0f);

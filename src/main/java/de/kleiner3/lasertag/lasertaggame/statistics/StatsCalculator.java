@@ -2,7 +2,7 @@ package de.kleiner3.lasertag.lasertaggame.statistics;
 
 import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
 import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
-import de.kleiner3.lasertag.util.Tuple;
+import de.kleiner3.lasertag.common.types.Tuple;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -45,10 +45,10 @@ public class StatsCalculator {
         }
 
         // Sort stats
-        lastGamesStats.teamScores.sort(Comparator.<Tuple<String, Integer>>comparingInt(t -> t.y).reversed());
-        lastGamesStats.playerScores.sort(Comparator.<Tuple<String, Integer>>comparingInt(t -> t.y).reversed());
+        lastGamesStats.teamScores.sort(Comparator.<Tuple<String, Integer>>comparingInt(t -> t.y()).reversed());
+        lastGamesStats.playerScores.sort(Comparator.<Tuple<String, Integer>>comparingInt(t -> t.y()).reversed());
         for (var team : lastGamesStats.teamPlayerScores.values()) {
-            team.sort(Comparator.<Tuple<String, Integer>>comparingInt(t -> t.y).reversed());
+            team.sort(Comparator.<Tuple<String, Integer>>comparingInt(t -> t.y()).reversed());
         }
     }
 

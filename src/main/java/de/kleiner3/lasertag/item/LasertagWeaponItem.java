@@ -1,14 +1,14 @@
 package de.kleiner3.lasertag.item;
 
-import de.kleiner3.lasertag.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.block.LaserTargetBlock;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import de.kleiner3.lasertag.settings.SettingNames;
-import de.kleiner3.lasertag.types.ILasertagColorable;
-import de.kleiner3.lasertag.util.RaycastUtil;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.ILasertagColorable;
+import de.kleiner3.lasertag.common.util.RaycastUtil;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;

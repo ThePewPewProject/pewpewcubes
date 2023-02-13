@@ -1,8 +1,8 @@
 package de.kleiner3.lasertag.mixin.fastiter;
 
-import de.kleiner3.lasertag.util.fastiter.IFastWorldIter;
-import de.kleiner3.lasertag.util.fastiter.IIter;
-import de.kleiner3.lasertag.util.fastiter.IProgressReport;
+import de.kleiner3.lasertag.common.util.fastiter.IFastWorldIter;
+import de.kleiner3.lasertag.common.util.fastiter.IIter;
+import de.kleiner3.lasertag.common.util.fastiter.IProgressReport;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;

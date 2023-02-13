@@ -3,7 +3,7 @@ package de.kleiner3.lasertag.networking.client.callbacks;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import de.kleiner3.lasertag.client.hud.LasertagHudOverlay;
-import de.kleiner3.lasertag.util.Tuple;
+import de.kleiner3.lasertag.common.types.Tuple;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;

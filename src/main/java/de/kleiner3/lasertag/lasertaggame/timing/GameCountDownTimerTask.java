@@ -1,8 +1,8 @@
 package de.kleiner3.lasertag.lasertaggame.timing;
 
-import de.kleiner3.lasertag.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.client.hud.LasertagHudOverlay;
-import de.kleiner3.lasertag.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
 
 import java.util.TimerTask;
 

@@ -1,6 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame.statistics;
 
-import de.kleiner3.lasertag.util.Tuple;
+import de.kleiner3.lasertag.common.types.Tuple;
 
 import java.util.ArrayList;
 import java.util.HashMap;

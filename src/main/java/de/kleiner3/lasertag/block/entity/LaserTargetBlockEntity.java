@@ -1,9 +1,9 @@
 package de.kleiner3.lasertag.block.entity;
 
-import de.kleiner3.lasertag.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.entity.Entities;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import de.kleiner3.lasertag.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;

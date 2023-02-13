@@ -2,7 +2,7 @@ package de.kleiner3.lasertag.client.hud;
 
 import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
 import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
-import de.kleiner3.lasertag.util.Tuple;
+import de.kleiner3.lasertag.common.types.Tuple;
 
 import java.util.HashMap;
 import java.util.LinkedList;

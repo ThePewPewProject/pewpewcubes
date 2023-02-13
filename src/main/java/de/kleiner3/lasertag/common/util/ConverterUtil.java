@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.util;
+package de.kleiner3.lasertag.common.util;
 
 /**
  * Utils for type conversion

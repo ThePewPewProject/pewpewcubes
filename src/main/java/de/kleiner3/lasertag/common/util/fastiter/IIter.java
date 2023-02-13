@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.util.fastiter;
+package de.kleiner3.lasertag.common.util.fastiter;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;

@@ -4,8 +4,8 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import de.kleiner3.lasertag.settings.LasertagSettingsManager;
-import de.kleiner3.lasertag.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 

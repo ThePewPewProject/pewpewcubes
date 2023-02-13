@@ -1,6 +1,6 @@
 package de.kleiner3.lasertag.item;
 
-import de.kleiner3.lasertag.types.ILasertagColorable;
+import de.kleiner3.lasertag.lasertaggame.ILasertagColorable;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;

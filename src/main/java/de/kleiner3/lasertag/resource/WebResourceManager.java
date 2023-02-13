@@ -1,8 +1,8 @@
 package de.kleiner3.lasertag.resource;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.util.StringUtil;
-import de.kleiner3.lasertag.util.Tuple;
+import de.kleiner3.lasertag.common.util.StringUtil;
+import de.kleiner3.lasertag.common.types.Tuple;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;

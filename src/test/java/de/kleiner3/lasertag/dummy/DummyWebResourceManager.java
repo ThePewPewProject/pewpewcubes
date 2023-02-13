@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.dummy;
 
 import de.kleiner3.lasertag.resource.WebResourceManager;
-import de.kleiner3.lasertag.util.Tuple;
+import de.kleiner3.lasertag.common.types.Tuple;
 import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
 

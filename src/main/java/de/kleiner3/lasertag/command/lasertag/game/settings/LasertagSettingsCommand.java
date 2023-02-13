@@ -3,7 +3,7 @@ package de.kleiner3.lasertag.command.lasertag.game.settings;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import de.kleiner3.lasertag.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 

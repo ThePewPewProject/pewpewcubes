@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.mixin;
 
 import com.google.gson.Gson;
-import de.kleiner3.lasertag.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.item.Items;
@@ -15,11 +15,11 @@ import de.kleiner3.lasertag.lasertaggame.statistics.StatsCalculator;
 import de.kleiner3.lasertag.lasertaggame.timing.GameTickTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import de.kleiner3.lasertag.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
 import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
 import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
-import de.kleiner3.lasertag.util.Tuple;
-import de.kleiner3.lasertag.util.serialize.TeamDtoSerializer;
+import de.kleiner3.lasertag.common.types.Tuple;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.serialize.TeamDtoSerializer;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;

@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.types;
+package de.kleiner3.lasertag.lasertaggame;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;

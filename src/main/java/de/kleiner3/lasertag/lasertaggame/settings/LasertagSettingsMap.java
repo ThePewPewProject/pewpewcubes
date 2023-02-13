@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.settings;
+package de.kleiner3.lasertag.lasertaggame.settings;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

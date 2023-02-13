@@ -3,7 +3,7 @@ package de.kleiner3.lasertag.lasertaggame.statistics;
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.resource.WebResourceManager;
-import de.kleiner3.lasertag.util.FileIO;
+import de.kleiner3.lasertag.common.util.FileIO;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.PlayerInfoDto;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.ProfileTextureDto;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.SessionPlayerProfileDto;
@@ -59,11 +59,11 @@ public class WebStatisticsVisualizer {
         for (var fileTuple : template) {
 
             // if it is the html file
-            if (fileTuple.x.getPath().endsWith(".html")) {
+            if (fileTuple.x().getPath().endsWith(".html")) {
                 // Read the file
                 String fileContents;
                 try {
-                    fileContents = FileIO.readAllFile(fileTuple.y.getInputStream());
+                    fileContents = FileIO.readAllFile(fileTuple.y().getInputStream());
                 } catch (IOException ex) {
                     LasertagMod.LOGGER.error("Exception in WebStatisticsVisualizer.build:", ex);
                     return null;
@@ -72,7 +72,7 @@ public class WebStatisticsVisualizer {
                 fileContents = buildHtml(fileContents, stats);
 
                 // Write file
-                resultPath = Path.of(TARGET_PATH.toString(), fileTuple.x.getPath()).toString();
+                resultPath = Path.of(TARGET_PATH.toString(), fileTuple.x().getPath()).toString();
                 try {
                     var ignored = FileIO.createNewFile(resultPath);
 
@@ -86,13 +86,13 @@ public class WebStatisticsVisualizer {
             }
 
             try {
-                var copyToPath = Path.of(TARGET_PATH.toString(), fileTuple.x.getPath());
+                var copyToPath = Path.of(TARGET_PATH.toString(), fileTuple.x().getPath());
 
                 var ignored = FileIO.createNewFile(copyToPath.toString());
 
-                Files.copy(fileTuple.y.getInputStream(), copyToPath, StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(fileTuple.y().getInputStream(), copyToPath, StandardCopyOption.REPLACE_EXISTING);
             } catch (Exception ex) {
-                LasertagMod.LOGGER.error("Failed to copy file '" + fileTuple.y.toString() + "' of statistics visualization.", ex);
+                LasertagMod.LOGGER.error("Failed to copy file '" + fileTuple.y().toString() + "' of statistics visualization.", ex);
                 return null;
             }
         }
@@ -119,7 +119,7 @@ public class WebStatisticsVisualizer {
 
         int teamNo = 1;
         for (var team : stats.teamScores) {
-            buildTableRow(builder, teamNo++, team.x, team.y);
+            buildTableRow(builder, teamNo++, team.x(), team.y());
         }
 
         buildTableEnd(builder);
@@ -130,9 +130,9 @@ public class WebStatisticsVisualizer {
 
         int playerNo = 1;
         for (var player : stats.playerScores) {
-            var playerHtml = getSkinNameHtml(player.x);
+            var playerHtml = getSkinNameHtml(player.x());
 
-            buildTableRow(builder, playerNo++, playerHtml, player.y);
+            buildTableRow(builder, playerNo++, playerHtml, player.y());
         }
 
         buildTableEnd(builder);
@@ -144,9 +144,9 @@ public class WebStatisticsVisualizer {
 
             int playerNo = 1;
             for (var player : team.getValue()) {
-                var playerHtml = getSkinNameHtml(player.x);
+                var playerHtml = getSkinNameHtml(player.x());
 
-                buildTableRow(builder, playerNo++, playerHtml, player.y);
+                buildTableRow(builder, playerNo++, playerHtml, player.y());
             }
 
             buildTableEnd(builder);

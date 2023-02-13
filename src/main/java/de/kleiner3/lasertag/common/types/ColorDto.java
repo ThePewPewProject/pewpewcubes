@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.types;
+package de.kleiner3.lasertag.common.types;
 
 /**
  * Color DTO

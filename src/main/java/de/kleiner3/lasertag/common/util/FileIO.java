@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.util;
+package de.kleiner3.lasertag.common.util;
 
 import java.io.*;
 import java.nio.file.Files;

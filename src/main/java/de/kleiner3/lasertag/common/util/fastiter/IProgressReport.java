@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.util.fastiter;
+package de.kleiner3.lasertag.common.util.fastiter;
 
 /**
  * Interface to provide callback method when a new chunk is being iterated in the fast block iteration

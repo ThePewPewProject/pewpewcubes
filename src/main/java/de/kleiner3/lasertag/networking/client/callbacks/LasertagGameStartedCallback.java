@@ -2,8 +2,8 @@ package de.kleiner3.lasertag.networking.client.callbacks;
 
 import de.kleiner3.lasertag.client.hud.LasertagHudOverlay;
 import de.kleiner3.lasertag.lasertaggame.timing.PreGameCountDownTimerTask;
-import de.kleiner3.lasertag.settings.LasertagSettingsManager;
-import de.kleiner3.lasertag.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;

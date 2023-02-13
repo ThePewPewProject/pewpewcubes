@@ -1,10 +1,10 @@
-package de.kleiner3.lasertag.settings;
+package de.kleiner3.lasertag.lasertaggame.settings;
 
 import com.google.gson.GsonBuilder;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import de.kleiner3.lasertag.util.FileIO;
+import de.kleiner3.lasertag.common.util.FileIO;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;

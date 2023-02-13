@@ -1,11 +1,11 @@
 package de.kleiner3.lasertag.client.hud;
 
-import de.kleiner3.lasertag.settings.LasertagSettingsManager;
-import de.kleiner3.lasertag.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
 import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
 import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
-import de.kleiner3.lasertag.util.DurationUtils;
-import de.kleiner3.lasertag.util.Tuple;
+import de.kleiner3.lasertag.common.util.DurationUtils;
+import de.kleiner3.lasertag.common.types.Tuple;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -144,10 +144,10 @@ public class LasertagHudOverlay implements HudRenderCallback {
         int memberY = y + 2 * LasertagHudRenderConfig.textPadding + LasertagHudRenderConfig.textHeight + 1;
         for (Tuple<String, Integer> playerData : renderData.teamMap.get(team.name())) {
             // Draw player name
-            renderer.draw(matrices, playerData.x, x + LasertagHudRenderConfig.textPadding, memberY, 0xFFFFFF);
+            renderer.draw(matrices, playerData.x(), x + LasertagHudRenderConfig.textPadding, memberY, 0xFFFFFF);
 
             // Get the players score
-            Integer playerScore = playerData.y;
+            Integer playerScore = playerData.y();
 
             // Add the players score to the team score
             teamScore += playerScore;

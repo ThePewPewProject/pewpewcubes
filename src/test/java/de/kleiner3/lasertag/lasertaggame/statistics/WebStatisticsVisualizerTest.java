@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.lasertaggame.statistics;
 
 import de.kleiner3.lasertag.dummy.DummyWebResourceManager;
-import de.kleiner3.lasertag.util.Tuple;
+import de.kleiner3.lasertag.common.types.Tuple;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
