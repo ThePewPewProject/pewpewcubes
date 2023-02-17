@@ -1,7 +1,9 @@
 package de.kleiner3.lasertag.worldgen.chunkgen;
 
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.common.util.NbtUtil;
 import de.kleiner3.lasertag.resource.ResourceManagers;
+import de.kleiner3.lasertag.resource.StructureResourceManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.nbt.NbtCompound;
@@ -58,8 +60,9 @@ public abstract class ArenaChunkGenerator extends ChunkGenerator {
      * The constructor to use to generate an arena
      * @param structureSetRegistry Should be BuiltinRegistries.STRUCTURE_SET
      * @param biome The biome for the arena (new FixedBiomeSource(biomeRegistry.getOrCreateEntry(BiomeKeys.YOUR_BIOME)))
-     * @param nbtFileId The id of the nbt file where the arena data is stored
+     * @param nbtFileId The id of the nbt file where the arena data is stored. Size has to be >0 in x, y and z! If this is a .litematic file the used region has to be called "main"
      * @param placementOffset The offset with which to place the arena. Insert the coordinates of the world spawn point block so that this block is 0, 0, 0
+     *                        (To calculate: Generate arena with offset 0,0,0 and use the targeted block coordinates of the desired spawn point block as the offset)
      */
     public ArenaChunkGenerator(Registry<StructureSet> structureSetRegistry, FixedBiomeSource biome, Identifier nbtFileId, Vec3i placementOffset) {
         super(structureSetRegistry, Optional.empty(), biome);
@@ -78,6 +81,17 @@ public abstract class ArenaChunkGenerator extends ChunkGenerator {
         } catch (IOException e) {
             LasertagMod.LOGGER.error("Unable to load nbt file.", e);
             return;
+        }
+
+        // If is litematic file
+        if (nbtFileId.getPath().endsWith(StructureResourceManager.LITEMATIC_FILE_ENDING)) {
+            // Convert litematic nbt compound to nbt nbt compound
+            nbt = NbtUtil.convertLitematicToNbt(nbt, "main");
+
+            // Sanity check
+            if (nbt == null) {
+                LasertagMod.LOGGER.error("Litematica file could not be converted to nbt.");
+            }
         }
 
         this.structureTemplate = new StructureTemplate();

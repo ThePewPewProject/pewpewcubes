@@ -24,7 +24,7 @@ public class JungleArenaChunkGenerator extends ArenaChunkGenerator {
     private final Registry<Biome> biomeRegistry;
 
     public JungleArenaChunkGenerator(Registry<StructureSet> structureSetRegistry, Registry<Biome> biomeRegistry) {
-        super(structureSetRegistry, new FixedBiomeSource(biomeRegistry.getOrCreateEntry(BiomeKeys.JUNGLE)), new Identifier(LasertagMod.ID, "structures/jungle_arena/main.nbt"), new Vec3i(27, 3, 60));
+        super(structureSetRegistry, new FixedBiomeSource(biomeRegistry.getOrCreateEntry(BiomeKeys.JUNGLE)), new Identifier(LasertagMod.ID, "structures/prebuild_arenas/jungle_arena.litematic"), new Vec3i(21, 3, 61));
 
         this.biomeRegistry = biomeRegistry;
     }
