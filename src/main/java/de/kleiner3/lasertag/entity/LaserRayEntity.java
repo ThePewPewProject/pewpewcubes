@@ -65,7 +65,7 @@ public class LaserRayEntity extends ProjectileEntity {
 
     @Override
     protected void initDataTracker() {
-
+        // Empty
     }
 
     /**

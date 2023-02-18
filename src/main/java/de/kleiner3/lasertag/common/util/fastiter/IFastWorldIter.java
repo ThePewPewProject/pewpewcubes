@@ -17,5 +17,6 @@ public interface IFastWorldIter {
      * @param progress The method called on every chunk after iteration over every block in this chunk has finished. MUST BE THREAD-SAFE! This method can be called on multiple threads at the same time.
      */
     default void fastSearchBlock(IIter iter, IProgressReport progress) {
+        // Default empty
     }
 }

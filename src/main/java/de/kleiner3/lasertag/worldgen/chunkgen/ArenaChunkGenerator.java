@@ -139,6 +139,7 @@ public abstract class ArenaChunkGenerator extends ChunkGenerator {
 
     @Override
     public void buildSurface(ChunkRegion region, StructureAccessor structures, NoiseConfig noiseConfig, Chunk chunk) {
+        // Empty
     }
 
     @Override
@@ -163,14 +164,17 @@ public abstract class ArenaChunkGenerator extends ChunkGenerator {
 
     @Override
     public void getDebugHudText(List<String> text, NoiseConfig noiseConfig, BlockPos pos) {
+        // Empty
     }
 
     @Override
     public void carve(ChunkRegion chunkRegion, long seed, NoiseConfig noiseConfig, BiomeAccess biomeAccess, StructureAccessor structureAccessor, Chunk chunk, GenerationStep.Carver carverStep) {
+        // Empty
     }
 
     @Override
     public void populateEntities(ChunkRegion region) {
+        // Empty
     }
 
     @Override

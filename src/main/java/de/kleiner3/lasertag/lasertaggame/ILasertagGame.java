@@ -19,6 +19,7 @@ public interface ILasertagGame {
      * Start the lasertag game
      */
     default void startGame(boolean scanSpawnpoints) {
+        // Default empty
     }
 
     /**
@@ -38,6 +39,7 @@ public interface ILasertagGame {
      * @param player The player to join the team
      */
     default void playerJoinTeam(TeamDto teamDto, PlayerEntity player) {
+        // Default empty
     }
 
     /**
@@ -47,6 +49,7 @@ public interface ILasertagGame {
      * @param score The score he scored
      */
     default void onPlayerScored(PlayerEntity player, int score) {
+        // Default empty
     }
 
     /**
@@ -55,6 +58,7 @@ public interface ILasertagGame {
      * @param player The player to leave his team
      */
     default void playerLeaveHisTeam(PlayerEntity player) {
+        // Default empty
     }
 
     /**
@@ -69,6 +73,7 @@ public interface ILasertagGame {
      * @param target The lasertarget block entity to register
      */
     default void registerLasertarget(LaserTargetBlockEntity target) {
+        // Default empty
     }
 
     /**
@@ -76,5 +81,6 @@ public interface ILasertagGame {
      * @param player The player to synchronize to
      */
     default void syncTeamsAndScoresToPlayer(ServerPlayerEntity player) {
+        // Default empty
     }
 }

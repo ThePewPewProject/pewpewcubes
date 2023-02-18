@@ -50,8 +50,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
-    @Shadow
-    public abstract ServerWorld getOverworld();
+    //region Private fields
 
     private HashMap<TeamDto, ArrayList<BlockPos>> spawnpointCache = null;
 
@@ -67,6 +66,11 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     private boolean isRunning = false;
 
     private ScheduledExecutorService gameTickTimer = null;
+
+    //endregion
+
+    @Shadow
+    public abstract ServerWorld getOverworld();
 
     /**
      * Inject into constructor of MinecraftServer

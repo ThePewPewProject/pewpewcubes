@@ -81,17 +81,13 @@ public class TeamConfigManager {
                 var dir = new File(LasertagMod.configFolderPath);
 
                 // Create directory if not exists
-                if (!dir.exists()) {
-                    if (!dir.mkdir()) {
-                        throw new IOException("Make directory for team config failed!");
-                    }
+                if (!dir.exists() && !dir.mkdir()) {
+                    throw new IOException("Make directory for team config failed!");
                 }
 
                 // Create file if not exists
-                if (!teamConfigFile.exists()) {
-                    if (!teamConfigFile.createNewFile()) {
-                        throw new IOException("Creation of file for team config failed!");
-                    }
+                if (!teamConfigFile.exists() && !teamConfigFile.createNewFile()) {
+                    throw new IOException("Creation of file for team config failed!");
                 }
 
                 // Write to file

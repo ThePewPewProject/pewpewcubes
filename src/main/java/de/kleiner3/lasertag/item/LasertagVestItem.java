@@ -53,10 +53,8 @@ public class LasertagVestItem extends ArmorItem implements ILasertagColorable, I
         // contains the 4 armor slots
         List<Item> armorList = new ArrayList<>(4);
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
-                if (livingEntity.getEquippedStack(slot) != null) {
+            if (slot.getType() == EquipmentSlot.Type.ARMOR && livingEntity.getEquippedStack(slot) != null) {
                     armorList.add(livingEntity.getEquippedStack(slot).getItem());
-                }
             }
         }
 

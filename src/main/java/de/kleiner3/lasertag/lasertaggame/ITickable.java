@@ -9,10 +9,14 @@ public interface ITickable {
     /**
      * Called on every tick
      */
-    default void doTick() {}
+    default void doTick() {
+        // Default empty
+    }
 
     /**
      * Called on the last tick
      */
-    default void endTick() {}
+    default void endTick() {
+        // Default empty
+    }
 }

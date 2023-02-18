@@ -22,7 +22,7 @@ public class NbtUtil {
         var regionsElement = litematic.get("Regions");
 
         // If the regions element is not a nbt compound
-        if ((regionsElement instanceof NbtCompound) == false) {
+        if (!(regionsElement instanceof NbtCompound)) {
             return null;
         }
 
@@ -33,7 +33,7 @@ public class NbtUtil {
         var mainRegionElement = regionsCompound.get(mainRegionName);
 
         // If the main region element is not a nbt compound
-        if ((mainRegionElement instanceof NbtCompound) == false) {
+        if (!(mainRegionElement instanceof NbtCompound)) {
             return null;
         }
 
@@ -41,12 +41,12 @@ public class NbtUtil {
         var mainRegionCompound = (NbtCompound)mainRegionElement;
 
         // Add size nbt list
-        if (addSize(nbt, mainRegionCompound) == false) {
+        if (!addSize(nbt, mainRegionCompound)) {
             return null;
         }
 
         // Add entities list
-        if (addEntities(nbt, mainRegionCompound) == false) {
+        if (!addEntities(nbt, mainRegionCompound)) {
             return null;
         }
 
@@ -54,7 +54,7 @@ public class NbtUtil {
         var sizeElement = mainRegionCompound.get("Size");
 
         // Check
-        if ((sizeElement instanceof NbtCompound) == false) {
+        if (!(sizeElement instanceof NbtCompound)) {
             return null;
         }
 
@@ -65,7 +65,7 @@ public class NbtUtil {
         var paletteElement = mainRegionCompound.get("BlockStatePalette");
 
         // Check
-        if ((paletteElement instanceof NbtList) == false) {
+        if (!(paletteElement instanceof NbtList)) {
             return null;
         }
 
@@ -73,7 +73,7 @@ public class NbtUtil {
         var paletteList = (NbtList)paletteElement;
 
         // Add blocks list
-        if (addBlockList(nbt, mainRegionCompound, sizeCompound, paletteList) == false) {
+        if (!addBlockList(nbt, mainRegionCompound, sizeCompound, paletteList)) {
             return null;
         }
 
@@ -93,7 +93,7 @@ public class NbtUtil {
         var sizeElement = litematicMainRegion.get("Size");
 
         // If is not nbt compound
-        if ((sizeElement instanceof NbtCompound) == false) {
+        if (!(sizeElement instanceof NbtCompound)) {
             return false;
         }
 
@@ -114,7 +114,7 @@ public class NbtUtil {
         var entitiesElement = litematicMainRegion.get("Entities");
 
         // If is not nbt list
-        if ((entitiesElement instanceof NbtList) == false) {
+        if (!(entitiesElement instanceof NbtList)) {
             return false;
         }
 
@@ -127,7 +127,7 @@ public class NbtUtil {
         // For every entity
         for (var entity : entitiesList) {
             // If is not nbtCompound
-            if ((entity instanceof NbtCompound) == false) {
+            if (!(entity instanceof NbtCompound)) {
                 return false;
             }
 
@@ -135,7 +135,7 @@ public class NbtUtil {
             var entityCompound = (NbtCompound)entity;
 
             // Add to list
-            if (addEntityToList(list, entityCompound) == false) {
+            if (!addEntityToList(list, entityCompound)) {
                 return false;
             }
         }
@@ -151,7 +151,7 @@ public class NbtUtil {
         var posElement = litematicEntity.get("Pos");
 
         // If pos is not nbt list
-        if ((posElement instanceof NbtList) == false) {
+        if (!(posElement instanceof NbtList)) {
             return false;
         }
 
@@ -189,7 +189,7 @@ public class NbtUtil {
         var blockStateArrayElement = litematicMainRegion.get("BlockStates");
 
         // If is not long array
-        if ((blockStateArrayElement instanceof NbtLongArray) == false) {
+        if (!(blockStateArrayElement instanceof NbtLongArray)) {
             return false;
         }
 
@@ -207,7 +207,7 @@ public class NbtUtil {
             for (long y = 0; y < sizeY; y++) {
                 for (long z = 0; z < sizeZ; z++) {
                     // Get index in array
-                    var index = (y * sizeX * sizeZ) + (z * sizeX) + x; // TODO: Verify this calculation
+                    var index = (y * sizeX * sizeZ) + (z * sizeX) + x;
 
                     // Get the block state index in the palette
                     var paletteIndex = getBlockAt(blockStateArray, index, bits, maxEntryValue);

@@ -20,6 +20,7 @@ public interface ILasertagPlayer {
      * Reset the players lasertag score to 0
      */
     default void resetLasertagScore() {
+        // Default empty
     }
 
     /**
@@ -28,6 +29,7 @@ public interface ILasertagPlayer {
      * @param score The amount
      */
     default void increaseScore(int score) {
+        // Default empty
     }
 
     /**
@@ -36,6 +38,7 @@ public interface ILasertagPlayer {
      * @param player The player who hit this player
      */
     default void onHitBy(PlayerEntity player) {
+        // Default empty
     }
 
     /**
@@ -43,6 +46,7 @@ public interface ILasertagPlayer {
      * @param teamDto The  team
      */
     default void setTeam(TeamDto teamDto) {
+        // Default empty
     }
 
     /**
@@ -57,12 +61,14 @@ public interface ILasertagPlayer {
      * Called when the player is deactivated
      */
     default void onDeactivated() {
+        // Default empty
     }
 
     /**
      * Called when the player gets activated
      */
     default void onActivated() {
+        // Default empty
     }
 
     default String getLasertagUsername() {

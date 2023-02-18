@@ -16,15 +16,19 @@ import java.util.Map;
  * @author Étienne Muser
  */
 public class StructureResourceManager implements SimpleSynchronousResourceReloadListener {
-    private final Map<Identifier, Resource> structureResources = new HashMap<>();
+    //region Private fields
 
-    public Resource get(Identifier id) {
-        return structureResources.get(id);
-    }
+    private final Map<Identifier, Resource> structureResources = new HashMap<>();
 
     public static final String LITEMATIC_FILE_ENDING = ".litematic";
     public static final String NBT_FILE_ENDING = ".nbt";
     public static final String[] FILE_ENDINGS = new String[] { NBT_FILE_ENDING, LITEMATIC_FILE_ENDING };
+
+    //endregion
+
+    public Resource get(Identifier id) {
+        return structureResources.get(id);
+    }
 
     @Override
     public Identifier getFabricId() {

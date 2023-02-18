@@ -138,6 +138,8 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
                 break;
             case MISS:
                 break;
+            default:
+                break;
         }
 
         // Spawn laser ray entity

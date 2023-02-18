@@ -20,7 +20,16 @@ import java.io.IOException;
  * @author Étienne Muser
  */
 public class LasertagSettingsManager {
+    //region Static fields
     private static LasertagSettingsMap settings;
+
+    // Get path to lasertag config file
+    private static final String lasertagConfigFilePath = LasertagMod.configFolderPath + "\\lasertagConfig.json";
+
+    // Create file object
+    private static final File lasertagConfigFile = new File(lasertagConfigFilePath);
+
+    //endregion
 
     public static Object get(String key) {
         return settings.get(key);
@@ -93,12 +102,6 @@ public class LasertagSettingsManager {
         // Write to file
         FileIO.writeAllFile(lasertagConfigFile, jsonString);
     }
-
-    // Get path to lasertag config file
-    private static final String lasertagConfigFilePath = LasertagMod.configFolderPath + "\\lasertagConfig.json";
-
-    // Create file object
-    private static final File lasertagConfigFile = new File(lasertagConfigFilePath);
 
     // Initialize lasertag game settings from file
     static {

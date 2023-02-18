@@ -21,8 +21,8 @@ public record TeamDto(String name, ColorDto color, Block spawnpointBlock) {
      * @return
      */
     public boolean canCoexistWith(TeamDto other) {
-        return name.equals(other.name) == false &&
-                color.equals(other.color) == false &&
-                spawnpointBlock.equals(other.spawnpointBlock) == false;
+        return !name.equals(other.name) &&
+                !color.equals(other.color) &&
+                !spawnpointBlock.equals(other.spawnpointBlock);
     }
 }

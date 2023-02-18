@@ -41,7 +41,8 @@ public class WorldMixin implements IFastWorldIter {
         // Spiral iteration variables
         int layer = 1;
         int leg = 0;
-        int x = 0, z = 0;
+        int x = 0;
+        int z = 0;
 
         // For every chunk
         for (int currChunkIdx = 0; currChunkIdx < numChunks; ++currChunkIdx) {
@@ -114,6 +115,7 @@ public class WorldMixin implements IFastWorldIter {
                         ++layer;
                     }
                 }
+                default -> { /* Do nothing */ }
             }
         }
 
