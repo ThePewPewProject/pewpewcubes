@@ -25,6 +25,9 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectCategory;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -124,6 +127,15 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
                     var destination = spawnpoints.get(idx);
                     player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
+
+                    // Give player mining fatigue
+                    player.addStatusEffect(
+                            new StatusEffectInstance(StatusEffect.byRawId(4),
+                                    (((int)(long)LasertagSettingsManager.get(SettingNames.PLAY_TIME)) * 60 * 20) +
+                                            (((int)(long)LasertagSettingsManager.get(SettingNames.START_TIME)) * 20) + 40,
+                                    Integer.MAX_VALUE,
+                                    false,
+                                    false));
 
                     // If player is server player entity
                     if (player instanceof ServerPlayerEntity serverPlayerEntity) {
