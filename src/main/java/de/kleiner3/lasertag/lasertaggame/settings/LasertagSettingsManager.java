@@ -32,6 +32,11 @@ public class LasertagSettingsManager {
     //endregion
 
     public static Object get(String key) {
+        // If key not in settings
+        if (!settings.containsKey(key)) {
+            putDefault(key);
+        }
+
         return settings.get(key);
     }
 
@@ -60,6 +65,24 @@ public class LasertagSettingsManager {
 
         // Send to all clients
         ServerPlayNetworking.send(player, NetworkingConstants.LASERTAG_SETTINGS_SYNC, buf);
+    }
+
+    private static void putDefault(String key) {
+        // Get default settings
+        var defaultSettings = LasertagSettingsMap.createDefaultSettings();
+
+        // Get the default value
+        var defaultValue = defaultSettings.get(key);
+
+        // Put the default value in this settings
+        settings.put(key, defaultValue);
+
+        try {
+            // Write to config file
+            persistUnsafe();
+        } catch (IOException ex) {
+            LasertagMod.LOGGER.warn("Persisting of lasertag config file in '" + lasertagConfigFilePath + "' failed: " + ex.getMessage());
+        }
     }
 
     //region Persistence
