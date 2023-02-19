@@ -39,6 +39,7 @@ public class LasertagSettingsCommand {
         LasertagWeaponReachSettingCommand.register(cmd);
         GenerateStatisticsFileSettingCommand.register(cmd);
         AutoOpenStatisticsFileSettingCommand.register(cmd);
+        OriginSpawnSettingCommand.register(cmd);
 
         lab.then(cmd);
     }

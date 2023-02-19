@@ -40,6 +40,7 @@ public class LasertagSettingsMap implements Map<String, Object> {
         settings.put(SettingNames.PLAY_TIME, 10);
         settings.put(SettingNames.GEN_STATS_FILE, true);
         settings.put(SettingNames.AUTO_OPEN_STATS_FILE, true);
+        settings.put(SettingNames.ORIGIN_SPAWN, true);
 
         return settings;
     }

@@ -15,4 +15,5 @@ public class SettingNames {
     public static final String PLAY_TIME = "playTime";
     public static final String GEN_STATS_FILE = "generateStatsFile";
     public static final String AUTO_OPEN_STATS_FILE = "autoOpenStatsFile";
+    public static final String ORIGIN_SPAWN = "originSpawn";
 }

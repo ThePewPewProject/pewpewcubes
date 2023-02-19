@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.events.callback;
 
 import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
 import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.server.MinecraftServer;
@@ -19,11 +20,14 @@ public class PlayerJoinEventHandler {
         // Get the player
         ServerPlayerEntity player = handler.getPlayer();
 
-        // Teleport to spawn
-        player.requestTeleport(0.5F, 1, 0.5F);
+        // If origin spawn setting is enabled
+        if ((boolean)LasertagSettingsManager.get(SettingNames.ORIGIN_SPAWN)) {
+            // Teleport to spawn
+            player.requestTeleport(0.5F, 1, 0.5F);
 
-        // Set players spawnpoint
-        player.setSpawnPoint(World.OVERWORLD, new BlockPos(0, 1, 0), 0.0F, true, false);
+            // Set players spawnpoint
+            player.setSpawnPoint(World.OVERWORLD, new BlockPos(0, 1, 0), 0.0F, true, false);
+        }
 
         // Sync settings
         LasertagSettingsManager.syncToPlayer(player);
