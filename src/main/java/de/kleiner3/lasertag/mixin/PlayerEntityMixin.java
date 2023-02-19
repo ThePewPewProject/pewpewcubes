@@ -13,16 +13,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Optional;
 
 /**
  * Mixin into the PlayerEntity class to implement the ILasertagPlayer
@@ -134,10 +126,5 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
     @Override
     public String getLasertagUsername() {
         return ((PlayerEntity)(Object)this).getDisplayName().getString();
-    }
-
-    @Inject(method = "findRespawnPosition", at = @At("HEAD"), cancellable = true)
-    private static void onFindRespawnPoint(ServerWorld world, BlockPos pos, float angle, boolean forced, boolean alive, CallbackInfoReturnable<Optional<Vec3d>> cir) {
-        cir.setReturnValue(Optional.of(new Vec3d(0.5, 0, 0.5)));
     }
 }

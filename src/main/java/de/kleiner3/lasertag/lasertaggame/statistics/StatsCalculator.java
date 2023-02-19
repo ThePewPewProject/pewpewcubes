@@ -1,13 +1,11 @@
 package de.kleiner3.lasertag.lasertaggame.statistics;
 
-import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
 import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
 import de.kleiner3.lasertag.common.types.Tuple;
+import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamMap;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Class to calculate the lasertag game stats
@@ -15,11 +13,11 @@ import java.util.List;
  * @author Étienne Muser
  */
 public class StatsCalculator {
-    private final HashMap<TeamDto, ? extends List<? extends ILasertagPlayer>> teamMap;
+    private final TeamMap teamMap;
 
     private GameStats lastGamesStats;
 
-    public StatsCalculator(HashMap<TeamDto, ? extends List<? extends ILasertagPlayer>> teamMap) {
+    public StatsCalculator(TeamMap teamMap) {
         this.teamMap = teamMap;
     }
 
