@@ -63,7 +63,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
      */
     private TeamMap teamMap;
 
-    private final StatsCalculator statsCalculator = new StatsCalculator(teamMap);
+    private StatsCalculator statsCalculator;
 
     private List<LaserTargetBlockEntity> lasertargetsToReset = new LinkedList<>();
 
@@ -91,6 +91,9 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         for (TeamDto teamDto : TeamConfigManager.teamConfig.values()) {
             teamMap.put(teamDto, new LinkedList<>());
         }
+
+        // Init stats calculator
+        statsCalculator = new StatsCalculator(teamMap);
     }
 
     //region ILasertagGame
@@ -131,8 +134,8 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
                     // Give player mining fatigue
                     player.addStatusEffect(
                             new StatusEffectInstance(StatusEffect.byRawId(4),
-                                    (((int)(long)LasertagSettingsManager.get(SettingNames.PLAY_TIME)) * 60 * 20) +
-                                            (((int)(long)LasertagSettingsManager.get(SettingNames.START_TIME)) * 20) + 40,
+                                    (((int) (long) LasertagSettingsManager.get(SettingNames.PLAY_TIME)) * 60 * 20) +
+                                            (((int) (long) LasertagSettingsManager.get(SettingNames.START_TIME)) * 20) + 40,
                                     Integer.MAX_VALUE,
                                     false,
                                     false));
@@ -358,26 +361,30 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         }
         lasertargetsToReset = new LinkedList<>();
 
-        // Calculate stats
-        statsCalculator.calcStats();
+        try {
+            // Calculate stats
+            statsCalculator.calcStats();
 
-        // Create packet
-        var buf = new PacketByteBuf(Unpooled.buffer());
+            // Create packet
+            var buf = new PacketByteBuf(Unpooled.buffer());
 
-        // Get last games stats
-        var stats = statsCalculator.getLastGamesStats();
+            // Get last games stats
+            var stats = statsCalculator.getLastGamesStats();
 
-        // Get gson builder
-        var gsonBuilder = TeamDtoSerializer.getSerializer();
+            // Get gson builder
+            var gsonBuilder = TeamDtoSerializer.getSerializer();
 
-        // To json
-        var jsonString = gsonBuilder.create().toJson(stats, GameStats.class);
+            // To json
+            var jsonString = gsonBuilder.create().toJson(stats, GameStats.class);
 
-        // Write to buffer
-        buf.writeString(jsonString);
+            // Write to buffer
+            buf.writeString(jsonString);
 
-        // Send statistics to clients
-        ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_STATISTICS, buf);
+            // Send statistics to clients
+            ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_STATISTICS, buf);
+        } catch (Exception e) {
+            LasertagMod.LOGGER.error("ERROR:", e);
+        }
     }
 
     /**
