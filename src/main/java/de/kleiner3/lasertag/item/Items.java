@@ -25,6 +25,8 @@ public class Items {
         // Block items
         Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block"),
                 new BlockItem(Blocks.ARENA_BLOCK, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_dark"),
+                new BlockItem(Blocks.ARENA_BLOCK_DARK, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
         Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_stairs"),
                 new BlockItem(Blocks.ARENA_BLOCK_STAIRS, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
         Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_slab"),

@@ -11,7 +11,8 @@ import net.minecraft.util.registry.Registry;
 
 public class Blocks {
     // Create instances for all blocks
-    public static final Block ARENA_BLOCK = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
+    public static final Block ARENA_BLOCK = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f).luminance(15));
+    public static final Block ARENA_BLOCK_DARK = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
     public static final Block ARENA_BLOCK_STAIRS = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
     public static final Block ARENA_BLOCK_SLAB = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
     public static final Block ARENA_DIVIDER = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
@@ -20,6 +21,7 @@ public class Blocks {
 
     public static void register() {
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "arena_block"), ARENA_BLOCK);
+        Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "arena_block_dark"), ARENA_BLOCK_DARK);
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "arena_block_stairs"), ARENA_BLOCK_STAIRS);
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "arena_block_slab"), ARENA_BLOCK_SLAB);
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "arena_divider"), ARENA_DIVIDER);
