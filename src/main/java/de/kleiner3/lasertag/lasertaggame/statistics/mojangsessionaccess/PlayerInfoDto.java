@@ -5,5 +5,7 @@ package de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess;
  *
  * @author Étienne Muser
  */
-public record PlayerInfoDto(String name, String id) {
+public class PlayerInfoDto {
+    public String name;
+    public String id;
 }

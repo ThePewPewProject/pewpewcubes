@@ -7,8 +7,9 @@ import java.util.HashMap;
  *
  * @author Étienne Muser
  */
-public record ProfileTextureDto(long timestamp,
-                                String profileId,
-                                String profileName,
-                                HashMap<String, TextureObjectDto> textures) {
+public class ProfileTextureDto {
+    public long timestamp;
+    public String profileId;
+    public String profileName;
+    public HashMap<String, TextureObjectDto> textures;
 }

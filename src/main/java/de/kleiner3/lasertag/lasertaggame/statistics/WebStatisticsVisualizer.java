@@ -194,7 +194,7 @@ public class WebStatisticsVisualizer {
         var playerInfoInputStreamReader = new InputStreamReader(playerInfoUrl.openStream());
 
         // Get uuid of player
-        var uuid = new Gson().fromJson(playerInfoInputStreamReader, PlayerInfoDto.class).id();
+        var uuid = new Gson().fromJson(playerInfoInputStreamReader, PlayerInfoDto.class).id;
 
         // Url to session profile of player
         var sessionProfileUrl = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid);
@@ -203,12 +203,12 @@ public class WebStatisticsVisualizer {
         var sessionProfileInputStreamReader = new InputStreamReader(sessionProfileUrl.openStream());
 
         // Get base64 encoded texture json
-        var encodedTextureJson = new Gson().fromJson(sessionProfileInputStreamReader, SessionPlayerProfileDto.class).properties()[0].value();
+        var encodedTextureJson = new Gson().fromJson(sessionProfileInputStreamReader, SessionPlayerProfileDto.class).properties[0].value;
 
         // Decode
         var decodedTextureJson = new String(Base64.getDecoder().decode(encodedTextureJson), StandardCharsets.UTF_8);
 
         // Get skin url
-        return new Gson().fromJson(decodedTextureJson, ProfileTextureDto.class).textures().get("SKIN").url();
+        return new Gson().fromJson(decodedTextureJson, ProfileTextureDto.class).textures.get("SKIN").url;
     }
 }
