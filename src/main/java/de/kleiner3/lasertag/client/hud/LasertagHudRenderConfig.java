@@ -29,7 +29,7 @@ public class LasertagHudRenderConfig {
 
     public double progress = 0.0;
 
-    public int startingIn = -1;
+    public long startingIn = -1;
 
     // The logical size of the window
     public int width;

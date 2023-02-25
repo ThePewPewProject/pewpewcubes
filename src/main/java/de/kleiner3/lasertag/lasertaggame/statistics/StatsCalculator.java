@@ -25,11 +25,11 @@ public class StatsCalculator {
         lastGamesStats = new GameStats();
         for (TeamDto teamDto : teamMap.keySet()) {
             var team = teamMap.get(teamDto);
-            int teamScore = 0;
+            var teamScore = 0L;
 
-            var playersOfThisTeam = new ArrayList<Tuple<String, Integer>>();
+            var playersOfThisTeam = new ArrayList<Tuple<String, Long>>();
             for (var player : team) {
-                int playerScore = player.getLasertagScore();
+                var playerScore = player.getLasertagScore();
                 var playerScoreTuple = new Tuple<>(player.getLasertagUsername(), playerScore);
                 teamScore += playerScore;
                 lastGamesStats.playerScores.add(playerScoreTuple);
@@ -43,10 +43,10 @@ public class StatsCalculator {
         }
 
         // Sort stats
-        lastGamesStats.teamScores.sort(Comparator.<Tuple<String, Integer>>comparingInt(t -> t.y()).reversed());
-        lastGamesStats.playerScores.sort(Comparator.<Tuple<String, Integer>>comparingInt(t -> t.y()).reversed());
+        lastGamesStats.teamScores.sort(Comparator.<Tuple<String, Long>>comparingLong(t -> t.y()).reversed());
+        lastGamesStats.playerScores.sort(Comparator.<Tuple<String, Long>>comparingLong(t -> t.y()).reversed());
         for (var team : lastGamesStats.teamPlayerScores.values()) {
-            team.sort(Comparator.<Tuple<String, Integer>>comparingInt(t -> t.y()).reversed());
+            team.sort(Comparator.<Tuple<String, Long>>comparingLong(t -> t.y()).reversed());
         }
     }
 

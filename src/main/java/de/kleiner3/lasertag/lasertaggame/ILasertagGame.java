@@ -48,7 +48,7 @@ public interface ILasertagGame {
      * @param player The player who scored
      * @param score The score he scored
      */
-    default void onPlayerScored(PlayerEntity player, int score) {
+    default void onPlayerScored(PlayerEntity player, long score) {
         // Default empty
     }
 

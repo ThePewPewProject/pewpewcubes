@@ -43,7 +43,7 @@ public class LaserTargetBlockEntity extends BlockEntity {
             return;
         }
 
-        server.onPlayerScored(playerEntity, (int)(long)LasertagSettingsManager.get(SettingNames.LASERTARGET_HIT_SCORE));
+        server.onPlayerScored(playerEntity, (long)LasertagSettingsManager.get(SettingNames.LASERTARGET_HIT_SCORE));
         ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) playerEntity);
 
         // Register on server

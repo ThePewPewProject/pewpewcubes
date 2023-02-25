@@ -26,11 +26,11 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
     /**
      * The players lasertag score
      */
-    private int score = 0;
+    private long score = 0;
     private TeamDto team = null;
 
     @Override
-    public int getLasertagScore() {
+    public long getLasertagScore() {
         return score;
     }
 
@@ -40,7 +40,7 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
     }
 
     @Override
-    public void increaseScore(int score) {
+    public void increaseScore(long score) {
         this.score += score;
     }
 
@@ -80,7 +80,7 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
         // Get the server
         MinecraftServer server = player.getServer();
         if (server != null) {
-            server.onPlayerScored(player, (int)(long)LasertagSettingsManager.get(SettingNames.PLAYER_HIT_SCORE));
+            server.onPlayerScored(player, (long)LasertagSettingsManager.get(SettingNames.PLAYER_HIT_SCORE));
             ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) player);
         }
     }

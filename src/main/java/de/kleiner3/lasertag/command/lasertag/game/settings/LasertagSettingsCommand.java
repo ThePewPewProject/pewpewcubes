@@ -17,7 +17,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class LasertagSettingsCommand {
     @SuppressWarnings("SameReturnValue")
     private static int execute(CommandContext<ServerCommandSource> context) {
-        context.getSource().sendFeedback(Text.literal(LasertagSettingsManager.get()), false);
+        context.getSource().sendFeedback(Text.literal(LasertagSettingsManager.toJson()), false);
         return Command.SINGLE_SUCCESS;
     }
 

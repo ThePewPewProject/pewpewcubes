@@ -15,15 +15,15 @@ public class GameStats {
     /**
      * Map every team to the teams combined score ordered by score
      */
-    public final ArrayList<Tuple<String, Integer>> teamScores = new ArrayList<>(6);
+    public final ArrayList<Tuple<String, Long>> teamScores = new ArrayList<>(6);
 
     /**
      * Map every player to his score ordered by score
      */
-    public final ArrayList<Tuple<String, Integer>> playerScores = new ArrayList<>();
+    public final ArrayList<Tuple<String, Long>> playerScores = new ArrayList<>();
 
     /**
      * Map every team to the teams players and their scores ordered by scores inside the teams
      */
-    public final HashMap<String, List<Tuple<String, Integer>>> teamPlayerScores = new HashMap<>();
+    public final HashMap<String, List<Tuple<String, Long>>> teamPlayerScores = new HashMap<>();
 }

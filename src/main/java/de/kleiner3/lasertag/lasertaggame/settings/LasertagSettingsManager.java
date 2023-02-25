@@ -40,7 +40,7 @@ public class LasertagSettingsManager {
         return settings.get(key);
     }
 
-    public static String get() {
+    public static String toJson() {
         return new GsonBuilder().setPrettyPrinting().create().toJson(settings);
     }
 

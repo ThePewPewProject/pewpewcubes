@@ -12,7 +12,7 @@ public interface ILasertagPlayer {
     /**
      * @return The lasertag score of the player
      */
-    default int getLasertagScore() {
+    default long getLasertagScore() {
         return -1;
     }
 
@@ -28,7 +28,7 @@ public interface ILasertagPlayer {
      *
      * @param score The amount
      */
-    default void increaseScore(int score) {
+    default void increaseScore(long score) {
         // Default empty
     }
 

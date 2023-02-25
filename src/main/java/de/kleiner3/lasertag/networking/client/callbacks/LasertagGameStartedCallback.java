@@ -23,7 +23,7 @@ public class LasertagGameStartedCallback implements ClientPlayNetworking.PlayCha
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
         // TODO: Assert that this method does nothing if game is already running
         LasertagHudOverlay.renderData.progress = 0.0;
-        LasertagHudOverlay.renderData.startingIn = (int)(long) LasertagSettingsManager.get(SettingNames.START_TIME);
+        LasertagHudOverlay.renderData.startingIn = (long) LasertagSettingsManager.get(SettingNames.START_TIME);
         LasertagHudOverlay.renderData.shouldRenderNameTags = false;
 
         // Start pregame count down timer

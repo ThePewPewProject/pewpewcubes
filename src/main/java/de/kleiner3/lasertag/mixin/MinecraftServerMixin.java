@@ -26,7 +26,6 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -261,7 +260,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     }
 
     @Override
-    public void onPlayerScored(PlayerEntity player, int score) {
+    public void onPlayerScored(PlayerEntity player, long score) {
         player.increaseScore(score);
 
         notifyPlayersAboutUpdate();
@@ -406,14 +405,14 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         ServerEventSending.sendToEveryone(getOverworld(), NetworkingConstants.LASERTAG_GAME_TEAM_OR_SCORE_UPDATE, buf);
     }
 
-    private HashMap<String, List<Tuple<String, Integer>>> buildSimplifiedTeamMap() {
+    private HashMap<String, List<Tuple<String, Long>>> buildSimplifiedTeamMap() {
         // Create simplified team map
-        final HashMap<String, List<Tuple<String, Integer>>> simplifiedTeamMap = new HashMap<>();
+        final HashMap<String, List<Tuple<String, Long>>> simplifiedTeamMap = new HashMap<>();
 
         // For each team
         for (var t : TeamConfigManager.teamConfig.values()) {
             // Create a new list of (player name, player score) tuples
-            List<Tuple<String, Integer>> playerDatas = new LinkedList<>();
+            List<Tuple<String, Long>> playerDatas = new LinkedList<>();
 
             // For every player in the team
             for (var player : teamMap.get(t)) {
