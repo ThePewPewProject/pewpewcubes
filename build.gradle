@@ -1,6 +1,9 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+
 plugins {
 	id 'fabric-loom' version '1.0-SNAPSHOT'
 	id 'maven-publish'
+	id 'com.github.johnrengelman.shadow' version '7.1.2'
 	id 'java'
 }
 
@@ -19,9 +22,36 @@ repositories {
 	// for more information about repositories.
 
 	// GeckoLib
-	maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+	maven {
+		name = "GeckoLib"
+		url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
+	}
 
 	mavenCentral()
+}
+
+configurations {
+	// extends the shadowJar configuration
+	shadowMe
+	// have implemented dependencies automatically embedded in the final jar
+	implementation.extendsFrom(shadowMe)
+
+	customModule
+	implementation.extendsFrom(customModule)
+
+	if (isMinecraftSubProject) {
+		// Shadow common
+		common
+		shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+		compileClasspath.extendsFrom common
+		runtimeClasspath.extendsFrom common
+		developmentForge.extendsFrom common
+	}
+
+
+	addModJar
+	include.extendsFrom addModJar
+	modImplementation.extendsFrom addModJar
 }
 
 dependencies {
@@ -35,15 +65,26 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	// Uncomment the following line to enable the deprecated Fabric API modules. 
-	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
-
-	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
-
 	// GeckoLib
-	modImplementation 'software.bernie.geckolib:geckolib-fabric-1.19:3.1.38'
+	addModJar 'software.bernie.geckolib:geckolib-fabric-1.19:3.1.38'
+}
 
-	implementation 'com.google.code.gson:gson:2.10.1'
+shadowJar {
+	configurations = [project.configurations.shadowCommon, project.configurations.shadowMe, project.configurations.customModule]
+
+	exclude 'software/bernie/example/**'
+	exclude 'assets/geckolib3/**'
+	exclude '**/*.java'
+
+	relocate 'software.bernie.geckolib', 'lasertag.shadowed.software.bernie.geckolib'
+	relocate 'software.bernie.shadowed', 'lasertag.shadowed.software.bernie.shadowed'
+
+	mergeServiceFiles()
+}
+
+remapJar {
+	inputs.file shadowJar.archiveFile
+	dependsOn shadowJar
 }
 
 processResources {
