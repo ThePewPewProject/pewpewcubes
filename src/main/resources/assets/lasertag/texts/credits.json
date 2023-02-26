@@ -48,6 +48,13 @@
         "names": [
           "Aaron Werner aka Sol Astrum"
         ]
+      },
+      {
+        "title": "Powered by",
+        "names": [
+          "GeckoLib     MIT license",
+          "Fabric API   Apache-2.0 license"
+        ]
       }
     ]
   }
