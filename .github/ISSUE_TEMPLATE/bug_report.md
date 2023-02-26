@@ -3,7 +3,7 @@ name: Bug report
 about: Create a report to help us improve
 title: ''
 labels: 'bug'
-assignees: ''
+assignees: 'efibs'
 
 ---
 
@@ -26,7 +26,6 @@ If applicable, add screenshots to help explain your problem.
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows 11]
  - Minecraft Version: [e.g. 1.19.2]
- - GeckoLib Version: [e.g. 3.1.37]
  - Additional Mods: [e.g. None; e.g. Lithium v0.10.2, Sodium v0.4.4, ...]
 
 **Additional context**
