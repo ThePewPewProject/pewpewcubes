@@ -36,6 +36,7 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
     /**
      * Renders the entity
      */
+    // TODO: Refactor rendering
     @Override
     public void render(LaserRayEntity laserRayEntity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         long worldTime = laserRayEntity.getWorld().getTime();
