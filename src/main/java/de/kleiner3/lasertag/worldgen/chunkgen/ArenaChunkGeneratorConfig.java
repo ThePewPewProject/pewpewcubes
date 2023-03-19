@@ -26,6 +26,6 @@ public class ArenaChunkGeneratorConfig {
     }
 
     public static ArenaChunkGeneratorConfig getDefaultConfig() {
-        return new ArenaChunkGeneratorConfig(1);
+        return new ArenaChunkGeneratorConfig(0);
     }
 }

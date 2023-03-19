@@ -10,11 +10,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.structure.StructureSet;
 import net.minecraft.structure.StructureTemplate;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
 import net.minecraft.util.collection.Pool;
 import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.math.BlockBox;
@@ -61,8 +58,7 @@ public class ArenaChunkGenerator extends ChunkGenerator {
                 .forGetter(ArenaChunkGenerator::getConfig))
             .apply(instance, instance.stable(ArenaChunkGenerator::new)));
 
-    private StructureTemplate structureTemplate;
-    private StructurePlacementData basePlacementData;
+    private StructureTemplate arenaTemplate;
     private Vec3i size;
     private BlockPos startPos;
 
@@ -112,19 +108,14 @@ public class ArenaChunkGenerator extends ChunkGenerator {
             }
         }
 
-        this.structureTemplate = new StructureTemplate();
-        this.structureTemplate.readNbt(nbt);
-        this.basePlacementData = new StructurePlacementData().setMirror(BlockMirror.NONE).setRotation(BlockRotation.NONE).setIgnoreEntities(false);
-        this.size = structureTemplate.getSize();
+        this.arenaTemplate = new StructureTemplate();
+        this.arenaTemplate.readNbt(nbt);
+        this.size = arenaTemplate.getSize();
         this.startPos = BlockPos.ORIGIN.subtract(arenaType.placementOffset);
     }
 
     @Override
     public void generateFeatures(StructureWorldAccess world, Chunk chunk, StructureAccessor structureAccessor) {
-        if (chunk.getPos().x < -8 || chunk.getPos().z < -8 || chunk.getPos().x > 8 || chunk.getPos().z > 8) {
-            return;
-        }
-
         var bBox = getBlockBoxForChunk(chunk);
 
         // If chunk does not intersect with arena bounding box, do nothing
@@ -134,18 +125,17 @@ public class ArenaChunkGenerator extends ChunkGenerator {
         }
 
         // Place the arena
-        StructurePlacementData structurePlacementData = basePlacementData.setBoundingBox(bBox);
-        structureTemplate.place(world, startPos, BlockPos.ORIGIN, structurePlacementData, world.getRandom(), 2);
+        ArenaStructurePlacer.placeArenaChunkSegment(arenaTemplate, bBox, this.startPos, world);
     }
 
     private static BlockBox getBlockBoxForChunk(Chunk chunk) {
         ChunkPos chunkPos = chunk.getPos();
-        int i = chunkPos.getStartX();
-        int j = chunkPos.getStartZ();
+        int startX = chunkPos.getStartX();
+        int startZ = chunkPos.getStartZ();
         HeightLimitView heightLimitView = chunk.getHeightLimitView();
-        int k = heightLimitView.getBottomY() + 1;
-        int l = heightLimitView.getTopY() - 1;
-        return new BlockBox(i, k, j, i + 15, l, j + 15);
+        int startY = heightLimitView.getBottomY() + 1;
+        int endY = heightLimitView.getTopY() - 1;
+        return new BlockBox(startX, startY, startZ, startX + 15, endY, startZ + 15);
     }
 
     public ArenaChunkGeneratorConfig getConfig() {
@@ -195,7 +185,9 @@ public class ArenaChunkGenerator extends ChunkGenerator {
 
     @Override
     public void populateEntities(ChunkRegion region) {
-        // Empty
+
+        // Place the arena entities
+        ArenaStructurePlacer.spawnEntitiesOfArena(arenaTemplate, this.startPos, region);
     }
 
     @Override
