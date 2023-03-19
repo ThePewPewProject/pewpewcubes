@@ -45,10 +45,12 @@ public class NbtUtil {
             return null;
         }
 
+        // TODO: Workaround - A Entity on the desert map crashes the game while generating
+        /*
         // Add entities list
         if (!addEntities(nbt, mainRegionCompound)) {
             return null;
-        }
+        } */
 
         // Get size element
         var sizeElement = mainRegionCompound.get("Size");

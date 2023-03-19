@@ -1,5 +1,7 @@
 package de.kleiner3.lasertag.worldgen.chunkgen;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.common.util.NbtUtil;
 import de.kleiner3.lasertag.resource.ResourceManagers;
@@ -13,8 +15,8 @@ import net.minecraft.structure.StructureSet;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.Pool;
+import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -48,24 +50,40 @@ import java.util.concurrent.Executor;
  *
  * @author Étienne Muser
  */
-public abstract class ArenaChunkGenerator extends ChunkGenerator {
+public class ArenaChunkGenerator extends ChunkGenerator {
     // TODO: Set difficulty to peaceful
+
+    public static final Codec<ArenaChunkGenerator> CODEC = RecordCodecBuilder.create((instance) ->
+            createStructureSetRegistryGetter(instance)
+            .and(RegistryOps.createRegistryCodec(Registry.BIOME_KEY)
+                .forGetter(chunkGenerator -> chunkGenerator.biomeRegistry))
+            .and(ArenaChunkGeneratorConfig.CODEC.fieldOf("settings")
+                .forGetter(ArenaChunkGenerator::getConfig))
+            .apply(instance, instance.stable(ArenaChunkGenerator::new)));
 
     private StructureTemplate structureTemplate;
     private StructurePlacementData basePlacementData;
     private Vec3i size;
     private BlockPos startPos;
 
+    private final ArenaChunkGeneratorConfig config;
+    private final Registry<Biome> biomeRegistry;
+
     /**
      * The constructor to use to generate an arena
-     * @param structureSetRegistry Should be BuiltinRegistries.STRUCTURE_SET
-     * @param biome The biome for the arena (new FixedBiomeSource(biomeRegistry.getOrCreateEntry(BiomeKeys.YOUR_BIOME)))
-     * @param nbtFileId The id of the nbt file where the arena data is stored. Size has to be >0 in x, y and z! If this is a .litematic file the used region has to be called "main"
-     * @param placementOffset The offset with which to place the arena. Insert the coordinates of the world spawn point block so that this block is 0, 0, 0
-     *                        (To calculate: Generate arena with offset 0,0,0 and use the targeted block coordinates of the desired spawn point block as the offset)
+     * @param config The arena chunk generator config
      */
-    public ArenaChunkGenerator(Registry<StructureSet> structureSetRegistry, FixedBiomeSource biome, Identifier nbtFileId, Vec3i placementOffset) {
-        super(structureSetRegistry, Optional.empty(), biome);
+    public ArenaChunkGenerator(Registry<StructureSet> structureSetRegistry, Registry<Biome> biomeRegistry,  ArenaChunkGeneratorConfig config) {
+        super(structureSetRegistry, Optional.empty(), new FixedBiomeSource(biomeRegistry.getOrCreateEntry(config.getType().biome)));
+
+        this.config = config;
+        this.biomeRegistry = biomeRegistry;
+
+        // Get the arena type
+        var arenaType = config.getType();
+
+        // Get the nbt file id
+        var nbtFileId = arenaType.nbtFileId;
 
         // Read nbt file
         var resource = ResourceManagers.STRUCTURE_RESOURCE_MANAGER.get(nbtFileId);
@@ -98,17 +116,16 @@ public abstract class ArenaChunkGenerator extends ChunkGenerator {
         this.structureTemplate.readNbt(nbt);
         this.basePlacementData = new StructurePlacementData().setMirror(BlockMirror.NONE).setRotation(BlockRotation.NONE).setIgnoreEntities(false);
         this.size = structureTemplate.getSize();
-        this.startPos = BlockPos.ORIGIN.subtract(placementOffset);
+        this.startPos = BlockPos.ORIGIN.subtract(arenaType.placementOffset);
     }
 
     @Override
     public void generateFeatures(StructureWorldAccess world, Chunk chunk, StructureAccessor structureAccessor) {
-        var bBox = getBlockBoxForChunk(chunk);
-
-        if (startPos == null) {
-            LasertagMod.LOGGER.error("Error while generating arena chunk " + chunk.getPos() + ": startPos was null.");
+        if (chunk.getPos().x < -8 || chunk.getPos().z < -8 || chunk.getPos().x > 8 || chunk.getPos().z > 8) {
             return;
         }
+
+        var bBox = getBlockBoxForChunk(chunk);
 
         // If chunk does not intersect with arena bounding box, do nothing
         if (bBox.getMaxX() < startPos.getX() || bBox.getMinX() > (startPos.getX() + size.getX()) ||
@@ -129,6 +146,10 @@ public abstract class ArenaChunkGenerator extends ChunkGenerator {
         int k = heightLimitView.getBottomY() + 1;
         int l = heightLimitView.getTopY() - 1;
         return new BlockBox(i, k, j, i + 15, l, j + 15);
+    }
+
+    public ArenaChunkGeneratorConfig getConfig() {
+        return config;
     }
 
     @Override
@@ -190,5 +211,10 @@ public abstract class ArenaChunkGenerator extends ChunkGenerator {
     @Override
     public int getSeaLevel() {
         return -63;
+    }
+
+    @Override
+    public Codec<ArenaChunkGenerator> getCodec() {
+        return CODEC;
     }
 }

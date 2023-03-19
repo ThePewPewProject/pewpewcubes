@@ -11,6 +11,6 @@ import net.minecraft.util.registry.Registry;
  */
 public class ChunkGenerators {
     public static void register() {
-        Registry.register(Registry.CHUNK_GENERATOR, new Identifier(LasertagMod.ID, "jungle_arena_chunk_generator"), JungleArenaChunkGenerator.CODEC);
+        Registry.register(Registry.CHUNK_GENERATOR, new Identifier(LasertagMod.ID, "arena_chunk_generator"), ArenaChunkGenerator.CODEC);
     }
 }
