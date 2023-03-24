@@ -32,7 +32,7 @@ public class RaycastUtil {
         Vec3d ray = startPos.add(direction.x * maxDistance, direction.y * maxDistance, direction.z * maxDistance);
 
         // Do the block-raycast (ignore fluids) and return the result
-        BlockHitResult blockHit = playerEntity.world.raycast(new RaycastContext(startPos, ray, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, playerEntity));
+        BlockHitResult blockHit = playerEntity.world.raycast(new RaycastContext(startPos, ray, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, playerEntity));
 
         Box box = playerEntity
                 .getBoundingBox()
