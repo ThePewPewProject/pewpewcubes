@@ -25,6 +25,10 @@ public class ArenaChunkGeneratorConfig {
         return ArenaType.values()[type];
     }
 
+    public void setType(int type) {
+        this.type = type;
+    }
+
     public static ArenaChunkGeneratorConfig getDefaultConfig() {
         return new ArenaChunkGeneratorConfig(0);
     }

@@ -15,13 +15,16 @@ import net.minecraft.world.biome.BiomeKeys;
 public enum ArenaType {
     JUNGLE(BiomeKeys.JUNGLE,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/jungle_arena.litematic"),
-            new Vec3i(21, 3, 61)),
+            new Vec3i(21, 3, 61),
+            "arenaType.jungle"),
     DESERT(BiomeKeys.DESERT,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/desert_arena.litematic"),
-            new Vec3i(55, 1, 99)),
+            new Vec3i(55, 1, 99),
+            "arenaType.desert"),
     FLOWER_FOREST(BiomeKeys.JUNGLE,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/jungle_arena.litematic"),
-            new Vec3i(0, 0, 0));
+            new Vec3i(0, 0, 0),
+            "arenaType.flower_forest");
 
     /**
      * Enum Constructor
@@ -31,13 +34,16 @@ public enum ArenaType {
      * @param placementOffset The offset with which to place the arena. Insert the coordinates of the world spawn point block so that this block is 0, 0, 0
      *                        (To calculate: Generate arena with offset 0,0,0 and use the targeted block coordinates of the desired spawn point block as the offset)
      */
-    ArenaType(RegistryKey<Biome> biome, Identifier nbtFileId, Vec3i placementOffset) {
+    ArenaType(RegistryKey<Biome> biome, Identifier nbtFileId, Vec3i placementOffset, String translatableName) {
         this.biome = biome;
         this.nbtFileId = nbtFileId;
         this.placementOffset = placementOffset;
+        this.translatableName = translatableName;
     }
 
     public final RegistryKey<Biome> biome;
     public final  Identifier nbtFileId;
     public final  Vec3i placementOffset;
+
+    public final String translatableName;
 }

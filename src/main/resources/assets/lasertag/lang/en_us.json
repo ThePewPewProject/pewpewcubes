@@ -13,5 +13,9 @@
 	"item.lasertag.lasertag_weapon": "Lasertag Weapon",
 	"item.lasertag.lasertag_vest": "Lasertag Vest",
 
-	"generator.lasertag.lasertag_arena": "Lasertag Arena"
+	"generator.lasertag.lasertag_arena": "Lasertag Arena",
+	"selectWorld.arenaType": "Arena",
+	"arenaType.jungle": "Jungle",
+	"arenaType.desert": "Desert",
+	"arenaType.flower_forest": "Flower Forest"
 }
