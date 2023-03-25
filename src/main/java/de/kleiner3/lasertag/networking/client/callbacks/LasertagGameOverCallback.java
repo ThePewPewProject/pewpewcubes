@@ -15,13 +15,7 @@ import net.minecraft.network.PacketByteBuf;
 public class LasertagGameOverCallback implements ClientPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        synchronized (LasertagHudOverlay.renderData.gameTimerLock) {
-            if (LasertagHudOverlay.renderData.gameTimer != null) {
-                LasertagHudOverlay.renderData.gameTimer.shutdown();
-                LasertagHudOverlay.renderData.gameTimer = null;
-                LasertagHudOverlay.renderData.gameTime = 0;
-            }
-        }
+        LasertagHudOverlay.renderData.stopGameTimer();
 
         LasertagHudOverlay.renderData.shouldRenderNameTags = true;
     }

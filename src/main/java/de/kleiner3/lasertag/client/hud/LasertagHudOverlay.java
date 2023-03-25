@@ -23,6 +23,8 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
     public static LasertagHudRenderConfig renderData = new LasertagHudRenderConfig();
 
+    //region Rendering
+
     /**
      * Render the lasertag HUD overlay
      *
@@ -58,7 +60,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
     private void renderStartingIn(TextRenderer renderer, MatrixStack matrices) {
         // If starting in is -1 (the halting value)
-        if (renderData.startingIn == -1) {
+        if (renderData.startingIn <= -1) {
             // Abort
             return;
         }
@@ -164,4 +166,6 @@ public class LasertagHudOverlay implements HudRenderCallback {
         String scoreString = Integer.toString(teamScore);
         renderer.draw(matrices, scoreString, x + LasertagHudRenderConfig.boxWidth - LasertagHudRenderConfig.textPadding - renderer.getWidth(scoreString), y + LasertagHudRenderConfig.textPadding, 0xFFFFFF);
     }
+
+    //endregion
 }

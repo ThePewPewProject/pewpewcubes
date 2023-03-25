@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.events.callback;
 
+import de.kleiner3.lasertag.client.hud.LasertagHudOverlay;
 import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
 import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
 import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
@@ -32,10 +33,13 @@ public class PlayerJoinEventHandler {
         // Sync settings
         LasertagSettingsManager.syncToPlayer(player);
 
-        // Sync teams
+        // Sync team config
         TeamConfigManager.syncTeamsToClient(player);
 
         // Sync scores
         server.syncTeamsAndScoresToPlayer(player);
+
+        // Sync HUD to player
+        LasertagHudOverlay.renderData.syncToPlayer(player, server);
     }
 }
