@@ -3,12 +3,12 @@ package de.kleiner3.lasertag.entity;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.*;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -17,37 +17,63 @@ import net.minecraft.world.World;
  *
  * @author Étienne Muser
  */
-public class LaserRayEntity extends ProjectileEntity {
+public class LaserRayEntity extends Entity {
 
     /**
      * The color of the ray
      */
-    private final int color;
+    private int color;
     /**
      * The end of the laser ray in world coordinates
      */
     private Vec3d end;
 
-    public LaserRayEntity(EntityType<? extends ProjectileEntity> type, World world) {
-        super(type, world);
+    /**
+     * The start of the laser ray in world coordinates
+     */
+    private Vec3d start;
 
-        // Set default color Teal
-        color = 0xFFFFFFFF;
-        System.out.println("WRONG CONSTRUCTOR CALLED!!!");
+    public LaserRayEntity(EntityType<? extends LaserRayEntity> type, World world) {
+        super(type, world);
     }
 
     public LaserRayEntity(World world, LivingEntity owner, int color, HitResult hit) {
         this(world, owner.getEyePos(), owner.getYaw(), owner.getPitch(), color, hit.getPos());
     }
 
-    public LaserRayEntity(World world, Vec3d pos, float yaw, float pitch, int color, Vec3d endPos) {
+    public LaserRayEntity(World world, Vec3d startPos, float yaw, float pitch, int color, Vec3d endPos) {
         super(Entities.LASER_RAY, world);
 
         this.color = color;
+        this.start = startPos;
         this.end = endPos;
+
         this.setYaw(yaw);
         this.setPitch(pitch);
-        this.setPosition(pos);
+        this.setPosition(startPos);
+
+        float xWidth = (float) Math.abs(endPos.x - startPos.x);
+        float zWidth = (float) Math.abs(endPos.z - startPos.z);
+        float height = (float) Math.abs(endPos.y - startPos.y);
+        this.dimensions = EntityDimensions.changing(Math.max(xWidth, zWidth), height);
+    }
+
+    @Override
+    public EntityDimensions getDimensions(EntityPose pose) {
+        // Overwrite entity dimensions
+        return this.dimensions;
+    }
+
+    @Override
+    protected Box calculateBoundingBox() {
+        // If start or end pos are not set yet
+        if (this.start == null || this.end == null) {
+            // Bounding box cannot be calculated
+            return null;
+        }
+
+        // Create bounding box to go from laser ray start to end
+        return new Box(this.start, this.end);
     }
 
     public int getColor() {
@@ -63,9 +89,26 @@ public class LaserRayEntity extends ProjectileEntity {
         return end;
     }
 
+    /**
+     * Gets the start position of the ray in world coordinates
+     *
+     * @return the position vector of the start position
+     */
+    public Vec3d getStart() { return start; }
+
     @Override
     protected void initDataTracker() {
         // Empty
+    }
+
+    @Override
+    protected void readCustomDataFromNbt(NbtCompound nbt) {
+
+    }
+
+    @Override
+    protected void writeCustomDataToNbt(NbtCompound nbt) {
+
     }
 
     /**
