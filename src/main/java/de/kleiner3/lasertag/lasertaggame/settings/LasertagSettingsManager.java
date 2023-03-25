@@ -67,6 +67,11 @@ public class LasertagSettingsManager {
         ServerPlayNetworking.send(player, NetworkingConstants.LASERTAG_SETTINGS_SYNC, buf);
     }
 
+    public static void reset() {
+        // Set the default settings
+        settings = LasertagSettingsMap.createDefaultSettings();
+    }
+
     private static void putDefault(String key) {
         // Get default settings
         var defaultSettings = LasertagSettingsMap.createDefaultSettings();

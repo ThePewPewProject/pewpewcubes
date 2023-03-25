@@ -4,6 +4,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.command.lasertag.game.settings.LasertagSettingsCommand;
+import de.kleiner3.lasertag.command.lasertag.game.settings.ResetSettingsCommand;
 import net.minecraft.server.command.ServerCommandSource;
 
 import static net.minecraft.server.command.CommandManager.literal;
@@ -28,6 +29,7 @@ public class LasertagCommand {
         JoinLasertagTeamCommand.register(cmd);
         LeaveLasertagTeamCommand.register(cmd);
         LasertagSettingsCommand.register(cmd);
+        ResetSettingsCommand.register(cmd);
 
         dispatcher.register(cmd);
     }
