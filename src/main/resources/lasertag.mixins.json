@@ -9,10 +9,14 @@
     "fastiter.WorldMixin",
     "WorldPresetsMixin",
     "IStructureTemplateAccessor",
-    "gui.MoreWorldOptionsDialogMixin"
+    "PlayerManagerMixin"
   ],
   "client": [
-    "LivingEntityRendererMixin"
+    "LivingEntityRendererMixin",
+    "gui.MoreWorldOptionsDialogMixin"
+  ],
+  "server": [
+
   ],
   "injectors": {
     "defaultRequire": 1

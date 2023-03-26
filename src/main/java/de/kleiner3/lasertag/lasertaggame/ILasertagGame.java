@@ -1,10 +1,12 @@
 package de.kleiner3.lasertag.lasertaggame;
 
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
-import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
+import de.kleiner3.lasertag.common.types.Tuple;
+import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -20,16 +22,6 @@ public interface ILasertagGame {
      */
     default void startGame(boolean scanSpawnpoints) {
         // Default empty
-    }
-
-    /**
-     * Get all players currently assigned to the given team
-     *
-     * @param teamDto The team to get the players of
-     * @return The list of all players in this team
-     */
-    default List<PlayerEntity> getPlayersOfTeam(TeamDto teamDto) {
-        return new LinkedList<>();
     }
 
     /**
@@ -82,5 +74,45 @@ public interface ILasertagGame {
      */
     default void syncTeamsAndScoresToPlayer(ServerPlayerEntity player) {
         // Default empty
+    }
+
+    /**
+     * Notifies every player of this world about a team or score update
+     */
+    default void notifyPlayersAboutUpdate() {
+        // Default empty
+    }
+
+    /**
+     * Checks whether a palyer is in a team or not
+     * @param player
+     * @return If the player is in a team
+     */
+    default boolean isPlayerInTeam(ServerPlayerEntity player) {
+        return false;
+    }
+
+    /**
+     * Disposes the game. Stops all running timers etc.
+     */
+    default void dispose() {
+        // Default empty
+    }
+
+    /**
+     * Gets the simplified team map
+     * @return
+     */
+    default HashMap<String, List<Tuple<String, Long>>> getSimplifiedTeamMap() {
+        return null;
+    }
+
+    /**
+     * Gets the team of the player or null if he is in no team
+     * @param playerUuid The uuid of the player
+     * @return
+     */
+    default TeamDto getTeamOfPlayer(UUID playerUuid) {
+        return null;
     }
 }

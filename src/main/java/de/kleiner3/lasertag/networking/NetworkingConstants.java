@@ -15,9 +15,7 @@ public class NetworkingConstants {
     // ===== Lasertag game ==========
     public static final Identifier LASERTAG_GAME_TEAM_OR_SCORE_UPDATE = new Identifier(LasertagMod.ID, "lasertag_game_team_or_score_update");
     public static final Identifier LASERTAG_SETTINGS_CHANGED = new Identifier(LasertagMod.ID, "lasertag_settings_changed");
-    public static final Identifier LASERTAG_SETTINGS_SYNC = new Identifier(LasertagMod.ID, "lasertag_settings_sync");
-    public static final Identifier LASERTAG_TEAMS_SYNC = new Identifier(LasertagMod.ID, "lasertag_teams_sync");
-    public static final Identifier LASERTAG_HUD_SYNC = new Identifier(LasertagMod.ID, "lasertag_hud_sync");
+    public static final Identifier LASERTAG_GAME_MANAGER_SYNC = new Identifier(LasertagMod.ID, "lasertag_game_manager_sync");
     public static final Identifier PLAYER_DEACTIVATED_STATUS_CHANGED = new Identifier(LasertagMod.ID, "player_deactivated_status_changed");
     public static final Identifier GAME_STATISTICS = new Identifier(LasertagMod.ID, "game_statistics");
 

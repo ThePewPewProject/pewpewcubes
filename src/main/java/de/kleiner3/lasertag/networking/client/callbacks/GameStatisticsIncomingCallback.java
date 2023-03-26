@@ -2,11 +2,11 @@ package de.kleiner3.lasertag.networking.client.callbacks;
 
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.statistics.GameStats;
 import de.kleiner3.lasertag.lasertaggame.statistics.WebStatisticsVisualizer;
 import de.kleiner3.lasertag.resource.ResourceManagers;
-import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
-import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.mightypork.rpack.utils.DesktopApi;
@@ -34,7 +34,7 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
         var stats = new Gson().fromJson(json, GameStats.class);
 
         // If should generate file
-        if ((boolean) LasertagSettingsManager.get(SettingNames.GEN_STATS_FILE)) {
+        if (LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingNames.GEN_STATS_FILE)) {
 
             // Generate file
             var generatedFilePath = WebStatisticsVisualizer.build(stats, ResourceManagers.WEB_RESOURCE_MANAGER);
@@ -51,7 +51,7 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
             }
 
             // If should automatically open file
-            if ((boolean)LasertagSettingsManager.get(SettingNames.AUTO_OPEN_STATS_FILE)) {
+            if (LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingNames.AUTO_OPEN_STATS_FILE)) {
 
                 try {
                     DesktopApi.open(new File(generatedFilePath));

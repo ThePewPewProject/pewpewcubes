@@ -1,7 +1,6 @@
 package de.kleiner3.lasertag.events.callback;
 
-import de.kleiner3.lasertag.client.hud.LasertagHudOverlay;
-import de.kleiner3.lasertag.client.hud.LasertagHudRenderConfig;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 
@@ -12,10 +11,10 @@ import net.minecraft.server.world.ServerWorld;
  */
 public class ServerWorldUnloadedEventHandler {
     public static void onServerWorldUnloaded(MinecraftServer minecraftServer, ServerWorld serverWorld) {
-        // Dispose old render config
-        LasertagHudOverlay.renderData.dispose();
+        // Reset game manager
+        LasertagGameManager.reset();
 
-        // Set new render config
-        LasertagHudOverlay.renderData = new LasertagHudRenderConfig();
+        // Dispose server
+        minecraftServer.dispose();
     }
 }

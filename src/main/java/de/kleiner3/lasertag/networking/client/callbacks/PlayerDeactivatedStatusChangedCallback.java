@@ -1,6 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
-import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -20,6 +20,6 @@ public class PlayerDeactivatedStatusChangedCallback implements ClientPlayNetwork
         var deactivated = buf.readBoolean();
 
         // Set deactivated status
-        PlayerDeactivatedManager.setDeactivated(uuid, deactivated);
+        LasertagGameManager.getInstance().getDeactivatedManager().setDeactivated(uuid, deactivated);
     }
 }

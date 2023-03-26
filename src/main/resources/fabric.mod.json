@@ -40,7 +40,8 @@
 	"loom:injected_interfaces": {
 		"net/minecraft/server/MinecraftServer": ["de/kleiner3/lasertag/lasertaggame/ILasertagGame", "de/kleiner3/lasertag/lasertaggame/ITickable"],
 		"net/minecraft/entity/player/PlayerEntity": ["de/kleiner3/lasertag/lasertaggame/ILasertagPlayer"],
-        "net/minecraft/world/World": ["de/kleiner3/lasertag/common/util/fastiter/IFastWorldIter"]
+        "net/minecraft/world/World": ["de/kleiner3/lasertag/common/util/fastiter/IFastWorldIter"],
+        "net/minecraft/server/PlayerManager": ["de/kleiner3/lasertag/lasertaggame/management/team/player/IPlayerRepository"]
     }
   },
 

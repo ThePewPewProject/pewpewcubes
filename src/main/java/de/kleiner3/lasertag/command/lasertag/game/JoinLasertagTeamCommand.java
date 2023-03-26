@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.command.suggestions.TeamSuggestionProvider;
-import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -31,7 +31,7 @@ public class JoinLasertagTeamCommand {
         var player = context.getSource().getPlayer();
 
         // Get team
-        var teamDto = TeamConfigManager.teamConfig.get(teamName);
+        var teamDto =  LasertagGameManager.getInstance().getTeamManager().teamConfig.get(teamName);
 
         // Join team
         server.playerJoinTeam(teamDto, player);

@@ -5,7 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.concurrent.CompletableFuture;
@@ -40,7 +40,7 @@ public class TeamSuggestionProvider implements SuggestionProvider<ServerCommandS
             inputEmpty = true;
         }
 
-        for (String color : TeamConfigManager.teamConfig.keySet()) {
+        for (String color :  LasertagGameManager.getInstance().getTeamManager().teamConfig.keySet()) {
             if (inputEmpty || color.toLowerCase().startsWith(input.toLowerCase())) {
                 builder.suggest(color);
             }

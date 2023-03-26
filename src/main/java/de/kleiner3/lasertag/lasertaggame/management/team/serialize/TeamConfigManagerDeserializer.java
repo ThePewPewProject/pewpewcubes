@@ -1,7 +1,7 @@
-package de.kleiner3.lasertag.lasertaggame.teammanagement.serialize;
+package de.kleiner3.lasertag.lasertaggame.management.team.serialize;
 
 import com.google.gson.*;
-import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -18,10 +18,7 @@ public class TeamConfigManagerDeserializer {
      * Build a GsonBuilder for the TeamConfigManager
      * @return The GsonBuilder designed for the TeamConfigManager
      */
-    public static GsonBuilder getDeserializer() {
-        // Create builder
-        var gsonBuilder = new GsonBuilder();
-
+    public static JsonDeserializer<HashMap<String, TeamDto>> getDeserializer() {
         // Create deserializer for HashMap
         var deserializer = new JsonDeserializer<HashMap<String, TeamDto>>() {
             @Override
@@ -55,9 +52,6 @@ public class TeamConfigManagerDeserializer {
             }
         };
 
-        // Register deserializer for HashMap
-        gsonBuilder.registerTypeAdapter(HashMap.class, deserializer);
-
-        return gsonBuilder;
+        return deserializer;
     }
 }

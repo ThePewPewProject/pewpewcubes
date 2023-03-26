@@ -2,8 +2,8 @@ package de.kleiner3.lasertag.networking.client.callbacks;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import de.kleiner3.lasertag.client.hud.LasertagHudOverlay;
 import de.kleiner3.lasertag.common.types.Tuple;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -21,8 +21,8 @@ import java.util.LinkedList;
 public class TeamOrScoreUpdateCallback implements ClientPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        LasertagHudOverlay.renderData.teamMap = new Gson().fromJson(buf.readString(),
-                new TypeToken<HashMap<String, LinkedList<Tuple<String, Integer>>>>() {
+        LasertagGameManager.getInstance().getHudRenderManager().teamMap = new Gson().fromJson(buf.readString(),
+                new TypeToken<HashMap<String, LinkedList<Tuple<String, Long>>>>() {
                 }.getType());
     }
 }

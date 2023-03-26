@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.lasertaggame.teammanagement;
+package de.kleiner3.lasertag.lasertaggame.management.team;
 
 import de.kleiner3.lasertag.common.types.ColorDto;
 import net.minecraft.block.Block;

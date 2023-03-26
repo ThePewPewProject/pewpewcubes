@@ -1,6 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame.timing;
 
-import de.kleiner3.lasertag.client.hud.LasertagHudOverlay;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 
 import java.util.TimerTask;
 
@@ -13,14 +13,16 @@ public class PreGameCountDownTimerTask extends TimerTask {
 
     @Override
     public void run() {
-        --LasertagHudOverlay.renderData.startingIn;
+        var renderData = LasertagGameManager.getInstance().getHudRenderManager();
 
-        if (LasertagHudOverlay.renderData.startingIn <= -1) {
+        --renderData.startingIn;
+
+        if (renderData.startingIn <= -1) {
             // Stop countdown timer
-            LasertagHudOverlay.renderData.stopPreGameCountdownTimer();
+            renderData.stopPreGameCountdownTimer();
 
             // Start game count down timer
-            LasertagHudOverlay.renderData.startGameTimer(0);
+            renderData.startGameTimer(0);
         }
     }
 }

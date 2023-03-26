@@ -3,7 +3,7 @@ package de.kleiner3.lasertag.command.lasertag.game.settings;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -17,7 +17,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class LasertagSettingsCommand {
     @SuppressWarnings("SameReturnValue")
     private static int execute(CommandContext<ServerCommandSource> context) {
-        context.getSource().sendFeedback(Text.literal(LasertagSettingsManager.toJson()), false);
+        context.getSource().sendFeedback(Text.literal(LasertagGameManager.getInstance().getSettingsManager().toJson()), false);
         return Command.SINGLE_SUCCESS;
     }
 

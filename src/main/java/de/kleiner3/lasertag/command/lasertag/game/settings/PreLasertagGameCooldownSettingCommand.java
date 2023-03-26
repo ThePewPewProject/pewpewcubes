@@ -4,8 +4,8 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
-import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -22,7 +22,7 @@ public class PreLasertagGameCooldownSettingCommand {
     @SuppressWarnings("SameReturnValue")
     private static int execute(CommandContext<ServerCommandSource> context) {
         var value = LongArgumentType.getLong(context, "duration");
-        LasertagSettingsManager.set(context.getSource().getServer(), SettingNames.START_TIME, value);
+        LasertagGameManager.getInstance().getSettingsManager().set(context.getSource().getServer(), SettingNames.START_TIME, value);
         context.getSource().getServer().getPlayerManager().broadcast(Text.literal("Lasertag setting preGameCooldown is now set to " + value), false);
         return Command.SINGLE_SUCCESS;
     }

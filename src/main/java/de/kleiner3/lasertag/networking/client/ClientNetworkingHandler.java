@@ -21,9 +21,7 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_OVER, new LasertagGameOverCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PROGRESS, new ProgressCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_SETTINGS_CHANGED, new LasertagSettingsChangedCallback());
-        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_SETTINGS_SYNC, new LasertagSettingsSyncCallback());
-        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_HUD_SYNC, new LasertagHudSyncCallback());
-        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_TEAMS_SYNC, new LasertagTeamsSyncCallback());
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTAG_GAME_MANAGER_SYNC, new LasertagGameManagerSyncCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_DEACTIVATED_STATUS_CHANGED, new PlayerDeactivatedStatusChangedCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_STATISTICS, new GameStatisticsIncomingCallback());
     }
