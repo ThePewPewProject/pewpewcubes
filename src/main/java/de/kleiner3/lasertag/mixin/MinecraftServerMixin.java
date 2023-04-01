@@ -187,6 +187,20 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     }
 
     @Override
+    public boolean stopLasertagGame() {
+        // If there is no game running
+        if (!this.isRunning) {
+            return false;
+        }
+
+        // Stop the game
+        this.dispose();
+        this.lasertagGameOver();
+
+        return true;
+    }
+
+    @Override
     public void playerJoinTeam(TeamDto newTeamDto, PlayerEntity player) {
         // Get new team
         var newTeam = teamMap.get(newTeamDto);

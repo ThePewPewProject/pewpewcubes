@@ -25,6 +25,14 @@ public interface ILasertagGame {
     }
 
     /**
+     * Stops the running lasertag game
+     * @return False if there was no game running. Otherwise, true.
+     */
+    default boolean stopLasertagGame() {
+        return false;
+    }
+
+    /**
      * Add a player to the given team
      *
      * @param teamDto The team to join

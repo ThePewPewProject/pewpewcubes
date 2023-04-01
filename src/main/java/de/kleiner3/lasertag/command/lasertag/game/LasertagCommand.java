@@ -26,6 +26,7 @@ public class LasertagCommand {
                 .executes(LasertagCommand::execute);
 
         StartLasertagGameCommand.register(cmd);
+        StopLasertagGameCommand.register(cmd);
         JoinLasertagTeamCommand.register(cmd);
         LeaveLasertagTeamCommand.register(cmd);
         LasertagSettingsCommand.register(cmd);
