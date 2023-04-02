@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.mixin.fastiter;
 
+import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.common.util.fastiter.IFastWorldIter;
 import de.kleiner3.lasertag.common.util.fastiter.IIter;
 import de.kleiner3.lasertag.common.util.fastiter.IProgressReport;
@@ -120,11 +121,7 @@ public class WorldMixin implements IFastWorldIter {
         }
 
         // Wait for threadpool to finish
-        try {
-            executor.shutdown();
-            var ignored = executor.awaitTermination(30, TimeUnit.SECONDS);
-        } catch (InterruptedException ignored) {
-        }
+        ThreadUtil.attemptShutdown(executor, 30L);
     }
 
     // 40 x 40 Chunks single threaded -   ~20sec   (with sysout)

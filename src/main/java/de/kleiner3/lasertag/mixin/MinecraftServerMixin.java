@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.common.types.Tuple;
+import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.item.Items;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.item.LasertagWeaponItem;
@@ -96,6 +97,21 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         statsCalculator = new StatsCalculator(((MinecraftServer) (Object) this));
     }
 
+    /**
+     * Inject into the stop method of the minecraft server.
+     * This method gets called after entering the /stop command or typing stop into the server console.
+     *
+     * @param ci
+     */
+    @Inject(method = "shutdown", at = @At("HEAD"))
+    private void atShutdown(CallbackInfo ci) {
+        // Stop the lasertag game
+        this.stopLasertagGame();
+
+        // Dispose the game managers
+        LasertagGameManager.getInstance().dispose();
+    }
+
     //region ILasertagGame
 
     @Override
@@ -160,7 +176,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         // Start game
         isRunning = true;
 
-        var preGameDelayTimer = Executors.newSingleThreadScheduledExecutor();
+        var preGameDelayTimer = ThreadUtil.createScheduledExecutor("lasertag-server-pregame-delay-timer-thread-%d");
         var preGameDelay = LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.START_TIME);
         preGameDelayTimer.schedule(() -> {
 
@@ -173,8 +189,11 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
             }
 
             // Start game tick timer
-            gameTickTimer = Executors.newSingleThreadScheduledExecutor();
+            gameTickTimer = ThreadUtil.createScheduledExecutor("lasertag-server-game-tick-timer-thread-%d");
             gameTickTimer.scheduleAtFixedRate(new GameTickTimerTask(this), 0, 1, TimeUnit.MINUTES);
+
+            // Stop the pre game delay timer
+            ThreadUtil.attemptShutdown(preGameDelayTimer);
 
         }, preGameDelay, TimeUnit.SECONDS);
 
@@ -361,7 +380,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
             if (gameTickTimer == null) {
                 return;
             }
-            gameTickTimer.shutdown();
+            ThreadUtil.attemptShutdown(gameTickTimer);
             gameTickTimer = null;
         }
     }
@@ -398,7 +417,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     @Override
     public void endTick() {
         synchronized (this) {
-            gameTickTimer.shutdown();
+            ThreadUtil.attemptShutdown(gameTickTimer);
             gameTickTimer = null;
         }
 

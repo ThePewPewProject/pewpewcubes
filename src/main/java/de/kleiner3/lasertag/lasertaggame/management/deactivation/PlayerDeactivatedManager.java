@@ -1,6 +1,8 @@
 package de.kleiner3.lasertag.lasertaggame.management.deactivation;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
+import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
@@ -67,10 +69,12 @@ public class PlayerDeactivatedManager implements IManager {
         sendDeactivatedToClients(world, uuid, true);
 
         // Reactivate player after configured amount of time
-        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+        var deactivationThread = ThreadUtil.createScheduledExecutor("lasertag-player-deactivation-thread-%d");
+        deactivationThread.schedule(() -> {
             deactivatedMap.put(uuid, false);
             player.onActivated();
             sendDeactivatedToClients(world, uuid, false);
+            ThreadUtil.attemptShutdown(deactivationThread);
         }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.DEACTIVATE_TIME), TimeUnit.SECONDS);
     }
 

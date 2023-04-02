@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.block.entity;
 
+import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.entity.Entities;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
@@ -53,8 +54,11 @@ public class LaserTargetBlockEntity extends BlockEntity {
         deactivated = true;
 
         // Reactivate after configured amount of seconds
-        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+        var deactivationThread = ThreadUtil.createScheduledExecutor("lasertag-target-deactivation-thread-%d");
+        deactivationThread.schedule(() -> {
             deactivated = false;
+
+            ThreadUtil.attemptShutdown(deactivationThread);
         }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.LASERTARGET_DEACTIVATE_TIME), TimeUnit.SECONDS);
 
         // Add player to the players who hit the target

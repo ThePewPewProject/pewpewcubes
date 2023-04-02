@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.item;
 
+import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.block.LaserTargetBlock;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
@@ -147,7 +148,12 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
             world.spawnEntity(ray);
 
             // Despawn ray after 50ms
-            Executors.newSingleThreadScheduledExecutor().schedule(() -> world.getServer().execute(ray::discard), 50, TimeUnit.MILLISECONDS);
+            var despawnThread = ThreadUtil.createScheduledExecutor("lasertag-laserray-despawn-thread-%d");
+            despawnThread.schedule(() -> {
+                world.getServer().execute(ray::discard);
+
+                ThreadUtil.attemptShutdown(despawnThread);
+            }, 50, TimeUnit.MILLISECONDS);
         }
     }
 

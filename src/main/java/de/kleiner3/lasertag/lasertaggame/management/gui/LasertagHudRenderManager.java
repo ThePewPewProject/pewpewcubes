@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.lasertaggame.management.gui;
 
 import de.kleiner3.lasertag.common.types.Tuple;
+import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import de.kleiner3.lasertag.lasertaggame.timing.GameCountDownTimerTask;
@@ -84,7 +85,7 @@ public class LasertagHudRenderManager implements IManager {
 
         this.gameTime = gameTime;
 
-        gameTimer = Executors.newSingleThreadScheduledExecutor();
+        gameTimer = ThreadUtil.createScheduledExecutor("lasertag-game-timer-thread-%d");
         gameTimer.scheduleAtFixedRate(new GameCountDownTimerTask(), 0, 1, TimeUnit.SECONDS);
     }
 
@@ -94,7 +95,7 @@ public class LasertagHudRenderManager implements IManager {
                 return;
             }
 
-            this.gameTimer.shutdown();
+            ThreadUtil.attemptShutdown(gameTimer);
             this.gameTimer = null;
             this.gameTime = 0;
         }
@@ -107,7 +108,7 @@ public class LasertagHudRenderManager implements IManager {
 
         this.startingIn = startingIn;
 
-        preGameTimer = Executors.newSingleThreadScheduledExecutor();
+        preGameTimer = ThreadUtil.createScheduledExecutor("lasertag-pregame-timer-thread-%d");
         preGameTimer.scheduleAtFixedRate(new PreGameCountDownTimerTask(), 1, 1, TimeUnit.SECONDS);
     }
 
@@ -117,7 +118,7 @@ public class LasertagHudRenderManager implements IManager {
                 return;
             }
 
-            this.preGameTimer.shutdown();
+            ThreadUtil.attemptShutdown(preGameTimer);
             this.preGameTimer = null;
             this.startingIn = -1;
         }
