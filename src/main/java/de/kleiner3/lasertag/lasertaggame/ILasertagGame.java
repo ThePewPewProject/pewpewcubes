@@ -1,14 +1,15 @@
 package de.kleiner3.lasertag.lasertaggame;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Interface to provide methods for a lasertag game
@@ -19,9 +20,11 @@ public interface ILasertagGame {
 
     /**
      * Start the lasertag game
+     *
+     * @return The reasons why the start game got aborted.
      */
-    default void startGame(boolean scanSpawnpoints) {
-        // Default empty
+    default Optional<String> startGame(boolean scanSpawnpoints) {
+        return Optional.empty();
     }
 
     /**
@@ -37,9 +40,10 @@ public interface ILasertagGame {
      *
      * @param teamDto The team to join
      * @param player The player to join the team
+     * @return True if the join succeeded. Otherwise false.
      */
-    default void playerJoinTeam(TeamDto teamDto, PlayerEntity player) {
-        // Default empty
+    default boolean playerJoinTeam(TeamDto teamDto, PlayerEntity player) {
+        return false;
     }
 
     /**

@@ -1,10 +1,14 @@
 package de.kleiner3.lasertag.command.lasertag.game;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.command.CommandFeedback;
+import de.kleiner3.lasertag.command.ServerFeedbackCommand;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+
+import java.util.Optional;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -13,40 +17,26 @@ import static net.minecraft.server.command.CommandManager.literal;
  *
  * @author Étienne Muser
  */
-public class StartLasertagGameCommand {
-    /**
-     * Execute the start lasertag command
-     *
-     * @param context The CommandContext
-     * @param scanSpawnpoints Bool if the world should be scanned for the spawnpoint blocks again
-     * @return Return code
-     */
-    @SuppressWarnings("SameReturnValue")
-    private static int execute(CommandContext<ServerCommandSource> context, boolean scanSpawnpoints) {
-        try {
-            context.getSource().getServer().startGame(scanSpawnpoints);
-        } catch (Exception ex) {
-            LasertagMod.LOGGER.error("An Error occurred while trying to execute that command:", ex);
-        }
+public class StartLasertagGameCommand extends ServerFeedbackCommand {
+    private boolean scanSpawnpoints;
 
-        return Command.SINGLE_SUCCESS;
+    private StartLasertagGameCommand(boolean scanSpawnpoints) {
+        this.scanSpawnpoints = scanSpawnpoints;
     }
 
-    /**
-     * Execute the start lasertag command without searching for spawnpoint blocks
-     *
-     * @param context The CommandContext
-     * @return Return code
-     */
-    private static int execute(CommandContext<ServerCommandSource> context) {
-        return execute(context, false);
+    @Override
+    protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+        var abortReasons = context.getSource().getServer().startGame(scanSpawnpoints);
+
+        // If start game got aborted
+        return abortReasons.map(s -> new CommandFeedback(Text.literal("Start game aborted. Reasons:\n" + s).formatted(Formatting.RED), false, true));
     }
 
     static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
         lab.then(literal("startLasertagGame")
                 .requires(s -> s.hasPermissionLevel(1))
-                .executes(StartLasertagGameCommand::execute)
+                .executes(new StartLasertagGameCommand(false))
                 .then(literal("scanSpawnpoints")
-                        .executes(ctx -> execute(ctx, true))));
+                        .executes(new StartLasertagGameCommand(true))));
     }
 }
