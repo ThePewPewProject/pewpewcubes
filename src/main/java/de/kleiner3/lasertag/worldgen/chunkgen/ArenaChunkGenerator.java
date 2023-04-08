@@ -2,22 +2,14 @@ package de.kleiner3.lasertag.worldgen.chunkgen;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.common.util.NbtUtil;
-import de.kleiner3.lasertag.resource.ResourceManagers;
-import de.kleiner3.lasertag.resource.StructureResourceManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtIo;
 import net.minecraft.structure.StructureSet;
-import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.collection.Pool;
 import net.minecraft.util.dynamic.RegistryOps;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.ChunkRegion;
@@ -36,7 +28,6 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.VerticalBlockSample;
 import net.minecraft.world.gen.noise.NoiseConfig;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -56,10 +47,6 @@ public class ArenaChunkGenerator extends ChunkGenerator {
                 .forGetter(ArenaChunkGenerator::getConfig))
             .apply(instance, instance.stable(ArenaChunkGenerator::new)));
 
-    private StructureTemplate arenaTemplate;
-    private Vec3i size;
-    private BlockPos startPos;
-
     private final ArenaChunkGeneratorConfig config;
     private final Registry<Biome> biomeRegistry;
 
@@ -72,49 +59,21 @@ public class ArenaChunkGenerator extends ChunkGenerator {
 
         this.config = config;
         this.biomeRegistry = biomeRegistry;
-
-        // Get the arena type
-        var arenaType = config.getType();
-
-        // Get the nbt file id
-        var nbtFileId = arenaType.nbtFileId;
-
-        // Read nbt file
-        var resource = ResourceManagers.STRUCTURE_RESOURCE_MANAGER.get(nbtFileId);
-
-        if (resource == null) {
-            LasertagMod.LOGGER.warn("Arena nbt file not in resource manager.");
-            return;
-        }
-
-        NbtCompound nbt;
-        try {
-            nbt = NbtIo.readCompressed(resource.getInputStream());
-        } catch (IOException e) {
-            LasertagMod.LOGGER.error("Unable to load nbt file.", e);
-            return;
-        }
-
-        // If is litematic file
-        if (nbtFileId.getPath().endsWith(StructureResourceManager.LITEMATIC_FILE_ENDING)) {
-            // Convert litematic nbt compound to nbt nbt compound
-            nbt = NbtUtil.convertLitematicToNbt(nbt, "main");
-
-            // Sanity check
-            if (nbt == null) {
-                LasertagMod.LOGGER.error("Litematica file could not be converted to nbt.");
-            }
-        }
-
-        this.arenaTemplate = new StructureTemplate();
-        this.arenaTemplate.readNbt(nbt);
-        this.size = arenaTemplate.getSize();
-        this.startPos = BlockPos.ORIGIN.subtract(arenaType.placementOffset);
     }
 
     @Override
     public void generateFeatures(StructureWorldAccess world, Chunk chunk, StructureAccessor structureAccessor) {
+        // Get the current chunks block box
         var bBox = getBlockBoxForChunk(chunk);
+
+        // Get the arena chunk generator config type
+        var type = config.getType();
+
+        // Calculate the start pos
+        var startPos = BlockPos.ORIGIN.subtract(type.placementOffset);
+
+        // Get the arena size
+        var size = type.getArenaSize();
 
         // If chunk does not intersect with arena bounding box, do nothing
         if (bBox.getMaxX() < startPos.getX() || bBox.getMinX() > (startPos.getX() + size.getX()) ||
@@ -123,7 +82,7 @@ public class ArenaChunkGenerator extends ChunkGenerator {
         }
 
         // Place the arena
-        ArenaStructurePlacer.placeArenaChunkSegment(arenaTemplate, bBox, this.startPos, world);
+        ArenaStructurePlacer.placeArenaChunkSegment(type.getArenaTemplate(), bBox, startPos, world);
     }
 
     private static BlockBox getBlockBoxForChunk(Chunk chunk) {
@@ -185,7 +144,7 @@ public class ArenaChunkGenerator extends ChunkGenerator {
     public void populateEntities(ChunkRegion region) {
 
         // Place the arena entities
-        ArenaStructurePlacer.spawnEntitiesOfArena(arenaTemplate, this.startPos, region);
+        ArenaStructurePlacer.spawnEntitiesOfArena(config.getType().getArenaTemplate(), BlockPos.ORIGIN.subtract(config.getType().placementOffset), region);
     }
 
     @Override

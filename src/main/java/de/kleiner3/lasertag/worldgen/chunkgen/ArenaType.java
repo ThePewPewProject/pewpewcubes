@@ -1,11 +1,19 @@
 package de.kleiner3.lasertag.worldgen.chunkgen;
 
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.common.util.NbtUtil;
+import de.kleiner3.lasertag.resource.ResourceManagers;
+import de.kleiner3.lasertag.resource.StructureResourceManager;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
+
+import java.io.IOException;
 
 /**
  * Enum to represent all possible arena types
@@ -44,6 +52,62 @@ public enum ArenaType {
     public final RegistryKey<Biome> biome;
     public final  Identifier nbtFileId;
     public final  Vec3i placementOffset;
-
     public final String translatableName;
+
+    private StructureTemplate arenaTemplate = null;
+    private Vec3i arenaSize = null;
+
+    public StructureTemplate getArenaTemplate() {
+        if (arenaTemplate == null) {
+            initArenaTemplate();
+        }
+
+        return arenaTemplate;
+    }
+
+    public Vec3i getArenaSize() {
+        if (arenaSize == null) {
+            initArenaTemplate();
+        }
+
+        return arenaSize;
+    }
+
+    /**
+     * Initializes the arena template with the information of the arena nbt file.
+     */
+    private void initArenaTemplate() {
+        // Get nbt file
+        var resource = ResourceManagers.STRUCTURE_RESOURCE_MANAGER.get(nbtFileId);
+
+        // Sanity check
+        if (resource == null) {
+            LasertagMod.LOGGER.warn("Arena nbt file not in resource manager.");
+            return;
+        }
+
+        // Read nbt file
+        NbtCompound nbt;
+        try {
+            nbt = NbtIo.readCompressed(resource.getInputStream());
+        } catch (IOException e) {
+            LasertagMod.LOGGER.error("Unable to load nbt file.", e);
+            return;
+        }
+
+        // If is litematic file
+        if (nbtFileId.getPath().endsWith(StructureResourceManager.LITEMATIC_FILE_ENDING)) {
+            // Convert litematic nbt compound to nbt nbt compound
+            nbt = NbtUtil.convertLitematicToNbt(nbt, "main");
+
+            // Sanity check
+            if (nbt == null) {
+                LasertagMod.LOGGER.error("Litematica file could not be converted to nbt.");
+            }
+        }
+
+        this.arenaTemplate = new StructureTemplate();
+        this.arenaTemplate.readNbt(nbt);
+        this.arenaSize = arenaTemplate.getSize();
+    }
 }
