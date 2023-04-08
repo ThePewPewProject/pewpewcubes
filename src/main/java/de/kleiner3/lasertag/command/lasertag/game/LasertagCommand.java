@@ -13,8 +13,6 @@ import static net.minecraft.server.command.CommandManager.literal;
  * @author Étienne Muser
  */
 public class LasertagCommand {
-    // TODO: Dont allow starting a game or switching/leaving teams while a game is running
-
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         var cmd = literal("lasertag");
 

@@ -48,8 +48,6 @@ import java.util.concurrent.Executor;
  * @author Étienne Muser
  */
 public class ArenaChunkGenerator extends ChunkGenerator {
-    // TODO: Set difficulty to peaceful
-
     public static final Codec<ArenaChunkGenerator> CODEC = RecordCodecBuilder.create((instance) ->
             createStructureSetRegistryGetter(instance)
             .and(RegistryOps.createRegistryCodec(Registry.BIOME_KEY)

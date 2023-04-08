@@ -410,8 +410,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
      */
     @Override
     public void doTick() {
-        System.out.println("Tick");
-        // TODO
+        // Here the music can be started
     }
 
     @Override

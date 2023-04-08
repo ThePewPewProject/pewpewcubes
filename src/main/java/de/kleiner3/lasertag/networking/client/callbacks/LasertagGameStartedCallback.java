@@ -18,7 +18,6 @@ public class LasertagGameStartedCallback implements ClientPlayNetworking.PlayCha
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
         var renderData = LasertagGameManager.getInstance().getHudRenderManager();
 
-        // TODO: Assert that this method does nothing if game is already running
         renderData.progress = 0.0;
         renderData.shouldRenderNameTags = false;
 
