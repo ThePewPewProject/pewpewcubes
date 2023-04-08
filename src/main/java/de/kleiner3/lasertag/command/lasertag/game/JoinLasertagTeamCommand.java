@@ -1,13 +1,17 @@
 package de.kleiner3.lasertag.command.lasertag.game;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import de.kleiner3.lasertag.command.CommandFeedback;
+import de.kleiner3.lasertag.command.ServerFeedbackCommand;
 import de.kleiner3.lasertag.command.suggestions.TeamSuggestionProvider;
-import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+
+import java.util.Optional;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -18,9 +22,9 @@ import static net.minecraft.server.command.CommandManager.literal;
  *
  * @author Étiennne Muser
  */
-public class JoinLasertagTeamCommand {
-    @SuppressWarnings("SameReturnValue")
-    private static int execute(CommandContext<ServerCommandSource> context) {
+public class JoinLasertagTeamCommand extends ServerFeedbackCommand {
+    @Override
+    protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
         // Get the team
         var teamName = StringArgumentType.getString(context, "team");
 
@@ -31,21 +35,29 @@ public class JoinLasertagTeamCommand {
         var player = context.getSource().getPlayer();
 
         // Get team
-        var teamDto = TeamConfigManager.teamConfig.get(teamName);
+        var teamDto =  LasertagGameManager.getInstance().getTeamManager().teamConfig.get(teamName);
+
+        // If team was not found
+        if (teamDto == null) {
+            return Optional.of(new CommandFeedback(Text.literal("That team does not exist.").formatted(Formatting.RED), false, false));
+        }
 
         // Join team
-        server.playerJoinTeam(teamDto, player);
+        var joinSucceeded = server.playerJoinTeam(teamDto, player);
 
-        // Notify player in chat
-        player.sendMessage(Text.literal("You joined team " + teamName), true);
+        // If join did not succeed
+        if (!joinSucceeded) {
+            return Optional.of(new CommandFeedback(Text.literal("That team is already full.").formatted(Formatting.RED), false, false));
+        }
 
-        return Command.SINGLE_SUCCESS;
+        // Return feedback
+        return Optional.of(new CommandFeedback(Text.literal("You joined team " + teamName), true, false));
     }
 
     static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
         lab.then(literal("joinTeam")
                 .then(argument("team", word())
                         .suggests(TeamSuggestionProvider.getInstance())
-                        .executes(JoinLasertagTeamCommand::execute)));
+                        .executes(new JoinLasertagTeamCommand())));
     }
 }

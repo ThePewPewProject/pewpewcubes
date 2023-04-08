@@ -1,8 +1,9 @@
 package de.kleiner3.lasertag.lasertaggame.statistics;
 
-import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
 import de.kleiner3.lasertag.common.types.Tuple;
-import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamMap;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
+import net.minecraft.server.MinecraftServer;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,25 +14,25 @@ import java.util.Comparator;
  * @author Étienne Muser
  */
 public class StatsCalculator {
-    private final TeamMap teamMap;
+    private final MinecraftServer server;
 
     private GameStats lastGamesStats;
 
-    public StatsCalculator(TeamMap teamMap) {
-        this.teamMap = teamMap;
+    public StatsCalculator(MinecraftServer server) {
+        this.server = server;
     }
 
     public void calcStats() {
+        var teamMap = server.getSimplifiedTeamMap();
+
         lastGamesStats = new GameStats();
-        for (TeamDto teamDto : teamMap.keySet()) {
-            var team = teamMap.get(teamDto);
+        for (TeamDto teamDto : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
+            var team = teamMap.get(teamDto.name());
             var teamScore = 0L;
 
             var playersOfThisTeam = new ArrayList<Tuple<String, Long>>();
-            for (var player : team) {
-                var playerScore = player.getLasertagScore();
-                var playerScoreTuple = new Tuple<>(player.getLasertagUsername(), playerScore);
-                teamScore += playerScore;
+            for (var playerScoreTuple : team) {
+                teamScore += playerScoreTuple.y();
                 lastGamesStats.playerScores.add(playerScoreTuple);
                 playersOfThisTeam.add(playerScoreTuple);
             }

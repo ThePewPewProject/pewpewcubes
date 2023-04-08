@@ -35,7 +35,7 @@ import java.util.List;
  * @author Étienne Muser
  */
 public class LasertagCreditsScreen extends Screen {
-    private static final Identifier MINECRAFT_TITLE_TEXTURE = new Identifier("textures/gui/title/minecraft.png"); // TODO: Replace by our banner
+    private static final Identifier MINECRAFT_TITLE_TEXTURE = new Identifier("textures/gui/title/minecraft.png");
     private static final Identifier VIGNETTE_TEXTURE = new Identifier("textures/misc/vignette.png");
     private static final Text SEPARATOR_LINE = Text.literal("============").formatted(Formatting.WHITE);
     private static final String CENTERED_LINE_PREFIX = "           ";

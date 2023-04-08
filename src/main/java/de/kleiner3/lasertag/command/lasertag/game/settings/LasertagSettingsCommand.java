@@ -1,11 +1,14 @@
 package de.kleiner3.lasertag.command.lasertag.game.settings;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.command.CommandFeedback;
+import de.kleiner3.lasertag.command.ServerFeedbackCommand;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+
+import java.util.Optional;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -14,17 +17,15 @@ import static net.minecraft.server.command.CommandManager.literal;
  *
  * @author Étienne Muser
  */
-public class LasertagSettingsCommand {
-    @SuppressWarnings("SameReturnValue")
-    private static int execute(CommandContext<ServerCommandSource> context) {
-        context.getSource().sendFeedback(Text.literal(LasertagSettingsManager.toJson()), false);
-        return Command.SINGLE_SUCCESS;
+public class LasertagSettingsCommand extends ServerFeedbackCommand {
+    protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+        return Optional.of(new CommandFeedback(Text.literal(LasertagGameManager.getInstance().getSettingsManager().toJson()), false, false));
     }
 
     public static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
         var cmd = literal("settings")
                 .requires(s -> s.hasPermissionLevel(4))
-                .executes(LasertagSettingsCommand::execute);
+                .executes(new LasertagSettingsCommand());
 
         RenderTeamListSettingCommand.register(cmd);
         RenderTimerSettingCommand.register(cmd);

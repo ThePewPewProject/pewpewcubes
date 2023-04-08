@@ -1,12 +1,11 @@
 package de.kleiner3.lasertag.mixin;
 
-import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
-import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
-import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -23,26 +22,7 @@ import org.spongepowered.asm.mixin.Mixin;
  */
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin implements ILasertagPlayer {
-    /**
-     * The players lasertag score
-     */
-    private long score = 0;
     private TeamDto team = null;
-
-    @Override
-    public long getLasertagScore() {
-        return score;
-    }
-
-    @Override
-    public void resetLasertagScore() {
-        score = 0;
-    }
-
-    @Override
-    public void increaseScore(long score) {
-        this.score += score;
-    }
 
     @Override
     public void onHitBy(PlayerEntity player) {
@@ -70,17 +50,17 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
         }
 
         // Check that hit player is not deactivated
-        if (PlayerDeactivatedManager.isDeactivated(((PlayerEntity)(Object)this).getUuid())) {
+        if (LasertagGameManager.getInstance().getDeactivatedManager().isDeactivated(((PlayerEntity)(Object)this).getUuid())) {
             return;
         }
 
         // Deactivate player
-        PlayerDeactivatedManager.deactivate(((PlayerEntity) (Object) this), player.getWorld());
+        LasertagGameManager.getInstance().getDeactivatedManager().deactivate(((PlayerEntity) (Object) this), player.getWorld());
 
         // Get the server
         MinecraftServer server = player.getServer();
         if (server != null) {
-            server.onPlayerScored(player, (long)LasertagSettingsManager.get(SettingNames.PLAYER_HIT_SCORE));
+            server.onPlayerScored(player, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.PLAYER_HIT_SCORE));
             ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) player);
         }
     }

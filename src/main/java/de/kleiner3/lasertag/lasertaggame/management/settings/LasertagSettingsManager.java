@@ -1,12 +1,13 @@
-package de.kleiner3.lasertag.lasertaggame.settings;
+package de.kleiner3.lasertag.lasertaggame.management.settings;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.common.util.FileIO;
+import de.kleiner3.lasertag.lasertaggame.management.IManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import de.kleiner3.lasertag.common.util.FileIO;
 import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -19,9 +20,9 @@ import java.io.IOException;
  *
  * @author Étienne Muser
  */
-public class LasertagSettingsManager {
-    //region Static fields
-    private static LasertagSettingsMap settings;
+public class LasertagSettingsManager implements IManager {
+    //region Private fields
+    private LasertagSettingsMap settings;
 
     // Get path to lasertag config file
     private static final String lasertagConfigFilePath = LasertagMod.configFolderPath + "\\lasertagConfig.json";
@@ -31,103 +32,7 @@ public class LasertagSettingsManager {
 
     //endregion
 
-    public static Object get(String key) {
-        // If key not in settings
-        if (!settings.containsKey(key)) {
-            putDefault(key);
-        }
-
-        return settings.get(key);
-    }
-
-    public static String toJson() {
-        return new GsonBuilder().setPrettyPrinting().create().toJson(settings);
-    }
-
-    public static void set(MinecraftServer s, String key, Object value) {
-        settings.put(key, value);
-        persist(s, key, value.toString());
-    }
-
-    public static void set(String newSettingsJson) {
-        settings = LasertagSettingsMap.fromJson(newSettingsJson);
-    }
-
-    public static void syncToPlayer(ServerPlayerEntity player) {
-        // Serialize to json
-        var json = settings.toJson();
-
-        // Create packet buffer
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-
-        // Write errorMessage to buffer
-        buf.writeString(json);
-
-        // Send to all clients
-        ServerPlayNetworking.send(player, NetworkingConstants.LASERTAG_SETTINGS_SYNC, buf);
-    }
-
-    private static void putDefault(String key) {
-        // Get default settings
-        var defaultSettings = LasertagSettingsMap.createDefaultSettings();
-
-        // Get the default value
-        var defaultValue = defaultSettings.get(key);
-
-        // Put the default value in this settings
-        settings.put(key, defaultValue);
-
-        try {
-            // Write to config file
-            persistUnsafe();
-        } catch (IOException ex) {
-            LasertagMod.LOGGER.warn("Persisting of lasertag config file in '" + lasertagConfigFilePath + "' failed: " + ex.getMessage());
-        }
-    }
-
-    //region Persistence
-
-    /**
-     * Persist the config changes to the file system.
-     *
-     * @param server The server this is executed on. null if on the client
-     * @param key    The name of the setter method which executes the persist method
-     * @param value  The new value of the setting as a string
-     */
-    private static void persist(MinecraftServer server, String key, String value) {
-        // Check if this is executed on client
-        if (server == null) {
-            // Do not persist lasertag config on client
-            return;
-        }
-
-        // Create packet
-        var buf = new PacketByteBuf(Unpooled.buffer());
-
-        // Write to packet
-        buf.writeString(key);
-        buf.writeString(value);
-
-        // Send update to clients
-        ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.LASERTAG_SETTINGS_CHANGED, buf);
-
-        try {
-            persistUnsafe();
-        } catch (IOException e) {
-            LasertagMod.LOGGER.warn("Failed to persist lasertag config: " + e.getMessage());
-        }
-    }
-
-    private static void persistUnsafe() throws IOException {
-        // Parse to json string
-        var jsonString = settings.toJson();
-
-        // Write to file
-        FileIO.writeAllFile(lasertagConfigFile, jsonString);
-    }
-
-    // Initialize lasertag game settings from file
-    static {
+    public LasertagSettingsManager() {
         if (lasertagConfigFile.exists()) {
 
             try {
@@ -158,6 +63,111 @@ public class LasertagSettingsManager {
                 LasertagMod.LOGGER.warn("Creation of new lasertag config file in '" + lasertagConfigFilePath + "' failed: " + e.getMessage());
             }
         }
+    }
+
+    //region Public methods
+
+    public <T> T get(String key) {
+        // If key not in settings
+        if (!settings.containsKey(key)) {
+            putDefault(key);
+        }
+
+        return (T)settings.get(key);
+    }
+
+    @Override
+    public void dispose() {
+        // Nothing to dispose
+    }
+
+    public static LasertagSettingsManager fromJson(String jsonString) {
+        return new Gson().fromJson(jsonString, LasertagSettingsManager.class);
+    }
+
+    public String toJson() {
+        return new GsonBuilder().setPrettyPrinting().create().toJson(settings);
+    }
+
+    @Override
+    public void syncToClient(ServerPlayerEntity client, MinecraftServer server) {
+        // Do not sync!
+        throw new UnsupportedOperationException("LasertagSettingsManager should not be synced on its own.");
+    }
+
+    public void set(MinecraftServer s, String key, Object value) {
+        settings.put(key, value);
+        persist(s, key, value.toString());
+    }
+
+    public void set(String newSettingsJson) {
+        settings = LasertagSettingsMap.fromJson(newSettingsJson);
+    }
+
+    public void reset() {
+        // Set the default settings
+        settings = LasertagSettingsMap.createDefaultSettings();
+    }
+
+    //endregion
+
+    private void putDefault(String key) {
+        // Get default settings
+        var defaultSettings = LasertagSettingsMap.createDefaultSettings();
+
+        // Get the default value
+        var defaultValue = defaultSettings.get(key);
+
+        // Put the default value in this settings
+        settings.put(key, defaultValue);
+
+        try {
+            // Write to config file
+            persistUnsafe();
+        } catch (IOException ex) {
+            LasertagMod.LOGGER.warn("Persisting of lasertag config file in '" + lasertagConfigFilePath + "' failed: " + ex.getMessage());
+        }
+    }
+
+    //region Persistence
+
+    /**
+     * Persist the config changes to the file system.
+     *
+     * @param server The server this is executed on. null if on the client
+     * @param key    The name of the setter method which executes the persist method
+     * @param value  The new value of the setting as a string
+     */
+    private void persist(MinecraftServer server, String key, String value) {
+        // Check if this is executed on client
+        if (server == null) {
+            // Do not persist lasertag config on client
+            return;
+        }
+
+        // Create packet
+        var buf = new PacketByteBuf(Unpooled.buffer());
+
+        // Write to packet
+        buf.writeString(key);
+        buf.writeString(value);
+
+        // Send update to clients
+        ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.LASERTAG_SETTINGS_CHANGED, buf);
+
+        try {
+            persistUnsafe();
+        } catch (IOException e) {
+            LasertagMod.LOGGER.warn("Failed to persist lasertag config: " + e.getMessage());
+        }
+    }
+
+    private void persistUnsafe() throws IOException {
+        // Parse to json string
+        var jsonString = settings.toJson();
+
+        // Write to file
+        FileIO.writeAllFile(lasertagConfigFile, jsonString);
     }
 
     //endregion

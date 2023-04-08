@@ -1,12 +1,12 @@
 package de.kleiner3.lasertag.item;
 
-import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.common.util.ThreadUtil;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.block.LaserTargetBlock;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
-import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
 import de.kleiner3.lasertag.lasertaggame.ILasertagColorable;
 import de.kleiner3.lasertag.common.util.RaycastUtil;
 import io.netty.buffer.Unpooled;
@@ -50,13 +50,13 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
 
     @Override
     public int getRange() {
-        return (int)(long)LasertagSettingsManager.get(SettingNames.WEAPON_REACH);
+        return Math.toIntExact(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.WEAPON_REACH));
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
         // Apply cooldown
-        playerEntity.getItemCooldownManager().set(this, (int)(long)LasertagSettingsManager.get(SettingNames.WEAPON_COOLDOWN));
+        playerEntity.getItemCooldownManager().set(this, Math.toIntExact(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.WEAPON_COOLDOWN)));
 
         // Get all armor pieces of the player
         DefaultedList<ItemStack> armorPieces = (DefaultedList<ItemStack>) playerEntity.getArmorItems();
@@ -68,7 +68,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
         var laserweaponStack = playerEntity.getStackInHand(hand);
 
         // Check that player is active
-        if (PlayerDeactivatedManager.isDeactivated(playerEntity.getUuid())) {
+        if (LasertagGameManager.getInstance().getDeactivatedManager().isDeactivated(playerEntity.getUuid())) {
             playWeaponFailSound(playerEntity);
             return TypedActionResult.fail(laserweaponStack);
         }
@@ -137,18 +137,23 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
                 hitPlayer.onHitBy(playerEntity);
                 break;
             case MISS:
-                break;
+                // Fall through intended
             default:
                 break;
         }
 
         // Spawn laser ray entity
-        if ((boolean)LasertagSettingsManager.get(SettingNames.SHOW_LASER_RAYS)) {
+        if (LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingNames.SHOW_LASER_RAYS)) {
             LaserRayEntity ray = new LaserRayEntity(world, playerEntity, color, hit);
             world.spawnEntity(ray);
 
             // Despawn ray after 50ms
-            Executors.newSingleThreadScheduledExecutor().schedule(() -> world.getServer().execute(ray::discard), 50, TimeUnit.MILLISECONDS);
+            var despawnThread = ThreadUtil.createScheduledExecutor("lasertag-laserray-despawn-thread-%d");
+            despawnThread.schedule(() -> {
+                world.getServer().execute(ray::discard);
+
+                ThreadUtil.attemptShutdown(despawnThread);
+            }, 50, TimeUnit.MILLISECONDS);
         }
     }
 

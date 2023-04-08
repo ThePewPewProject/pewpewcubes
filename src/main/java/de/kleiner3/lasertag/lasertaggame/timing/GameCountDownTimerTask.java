@@ -1,8 +1,7 @@
 package de.kleiner3.lasertag.lasertaggame.timing;
 
-import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
-import de.kleiner3.lasertag.client.hud.LasertagHudOverlay;
-import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
 
 import java.util.TimerTask;
 
@@ -14,14 +13,12 @@ import java.util.TimerTask;
 public class GameCountDownTimerTask extends TimerTask {
     @Override
     public void run() {
-        ++LasertagHudOverlay.renderData.gameTime;
+        var renderData = LasertagGameManager.getInstance().getHudRenderManager();
 
-        if (((long)LasertagSettingsManager.get(SettingNames.PLAY_TIME) * 60L) - LasertagHudOverlay.renderData.gameTime == 0) {
-            synchronized (LasertagHudOverlay.renderData.gameTimerLock) {
-                LasertagHudOverlay.renderData.gameTimer.shutdown();
-                LasertagHudOverlay.renderData.gameTimer = null;
-                LasertagHudOverlay.renderData.gameTime = 0;
-            }
+        ++renderData.gameTime;
+
+        if ((LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.PLAY_TIME) * 60L) - renderData.gameTime == 0) {
+            renderData.stopGameTimer();
         }
     }
 }

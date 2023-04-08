@@ -7,10 +7,16 @@
 	"MinecraftServerMixin",
 	"PlayerEntityMixin",
     "fastiter.WorldMixin",
-    "WorldPresetsMixin"
+    "WorldPresetsMixin",
+    "IStructureTemplateAccessor",
+    "PlayerManagerMixin"
   ],
   "client": [
-    "LivingEntityRendererMixin"
+    "LivingEntityRendererMixin",
+    "gui.MoreWorldOptionsDialogMixin"
+  ],
+  "server": [
+
   ],
   "injectors": {
     "defaultRequire": 1

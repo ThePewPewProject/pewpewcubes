@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "face=ceiling": { "model": "lasertag:block/lasertarget", "x": 180 },
+    "face=floor": { "model": "lasertag:block/lasertarget" },
+    "face=wall,facing=north": { "model": "lasertag:block/lasertarget", "x":  90 },
+    "face=wall,facing=east": { "model": "lasertag:block/lasertarget", "x": 270, "y": 270 },
+    "face=wall,facing=south": { "model": "lasertag:block/lasertarget", "x": 270 },
+    "face=wall,facing=west": { "model": "lasertag:block/lasertarget", "x": 90, "y": 270 }
+  }
+}

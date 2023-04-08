@@ -45,7 +45,7 @@ public class LaserRayEntityRenderer extends EntityRenderer<LaserRayEntity> {
                 ((color >> 8) & 0xFF) / 255.0F,
                 ((color) & 0xFF) / 255.0F
         };
-        Vec3d end = laserRayEntity.getEnd().subtract(laserRayEntity.getPos());
+        Vec3d end = laserRayEntity.getEnd().subtract(laserRayEntity.getStart());
         renderBeam(matrices, vertexConsumers, tickDelta, worldTime, colorArr, end);
     }
 

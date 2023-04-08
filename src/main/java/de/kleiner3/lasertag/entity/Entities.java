@@ -6,7 +6,6 @@ import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.Identifier;
@@ -28,7 +27,7 @@ public class Entities {
         LASER_RAY = Registry.register(
                 Registry.ENTITY_TYPE,
                 new Identifier(LasertagMod.ID, "laser_ray_entity"),
-                FabricEntityTypeBuilder.<LaserRayEntity>create(SpawnGroup.MISC, LaserRayEntity::new).dimensions(EntityDimensions.fixed(.1F, .1F)).build());
+                FabricEntityTypeBuilder.<LaserRayEntity>create(SpawnGroup.MISC, LaserRayEntity::new).build());
 
         LASER_TARGET_ENTITY = Registry.register(
                 Registry.BLOCK_ENTITY_TYPE,

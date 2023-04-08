@@ -1,6 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame;
 
-import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import net.minecraft.entity.player.PlayerEntity;
 
 /**
@@ -9,29 +9,6 @@ import net.minecraft.entity.player.PlayerEntity;
  * @author Étienne Muser
  */
 public interface ILasertagPlayer {
-    /**
-     * @return The lasertag score of the player
-     */
-    default long getLasertagScore() {
-        return -1;
-    }
-
-    /**
-     * Reset the players lasertag score to 0
-     */
-    default void resetLasertagScore() {
-        // Default empty
-    }
-
-    /**
-     * Increase the players score by the given amount
-     *
-     * @param score The amount
-     */
-    default void increaseScore(long score) {
-        // Default empty
-    }
-
     /**
      * Called when this player got hit by another player
      *

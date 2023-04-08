@@ -2,7 +2,7 @@ package de.kleiner3.lasertag.entity.render.armor;
 
 import de.kleiner3.lasertag.item.Items;
 import de.kleiner3.lasertag.item.LasertagVestItem;
-import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -70,7 +70,7 @@ public class LasertagVestRenderer extends GeoArmorRenderer<LasertagVestItem> {
 
         // If player is activated
         if (entity instanceof PlayerEntity) {
-            boolean isDeactivated = PlayerDeactivatedManager.isDeactivated(entity.getUuid());
+            boolean isDeactivated = LasertagGameManager.getInstance().getDeactivatedManager().isDeactivated(entity.getUuid());
 
             if (!isDeactivated) {
                 var color = ((LasertagVestItem) Items.LASERTAG_VEST).getColor(stack);

@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.lasertaggame.settings;
+package de.kleiner3.lasertag.lasertaggame.management.settings;
 
 public class SettingNames {
     public static final String WEAPON_COOLDOWN = "lasertagWeaponCooldown";

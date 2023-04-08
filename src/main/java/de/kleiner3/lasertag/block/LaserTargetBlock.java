@@ -1,10 +1,7 @@
 package de.kleiner3.lasertag.block;
 
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.WallMountedBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.WallMountLocation;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,6 +9,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 
 /**
  * Class to implement the custom behavior of the lasertagret block
@@ -47,5 +47,26 @@ public class LaserTargetBlock extends WallMountedBlock implements BlockEntityPro
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new LaserTargetBlockEntity(pos, state);
+    }
+
+    @Override
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        final float min = 0.1875F;
+        final float max = 0.8125F;
+
+        switch ((WallMountLocation)state.get(FACE)) {
+            case FLOOR -> { return VoxelShapes.cuboid(min, 0, min, max, max, max); }
+            case WALL -> {
+                switch ((Direction)state.get(FACING)) {
+                    case NORTH -> { return VoxelShapes.cuboid(min, min, min, max, max, 1); }
+                    case EAST -> { return VoxelShapes.cuboid(0, min, min, max, max, max); }
+                    case SOUTH -> { return VoxelShapes.cuboid(min, min, 0, max, max, max); }
+                    case WEST -> { return VoxelShapes.cuboid(min, min, min, 1, max, max); }
+                    default -> { return null; }
+                }
+            }
+            case CEILING -> { return VoxelShapes.cuboid(min, min, min, max, 1.0, max); }
+            default -> { return null; }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.client;
 
+import de.kleiner3.lasertag.block.Blocks;
 import de.kleiner3.lasertag.item.Items;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 
@@ -36,5 +37,10 @@ public class ColorProviders {
 
             return 0xFFFFFF;
         }, Items.LASERTAG_VEST);
+
+        // Register color provider for lasertarget block
+        ColorProviderRegistry.BLOCK.register((state, world, pos, tintIndex) -> {
+            return 0xFF0000;
+        }, Blocks.LASER_TARGET);
     }
 }

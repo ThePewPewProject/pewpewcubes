@@ -5,6 +5,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.client.screen.LasertagCreditsScreen;
+import de.kleiner3.lasertag.common.util.ThreadUtil;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 
@@ -25,7 +26,12 @@ public class CreditsCommand {
         }
 
         // Workaround: setScreen(null) in ChatScreen gets triggered after command execution
-        Executors.newSingleThreadScheduledExecutor().schedule(() -> client.execute(() -> client.setScreen(new LasertagCreditsScreen())), 250, TimeUnit.MILLISECONDS);
+        var delayThread = ThreadUtil.createScheduledExecutor("lasertag-creditsscreen-delay-thread-%d");
+        delayThread.schedule(() -> {
+            client.execute(() -> client.setScreen(new LasertagCreditsScreen()));
+
+            ThreadUtil.attemptShutdown(delayThread);
+        }, 250, TimeUnit.MILLISECONDS);
 
         return Command.SINGLE_SUCCESS;
     }

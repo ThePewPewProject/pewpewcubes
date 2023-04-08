@@ -1,23 +1,22 @@
 package de.kleiner3.lasertag.mixin;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.common.types.Tuple;
+import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.item.Items;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.lasertaggame.ILasertagGame;
 import de.kleiner3.lasertag.lasertaggame.ITickable;
-import de.kleiner3.lasertag.lasertaggame.PlayerDeactivatedManager;
-import de.kleiner3.lasertag.lasertaggame.settings.LasertagSettingsManager;
-import de.kleiner3.lasertag.lasertaggame.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamDtoSerializer;
 import de.kleiner3.lasertag.lasertaggame.statistics.GameStats;
 import de.kleiner3.lasertag.lasertaggame.statistics.StatsCalculator;
-import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamConfigManager;
-import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamDto;
-import de.kleiner3.lasertag.lasertaggame.teammanagement.TeamMap;
-import de.kleiner3.lasertag.lasertaggame.teammanagement.serialize.TeamDtoSerializer;
 import de.kleiner3.lasertag.lasertaggame.timing.GameTickTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
@@ -60,7 +59,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     /**
      * Map every player to their team
      */
-    private TeamMap teamMap;
+    private HashMap<TeamDto, List<UUID>> teamMap;
 
     private StatsCalculator statsCalculator;
 
@@ -75,6 +74,9 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     @Shadow
     public abstract ServerWorld getOverworld();
 
+    @Shadow
+    public abstract boolean isDedicated();
+
     /**
      * Inject into constructor of MinecraftServer
      *
@@ -84,27 +86,38 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     private void init(CallbackInfo ci) {
 
         // Init team map
-        teamMap = new TeamMap((MinecraftServer) (Object) this);
+        teamMap = new HashMap<>();
 
         // Initialize team map
-        for (TeamDto teamDto : TeamConfigManager.teamConfig.values()) {
+        for (TeamDto teamDto : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
             teamMap.put(teamDto, new LinkedList<>());
         }
 
         // Init stats calculator
-        statsCalculator = new StatsCalculator(teamMap);
+        statsCalculator = new StatsCalculator(((MinecraftServer) (Object) this));
+    }
+
+    /**
+     * Inject into the stop method of the minecraft server.
+     * This method gets called after entering the /stop command or typing stop into the server console.
+     *
+     * @param ci
+     */
+    @Inject(method = "shutdown", at = @At("HEAD"))
+    private void atShutdown(CallbackInfo ci) {
+        // Stop the lasertag game
+        this.stopLasertagGame();
+
+        // Dispose the game managers
+        LasertagGameManager.getInstance().dispose();
     }
 
     //region ILasertagGame
 
     @Override
-    public void startGame(boolean scanSpawnpoints) {
+    public Optional<String> startGame(boolean scanSpawnpoints) {
         // Reset all scores
-        for (var team : teamMap.values()) {
-            for (var player : team) {
-                player.resetLasertagScore();
-            }
-        }
+        LasertagGameManager.getInstance().getScoreManager().resetScores();
         notifyPlayersAboutUpdate();
 
         // If spawnpoint cache needs to be filled
@@ -115,92 +128,125 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         // Get world
         var world = getOverworld();
 
+        // Check starting conditions
+        var abortReasons = checkStartingConditions();
+
+        // If should abort
+        if (abortReasons.isPresent()) {
+            // Send abort event to clients
+            ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_START_ABORTED, new PacketByteBuf(Unpooled.buffer()));
+            return abortReasons;
+        }
+
         // Teleport players
-        for (var teamDto : TeamConfigManager.teamConfig.values()) {
+        for (var teamDto : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
             var team = teamMap.get(teamDto);
 
-            for (var player : team) {
+            for (var playerUuid : team) {
                 // Get spawnpoints
                 var spawnpoints = spawnpointCache.get(teamDto);
 
-                // If there are spawnpoints for this team
-                if (spawnpoints.size() > 0) {
-                    int idx = world.getRandom().nextInt(spawnpoints.size());
+                var player = ((MinecraftServer) (Object) this).getPlayerManager().getPlayer(playerUuid);
 
-                    var destination = spawnpoints.get(idx);
-                    player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
+                int idx = world.getRandom().nextInt(spawnpoints.size());
 
-                    // Give player mining fatigue
-                    player.addStatusEffect(
-                            new StatusEffectInstance(StatusEffect.byRawId(4),
-                                    (((int) (long) LasertagSettingsManager.get(SettingNames.PLAY_TIME)) * 60 * 20) +
-                                            (((int) (long) LasertagSettingsManager.get(SettingNames.START_TIME)) * 20) + 40,
-                                    Integer.MAX_VALUE,
-                                    false,
-                                    false));
+                var destination = spawnpoints.get(idx);
+                player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
 
-                    // If player is server player entity
-                    if (player instanceof ServerPlayerEntity serverPlayerEntity) {
-                        // Get spawn pos
-                        var spawnPos = new BlockPos(destination.getX(), destination.getY() + 1, destination.getZ());
+                // Give player mining fatigue
+                player.addStatusEffect(
+                        new StatusEffectInstance(StatusEffect.byRawId(4),
+                                (int) (((LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.PLAY_TIME)) * 60 * 20) +
+                                        ((LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.START_TIME)) * 20) + 40),
+                                Integer.MAX_VALUE,
+                                false,
+                                false));
 
-                        // Set players spawnpoint
-                        serverPlayerEntity.setSpawnPoint(
-                                World.OVERWORLD,
-                                spawnPos, 0.0F, true, false);
-                    }
-                }
+
+                // Get spawn pos
+                var spawnPos = new BlockPos(destination.getX(), destination.getY() + 1, destination.getZ());
+
+                // Set players spawnpoint
+                player.setSpawnPoint(
+                        World.OVERWORLD,
+                        spawnPos, 0.0F, true, false);
             }
         }
 
         // Start game
         isRunning = true;
 
-        var preGameDelayTimer = Executors.newSingleThreadScheduledExecutor();
-        var preGameDelay = (long) LasertagSettingsManager.get(SettingNames.START_TIME);
+        var preGameDelayTimer = ThreadUtil.createScheduledExecutor("lasertag-server-pregame-delay-timer-thread-%d");
+        var preGameDelay = LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.START_TIME);
         preGameDelayTimer.schedule(() -> {
 
             // Activate every player
             for (var team : teamMap.values()) {
-                for (var player : team) {
-                    PlayerDeactivatedManager.activate(player.getUuid(), world);
-                    player.onActivated();
+                for (var playerUuid : team) {
+                    LasertagGameManager.getInstance().getDeactivatedManager().activate(playerUuid, world);
+                    ((MinecraftServer) (Object) this).getPlayerManager().getPlayer(playerUuid).onActivated();
                 }
             }
 
             // Start game tick timer
-            gameTickTimer = Executors.newSingleThreadScheduledExecutor();
+            gameTickTimer = ThreadUtil.createScheduledExecutor("lasertag-server-game-tick-timer-thread-%d");
             gameTickTimer.scheduleAtFixedRate(new GameTickTimerTask(this), 0, 1, TimeUnit.MINUTES);
+
+            // Stop the pre game delay timer
+            ThreadUtil.attemptShutdown(preGameDelayTimer);
 
         }, preGameDelay, TimeUnit.SECONDS);
 
         // Notify players
         sendGameStartedEvent();
+
+        // If is on dedicated server
+        if (((MinecraftServer) (Object) this).isDedicated()) {
+            // Set render data on server
+            var renderData = LasertagGameManager.getInstance().getHudRenderManager();
+
+            renderData.progress = 0.0;
+            renderData.shouldRenderNameTags = false;
+
+            // Start pregame count down timer
+            renderData.startPreGameCountdownTimer(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.START_TIME));
+        }
+
+        return Optional.empty();
     }
 
     @Override
-    public List<PlayerEntity> getPlayersOfTeam(TeamDto teamDto) {
-        return teamMap.get(teamDto);
+    public boolean stopLasertagGame() {
+        // If there is no game running
+        if (!this.isRunning) {
+            return false;
+        }
+
+        // Stop the game
+        this.dispose();
+        this.lasertagGameOver();
+
+        return true;
     }
 
     @Override
-    public void playerJoinTeam(TeamDto newTeamDto, PlayerEntity player) {
+    public boolean playerJoinTeam(TeamDto newTeamDto, PlayerEntity player) {
         // Get new team
         var newTeam = teamMap.get(newTeamDto);
 
         // Check if team is full
-        if (newTeam.size() >= (long) LasertagSettingsManager.get(SettingNames.MAX_TEAM_SIZE)) {
+        if (newTeam.size() >= LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.MAX_TEAM_SIZE)) {
             // If is Server
             if (player instanceof ServerPlayerEntity) {
                 ServerEventSending.sendErrorMessageToClient((ServerPlayerEntity) player, "Team " + newTeamDto.name() + " is full.");
             }
-            return;
+            return false;
         }
 
         // Check if player is in a team already
         TeamDto oldTeamDto = null;
-        for (var t : TeamConfigManager.teamConfig.values()) {
-            if (teamMap.get(t).contains(player)) {
+        for (var t : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
+            if (teamMap.get(t).contains(player.getUuid())) {
                 oldTeamDto = t;
                 break;
             }
@@ -208,16 +254,16 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
         // If player has no team
         if (oldTeamDto == null) {
-            teamMap.playerJoinTeam(player, newTeamDto);
+            teamMap.get(newTeamDto).add(player.getUuid());
         } else {
             // If player tries to join his team again
             if (newTeamDto == oldTeamDto) {
-                return;
+                return true;
             }
 
             // Swap team
-            teamMap.playerLeaveTeam(player, oldTeamDto);
-            teamMap.playerJoinTeam(player, newTeamDto);
+            teamMap.get(oldTeamDto).remove(player.getUuid());
+            teamMap.get(newTeamDto).add(player.getUuid());
         }
 
         // Set team on player
@@ -242,6 +288,8 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
         // Notify about change
         notifyPlayersAboutUpdate();
+
+        return true;
     }
 
     @Override
@@ -249,9 +297,9 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         // For each team
         for (var team : teamMap.values()) {
             // If the player is in the team
-            if (team.contains(player)) {
+            if (team.contains(player.getUuid())) {
                 // Leave the team
-                team.remove(player);
+                team.remove(player.getUuid());
                 player.setTeam(null);
                 notifyPlayersAboutUpdate();
                 return;
@@ -261,7 +309,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
     @Override
     public void onPlayerScored(PlayerEntity player, long score) {
-        player.increaseScore(score);
+        LasertagGameManager.getInstance().getScoreManager().increaseScore(player.getUuid(), score);
 
         notifyPlayersAboutUpdate();
     }
@@ -292,6 +340,67 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         lasertargetsToReset.add(target);
     }
 
+    @Override
+    public void notifyPlayersAboutUpdate() {
+        var simplifiedTeamMap = buildSimplifiedTeamMap();
+
+        // Serialize team map to json
+        var messagesString = new Gson().toJson(simplifiedTeamMap);
+
+        // Create packet buffer
+        var buf = new PacketByteBuf(Unpooled.buffer());
+
+        // Write team map string to buffer
+        buf.writeString(messagesString);
+
+        // Send to all clients
+        ServerEventSending.sendToEveryone(getOverworld(), NetworkingConstants.LASERTAG_GAME_TEAM_OR_SCORE_UPDATE, buf);
+
+        // Update simplified team map in local copy of render data
+        LasertagGameManager.getInstance().getHudRenderManager().teamMap = simplifiedTeamMap;
+    }
+
+    @Override
+    public boolean isPlayerInTeam(ServerPlayerEntity player) {
+        // For every team
+        return teamMap
+                .values()
+                .stream()
+                .anyMatch((team) -> team
+                        .stream()
+                        .anyMatch((playerUuid -> playerUuid
+                                .equals(player.getUuid())
+                        ))
+                );
+    }
+
+    @Override
+    public void dispose() {
+        synchronized (this) {
+            if (gameTickTimer == null) {
+                return;
+            }
+            ThreadUtil.attemptShutdown(gameTickTimer);
+            gameTickTimer = null;
+        }
+    }
+
+    @Override
+    public HashMap<String, List<Tuple<String, Long>>> getSimplifiedTeamMap() {
+        return buildSimplifiedTeamMap();
+    }
+
+    @Override
+    public TeamDto getTeamOfPlayer(UUID playerUuid) {
+        return teamMap
+                .entrySet()
+                .stream()
+                .filter((team) -> team.getValue().contains(playerUuid))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+    }
+
     //endregion
 
     //region ITickable
@@ -301,14 +410,16 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
      */
     @Override
     public void doTick() {
-        System.out.println("Tick");
-        // TODO
+        // Here the music can be started
     }
 
     @Override
     public void endTick() {
-        gameTickTimer.shutdown();
-        gameTickTimer = null;
+        synchronized (this) {
+            ThreadUtil.attemptShutdown(gameTickTimer);
+            gameTickTimer = null;
+        }
+
         lasertagGameOver();
     }
 
@@ -329,28 +440,29 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
         // Deactivate every player
         for (var team : teamMap.values()) {
-            for (var player : team) {
-                PlayerDeactivatedManager.deactivate(player, world, true);
+            for (var playerUuid : team) {
+                var player = ((MinecraftServer) (Object) this).getPlayerManager().getPlayer(playerUuid);
+
+                LasertagGameManager.getInstance().getDeactivatedManager().deactivate(player, world, true);
                 player.onDeactivated();
             }
         }
 
         // Teleport players back to spawn
         for (var team : teamMap.values()) {
-            for (var player : team) {
+            for (var playerUuid : team) {
+                var player = ((MinecraftServer) (Object) this).getPlayerManager().getPlayer(playerUuid);
+
                 player.requestTeleport(0.5F, 1, 0.5F);
 
-                // If player is server player entity
-                if (player instanceof ServerPlayerEntity serverPlayerEntity) {
-                    // Create block pos
-                    var origin = new BlockPos(0, 1, 0);
+                // Create block pos
+                var origin = new BlockPos(0, 1, 0);
 
-                    // Set players spawnpoint
-                    serverPlayerEntity.setSpawnPoint(
-                            World.OVERWORLD,
-                            origin, 0.0F, true, false);
+                // Set players spawnpoint
+                player.setSpawnPoint(
+                        World.OVERWORLD,
+                        origin, 0.0F, true, false);
 
-                }
             }
         }
 
@@ -371,7 +483,13 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
             var stats = statsCalculator.getLastGamesStats();
 
             // Get gson builder
-            var gsonBuilder = TeamDtoSerializer.getSerializer();
+            var gsonBuilder = new GsonBuilder();
+
+            // Get serializer
+            var serializer = TeamDtoSerializer.getSerializer();
+
+            // Register type adapter
+            gsonBuilder.registerTypeAdapter(TeamDto.class, serializer);
 
             // To json
             var jsonString = gsonBuilder.create().toJson(stats, GameStats.class);
@@ -386,38 +504,20 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         }
     }
 
-    /**
-     * Notifies every player of this world about a team or score update
-     */
-    private void notifyPlayersAboutUpdate() {
-        var simplifiedTeamMap = buildSimplifiedTeamMap();
-
-        // Serialize team map to json
-        var messagesString = new Gson().toJson(simplifiedTeamMap);
-
-        // Create packet buffer
-        var buf = new PacketByteBuf(Unpooled.buffer());
-
-        // Write team map string to buffer
-        buf.writeString(messagesString);
-
-        // Send to all clients
-        ServerEventSending.sendToEveryone(getOverworld(), NetworkingConstants.LASERTAG_GAME_TEAM_OR_SCORE_UPDATE, buf);
-    }
-
     private HashMap<String, List<Tuple<String, Long>>> buildSimplifiedTeamMap() {
         // Create simplified team map
         final HashMap<String, List<Tuple<String, Long>>> simplifiedTeamMap = new HashMap<>();
 
         // For each team
-        for (var t : TeamConfigManager.teamConfig.values()) {
+        for (var t : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
             // Create a new list of (player name, player score) tuples
             List<Tuple<String, Long>> playerDatas = new LinkedList<>();
 
             // For every player in the team
-            for (var player : teamMap.get(t)) {
+            for (var playerUuid : teamMap.get(t)) {
                 // Add his name and score to the list
-                playerDatas.add(new Tuple<>(player.getDisplayName().getString(), player.getLasertagScore()));
+                playerDatas.add(new Tuple<>(((MinecraftServer) (Object) this).getPlayerManager().getConsistentPlayerUsername(playerUuid),
+                        LasertagGameManager.getInstance().getScoreManager().getScore(playerUuid)));
             }
 
             // Add the current team to the simplified team map
@@ -450,7 +550,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         spawnpointCache = new HashMap<>();
 
         // Initialize team lists
-        for (var team : TeamConfigManager.teamConfig.values()) {
+        for (var team : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
             spawnpointCache.put(team, new ArrayList<>());
         }
 
@@ -462,7 +562,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
         // Iterate over blocks and find spawnpoints
         world.fastSearchBlock((block, pos) -> {
-            for (var teamDto : TeamConfigManager.teamConfig.values()) {
+            for (var teamDto : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
                 if (teamDto.spawnpointBlock().equals(block)) {
                     var team = spawnpointCache.get(teamDto);
                     synchronized (teamDto) {
@@ -490,6 +590,37 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         var stopTime = System.nanoTime();
         var duration = (stopTime - startTime) / 1000000000.0;
         LasertagMod.LOGGER.info("Spawnpoint search took " + duration + "s.");
+    }
+
+    /**
+     * Checks if all starting conditions are met. If the game can start, this method returns an empty optional
+     * Otherwise it returns the reasons why the game can not start as a string.
+     * @return
+     */
+    private Optional<String> checkStartingConditions() {
+        boolean abort = false;
+        var builder = new StringBuilder();
+
+        // For every team
+        for (var team : teamMap.entrySet()) {
+            // If the team contains players
+            if (team.getValue().size() > 0) {
+                // Get the spawnpoints for the team
+                var spawnpoints = spawnpointCache.get(team.getKey());
+
+                // If the team has no spawnpoints
+                if (spawnpoints.size() == 0) {
+                    abort = true;
+                    builder.append("  *No spawnpoints were found for team '" + team.getKey().name() + "'\n");
+                }
+            }
+        }
+
+        if (abort) {
+            return Optional.of(builder.toString());
+        }
+
+        return Optional.empty();
     }
 
     //endregion

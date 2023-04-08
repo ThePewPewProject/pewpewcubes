@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag;
 
+import de.kleiner3.lasertag.block.BlockRenderLayers;
 import de.kleiner3.lasertag.client.ColorProviders;
 import de.kleiner3.lasertag.client.hud.HudRenderers;
 import de.kleiner3.lasertag.command.ClientCommands;
@@ -37,6 +38,9 @@ public class LasertagModClient implements ClientModInitializer {
 
         // Register commands
         ClientCommands.register();
+
+        // Register block render layer handler
+        BlockRenderLayers.register();
     }
 
 }

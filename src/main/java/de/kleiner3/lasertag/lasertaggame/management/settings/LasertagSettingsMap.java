@@ -1,4 +1,4 @@
-package de.kleiner3.lasertag.lasertaggame.settings;
+package de.kleiner3.lasertag.lasertaggame.management.settings;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,7 +17,7 @@ import java.util.Set;
  * @author Étienne Muser
  */
 public class LasertagSettingsMap implements Map<String, Object> {
-    private final HashMap<String, Object> hashMap;
+    private HashMap<String, Object> hashMap;
 
     public LasertagSettingsMap() {
         hashMap = new HashMap<>();

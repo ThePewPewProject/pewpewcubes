@@ -1,15 +1,15 @@
-package de.kleiner3.lasertag.lasertaggame.teammanagement;
+package de.kleiner3.lasertag.lasertaggame.management.team;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.networking.NetworkingConstants;
+import de.kleiner3.lasertag.lasertaggame.management.IManager;
+import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamConfigManagerDeserializer;
 import de.kleiner3.lasertag.common.util.FileIO;
-import de.kleiner3.lasertag.lasertaggame.teammanagement.serialize.TeamConfigManagerDeserializer;
-import de.kleiner3.lasertag.lasertaggame.teammanagement.serialize.TeamDtoSerializer;
-import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamDtoSerializer;
 import net.minecraft.block.Blocks;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.io.File;
@@ -21,7 +21,7 @@ import java.util.HashMap;
  *
  * @author Étienne Muser
  */
-public class TeamConfigManager {
+public class TeamConfigManager implements IManager {
     /**
      * The path to the team config file
      */
@@ -30,13 +30,9 @@ public class TeamConfigManager {
     /**
      * The actual in-memory team config
      */
-    public static HashMap<String, TeamDto> teamConfig = null;
+    public HashMap<String, TeamDto> teamConfig = null;
 
-    static {
-        // TODO: team config leaks over into singleplayer from servers
-        // TODO: Catch that teams must be unique
-        // TODO: Make team config reloadable by command
-
+    public TeamConfigManager() {
         // Get config file
         var teamConfigFile = new File(teamConfigFilePath);
 
@@ -47,7 +43,13 @@ public class TeamConfigManager {
                 var configFileContents = FileIO.readAllFile(teamConfigFile);
 
                 // get gson builder
-                var gsonBuilder = TeamConfigManagerDeserializer.getDeserializer();
+                var gsonBuilder = new GsonBuilder();
+
+                // Get deserializer
+                var deserializer = TeamConfigManagerDeserializer.getDeserializer();
+
+                // Register type
+                gsonBuilder.registerTypeAdapter(HashMap.class, deserializer);
 
                 // Parse
                 teamConfig = gsonBuilder.create().fromJson(configFileContents, new TypeToken<HashMap<String, TeamDto>>() {
@@ -71,7 +73,10 @@ public class TeamConfigManager {
             teamConfig.put("Pink", new TeamDto("Pink", 255, 0, 255, Blocks.PINK_CONCRETE));
 
             // Get gson builder
-            var gsonBuilder = TeamDtoSerializer.getSerializer();
+            var gsonBuilder = new GsonBuilder();
+
+            // Register type adapter
+            gsonBuilder.registerTypeAdapter(TeamDto.class, TeamDtoSerializer.getSerializer());
 
             // Serialize
             var configJson = gsonBuilder.setPrettyPrinting().create().toJson(teamConfig);
@@ -98,20 +103,22 @@ public class TeamConfigManager {
         }
     }
 
-    public static void syncTeamsToClient(ServerPlayerEntity player) {
-        // Get gson builder
-        var gsonBuilder = TeamDtoSerializer.getSerializer();
+    @Override
+    public void dispose() {
+        // Nothing to dispose
+    }
 
-        // Serialize
-        var configJson = gsonBuilder.create().toJson(teamConfig);
+    public String toJson() {
+        return new Gson().toJson(this);
+    }
 
-        // Create packet buffer
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+    public static TeamConfigManager fromJson(String jsonString) {
+        return new Gson().fromJson(jsonString, TeamConfigManager.class);
+    }
 
-        // Write errorMessage to buffer
-        buf.writeString(configJson);
-
-        // Send to all clients
-        ServerPlayNetworking.send(player, NetworkingConstants.LASERTAG_TEAMS_SYNC, buf);
+    @Override
+    public void syncToClient(ServerPlayerEntity client, MinecraftServer server) {
+        // Do not sync!
+        throw new UnsupportedOperationException("TeamConfigManager should not be synced on its own.");
     }
 }
