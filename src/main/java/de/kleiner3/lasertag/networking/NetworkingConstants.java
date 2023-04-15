@@ -27,6 +27,8 @@ public class NetworkingConstants {
     public static final Identifier PLAY_WEAPON_FIRED_SOUND = new Identifier(LasertagMod.ID, "play_weapon_fired_sound");
     public static final Identifier PLAY_WEAPON_FAILED_SOUND = new Identifier(LasertagMod.ID, "play_weapon_failed_sound");
     public static final Identifier PLAY_PLAYER_SCORED_SOUND = new Identifier(LasertagMod.ID, "play_player_scored_sound");
+    public static final Identifier PLAY_PLAYER_DEACTIVATED_SOUND = new Identifier(LasertagMod.ID, "play_player_deactivated_sound");
+    public static final Identifier PLAY_PLAYER_ACTIVATED_SOUND = new Identifier(LasertagMod.ID, "play_player_activated_sound");
     public static final Identifier GAME_STARTED = new Identifier(LasertagMod.ID, "game_started");
     public static final Identifier GAME_START_ABORTED = new Identifier(LasertagMod.ID, "game_start_aborted");
     public static final Identifier GAME_OVER = new Identifier(LasertagMod.ID, "game_over");

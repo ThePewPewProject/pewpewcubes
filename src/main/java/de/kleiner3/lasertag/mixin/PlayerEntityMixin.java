@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.mixin;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
+import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
@@ -61,7 +62,7 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
         MinecraftServer server = player.getServer();
         if (server != null) {
             server.onPlayerScored(player, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.PLAYER_HIT_SCORE));
-            ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) player);
+            ServerEventSending.sendPlayerSoundEvent((ServerPlayerEntity) player, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND);
         }
     }
 
@@ -77,6 +78,9 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
 
     @Override
     public void onDeactivated() {
+        // Play deactivation sound
+        ServerEventSending.sendPlayerSoundEvent((ServerPlayerEntity)(Object)this, NetworkingConstants.PLAY_PLAYER_DEACTIVATED_SOUND);
+
         // Get players weapon
         var weaponStack = ((PlayerEntity) (Object) this).getMainHandStack();
 
@@ -91,6 +95,9 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer {
 
     @Override
     public void onActivated() {
+        // Play activation sound
+        ServerEventSending.sendPlayerSoundEvent((ServerPlayerEntity)(Object)this, NetworkingConstants.PLAY_PLAYER_ACTIVATED_SOUND);
+
         // Get players weapon
         var weaponStack = ((PlayerEntity) (Object) this).getMainHandStack();
 

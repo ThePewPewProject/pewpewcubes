@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.block.entity;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.entity.Entities;
+import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
 import net.minecraft.block.BlockState;
@@ -45,7 +46,7 @@ public class LaserTargetBlockEntity extends BlockEntity {
         }
 
         server.onPlayerScored(playerEntity, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.LASERTARGET_HIT_SCORE));
-        ServerEventSending.sendPlayerScoredSoundEvent((ServerPlayerEntity) playerEntity);
+        ServerEventSending.sendPlayerSoundEvent((ServerPlayerEntity) playerEntity, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND);
 
         // Register on server
         server.registerLasertarget(this);

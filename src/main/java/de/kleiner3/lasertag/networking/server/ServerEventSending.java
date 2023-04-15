@@ -53,11 +53,13 @@ public class ServerEventSending {
     }
 
     /**
-     * Sends the player scored sound event to the client
+     * Sends a sound event given its id to the client
      *
      * @param client The ServerPlayerEntity to send the event to
+     * @param soundEventId The Id of the sound event
      */
-    public static void sendPlayerScoredSoundEvent(ServerPlayerEntity client) {
-        ServerPlayNetworking.send(client, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND, PacketByteBufs.empty());
+    public static void sendPlayerSoundEvent(ServerPlayerEntity client, Identifier soundEventId)
+    {
+        ServerPlayNetworking.send(client, soundEventId, PacketByteBufs.empty());
     }
 }
