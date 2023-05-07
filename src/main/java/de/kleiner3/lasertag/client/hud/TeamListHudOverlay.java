@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.client.hud;
 import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.common.util.AdvancedDrawableHelper;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -26,16 +27,30 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
     private static final int TEXT_PADDING = 2;
     private static final int INTRA_PLAYER_PADDING = 0;
     private static final int TEAM_LIST_TOP_PADDING = 15;
-    private static final TextRenderer TEXT_RENDERER = MinecraftClient.getInstance().textRenderer;
+    private static final int NOTE_TOP_PADDING = 25;
+    private static final int BACKGROUND_COLOR = 0x66000000;
+    private static final int MAX_NUMBER_PLAYERS_IN_WITHOUT_TEAM_LIST = 15;
+    private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
+    private static final TextRenderer TEXT_RENDERER = CLIENT.textRenderer;
 
     /**
      * Renders the current team list into the matrix stack
      * @param matrices
-     * @param scaledWindowWidth
      */
-    public void render(MatrixStack matrices, int scaledWindowWidth) {
+    public void render(MatrixStack matrices) {
 
-        drawPlayersWithoutTeam(matrices, scaledWindowWidth);
+        // Get the scaled window size
+        var scaledWindowWidth = CLIENT.getWindow().getScaledWidth();
+        var scaledWindowHeight = CLIENT.getWindow().getScaledHeight();
+
+        drawPlayersWithoutTeam(matrices, scaledWindowWidth, scaledWindowHeight);
+
+        // If render team list setting is disabled
+        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingNames.RENDER_TEAM_LIST)) {
+            var text = Text.literal("Render team list setting is disabled").asOrderedText();
+            drawCenteredTextWithShadow(matrices, TEXT_RENDERER, text, scaledWindowWidth / 2, NOTE_TOP_PADDING, 0xFFFFFF);
+            return;
+        }
 
         // Get the team config
         var teamConfig = LasertagGameManager.getInstance().getTeamManager().teamConfig;
@@ -52,9 +67,8 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
 
         // If there is no team to show
         if (numberOfTeams == 0) {
-            var text = "No teams to show";
-            var width = TEXT_RENDERER.getWidth(text);
-            TEXT_RENDERER.drawWithShadow(matrices, text, scaledWindowWidth / 2.0F - width / 2.0F, 20.0F, 0xFFFFFF);
+            var text = Text.literal("No teams to show").asOrderedText();
+            drawCenteredTextWithShadow(matrices, TEXT_RENDERER, text, scaledWindowWidth / 2, NOTE_TOP_PADDING, 0xFFFFFF);
             return;
         }
 
@@ -71,7 +85,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         var startX = (int)((scaledWindowWidth / 2.0) - (teamListWidth / 2.0));
 
         // Draw the background rectangle
-        fill(matrices, startX, TEAM_LIST_TOP_PADDING, startX + teamListWidth, TEAM_LIST_TOP_PADDING + teamListHeight, 0x66000000);
+        fill(matrices, startX, TEAM_LIST_TOP_PADDING, startX + teamListWidth, TEAM_LIST_TOP_PADDING + teamListHeight, BACKGROUND_COLOR);
 
         var teamIterator = teams.iterator();
         for (int row = 0; row < numberOfRows; ++row) {
@@ -135,15 +149,36 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         }
     }
 
-    private void drawPlayersWithoutTeam(MatrixStack matrices, int scaledWindowWidth) {
+    private void drawPlayersWithoutTeam(MatrixStack matrices, int scaledWindowWidth, int scaledWindowHeight) {
+
+        // Apply padding
+        scaledWindowWidth -= TEAM_PADDING;
+        scaledWindowHeight -= TEAM_PADDING;
 
         // Get the players without team
-        var playersWithoutTeam = MinecraftClient.getInstance().player.networkHandler.getPlayerList().stream()
+        var playersWithoutTeam = CLIENT.player.networkHandler.getPlayerList().stream()
                 .filter(playerListEntry -> !playerHasTeam(playerListEntry.getProfile().getName()))
+                .limit(MAX_NUMBER_PLAYERS_IN_WITHOUT_TEAM_LIST)
                 .toList();
 
         var startX = scaledWindowWidth - TEAM_WIDTH;
         var height = TEXT_PADDING + TEXT_RENDERER.fontHeight + TEXT_PADDING + (playersWithoutTeam.size() * (INTRA_PLAYER_PADDING + TEXT_RENDERER.fontHeight));
+        var startY = scaledWindowHeight - height;
+
+        // Draw background rect
+        fill(matrices, startX, startY, startX + TEAM_WIDTH, startY + height, BACKGROUND_COLOR);
+
+        // Draw header
+        TEXT_RENDERER.drawWithShadow(matrices, "Players without team:", startX + TEXT_PADDING, startY + TEXT_PADDING, 0xFFFFFFFF);
+
+        var yPos = startY + TEXT_PADDING + TEXT_RENDERER.fontHeight + TEXT_PADDING;
+        for (var player : playersWithoutTeam) {
+
+            // Draw players name
+            TEXT_RENDERER.draw(matrices, player.getProfile().getName(), startX + TEXT_PADDING, yPos, 0xFFFFFFFF);
+
+            yPos += (TEXT_RENDERER.fontHeight + INTRA_PLAYER_PADDING);
+        }
     }
 
     private boolean playerHasTeam(String playerUsername) {

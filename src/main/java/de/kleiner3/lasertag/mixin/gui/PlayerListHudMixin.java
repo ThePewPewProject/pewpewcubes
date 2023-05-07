@@ -25,14 +25,10 @@ public abstract class PlayerListHudMixin {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void onRender(MatrixStack matrices, int scaledWindowWidth, Scoreboard scoreboard, ScoreboardObjective objective, CallbackInfo ci) {
 
-        // Only show own hud and return if team list should be rendered
-        if (LasertagGameManager.getInstance().getSettingsManager().get(SettingNames.RENDER_TEAM_LIST)) {
+        // Call own render method
+        teamListHudOverlay.render(matrices);
 
-            // Call own render method
-            teamListHudOverlay.render(matrices, scaledWindowWidth);
-
-            // Prevent the rest of the render code of PlayerListHud from executing
-            ci.cancel();
-        }
+        // Prevent the rest of the render code of PlayerListHud from executing
+        ci.cancel();
     }
 }
