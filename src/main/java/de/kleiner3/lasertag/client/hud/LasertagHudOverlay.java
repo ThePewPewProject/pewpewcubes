@@ -51,7 +51,6 @@ public class LasertagHudOverlay implements HudRenderCallback {
         TextRenderer renderer = client.textRenderer;
 
         // Render HUD
-        renderTeamList(renderer, matrixStack, renderData);
         renderTimer(renderer, matrixStack, renderData);
         renderProgressBar(renderer, matrixStack, renderData);
         renderStartingIn(renderer, matrixStack, renderData);
