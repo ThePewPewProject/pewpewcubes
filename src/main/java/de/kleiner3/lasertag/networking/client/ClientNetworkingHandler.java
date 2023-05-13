@@ -19,6 +19,7 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_PLAYER_SCORED_SOUND, new PlayerScoredSoundEventCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_PLAYER_DEACTIVATED_SOUND, new PlayerDeactivatedSoundEventCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_PLAYER_ACTIVATED_SOUND, new PlayerActivatedSoundEventCallback());
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_COLOR_CHANGED, new PlayerColorChangedCallback());
 
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_STARTED, new LasertagGameStartedCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_START_ABORTED, new LasertagGameStartAbortedCallback());

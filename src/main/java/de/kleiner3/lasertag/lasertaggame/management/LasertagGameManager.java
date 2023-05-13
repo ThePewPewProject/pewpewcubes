@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.lasertaggame.management;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.GsonBuilder;
 import com.google.gson.ToNumberPolicy;
+import de.kleiner3.lasertag.lasertaggame.management.color.PlayerColorManager;
 import de.kleiner3.lasertag.lasertaggame.management.deactivation.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.lasertaggame.management.gui.LasertagHudRenderManager;
 import de.kleiner3.lasertag.lasertaggame.management.score.LasertagScoreManager;
@@ -57,6 +58,8 @@ public class LasertagGameManager implements IManager {
 
     private LasertagHudRenderManager hudRenderManager;
 
+    private PlayerColorManager playerColorManager;
+
     //endregion
 
     private LasertagGameManager() {
@@ -65,6 +68,7 @@ public class LasertagGameManager implements IManager {
         teamManager = new TeamConfigManager();
         scoreManager = new LasertagScoreManager();
         hudRenderManager = new LasertagHudRenderManager(teamManager.teamConfig.values());
+        playerColorManager = new PlayerColorManager();
     }
 
     //region Public methods
@@ -89,12 +93,15 @@ public class LasertagGameManager implements IManager {
         return scoreManager;
     }
 
+    public PlayerColorManager getPlayerColorManager() { return playerColorManager; }
+
     @Override
     public void dispose() {
         teamManager.dispose();
         settingsManager.dispose();
         hudRenderManager.dispose();
         deactivatedManager.dispose();
+        playerColorManager.dispose();
     }
 
     public static LasertagGameManager fromJson(String jsonString) {

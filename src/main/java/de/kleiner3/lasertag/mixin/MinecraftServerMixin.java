@@ -289,6 +289,9 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         // Notify about change
         notifyPlayersAboutUpdate();
 
+        // Sync to clients
+        ServerEventSending.sendPlayerColorChanged(getOverworld(), player.getLasertagUsername(), newTeamDto.color().getValue());
+
         return true;
     }
 
@@ -302,6 +305,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
                 team.remove(player.getUuid());
                 player.setTeam(null);
                 notifyPlayersAboutUpdate();
+                ServerEventSending.sendPlayerColorChanged(getOverworld(), player.getLasertagUsername(), null);
                 return;
             }
         }

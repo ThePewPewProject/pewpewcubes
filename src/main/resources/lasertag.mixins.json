@@ -14,7 +14,8 @@
   "client": [
     "LivingEntityRendererMixin",
     "gui.MoreWorldOptionsDialogMixin",
-    "gui.PlayerListHudMixin"
+    "gui.PlayerListHudMixin",
+    "EntityRendererMixin"
   ],
   "server": [
 
