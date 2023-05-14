@@ -33,6 +33,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -153,15 +154,8 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
                 var destination = spawnpoints.get(idx);
                 player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
 
-                // Give player mining fatigue
-                player.addStatusEffect(
-                        new StatusEffectInstance(StatusEffect.byRawId(4),
-                                (int) (((LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.PLAY_TIME)) * 60 * 20) +
-                                        ((LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.START_TIME)) * 20) + 40),
-                                Integer.MAX_VALUE,
-                                false,
-                                false));
-
+                // Set player to adventure gamemode
+                player.changeGameMode(GameMode.ADVENTURE);
 
                 // Get spawn pos
                 var spawnPos = new BlockPos(destination.getX(), destination.getY() + 1, destination.getZ());
@@ -467,6 +461,8 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
                         World.OVERWORLD,
                         origin, 0.0F, true, false);
 
+                // Set player to adventure gamemode
+                player.changeGameMode(GameMode.ADVENTURE);
             }
         }
 
