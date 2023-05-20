@@ -149,7 +149,7 @@ public class ArenaChunkGenerator extends ChunkGenerator {
 
     @Override
     public int getMinimumY() {
-        return -63;
+        return 0;
     }
 
     @Override
@@ -163,7 +163,7 @@ public class ArenaChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public Codec<ArenaChunkGenerator> getCodec() {
+    protected Codec<? extends ArenaChunkGenerator> getCodec() {
         return CODEC;
     }
 }
