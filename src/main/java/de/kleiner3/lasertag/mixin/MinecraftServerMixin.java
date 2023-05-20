@@ -443,6 +443,11 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
             for (var playerUuid : team) {
                 var player = ((MinecraftServer) (Object) this).getPlayerManager().getPlayer(playerUuid);
 
+                // Sanity check
+                if (player == null) {
+                    continue;
+                }
+
                 LasertagGameManager.getInstance().getDeactivatedManager().deactivate(player, world, true);
                 player.onDeactivated();
             }
@@ -452,6 +457,11 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         for (var team : teamMap.values()) {
             for (var playerUuid : team) {
                 var player = ((MinecraftServer) (Object) this).getPlayerManager().getPlayer(playerUuid);
+
+                // Sanity check
+                if (player == null) {
+                    continue;
+                }
 
                 player.requestTeleport(0.5F, 1, 0.5F);
 
