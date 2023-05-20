@@ -1,6 +1,5 @@
 package de.kleiner3.lasertag.lasertaggame.management.deactivation;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
@@ -18,7 +17,6 @@ import net.minecraft.world.World;
 
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**

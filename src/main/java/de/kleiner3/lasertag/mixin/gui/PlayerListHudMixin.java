@@ -1,8 +1,6 @@
 package de.kleiner3.lasertag.mixin.gui;
 
 import de.kleiner3.lasertag.client.hud.TeamListHudOverlay;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
 import net.minecraft.client.gui.hud.PlayerListHud;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.scoreboard.Scoreboard;

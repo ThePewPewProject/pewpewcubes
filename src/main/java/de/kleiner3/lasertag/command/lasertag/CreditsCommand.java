@@ -9,7 +9,6 @@ import de.kleiner3.lasertag.common.util.ThreadUtil;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
