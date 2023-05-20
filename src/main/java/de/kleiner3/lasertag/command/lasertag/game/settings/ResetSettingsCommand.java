@@ -26,6 +26,7 @@ public class ResetSettingsCommand extends ServerFeedbackCommand {
 
     public static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
         lab.then(literal("settingsReset")
+                .requires(s -> s.hasPermissionLevel(4))
                 .executes(new ResetSettingsCommand()));
     }
 }
