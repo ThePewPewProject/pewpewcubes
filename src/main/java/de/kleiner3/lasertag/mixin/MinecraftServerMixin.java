@@ -151,6 +151,11 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
                 var player = ((MinecraftServer) (Object) this).getPlayerManager().getPlayer(playerUuid);
 
+                // Sanity check
+                if (player == null) {
+                    continue;
+                }
+
                 int idx = world.getRandom().nextInt(spawnpoints.size());
 
                 var destination = spawnpoints.get(idx);
