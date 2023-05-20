@@ -41,6 +41,7 @@ public class LasertagSettingsCommand extends ServerFeedbackCommand {
         GenerateStatisticsFileSettingCommand.register(cmd);
         AutoOpenStatisticsFileSettingCommand.register(cmd);
         OriginSpawnSettingCommand.register(cmd);
+        DeathPenaltySettingCommand.register(cmd);
 
         lab.then(cmd);
     }

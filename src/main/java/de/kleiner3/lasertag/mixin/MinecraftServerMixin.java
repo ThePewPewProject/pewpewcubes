@@ -34,6 +34,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -138,6 +139,10 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
             ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_START_ABORTED, new PacketByteBuf(Unpooled.buffer()));
             return abortReasons;
         }
+
+        // Set gamerules
+        ((MinecraftServer)(Object)this).getGameRules().get(GameRules.KEEP_INVENTORY).set(true, ((MinecraftServer)(Object)this));
+        ((MinecraftServer)(Object)this).getGameRules().get(GameRules.DO_IMMEDIATE_RESPAWN).set(true, ((MinecraftServer)(Object)this));
 
         // Teleport players
         for (var teamDto : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
