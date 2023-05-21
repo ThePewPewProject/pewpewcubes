@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.events.callback;
 
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -26,7 +26,7 @@ public class PlayerJoinEventHandler {
         player.setTeam(server.getTeamOfPlayer(player.getUuid()));
 
         // If origin spawn setting is disabled
-        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingNames.ORIGIN_SPAWN)) {
+        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.ORIGIN_SPAWN)) {
             // Dont teleport him to origin
             return;
         }

@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -22,6 +22,6 @@ public class LasertagGameStartedCallback implements ClientPlayNetworking.PlayCha
         renderData.shouldRenderNameTags = false;
 
         // Start pregame count down timer
-        renderData.startPreGameCountdownTimer(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.START_TIME));
+        renderData.startPreGameCountdownTimer(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.START_TIME));
     }
 }

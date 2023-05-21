@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
@@ -73,7 +73,7 @@ public class PlayerDeactivatedManager implements IManager {
             player.onActivated();
             sendDeactivatedToClients(world, uuid, false);
             ThreadUtil.attemptShutdown(deactivationThread);
-        }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.DEACTIVATE_TIME), TimeUnit.SECONDS);
+        }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAYER_DEACTIVATE_TIME), TimeUnit.SECONDS);
     }
 
     /**

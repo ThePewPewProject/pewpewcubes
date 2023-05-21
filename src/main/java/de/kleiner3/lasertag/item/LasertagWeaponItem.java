@@ -4,9 +4,9 @@ import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.block.LaserTargetBlock;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
 import de.kleiner3.lasertag.lasertaggame.ILasertagColorable;
 import de.kleiner3.lasertag.common.util.RaycastUtil;
 import io.netty.buffer.Unpooled;
@@ -49,13 +49,13 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
 
     @Override
     public int getRange() {
-        return Math.toIntExact(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.WEAPON_REACH));
+        return Math.toIntExact(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.WEAPON_REACH));
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
         // Apply cooldown
-        playerEntity.getItemCooldownManager().set(this, Math.toIntExact(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.WEAPON_COOLDOWN)));
+        playerEntity.getItemCooldownManager().set(this, Math.toIntExact(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.WEAPON_COOLDOWN)));
 
         // Get all armor pieces of the player
         DefaultedList<ItemStack> armorPieces = (DefaultedList<ItemStack>) playerEntity.getArmorItems();
@@ -142,7 +142,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements ILasertagCol
         }
 
         // Spawn laser ray entity
-        if (LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingNames.SHOW_LASER_RAYS)) {
+        if (LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.SHOW_LASER_RAYS)) {
             LaserRayEntity ray = new LaserRayEntity(world, playerEntity, color, hit);
             world.spawnEntity(ray);
 

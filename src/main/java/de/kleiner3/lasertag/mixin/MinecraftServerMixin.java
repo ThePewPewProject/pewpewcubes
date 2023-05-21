@@ -12,7 +12,7 @@ import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.lasertaggame.ILasertagGame;
 import de.kleiner3.lasertag.lasertaggame.ITickable;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamDtoSerializer;
 import de.kleiner3.lasertag.lasertaggame.statistics.GameStats;
@@ -178,7 +178,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         isRunning = true;
 
         var preGameDelayTimer = ThreadUtil.createScheduledExecutor("lasertag-server-pregame-delay-timer-thread-%d");
-        var preGameDelay = LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.START_TIME);
+        var preGameDelay = LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.START_TIME);
         preGameDelayTimer.schedule(() -> {
 
             // Activate every player
@@ -210,7 +210,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
             renderData.shouldRenderNameTags = false;
 
             // Start pregame count down timer
-            renderData.startPreGameCountdownTimer(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.START_TIME));
+            renderData.startPreGameCountdownTimer(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.START_TIME));
         }
 
         return Optional.empty();
@@ -236,7 +236,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         var newTeam = teamMap.get(newTeamDto);
 
         // Check if team is full
-        if (newTeam.size() >= LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.MAX_TEAM_SIZE)) {
+        if (newTeam.size() >= LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.MAX_TEAM_SIZE)) {
             // If is Server
             if (player instanceof ServerPlayerEntity) {
                 ServerEventSending.sendErrorMessageToClient((ServerPlayerEntity) player, "Team " + newTeamDto.name() + " is full.");

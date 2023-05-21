@@ -67,7 +67,10 @@ public class LasertagSettingsManager implements IManager {
 
     //region Public methods
 
-    public <T> T get(String key) {
+    public <T> T get(SettingDescription setting) {
+
+        var key = setting.getName();
+
         // If key not in settings
         if (!settings.containsKey(key)) {
             putDefault(key);

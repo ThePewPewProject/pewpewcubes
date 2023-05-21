@@ -2,7 +2,7 @@ package de.kleiner3.lasertag.client.hud;
 
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.gui.LasertagHudRenderManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import de.kleiner3.lasertag.common.util.DurationUtils;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -92,20 +92,20 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
     private void renderTimer(TextRenderer renderer, MatrixStack matrices, LasertagHudRenderManager renderData) {
         // If game time should not be rendered
-        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingNames.RENDER_TIMER)) {
+        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.RENDER_TIMER)) {
             // Abort
             return;
         }
 
         DrawableHelper.drawCenteredText(matrices, renderer,
                 DurationUtils.toString(
-                        Duration.ofSeconds((LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.PLAY_TIME) * 60L) - renderData.gameTime)),
+                        Duration.ofSeconds((LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAY_TIME) * 60L) - renderData.gameTime)),
                 renderData.wMid, LasertagHudRenderManager.textPadding, 0xFFFFFF);
     }
 
     private void renderTeamList(TextRenderer renderer, MatrixStack matrices, LasertagHudRenderManager renderData) {
         // If team list should not be rendered
-        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingNames.RENDER_TEAM_LIST)) {
+        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.RENDER_TEAM_LIST)) {
             // Abort
             return;
         }

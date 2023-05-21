@@ -3,7 +3,7 @@ package de.kleiner3.lasertag.client.hud;
 import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.common.util.AdvancedDrawableHelper;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -45,7 +45,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         drawPlayersWithoutTeam(matrices, scaledWindowWidth, scaledWindowHeight);
 
         // If render team list setting is disabled
-        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingNames.RENDER_TEAM_LIST)) {
+        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.RENDER_TEAM_LIST)) {
             var text = Text.literal("Render team list setting is disabled").asOrderedText();
             drawCenteredTextWithShadow(matrices, TEXT_RENDERER, text, scaledWindowWidth / 2, NOTE_TOP_PADDING, 0xFFFFFF);
             return;

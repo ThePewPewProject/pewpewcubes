@@ -3,7 +3,7 @@ package de.kleiner3.lasertag.block.entity;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.entity.Entities;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import net.minecraft.block.BlockState;
@@ -46,7 +46,7 @@ public class LaserTargetBlockEntity extends BlockEntity {
             return;
         }
 
-        server.onPlayerScored(playerEntity, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.LASERTARGET_HIT_SCORE));
+        server.onPlayerScored(playerEntity, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.LASERTARGET_HIT_SCORE));
         ServerEventSending.sendPlayerSoundEvent((ServerPlayerEntity) playerEntity, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND);
 
         // Register on server
@@ -61,7 +61,7 @@ public class LaserTargetBlockEntity extends BlockEntity {
             deactivated = false;
 
             ThreadUtil.attemptShutdown(deactivationThread);
-        }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.LASERTARGET_DEACTIVATE_TIME), TimeUnit.SECONDS);
+        }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.LASERTARGET_DEACTIVATE_TIME), TimeUnit.SECONDS);
 
         // Add player to the players who hit the target
         hitBy.add(playerEntity.getUuid());

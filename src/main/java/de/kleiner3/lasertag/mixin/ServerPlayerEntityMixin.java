@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.mixin;
 
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
@@ -26,7 +26,7 @@ public class ServerPlayerEntityMixin {
         // Get the server
         MinecraftServer server = player.getServer();
         if (server != null) {
-            var deathPenalty = -LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.DEATH_PENALTY);
+            var deathPenalty = -LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.DEATH_PENALTY);
             server.onPlayerScored(player, deathPenalty);
         }
     }
