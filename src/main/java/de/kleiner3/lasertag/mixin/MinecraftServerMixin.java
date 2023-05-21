@@ -178,7 +178,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         isRunning = true;
 
         var preGameDelayTimer = ThreadUtil.createScheduledExecutor("lasertag-server-pregame-delay-timer-thread-%d");
-        var preGameDelay = LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.START_TIME);
+        var preGameDelay = LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PREGAME_DURATION);
         preGameDelayTimer.schedule(() -> {
 
             // Activate every player
@@ -210,7 +210,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
             renderData.shouldRenderNameTags = false;
 
             // Start pregame count down timer
-            renderData.startPreGameCountdownTimer(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.START_TIME));
+            renderData.startPreGameCountdownTimer(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PREGAME_DURATION));
         }
 
         return Optional.empty();

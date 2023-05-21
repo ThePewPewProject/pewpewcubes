@@ -26,7 +26,7 @@ public class PlayerJoinEventHandler {
         player.setTeam(server.getTeamOfPlayer(player.getUuid()));
 
         // If origin spawn setting is disabled
-        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.ORIGIN_SPAWN)) {
+        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.DO_ORIGIN_SPAWN)) {
             // Dont teleport him to origin
             return;
         }

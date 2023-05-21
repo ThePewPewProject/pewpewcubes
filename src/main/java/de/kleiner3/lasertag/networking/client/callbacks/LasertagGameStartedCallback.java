@@ -22,6 +22,6 @@ public class LasertagGameStartedCallback implements ClientPlayNetworking.PlayCha
         renderData.shouldRenderNameTags = false;
 
         // Start pregame count down timer
-        renderData.startPreGameCountdownTimer(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.START_TIME));
+        renderData.startPreGameCountdownTimer(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PREGAME_DURATION));
     }
 }
