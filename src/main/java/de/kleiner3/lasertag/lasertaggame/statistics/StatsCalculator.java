@@ -2,6 +2,7 @@ package de.kleiner3.lasertag.lasertaggame.statistics;
 
 import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import net.minecraft.server.MinecraftServer;
 
@@ -27,6 +28,12 @@ public class StatsCalculator {
 
         lastGamesStats = new GameStats();
         for (TeamDto teamDto : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
+
+            // Skip spectators
+            if (teamDto.equals(TeamConfigManager.SPECTATORS)) {
+                continue;
+            }
+
             var team = teamMap.get(teamDto.name());
             var teamScore = 0L;
 

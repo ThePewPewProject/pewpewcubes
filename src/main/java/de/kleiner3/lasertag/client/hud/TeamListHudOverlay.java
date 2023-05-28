@@ -4,6 +4,7 @@ import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.common.util.AdvancedDrawableHelper;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -43,6 +44,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         var scaledWindowHeight = CLIENT.getWindow().getScaledHeight();
 
         drawPlayersWithoutTeam(matrices, scaledWindowWidth, scaledWindowHeight);
+        drawSpectators(matrices, scaledWindowHeight);
 
         // If render team list setting is disabled
         if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.RENDER_TEAM_LIST)) {
@@ -60,6 +62,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         // Get a list of Tuple<TeamDto, List<Tuple<String, Long>>> (One entry is a team) which are not empty
         var teams = renderData.teamMap.entrySet().stream()
                 .filter(entry -> entry.getValue().size() > 0)
+                .filter(entry -> !entry.getKey().equals(TeamConfigManager.SPECTATORS.name()))
                 .map(entry -> new Tuple<TeamDto, List<Tuple<String, Long>>>(teamConfig.get(entry.getKey()), entry.getValue()))
                 .toList();
         var numberOfTeams = teams.size();
@@ -175,6 +178,43 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
 
             // Draw players name
             TEXT_RENDERER.draw(matrices, player.getProfile().getName(), startX + TEXT_PADDING, yPos, 0xFFFFFFFF);
+
+            yPos += (TEXT_RENDERER.fontHeight + INTRA_PLAYER_PADDING);
+        }
+    }
+
+    private void drawSpectators(MatrixStack matrices, int scaledWindowHeight) {
+
+        // Get the HUD render data
+        var renderData = LasertagGameManager.getInstance().getHudRenderManager();
+
+        // Get the team
+        var spectatorTeam = renderData.teamMap.entrySet().stream()
+                .filter(entry -> entry.getKey().equals(TeamConfigManager.SPECTATORS.name()))
+                .findFirst()
+                .get()
+                .getValue().stream()
+                .limit(MAX_NUMBER_PLAYERS_IN_WITHOUT_TEAM_LIST)
+                .toList();
+
+        // Apply padding
+        scaledWindowHeight -= TEAM_PADDING;
+
+        var startX = TEAM_PADDING;
+        var height = TEXT_PADDING + TEXT_RENDERER.fontHeight + TEXT_PADDING + (spectatorTeam.size() * (INTRA_PLAYER_PADDING + TEXT_RENDERER.fontHeight));
+        var startY = scaledWindowHeight - height;
+
+        // Draw background rect
+        fill(matrices, startX, startY, startX + TEAM_WIDTH, startY + height, BACKGROUND_COLOR);
+
+        // Draw header
+        TEXT_RENDERER.drawWithShadow(matrices, "Spectators:", startX + TEXT_PADDING, startY + TEXT_PADDING, 0xFFFFFFFF);
+
+        var yPos = startY + TEXT_PADDING + TEXT_RENDERER.fontHeight + TEXT_PADDING;
+        for (var player : spectatorTeam) {
+
+            // Draw players name
+            TEXT_RENDERER.draw(matrices, player.x(), startX + TEXT_PADDING, yPos, 0xFFFFFFFF);
 
             yPos += (TEXT_RENDERER.fontHeight + INTRA_PLAYER_PADDING);
         }

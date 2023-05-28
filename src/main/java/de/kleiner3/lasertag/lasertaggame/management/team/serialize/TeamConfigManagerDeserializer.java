@@ -2,6 +2,7 @@ package de.kleiner3.lasertag.lasertaggame.management.team.serialize;
 
 import com.google.gson.*;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
+import net.minecraft.block.Block;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -40,10 +41,17 @@ public class TeamConfigManagerDeserializer {
                     var b = teamObject.get("blue").getAsInt();
 
                     // Get id of spawnpoint block
-                    var spawnpointBlockId = new Identifier(teamObject.get("spawnpointBlock").getAsString());
+                    var spawnpointBlockIdString = teamObject.get("spawnpointBlock").getAsString();
+                    Block spawnPointBlock = null;
+
+                    if (!spawnpointBlockIdString.equals("null")) {
+
+                        var spawnpointBlockId = new Identifier(spawnpointBlockIdString);
+                        spawnPointBlock = Registry.BLOCK.get(spawnpointBlockId);
+                    }
 
                     // Create team
-                    var teamDto = new TeamDto(teamName, r, g, b, Registry.BLOCK.get(spawnpointBlockId));
+                    var teamDto = new TeamDto(teamName, r, g, b, spawnPointBlock);
 
                     config.put(teamName, teamDto);
                 }

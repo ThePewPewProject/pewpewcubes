@@ -1,10 +1,9 @@
 package de.kleiner3.lasertag.client.hud;
 
+import de.kleiner3.lasertag.common.util.DurationUtils;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.gui.LasertagHudRenderManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
-import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
-import de.kleiner3.lasertag.common.util.DurationUtils;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -101,68 +100,6 @@ public class LasertagHudOverlay implements HudRenderCallback {
                 DurationUtils.toString(
                         Duration.ofSeconds((LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAY_TIME) * 60L) - renderData.gameTime)),
                 renderData.wMid, LasertagHudRenderManager.textPadding, 0xFFFFFF);
-    }
-
-    private void renderTeamList(TextRenderer renderer, MatrixStack matrices, LasertagHudRenderManager renderData) {
-        // If team list should not be rendered
-        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.RENDER_TEAM_LIST)) {
-            // Abort
-            return;
-        }
-
-        // Iteration index
-        int i = 0;
-        for (TeamDto teamDto : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
-
-            // Draw teams on the left
-            if (i < 3) {
-                // The height to start rendering this box at
-                int y = LasertagHudRenderManager.startY + i * (LasertagHudRenderManager.boxHeight + LasertagHudRenderManager.margin);
-
-                renderTeam(renderer, matrices, teamDto, 0, y, renderData);
-            } else { // Draw teams on the right
-                // The height to start rendering this box at
-                int y = LasertagHudRenderManager.startY + (i - 3) * (LasertagHudRenderManager.boxHeight + LasertagHudRenderManager.margin);
-
-                renderTeam(renderer, matrices, teamDto, renderData.width - LasertagHudRenderManager.boxWidth, y, renderData);
-            }
-
-            ++i;
-        }
-    }
-
-    private void renderTeam(TextRenderer renderer, MatrixStack matrices, TeamDto team, int x, int y, LasertagHudRenderManager renderData) {
-        var teamScore = 0;
-
-        // Draw the opaque box
-        DrawableHelper.fill(matrices, x, y, x + LasertagHudRenderManager.boxWidth, y + LasertagHudRenderManager.boxHeight, LasertagHudRenderManager.boxColor);
-
-        // Draw team name
-        renderer.draw(matrices, team.name(), x + LasertagHudRenderManager.textPadding, y + LasertagHudRenderManager.textPadding, team.color().getValue());
-
-        // Draw team members
-        int memberY = y + 2 * LasertagHudRenderManager.textPadding + LasertagHudRenderManager.textHeight + 1;
-        for (var playerData : renderData.teamMap.get(team.name())) {
-            // Draw player name
-            renderer.draw(matrices, playerData.x(), x + LasertagHudRenderManager.textPadding, memberY, 0xFFFFFF);
-
-            // Get the players score
-            var playerScore = playerData.y();
-
-            // Add the players score to the team score
-            teamScore += playerScore;
-
-            // Draw the players score
-            String scoreString = Long.toString(playerScore);
-            renderer.draw(matrices, scoreString, x + LasertagHudRenderManager.boxWidth - LasertagHudRenderManager.textPadding - renderer.getWidth(scoreString), memberY, 0xFFFFFF);
-
-            // Offset to the next line
-            memberY += 2 * LasertagHudRenderManager.textPadding + LasertagHudRenderManager.textHeight - 2;
-        }
-
-        // Draw team score
-        String scoreString = Integer.toString(teamScore);
-        renderer.draw(matrices, scoreString, x + LasertagHudRenderManager.boxWidth - LasertagHudRenderManager.textPadding - renderer.getWidth(scoreString), y + LasertagHudRenderManager.textPadding, 0xFFFFFF);
     }
 
     //endregion

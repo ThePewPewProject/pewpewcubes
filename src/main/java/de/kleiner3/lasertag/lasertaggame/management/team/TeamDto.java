@@ -53,10 +53,22 @@ public class TeamDto {
 
     @Override
     public boolean equals(Object other) {
+
         if (other instanceof TeamDto otherTeam) {
-            return name.equals(otherTeam.name) &&
-                    color.equals(otherTeam.color) &&
-                    spawnpointBlock.equals(otherTeam.spawnpointBlock);
+
+            var nameEquals = name.equals(otherTeam.name);
+            var colorEquals = color.equals(otherTeam.color);
+            boolean spawnPointBlockEquals = false;
+
+            if (spawnpointBlock == null && otherTeam.spawnpointBlock == null) {
+
+                spawnPointBlockEquals = true;
+            } else {
+
+                spawnPointBlockEquals = spawnpointBlock.equals(otherTeam.spawnpointBlock);
+            }
+
+            return nameEquals && colorEquals && spawnPointBlockEquals;
         }
 
         return false;

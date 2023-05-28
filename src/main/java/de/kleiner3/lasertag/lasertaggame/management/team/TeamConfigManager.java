@@ -22,6 +22,9 @@ import java.util.HashMap;
  * @author Étienne Muser
  */
 public class TeamConfigManager implements IManager {
+
+    public static final TeamDto SPECTATORS = new TeamDto("Spectators", 128, 128, 128, null);
+
     /**
      * The path to the team config file
      */
@@ -101,6 +104,9 @@ public class TeamConfigManager implements IManager {
                 LasertagMod.LOGGER.error("Writing to team config file failed: " + e.getMessage());
             }
         }
+
+        // Add dummy team spectators
+        teamConfig.put(SPECTATORS.name(), SPECTATORS);
     }
 
     @Override

@@ -13,6 +13,7 @@ import de.kleiner3.lasertag.lasertaggame.ILasertagGame;
 import de.kleiner3.lasertag.lasertaggame.ITickable;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamDtoSerializer;
 import de.kleiner3.lasertag.lasertaggame.statistics.GameStats;
@@ -28,6 +29,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -76,6 +78,8 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     @Shadow
     public abstract boolean isDedicated();
 
+    @Shadow public abstract PlayerManager getPlayerManager();
+
     /**
      * Inject into constructor of MinecraftServer
      *
@@ -89,6 +93,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
         // Initialize team map
         for (TeamDto teamDto : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
+
             teamMap.put(teamDto, new LinkedList<>());
         }
 
@@ -138,14 +143,46 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         }
 
         // Set gamerules
-        ((MinecraftServer)(Object)this).getGameRules().get(GameRules.KEEP_INVENTORY).set(true, ((MinecraftServer)(Object)this));
-        ((MinecraftServer)(Object)this).getGameRules().get(GameRules.DO_IMMEDIATE_RESPAWN).set(true, ((MinecraftServer)(Object)this));
+        ((MinecraftServer) (Object) this).getGameRules().get(GameRules.KEEP_INVENTORY).set(true, ((MinecraftServer) (Object) this));
+        ((MinecraftServer) (Object) this).getGameRules().get(GameRules.DO_IMMEDIATE_RESPAWN).set(true, ((MinecraftServer) (Object) this));
 
         // Teleport players
         for (var teamDto : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
             var team = teamMap.get(teamDto);
 
+            // Handle spectators
+            if (teamDto.equals(TeamConfigManager.SPECTATORS)) {
+
+                for (var playerUuid : team) {
+
+                    // Get the player
+                    var player = ((MinecraftServer) (Object) this).getPlayerManager().getPlayer(playerUuid);
+
+                    // Sanity check
+                    if (player == null) {
+                        continue;
+                    }
+
+                    // Set player to adventure gamemode
+                    player.changeGameMode(GameMode.SPECTATOR);
+
+                    // Get all spawnpoints
+                    var spawnpoints = spawnpointCache.entrySet().stream()
+                            .flatMap(entry -> entry.getValue().stream())
+                            .toList();
+
+                    // Get random index
+                    var idx = world.getRandom().nextInt(spawnpoints.size());
+
+                    var destination = spawnpoints.get(idx);
+                    player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
+                }
+
+                continue;
+            }
+
             for (var playerUuid : team) {
+
                 // Get spawnpoints
                 var spawnpoints = spawnpointCache.get(teamDto);
 
@@ -247,7 +284,10 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         // Check if player is in a team already
         TeamDto oldTeamDto = null;
         for (var t : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
-            if (teamMap.get(t).contains(player.getUuid())) {
+
+            var team = teamMap.get(t);
+
+            if (team.contains(player.getUuid())) {
                 oldTeamDto = t;
                 break;
             }
@@ -276,16 +316,19 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         // Clear players inventory
         inventory.clear();
 
-        // Give player a lasertag vest
-        var vestStack = new ItemStack(Items.LASERTAG_VEST);
-        ((LasertagVestItem) Items.LASERTAG_VEST).setColor(vestStack, newTeamDto.color().getValue());
-        player.equipStack(EquipmentSlot.CHEST, vestStack);
+        if (!newTeamDto.equals(TeamConfigManager.SPECTATORS)) {
 
-        // Give player a lasertag weapon
-        var weaponStack = new ItemStack(Items.LASERTAG_WEAPON);
-        ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setColor(weaponStack, newTeamDto.color().getValue());
-        ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setDeactivated(weaponStack, true);
-        inventory.setStack(0, weaponStack);
+            // Give player a lasertag vest
+            var vestStack = new ItemStack(Items.LASERTAG_VEST);
+            ((LasertagVestItem) Items.LASERTAG_VEST).setColor(vestStack, newTeamDto.color().getValue());
+            player.equipStack(EquipmentSlot.CHEST, vestStack);
+
+            // Give player a lasertag weapon
+            var weaponStack = new ItemStack(Items.LASERTAG_WEAPON);
+            ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setColor(weaponStack, newTeamDto.color().getValue());
+            ((LasertagWeaponItem) Items.LASERTAG_WEAPON).setDeactivated(weaponStack, true);
+            inventory.setStack(0, weaponStack);
+        }
 
         // Notify about change
         notifyPlayersAboutUpdate();
@@ -527,6 +570,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
         // For each team
         for (var t : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
+
             // Create a new list of (player name, player score) tuples
             List<Tuple<String, Long>> playerDatas = new LinkedList<>();
 
@@ -568,6 +612,12 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
         // Initialize team lists
         for (var team : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
+
+            // Skip spectators
+            if (team.equals(TeamConfigManager.SPECTATORS)) {
+                continue;
+            }
+
             spawnpointCache.put(team, new ArrayList<>());
         }
 
@@ -580,6 +630,12 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
         // Iterate over blocks and find spawnpoints
         world.fastSearchBlock((block, pos) -> {
             for (var teamDto : LasertagGameManager.getInstance().getTeamManager().teamConfig.values()) {
+
+                // Skip spectators
+                if (teamDto.equals(TeamConfigManager.SPECTATORS)) {
+                    continue;
+                }
+
                 if (teamDto.spawnpointBlock().equals(block)) {
                     var team = spawnpointCache.get(teamDto);
                     synchronized (teamDto) {
@@ -612,6 +668,7 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
     /**
      * Checks if all starting conditions are met. If the game can start, this method returns an empty optional
      * Otherwise it returns the reasons why the game can not start as a string.
+     *
      * @return
      */
     private Optional<String> checkStartingConditions() {
@@ -620,6 +677,13 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
 
         // For every team
         for (var team : teamMap.entrySet()) {
+
+            // Skip spectators
+            if (team.getKey().equals(TeamConfigManager.SPECTATORS)) {
+
+                continue;
+            }
+
             // If the team contains players
             if (team.getValue().size() > 0) {
                 // Get the spawnpoints for the team
@@ -633,11 +697,38 @@ public abstract class MinecraftServerMixin implements ILasertagGame, ITickable {
             }
         }
 
+        // Get the players without team
+        var playersWithoutTeam = getPlayerManager().getPlayerList().stream()
+                .filter(playerListEntry -> !playerHasTeam(playerListEntry.getLasertagUsername()))
+                .toList();
+
+        if (playersWithoutTeam.size() > 0) {
+
+            abort = true;
+            for (var player : playersWithoutTeam) {
+
+                builder.append("  *Player '" + player.getLasertagUsername() + "' has no team\n");
+            }
+        }
+
         if (abort) {
             return Optional.of(builder.toString());
         }
 
         return Optional.empty();
+    }
+
+    private boolean playerHasTeam(String playerUsername) {
+        var teamList = LasertagGameManager.getInstance().getHudRenderManager().teamMap;
+
+        for (var team : teamList.values()) {
+            for (var player : team) {
+                if (player.x().equals(playerUsername)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     //endregion

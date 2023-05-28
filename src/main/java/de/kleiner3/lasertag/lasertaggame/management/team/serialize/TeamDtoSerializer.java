@@ -32,7 +32,12 @@ public class TeamDtoSerializer {
                 jsonObject.addProperty("blue", teamDto.color().b());
 
                 // Add spawnpoint block
-                jsonObject.addProperty("spawnpointBlock", Registry.BLOCK.getId(teamDto.spawnpointBlock()).toString());
+                var spawnPointBlockId = "null";
+                if (teamDto.spawnpointBlock() != null) {
+                    
+                    spawnPointBlockId = Registry.BLOCK.getId(teamDto.spawnpointBlock()).toString();
+                }
+                jsonObject.addProperty("spawnpointBlock", spawnPointBlockId);
 
                 return jsonObject;
             }
