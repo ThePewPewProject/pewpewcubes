@@ -6,17 +6,14 @@ package de.kleiner3.lasertag.lasertaggame;
  * @author Étienne Muser
  */
 public interface ITickable {
+
     /**
      * Called on every tick
      */
-    default void doTick() {
-        // Default empty
-    }
+    void doTick();
 
     /**
      * Called on the last tick
      */
-    default void endTick() {
-        // Default empty
-    }
+    void endTick();
 }

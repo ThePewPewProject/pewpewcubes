@@ -2,6 +2,7 @@ package de.kleiner3.lasertag.client;
 
 import de.kleiner3.lasertag.block.Blocks;
 import de.kleiner3.lasertag.item.Items;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 
 /**
@@ -13,30 +14,24 @@ public class ColorProviders {
     public static void register() {
         // Register color provider for lasertag weapon
         ColorProviderRegistry.ITEM.register((stack, tintIdx) -> {
-            // Team color
-            if (stack.hasNbt()) {
-                var nbt = stack.getNbt();
 
-                if (nbt.contains("deactivated") && nbt.getBoolean("deactivated")) {
-                    return 0x000000;
-                }
-                if (nbt.contains("color")) {
-                    return nbt.getInt("color");
-                }
+            var holder = stack.getHolder();
+
+            if (holder == null) {
+                return 0x000000;
             }
 
-            return 0xFFFFFF;
+            var holderUuid = holder.getUuid();
+
+            var deactivated = LasertagGameManager.getInstance().getDeactivatedManager().isDeactivated(holderUuid);
+            if (deactivated) {
+                return 0x000000;
+            }
+
+            var team = LasertagGameManager.getInstance().getTeamManager().getTeamOfPlayer(holderUuid);
+            return team.map(teamDto -> teamDto.color().getValue()).orElse(0xFFFFFF);
+
         }, Items.LASERTAG_WEAPON);
-
-        // Register color provider for lasertag vest
-        ColorProviderRegistry.ITEM.register((stack, tintIndex) -> {
-            // Team color
-            if (stack.hasNbt()) {
-                return stack.getNbt().getInt("color");
-            }
-
-            return 0xFFFFFF;
-        }, Items.LASERTAG_VEST);
 
         // Register color provider for lasertarget block
         ColorProviderRegistry.BLOCK.register((state, world, pos, tintIndex) -> {

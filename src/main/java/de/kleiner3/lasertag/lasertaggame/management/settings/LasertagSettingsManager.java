@@ -10,7 +10,6 @@ import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,12 +91,6 @@ public class LasertagSettingsManager implements IManager {
         return new GsonBuilder().setPrettyPrinting().create().toJson(settings);
     }
 
-    @Override
-    public void syncToClient(ServerPlayerEntity client, MinecraftServer server) {
-        // Do not sync!
-        throw new UnsupportedOperationException("LasertagSettingsManager should not be synced on its own.");
-    }
-
     public void set(MinecraftServer s, String key, Object value) {
         settings.put(key, value);
         persist(s, key, value.toString());
@@ -156,7 +149,7 @@ public class LasertagSettingsManager implements IManager {
         buf.writeString(value);
 
         // Send update to clients
-        ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.LASERTAG_SETTINGS_CHANGED, buf);
+        ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.SETTINGS_CHANGED, buf);
 
         try {
             persistUnsafe();

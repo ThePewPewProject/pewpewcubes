@@ -17,7 +17,7 @@ import static net.minecraft.server.command.CommandManager.literal;
  */
 public class StopLasertagGameCommand extends ServerFeedbackCommand {
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
-        context.getSource().getServer().stopLasertagGame();
+        context.getSource().getServer().getLasertagServerManager().stopLasertagGame();
 
         return Optional.empty();
     }

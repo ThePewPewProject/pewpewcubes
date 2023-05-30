@@ -7,7 +7,6 @@
     "IStructureTemplateAccessor",
     "MinecraftServerMixin",
     "PlayerEntityMixin",
-    "PlayerManagerMixin",
     "ServerPlayerEntityMixin",
     "WorldPresetsMixin",
     "fastiter.WorldMixin"
@@ -17,7 +16,8 @@
     "IntegratedServerLoaderMixin",
     "LivingEntityRendererMixin",
     "gui.MoreWorldOptionsDialogMixin",
-    "gui.PlayerListHudMixin"
+    "gui.PlayerListHudMixin",
+    "ItemRendererMixin"
   ],
   "server": [
   ],

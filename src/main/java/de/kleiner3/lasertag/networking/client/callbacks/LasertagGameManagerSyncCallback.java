@@ -7,6 +7,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 
+/**
+ * Callback for the game manager sync network event
+ *
+ * @author Étienne Muser
+ */
 public class LasertagGameManagerSyncCallback implements ClientPlayNetworking.PlayChannelHandler{
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {

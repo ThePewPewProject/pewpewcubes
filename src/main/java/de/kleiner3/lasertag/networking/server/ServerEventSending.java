@@ -62,19 +62,4 @@ public class ServerEventSending {
     {
         ServerPlayNetworking.send(client, soundEventId, PacketByteBufs.empty());
     }
-
-    public static void sendPlayerColorChanged(ServerWorld world, String playerUsername, Integer newColor) {
-        final var id = NetworkingConstants.PLAYER_COLOR_CHANGED;
-
-        // Create packet byte buffer
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-
-        // Write player username to buffer
-        buf.writeString(playerUsername);
-
-        // Write new color to buffer
-        buf.writeNullable(newColor, PacketByteBuf::writeInt);
-
-        sendToEveryone(world, id, buf);
-    }
 }

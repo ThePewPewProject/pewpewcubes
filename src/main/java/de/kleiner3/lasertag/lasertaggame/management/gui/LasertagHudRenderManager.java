@@ -1,18 +1,10 @@
 package de.kleiner3.lasertag.lasertaggame.management.gui;
 
-import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
-import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import de.kleiner3.lasertag.lasertaggame.timing.GameCountDownTimerTask;
 import de.kleiner3.lasertag.lasertaggame.timing.PreGameCountDownTimerTask;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -30,11 +22,6 @@ public class LasertagHudRenderManager implements IManager {
      * The time in seconds that has already elapsed
      */
     public long gameTime = 0;
-
-    /**
-     * Simplified team map to map players and their score to their teams
-     */
-    public HashMap<String, List<Tuple<String, Long>>> teamMap = new HashMap<>();
 
     public double progress = 0.0;
 
@@ -68,12 +55,6 @@ public class LasertagHudRenderManager implements IManager {
     public static final int textHeight = 9;
 
     //endregion
-
-    public LasertagHudRenderManager(Collection<TeamDto> teams) {
-        for (TeamDto t :  teams) {
-            teamMap.put(t.name(), new LinkedList<>());
-        }
-    }
 
     //region Game timer methods
 
@@ -131,11 +112,5 @@ public class LasertagHudRenderManager implements IManager {
 
         // Stop game timer if running
         stopGameTimer();
-    }
-
-    @Override
-    public void syncToClient(ServerPlayerEntity client, MinecraftServer server) {
-        // Do not sync!
-        throw new UnsupportedOperationException("LasertagHudRenderManager should not be synced on its own.");
     }
 }

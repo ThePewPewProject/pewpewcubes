@@ -8,21 +8,18 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 
 /**
- * Callback for the player changed color network event
+ * Callback for the score update network event
  *
  * @author Étienne Muser
  */
-public class PlayerColorChangedCallback implements ClientPlayNetworking.PlayChannelHandler {
+public class ScoreUpdateCallback implements ClientPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
-        // Read username from bufffer
-        var playerUsername = buf.readString();
+        // Get parameters
+        var playerUuid = buf.readUuid();
+        var newValue = buf.readLong();
 
-        // Read color from buffer
-        var newColor = buf.readNullable(PacketByteBuf::readInt);
-
-        // Put new color into player color manager
-        LasertagGameManager.getInstance().getPlayerColorManager().put(playerUsername, newColor);
+        LasertagGameManager.getInstance().getScoreManager().updateScore(playerUuid, newValue);
     }
 }

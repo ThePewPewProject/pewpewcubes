@@ -3,8 +3,6 @@ package de.kleiner3.lasertag.lasertaggame.management.team;
 import de.kleiner3.lasertag.common.types.ColorDto;
 import net.minecraft.block.Block;
 
-import java.util.Objects;
-
 
 /**
  * Team DTO
@@ -12,18 +10,22 @@ import java.util.Objects;
  * @author Étienne Muser
  */
 public class TeamDto {
+
+    private int id;
     private String name;
     private ColorDto color;
     private Block spawnpointBlock;
 
-    public TeamDto(String name, ColorDto color, Block spawnpointBlock) {
+    public TeamDto(int id, String name, ColorDto color, Block spawnpointBlock) {
+
+        this.id = id;
         this.name = name;
         this.color = color;
         this.spawnpointBlock = spawnpointBlock;
     }
 
-    public TeamDto(String name, int r, int g, int b, Block spawnpointBlock) {
-        this(name, new ColorDto(r, g, b), spawnpointBlock);
+    public TeamDto(int id, String name, int r, int g, int b, Block spawnpointBlock) {
+        this(id, name, new ColorDto(r, g, b), spawnpointBlock);
     }
 
     /**
@@ -34,10 +36,13 @@ public class TeamDto {
      * @return
      */
     public boolean canCoexistWith(TeamDto other) {
-        return !name.equals(other.name) &&
+        return id != other.id &&
+                !name.equals(other.name) &&
                 !color.equals(other.color) &&
                 !spawnpointBlock.equals(other.spawnpointBlock);
     }
+
+    public int id() { return id; }
 
     public String name() {
         return name;
@@ -56,19 +61,7 @@ public class TeamDto {
 
         if (other instanceof TeamDto otherTeam) {
 
-            var nameEquals = name.equals(otherTeam.name);
-            var colorEquals = color.equals(otherTeam.color);
-            boolean spawnPointBlockEquals = false;
-
-            if (spawnpointBlock == null && otherTeam.spawnpointBlock == null) {
-
-                spawnPointBlockEquals = true;
-            } else {
-
-                spawnPointBlockEquals = spawnpointBlock.equals(otherTeam.spawnpointBlock);
-            }
-
-            return nameEquals && colorEquals && spawnPointBlockEquals;
+            return id == otherTeam.id;
         }
 
         return false;
@@ -76,7 +69,7 @@ public class TeamDto {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, color, spawnpointBlock);
+        return Integer.hashCode(id);
     }
 
     @Override

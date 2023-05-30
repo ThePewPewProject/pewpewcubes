@@ -35,6 +35,9 @@ public class TeamConfigManagerDeserializer {
                     // Get the team of this key
                     var teamObject = jsonObject.get(teamName).getAsJsonObject();
 
+                    // Get id
+                    var id = teamObject.get("id").getAsInt();
+
                     // Get RGB
                     var r = teamObject.get("red").getAsInt();
                     var g = teamObject.get("green").getAsInt();
@@ -51,7 +54,7 @@ public class TeamConfigManagerDeserializer {
                     }
 
                     // Create team
-                    var teamDto = new TeamDto(teamName, r, g, b, spawnPointBlock);
+                    var teamDto = new TeamDto(id, teamName, r, g, b, spawnPointBlock);
 
                     config.put(teamName, teamDto);
                 }

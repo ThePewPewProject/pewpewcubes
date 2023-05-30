@@ -53,17 +53,21 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
             return;
         }
 
-        // Get the team config
-        var teamConfig = LasertagGameManager.getInstance().getTeamManager().teamConfig;
-
-        // Get the HUD render data
-        var renderData = LasertagGameManager.getInstance().getHudRenderManager();
+        var teamManager = LasertagGameManager.getInstance().getTeamManager();
+        var scoreManager = LasertagGameManager.getInstance().getScoreManager();
+        var playerManager = LasertagGameManager.getInstance().getPlayerManager();
 
         // Get a list of Tuple<TeamDto, List<Tuple<String, Long>>> (One entry is a team) which are not empty
-        var teams = renderData.teamMap.entrySet().stream()
+        var teams = teamManager.getTeamMap().entrySet().stream()
                 .filter(entry -> entry.getValue().size() > 0)
-                .filter(entry -> !entry.getKey().equals(TeamConfigManager.SPECTATORS.name()))
-                .map(entry -> new Tuple<TeamDto, List<Tuple<String, Long>>>(teamConfig.get(entry.getKey()), entry.getValue()))
+                .filter(entry -> !entry.getKey().equals(TeamConfigManager.SPECTATORS))
+                .map(entry -> {
+                    var teamList = entry.getValue().stream()
+                            .map(playerUuid -> new Tuple<>(playerManager.getPlayerUsername(playerUuid), scoreManager.getScore(playerUuid)))
+                            .toList();
+
+                    return new Tuple<>(entry.getKey(), teamList);
+                })
                 .toList();
         var numberOfTeams = teams.size();
 
@@ -80,7 +84,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
                 .get();
 
         var numberOfRows = (int)Math.ceil((float)numberOfTeams / (float)MAX_NUMBER_TEAMS_PER_ROW);
-        var numberOfcolumns = numberOfTeams < MAX_NUMBER_TEAMS_PER_ROW ? numberOfTeams : MAX_NUMBER_TEAMS_PER_ROW;
+        var numberOfcolumns = Math.min(numberOfTeams, MAX_NUMBER_TEAMS_PER_ROW);
         var teamListWidth = (numberOfcolumns * TEAM_WIDTH) + ((numberOfcolumns + 1) * TEAM_PADDING);
         var teamHeight = TEXT_PADDING + TEXT_RENDERER.fontHeight + TEXT_PADDING + (maxNumberOfPlayersInTeam * (INTRA_PLAYER_PADDING + TEXT_RENDERER.fontHeight));
         var teamListHeight = (numberOfRows * teamHeight) + ((numberOfRows + 1) * TEAM_PADDING);
@@ -92,7 +96,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         var teamIterator = teams.iterator();
         for (int row = 0; row < numberOfRows; ++row) {
             for (int column = 0; column < MAX_NUMBER_TEAMS_PER_ROW; ++column) {
-                if (teamIterator.hasNext() == false) {
+                if (!teamIterator.hasNext()) {
                     break;
                 }
 
@@ -159,7 +163,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
 
         // Get the players without team
         var playersWithoutTeam = CLIENT.player.networkHandler.getPlayerList().stream()
-                .filter(playerListEntry -> !playerHasTeam(playerListEntry.getProfile().getName()))
+                .filter(playerListEntry -> !LasertagGameManager.getInstance().getTeamManager().isPlayerInTeam(playerListEntry.getProfile().getId()))
                 .limit(MAX_NUMBER_PLAYERS_IN_WITHOUT_TEAM_LIST)
                 .toList();
 
@@ -186,11 +190,11 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
     private void drawSpectators(MatrixStack matrices, int scaledWindowHeight) {
 
         // Get the HUD render data
-        var renderData = LasertagGameManager.getInstance().getHudRenderManager();
+        var teamManager = LasertagGameManager.getInstance().getTeamManager();
 
         // Get the team
-        var spectatorTeam = renderData.teamMap.entrySet().stream()
-                .filter(entry -> entry.getKey().equals(TeamConfigManager.SPECTATORS.name()))
+        var spectatorTeam = teamManager.getTeamMap().entrySet().stream()
+                .filter(entry -> entry.getKey().equals(TeamConfigManager.SPECTATORS))
                 .findFirst()
                 .get()
                 .getValue().stream()
@@ -210,26 +214,15 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         // Draw header
         TEXT_RENDERER.drawWithShadow(matrices, "Spectators:", startX + TEXT_PADDING, startY + TEXT_PADDING, 0xFFFFFFFF);
 
+        var playerManager = LasertagGameManager.getInstance().getPlayerManager();
+
         var yPos = startY + TEXT_PADDING + TEXT_RENDERER.fontHeight + TEXT_PADDING;
-        for (var player : spectatorTeam) {
+        for (var playerUuid : spectatorTeam) {
 
             // Draw players name
-            TEXT_RENDERER.draw(matrices, player.x(), startX + TEXT_PADDING, yPos, 0xFFFFFFFF);
+            TEXT_RENDERER.draw(matrices, playerManager.getPlayerUsername(playerUuid), startX + TEXT_PADDING, yPos, 0xFFFFFFFF);
 
             yPos += (TEXT_RENDERER.fontHeight + INTRA_PLAYER_PADDING);
         }
-    }
-
-    private boolean playerHasTeam(String playerUsername) {
-        var teamList = LasertagGameManager.getInstance().getHudRenderManager().teamMap;
-
-        for (var team : teamList.values()) {
-            for (var player : team) {
-                if (player.x().equals(playerUsername)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

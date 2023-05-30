@@ -13,12 +13,12 @@ public class NetworkingConstants {
     public static final Identifier LASER_RAY_SPAWNED = new Identifier(LasertagMod.ID, "laser_ray_spawned");
 
     // ===== Lasertag game ==========
-    public static final Identifier LASERTAG_GAME_TEAM_OR_SCORE_UPDATE = new Identifier(LasertagMod.ID, "lasertag_game_team_or_score_update");
-    public static final Identifier LASERTAG_SETTINGS_CHANGED = new Identifier(LasertagMod.ID, "lasertag_settings_changed");
-    public static final Identifier LASERTAG_GAME_MANAGER_SYNC = new Identifier(LasertagMod.ID, "lasertag_game_manager_sync");
+    public static final Identifier SCORE_UPDATE = new Identifier(LasertagMod.ID, "score_update");
+    public static final Identifier TEAM_UPDATE = new Identifier(LasertagMod.ID, "team_update");
+    public static final Identifier SETTINGS_CHANGED = new Identifier(LasertagMod.ID, "settings_changed");
+    public static final Identifier GAME_MANAGER_SYNC = new Identifier(LasertagMod.ID, "game_manager_sync");
     public static final Identifier PLAYER_DEACTIVATED_STATUS_CHANGED = new Identifier(LasertagMod.ID, "player_deactivated_status_changed");
     public static final Identifier GAME_STATISTICS = new Identifier(LasertagMod.ID, "game_statistics");
-    public static final Identifier PLAYER_COLOR_CHANGED = new Identifier(LasertagMod.ID, "player_color_changed");
 
 
     // ===== General ================
@@ -34,4 +34,5 @@ public class NetworkingConstants {
     public static final Identifier GAME_START_ABORTED = new Identifier(LasertagMod.ID, "game_start_aborted");
     public static final Identifier GAME_OVER = new Identifier(LasertagMod.ID, "game_over");
     public static final Identifier PROGRESS = new Identifier(LasertagMod.ID, "progress");
+    public static final Identifier SCORE_RESET = new Identifier(LasertagMod.ID, "score_reset");
 }

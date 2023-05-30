@@ -27,7 +27,7 @@ public class ServerPlayerEntityMixin {
         MinecraftServer server = player.getServer();
         if (server != null) {
             var deathPenalty = -LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.DEATH_PENALTY);
-            server.onPlayerScored(player, deathPenalty);
+            LasertagGameManager.getInstance().getScoreManager().onPlayerScored(server.getOverworld(), player, deathPenalty);
         }
     }
 }

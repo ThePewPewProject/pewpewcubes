@@ -19,11 +19,11 @@ public class PlayerJoinEventHandler {
         // Get the player
         ServerPlayerEntity player = handler.getPlayer();
 
+        // Add player to player manager
+        LasertagGameManager.getInstance().getPlayerManager().putPlayer(player.getUuid(), player.getLasertagUsername());
+
         // Sync managers
         LasertagGameManager.getInstance().syncToClient(player, server);
-
-        // Set players team
-        player.setTeam(server.getTeamOfPlayer(player.getUuid()));
 
         // If origin spawn setting is disabled
         if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.DO_ORIGIN_SPAWN)) {
@@ -32,7 +32,7 @@ public class PlayerJoinEventHandler {
         }
 
         // If player is already in a team (i.e. he got disconnected)
-        if (server.isPlayerInTeam(player)) {
+        if (LasertagGameManager.getInstance().getTeamManager().isPlayerInTeam(player.getUuid())) {
             // Dont teleport him to origin
             return;
         }

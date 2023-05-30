@@ -28,14 +28,12 @@ public class EntityRendererMixin {
             return;
         }
 
-        var playerColor = LasertagGameManager.getInstance().getPlayerColorManager().get(player.getLasertagUsername());
+        LasertagGameManager.getInstance().getTeamManager().getTeamOfPlayer(player.getUuid())
+                .ifPresent(playerTeam -> {
+                    var playerColor = playerTeam.color().getValue();
 
-        // Sanity check
-        if (playerColor == null) {
-            return;
-        }
-
-        var mutableText = (MutableText)text;
-        mutableText.setStyle(Style.EMPTY.withColor(playerColor));
+                    var mutableText = (MutableText)text;
+                    mutableText.setStyle(Style.EMPTY.withColor(playerColor));
+                });
     }
 }
