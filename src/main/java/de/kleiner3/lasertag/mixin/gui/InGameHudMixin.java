@@ -23,7 +23,7 @@ public class InGameHudMixin {
      * @param original
      * @return
      */
-    @ModifyVariable(method = "render(Lnet/minecraft/client/util/math/MatrixStack;F)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z"), name = "scoreboardObjective2")
+    @ModifyVariable(method = "render(Lnet/minecraft/client/util/math/MatrixStack;F)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z"), ordinal = 1)
     private ScoreboardObjective modifyScoreboardObjective2(ScoreboardObjective original) {
         return new ScoreboardObjective(null, null, null, Text.literal("<dummy>"), null);
     }
