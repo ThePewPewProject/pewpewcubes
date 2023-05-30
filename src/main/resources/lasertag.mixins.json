@@ -14,10 +14,11 @@
   "client": [
     "EntityRendererMixin",
     "IntegratedServerLoaderMixin",
+    "ItemRendererMixin",
     "LivingEntityRendererMixin",
+    "gui.InGameHudMixin",
     "gui.MoreWorldOptionsDialogMixin",
-    "gui.PlayerListHudMixin",
-    "ItemRendererMixin"
+    "gui.PlayerListHudMixin"
   ],
   "server": [
   ],
