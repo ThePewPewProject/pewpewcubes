@@ -58,3 +58,6 @@ For an installation guide look no further than [our wiki](https://github.com/efi
 3. Close and reopen the project
 4. Open the Gradle settings
 5. Change 'Build and run using' as well as 'Rus tests using' to 'IntelliJ IDEA'
+6. Create a new folder inside your repository folder named 'bin'
+7. Open the project settings via 'Project Structure'
+8. Set the compiler output path to the folder created in step 6
