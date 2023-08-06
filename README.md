@@ -61,3 +61,4 @@ For an installation guide look no further than [our wiki](https://github.com/efi
 6. Create a new folder inside your repository folder named 'bin'
 7. Open the project settings via 'Project Structure'
 8. Set the compiler output path to the folder created in step 6
+9. Switch to the dev branch for the latest development
