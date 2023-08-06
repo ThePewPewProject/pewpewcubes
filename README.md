@@ -40,3 +40,21 @@ Here are some benchmarks in code quality:
 ## Installation
 
 For an installation guide look no further than [our wiki](https://github.com/efibs/mc-lasertag-mod/wiki/Installation-Guide).
+
+
+## Developer setup guide
+
+### Requirements
+* Git installed
+* IntelliJ IDEA installed
+* [optional] IntelliJ Minecraft Development Plugin installed
+
+### Setup
+1. Clone the repository:
+   ```console
+   git clone https://github.com/efibs/mc-lasertag-mod.git
+   ```
+2. Open IntelliJ and import the project
+3. Close and reopen the project
+4. Open the Gradle settings
+5. Change 'Build and run using' as well as 'Rus tests using' to 'IntelliJ IDEA'
