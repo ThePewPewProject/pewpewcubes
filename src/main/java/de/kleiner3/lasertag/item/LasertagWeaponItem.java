@@ -7,9 +7,11 @@ import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.networking.ClientNetworkingHandlers;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -73,59 +75,57 @@ public class LasertagWeaponItem extends RangedWeaponItem {
             return TypedActionResult.fail(laserweaponStack);
         }
 
-        if (!world.isClient) {
-
-            fireWeapon(world, (ServerPlayerEntity) playerEntity, team.get().color().getValue());
-        }
+        fireWeapon(world, playerEntity, team.get().color().getValue());
         return TypedActionResult.pass(laserweaponStack);
     }
 
-    private void fireWeapon(World world, ServerPlayerEntity playerEntity, int color) {
-        playWeaponFireSound(playerEntity);
+    private void fireWeapon(World world, PlayerEntity playerEntity, int color) {
+        if (!world.isClient) {
+            playWeaponFireSound(playerEntity);
+        }
 
         // Raycast the crosshair
         HitResult hit = RaycastUtil.raycastCrosshair(playerEntity, getRange());
 
-        switch (hit.getType()) {
-            // If a block was hit
-            case BLOCK:
-                // Cast to BlockHitResult
-                BlockHitResult blockHit = (BlockHitResult) hit;
+        if (world.isClient) {
+            switch (hit.getType()) {
+                // If a block was hit
+                case BLOCK -> {
+                    // Cast to BlockHitResult
+                    BlockHitResult blockHit = (BlockHitResult) hit;
 
-                // Get the block pos of the hit block
-                BlockPos blockPos = blockHit.getBlockPos();
+                    // Get the block pos of the hit block
+                    BlockPos blockPos = blockHit.getBlockPos();
 
-                // Get the hit block
-                BlockState blockState = world.getBlockState(blockPos);
-                net.minecraft.block.Block block = blockState.getBlock();
+                    // Get the hit block
+                    BlockState blockState = world.getBlockState(blockPos);
+                    net.minecraft.block.Block block = blockState.getBlock();
 
-                // If hit block is not a lasertarget block
-                if (!(block instanceof LaserTargetBlock laserTarget)) {
-                    break;
+                    // If hit block is not a lasertarget block
+                    if (!(block instanceof LaserTargetBlock laserTarget)) {
+                        break;
+                    }
+                    sendHitLasertarget(playerEntity, blockPos);
                 }
+                case ENTITY -> {
+                    // Cast to EntityHitResult
+                    EntityHitResult entityHit = (EntityHitResult) hit;
 
-                playerEntity.getServer().getLasertagServerManager().playerHitLasertarget(playerEntity, (LaserTargetBlockEntity) world.getBlockEntity(blockPos));
-                break;
+                    // Get hit entity
+                    Entity hitEntity = entityHit.getEntity();
 
-            case ENTITY:
-                // Cast to EntityHitResult
-                EntityHitResult entityHit = (EntityHitResult) hit;
+                    // Check that hit entity is a player
+                    if (!(hitEntity instanceof ServerPlayerEntity hitPlayer)) {
+                        break;
+                    }
 
-                // Get hit entity
-                Entity hitEntity = entityHit.getEntity();
-
-                // Check that hit entity is a player
-                if (!(hitEntity instanceof ServerPlayerEntity hitPlayer)) {
-                    break;
+                    // Cast to player and trigger onHit
+                    sendHitPlayer(playerEntity, hitPlayer);
                 }
-
-                // Cast to player and trigger onHit
-                playerEntity.getServer().getLasertagServerManager().playerHitPlayer(playerEntity, hitPlayer);
-                break;
-            case MISS:
-                // Fall through intended
-            default:
-                break;
+                default -> {
+                }
+            }
+            return;
         }
 
         // Spawn laser ray entity
@@ -141,6 +141,27 @@ public class LasertagWeaponItem extends RangedWeaponItem {
                 ThreadUtil.attemptShutdown(despawnThread);
             }, 50, TimeUnit.MILLISECONDS);
         }
+    }
+
+    private static void sendHitLasertarget(PlayerEntity player, BlockPos hitPos) {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+
+        buf.writeUuid(player.getUuid());
+
+        buf.writeDouble(hitPos.getX());
+        buf.writeDouble(hitPos.getY());
+        buf.writeDouble(hitPos.getZ());
+
+        ClientPlayNetworking.send(NetworkingConstants.PLAYER_HIT_LASERTARGET, buf);
+    }
+
+    private static void sendHitPlayer(PlayerEntity player, PlayerEntity target) {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+
+        buf.writeUuid(player.getUuid());
+        buf.writeUuid(target.getUuid());
+
+        ClientPlayNetworking.send(NetworkingConstants.PLAYER_HIT_PLAYER, buf);
     }
 
     private static void playWeaponFailSound(PlayerEntity playerEntity) {

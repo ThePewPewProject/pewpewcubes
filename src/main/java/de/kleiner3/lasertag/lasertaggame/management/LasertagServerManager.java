@@ -224,10 +224,31 @@ public class LasertagServerManager implements IManager, ITickable {
     }
 
     /**
+     * This gets called when a player hit another player
+     *
+     * @param shooterUuid The uuid of the player who fired
+     * @param targetUuid The uuid of the player who got hit
+     */
+    public void playerHitPlayer(UUID shooterUuid, UUID targetUuid) {
+
+        var playerManager = server.getPlayerManager();
+
+        var shooter = playerManager.getPlayer(shooterUuid);
+        var target = playerManager.getPlayer(targetUuid);
+
+        if (shooter == null || target == null) {
+            LasertagMod.LOGGER.error("playerHitPlayer where shooter or target is offline. Shooter uuid: " + shooterUuid + ", Target uuid: " + targetUuid);
+            return;
+        }
+
+        playerHitPlayer(shooter, target);
+    }
+
+    /**
      * This gets called when a player hit a lasertarget
      *
-     * @param shooter
-     * @param target
+     * @param shooter The player who fired
+     * @param target The lasertarget who got hit
      */
     public void playerHitLasertarget(ServerPlayerEntity shooter, LaserTargetBlockEntity target) {
 
@@ -260,6 +281,30 @@ public class LasertagServerManager implements IManager, ITickable {
 
         // Add player to the players who hit the target
         target.addHitBy(shooter);
+    }
+
+    /**
+     * This gets called when a player hit a lasertarget
+     *
+     * @param shooterUuid The uuid of the player who fired
+     * @param targetPos The block pos of the lasertarget who got hit
+     */
+    public void playerHitLasertarget(UUID shooterUuid, BlockPos targetPos) {
+        var playerManager = server.getPlayerManager();
+
+        var shooter = playerManager.getPlayer(shooterUuid);
+
+        // getBlockEntity must be executed on server thread
+        server.execute(() -> {
+            var target = server.getOverworld().getBlockEntity(targetPos);
+
+            if (shooter == null || target == null) {
+                LasertagMod.LOGGER.error("playerHitLasertarget where shooter is offline or target not found. Shooter uuid: " + shooterUuid + ", Target pos: (" + targetPos.getX() + ", " + targetPos.getY() + ", " + targetPos.getZ() + ")");
+                return;
+            }
+
+            playerHitLasertarget(shooter, (LaserTargetBlockEntity)target);
+        });
     }
 
     @Override

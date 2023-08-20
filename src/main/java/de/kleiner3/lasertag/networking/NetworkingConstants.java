@@ -35,4 +35,6 @@ public class NetworkingConstants {
     public static final Identifier GAME_OVER = new Identifier(LasertagMod.ID, "game_over");
     public static final Identifier PROGRESS = new Identifier(LasertagMod.ID, "progress");
     public static final Identifier SCORE_RESET = new Identifier(LasertagMod.ID, "score_reset");
+    public static final Identifier PLAYER_HIT_LASERTARGET = new Identifier(LasertagMod.ID, "player_hit_lasertarget");
+    public static final Identifier PLAYER_HIT_PLAYER = new Identifier(LasertagMod.ID, "player_hit_player");
 }

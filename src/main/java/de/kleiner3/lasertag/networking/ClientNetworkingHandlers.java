@@ -7,7 +7,7 @@ import de.kleiner3.lasertag.networking.client.ClientNetworkingHandler;
  *
  * @author Étienne Muser
  */
-public class NetworkingHandlers {
+public class ClientNetworkingHandlers {
     public static final ClientNetworkingHandler CLIENT_NETWORKING_HANDLER = new ClientNetworkingHandler();
 
     public static void register() {
