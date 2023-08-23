@@ -214,6 +214,11 @@ public class LasertagServerManager implements IManager, ITickable {
             return;
         }
 
+        // Check if player is deactivated
+        if (LasertagGameManager.getInstance().getDeactivatedManager().isDeactivated(target.getUuid())) {
+            return;
+        }
+
         var world = server.getOverworld();
 
         // Deactivate player

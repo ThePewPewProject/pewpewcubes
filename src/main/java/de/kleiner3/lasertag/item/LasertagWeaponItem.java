@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.item;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.LaserTargetBlock;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.common.util.RaycastUtil;
@@ -115,7 +116,7 @@ public class LasertagWeaponItem extends RangedWeaponItem {
                     Entity hitEntity = entityHit.getEntity();
 
                     // Check that hit entity is a player
-                    if (!(hitEntity instanceof ServerPlayerEntity hitPlayer)) {
+                    if (!(hitEntity instanceof PlayerEntity hitPlayer)) {
                         break;
                     }
 
