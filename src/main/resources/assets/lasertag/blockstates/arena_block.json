@@ -1,5 +1,5 @@
 {
   "variants": {
-    "": { "model": "lasertag:block/arena_block" }
+    "": { "model": "lasertag:block/arena_block_model" }
   }
 }
