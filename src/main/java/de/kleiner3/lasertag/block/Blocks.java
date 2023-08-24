@@ -11,7 +11,7 @@ import net.minecraft.util.registry.Registry;
 
 public class Blocks {
     // Create instances for all blocks
-    public static final Block ARENA_BLOCK = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f).luminance(15));
+    public static final Block ARENA_BLOCK = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
     public static final Block ARENA_BLOCK_DARK = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
     public static final Block ARENA_BLOCK_STAIRS = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
     public static final Block ARENA_BLOCK_SLAB = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
