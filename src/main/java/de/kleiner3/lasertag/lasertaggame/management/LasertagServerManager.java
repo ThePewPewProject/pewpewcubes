@@ -466,6 +466,10 @@ public class LasertagServerManager implements IManager, ITickable {
 
         ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_OVER, PacketByteBufs.empty());
 
+        // Reset server internal hud render manager
+        LasertagGameManager.getInstance().getHudRenderManager().stopGameTimer();
+        LasertagGameManager.getInstance().getHudRenderManager().shouldRenderNameTags = true;
+
         // Deactivate every player
         LasertagGameManager.getInstance().getDeactivatedManager().deactivateAll(world, server.getPlayerManager());
 
