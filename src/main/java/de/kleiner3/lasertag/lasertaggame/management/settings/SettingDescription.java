@@ -8,7 +8,7 @@ package de.kleiner3.lasertag.lasertaggame.management.settings;
 public enum SettingDescription {
 
     WEAPON_COOLDOWN("weaponCooldown", 4L, SettingDataType.LONG, "ticks", 0L, null),
-    WEAPON_REACH("weaponReach", 50L, SettingDataType.LONG, "blocks", 0L, null),
+    WEAPON_REACH("weaponReach", 200L, SettingDataType.LONG, "blocks", 0L, null),
     SHOW_LASER_RAYS("showLaserRays", true, SettingDataType.BOOL, "value", null, null),
     MAX_TEAM_SIZE("maxTeamSize", 6L, SettingDataType.LONG, "players", 0L, null),
     RENDER_TEAM_LIST("renderTeamList", true, SettingDataType.BOOL, "value", null, null),
