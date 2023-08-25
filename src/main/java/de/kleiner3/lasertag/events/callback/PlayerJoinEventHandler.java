@@ -31,8 +31,9 @@ public class PlayerJoinEventHandler {
             return;
         }
 
-        // If player is already in a team (i.e. he got disconnected)
-        if (LasertagGameManager.getInstance().getTeamManager().isPlayerInTeam(player.getUuid())) {
+        // If player is already in a team and game is running (i.e. he got disconnected)
+        if (LasertagGameManager.getInstance().getTeamManager().isPlayerInTeam(player.getUuid()) &&
+            server.getLasertagServerManager().isGameRunning()) {
             // Dont teleport him to origin
             return;
         }
