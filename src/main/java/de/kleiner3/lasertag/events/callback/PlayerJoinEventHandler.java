@@ -2,12 +2,19 @@ package de.kleiner3.lasertag.events.callback;
 
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.networking.NetworkingConstants;
+import de.kleiner3.lasertag.networking.server.ServerEventSending;
+import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import java.util.UUID;
 
 /**
  * Event handler for the player join event
@@ -24,6 +31,8 @@ public class PlayerJoinEventHandler {
 
         // Sync managers
         LasertagGameManager.getInstance().syncToClient(player, server);
+
+        sendPlayerJoinedNetworkEvent(server.getOverworld(), player.getUuid(), player.getLasertagUsername());
 
         // If origin spawn setting is disabled
         if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.DO_ORIGIN_SPAWN)) {
@@ -43,5 +52,15 @@ public class PlayerJoinEventHandler {
 
         // Set players spawnpoint
         player.setSpawnPoint(World.OVERWORLD, new BlockPos(0, 1, 0), 0.0F, true, false);
+    }
+
+    private static void sendPlayerJoinedNetworkEvent(ServerWorld world, UUID playerUuid, String playerName) {
+        // Create packet byte buffer
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+
+        buf.writeUuid(playerUuid);
+        buf.writeString(playerName);
+
+        ServerEventSending.sendToEveryone(world, NetworkingConstants.PLAYER_JOINED, buf);
     }
 }

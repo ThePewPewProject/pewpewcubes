@@ -30,5 +30,6 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_MANAGER_SYNC, new LasertagGameManagerSyncCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_DEACTIVATED_STATUS_CHANGED, new PlayerDeactivatedStatusChangedCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_STATISTICS, new GameStatisticsIncomingCallback());
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_JOINED, new PlayerJoinedCallback());
     }
 }
