@@ -75,7 +75,7 @@ public class LasertagHudRenderManager implements IManager {
                 return;
             }
 
-            ThreadUtil.attemptShutdown(gameTimer);
+            gameTimer.shutdownNow();
             this.gameTimer = null;
             this.gameTime = 0;
         }
@@ -98,7 +98,7 @@ public class LasertagHudRenderManager implements IManager {
                 return;
             }
 
-            ThreadUtil.attemptShutdown(preGameTimer);
+            preGameTimer.shutdownNow();
             this.preGameTimer = null;
             this.startingIn = -1;
         }

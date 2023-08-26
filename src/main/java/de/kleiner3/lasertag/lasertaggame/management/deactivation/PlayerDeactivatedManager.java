@@ -69,7 +69,7 @@ public class PlayerDeactivatedManager implements IManager {
         deactivationThread.schedule(() -> {
 
             activate(playerUuid, world, playerManager);
-            ThreadUtil.attemptShutdown(deactivationThread);
+            deactivationThread.shutdownNow();
         }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAYER_DEACTIVATE_TIME), TimeUnit.SECONDS);
 
         var player = playerManager.getPlayer(playerUuid);

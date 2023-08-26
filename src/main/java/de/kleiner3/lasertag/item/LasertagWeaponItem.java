@@ -139,7 +139,7 @@ public class LasertagWeaponItem extends RangedWeaponItem {
             despawnThread.schedule(() -> {
                 world.getServer().execute(ray::discard);
 
-                ThreadUtil.attemptShutdown(despawnThread);
+                despawnThread.shutdownNow();
             }, 50, TimeUnit.MILLISECONDS);
         }
     }

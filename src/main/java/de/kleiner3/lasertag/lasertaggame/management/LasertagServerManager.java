@@ -127,6 +127,7 @@ public class LasertagServerManager implements IManager, ITickable {
 
         var preGameDelayTimer = ThreadUtil.createScheduledExecutor("lasertag-server-pregame-delay-timer-thread-%d");
         var preGameDelay = LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PREGAME_DURATION);
+
         preGameDelayTimer.schedule(() -> {
 
             // Activate every player
@@ -148,7 +149,7 @@ public class LasertagServerManager implements IManager, ITickable {
             gameTickTimer.scheduleAtFixedRate(new GameTickTimerTask(this), 0, 1, TimeUnit.MINUTES);
 
             // Stop the pre game delay timer
-            ThreadUtil.attemptShutdown(preGameDelayTimer);
+            preGameDelayTimer.shutdownNow();
 
         }, preGameDelay, TimeUnit.SECONDS);
 
@@ -281,7 +282,7 @@ public class LasertagServerManager implements IManager, ITickable {
         deactivationThread.schedule(() -> {
             target.setDeactivated(false);
 
-            ThreadUtil.attemptShutdown(deactivationThread);
+            deactivationThread.shutdownNow();
         }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.LASERTARGET_DEACTIVATE_TIME), TimeUnit.SECONDS);
 
         // Add player to the players who hit the target
@@ -318,7 +319,7 @@ public class LasertagServerManager implements IManager, ITickable {
             if (gameTickTimer == null) {
                 return;
             }
-            ThreadUtil.attemptShutdown(gameTickTimer);
+            gameTickTimer.shutdownNow();
             gameTickTimer = null;
         }
     }
@@ -458,7 +459,6 @@ public class LasertagServerManager implements IManager, ITickable {
      * This method is called when the game ends
      */
     private void lasertagGameOver() {
-        dispose();
 
         isRunning = false;
 
@@ -526,6 +526,9 @@ public class LasertagServerManager implements IManager, ITickable {
         } catch (Exception e) {
             LasertagMod.LOGGER.error("ERROR:", e);
         }
+
+        // Clean up (stop game tick timer)
+        dispose();
     }
 
     //endregion
