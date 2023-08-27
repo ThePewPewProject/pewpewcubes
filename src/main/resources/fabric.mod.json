@@ -8,7 +8,8 @@
   "authors": [
     "Étienne Muser aka Der_fbs aka fibs",
     "Kevin Janzen aka ZaboKev aka K e v",
-    "Timon Maier aka _Timon aka Dr. Diarrhö"
+    "Timon Maier aka _Timon aka Dr. Diarrhö",
+    "ValliHalli"
   ],
   "contributors": [
     "Robert Senin aka Sogeking_1024",
@@ -38,10 +39,9 @@
   ],
   "custom": {
 	"loom:injected_interfaces": {
-		"net/minecraft/server/MinecraftServer": ["de/kleiner3/lasertag/lasertaggame/ILasertagGame", "de/kleiner3/lasertag/lasertaggame/ITickable"],
+		"net/minecraft/server/MinecraftServer": ["de/kleiner3/lasertag/lasertaggame/ILasertagServerManagerAccessor"],
 		"net/minecraft/entity/player/PlayerEntity": ["de/kleiner3/lasertag/lasertaggame/ILasertagPlayer"],
-        "net/minecraft/world/World": ["de/kleiner3/lasertag/common/util/fastiter/IFastWorldIter"],
-        "net/minecraft/server/PlayerManager": ["de/kleiner3/lasertag/lasertaggame/management/team/player/IPlayerRepository"]
+        "net/minecraft/world/World": ["de/kleiner3/lasertag/common/util/fastiter/IFastWorldIter"]
     }
   },
 
@@ -50,9 +50,7 @@
   "depends": {
     "fabricloader": ">=0.14.9",
     "minecraft": "~1.19",
-	"fabric-api": "*",
-    "java": ">=17",
-    "geckolib3": ">=3.1.40"
+    "java": ">=17"
   },
   "suggests": {
     "sodium": "*",

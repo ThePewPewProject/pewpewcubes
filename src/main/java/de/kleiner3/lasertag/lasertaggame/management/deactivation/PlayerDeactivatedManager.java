@@ -1,24 +1,20 @@
 package de.kleiner3.lasertag.lasertaggame.management.deactivation;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -49,6 +45,7 @@ public class PlayerDeactivatedManager implements IManager {
 
     /**
      * Sets if the player is deactivated
+     *
      * @param deactivated If the player is deactivated
      */
     public void setDeactivated(UUID uuid, boolean deactivated) {
@@ -57,51 +54,82 @@ public class PlayerDeactivatedManager implements IManager {
 
     /**
      * Deactivates a player, activates him again after the configured time
-     * @param player The player to deactivate
+     *
+     * @param playerUuid The uuid of the player to deactivate
      * @param world The world which the player is in
      */
-    public void deactivate(PlayerEntity player, World world) {
-        var uuid = player.getUuid();
+    public void deactivate(UUID playerUuid, World world, PlayerManager playerManager) {
 
         // Deactivate player
-        deactivatedMap.put(uuid, true);
-        player.onDeactivated();
-        sendDeactivatedToClients(world, uuid, true);
+        deactivatedMap.put(playerUuid, true);
+        sendDeactivatedToClients(world, playerUuid, true);
 
         // Reactivate player after configured amount of time
         var deactivationThread = ThreadUtil.createScheduledExecutor("lasertag-player-deactivation-thread-%d");
         deactivationThread.schedule(() -> {
-            deactivatedMap.put(uuid, false);
-            player.onActivated();
-            sendDeactivatedToClients(world, uuid, false);
-            ThreadUtil.attemptShutdown(deactivationThread);
-        }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.DEACTIVATE_TIME), TimeUnit.SECONDS);
+
+            activate(playerUuid, world, playerManager);
+            deactivationThread.shutdownNow();
+        }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAYER_DEACTIVATE_TIME), TimeUnit.SECONDS);
+
+        var player = playerManager.getPlayer(playerUuid);
+
+        // Sanity check
+        if (player == null) {
+            return;
+        }
+
+        player.onDeactivated();
     }
 
     /**
      * Activates the player referenced by uuid
+     *
      * @param uuid The uuid of the player to activate
      * @param world The world which the player is in
      */
-    public void activate(UUID uuid, World world) {
+    public void activate(UUID uuid, World world, PlayerManager playerManager) {
         deactivatedMap.put(uuid, false);
         sendDeactivatedToClients(world, uuid, false);
+
+        var player = playerManager.getPlayer(uuid);
+
+        // Sanity check
+        if (player == null) {
+            return;
+        }
+
+        player.onActivated();
     }
 
     /**
      * Deactivates a given player
-     * @param player The player to deactivate
+     *
+     * @param playerUuid The uuid of the player to deactivate
      * @param world The world he is in
      * @param forever Bool if he should be deactivated without reactivation count down
      */
-    public void deactivate(PlayerEntity player, World world, boolean forever) {
+    public void deactivate(UUID playerUuid, World world, boolean forever, PlayerManager playerManager) {
         if (forever) {
-            var uuid = player.getUuid();
-            deactivatedMap.put(uuid, true);
-            sendDeactivatedToClients(world, uuid, true);
+            deactivatedMap.put(playerUuid, true);
+            sendDeactivatedToClients(world, playerUuid, true);
         } else {
-            deactivate(player, world);
+            deactivate(playerUuid, world, playerManager);
         }
+    }
+
+    /**
+     * Deactivates all players forever
+     *
+     * @param world The world the game is in
+     */
+    public void deactivateAll(ServerWorld world, PlayerManager playerManager) {
+
+        var teamManager = LasertagGameManager.getInstance().getTeamManager();
+
+        teamManager.forEachPlayer((team, playerUuid) -> {
+            deactivate(playerUuid, world, true, playerManager);
+        });
     }
 
     @Override
@@ -111,12 +139,6 @@ public class PlayerDeactivatedManager implements IManager {
 
     public static PlayerDeactivatedManager fromJson(String jsonString) {
         return new Gson().fromJson(jsonString, PlayerDeactivatedManager.class);
-    }
-
-    @Override
-    public void syncToClient(ServerPlayerEntity client, MinecraftServer server) {
-        // Do not sync!
-        throw new UnsupportedOperationException("PlayerDeactivatedManger should not be synced on its own.");
     }
 
     //endregion

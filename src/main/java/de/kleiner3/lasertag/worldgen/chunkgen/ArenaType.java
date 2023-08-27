@@ -27,7 +27,7 @@ public enum ArenaType {
             "arenaType.jungle"),
     DESERT(BiomeKeys.DESERT,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/desert_arena.litematic"),
-            new Vec3i(55, 1, 99),
+            new Vec3i(55, 7, 99),
             "arenaType.desert"),
     FLOWER_FOREST(BiomeKeys.FLOWER_FOREST,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/flower_forest_arena.litematic"),

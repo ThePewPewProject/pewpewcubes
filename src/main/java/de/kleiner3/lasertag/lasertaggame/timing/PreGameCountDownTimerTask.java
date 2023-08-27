@@ -18,11 +18,12 @@ public class PreGameCountDownTimerTask extends TimerTask {
         --renderData.startingIn;
 
         if (renderData.startingIn <= -1) {
-            // Stop countdown timer
-            renderData.stopPreGameCountdownTimer();
 
             // Start game count down timer
             renderData.startGameTimer(0);
+
+            // Stop countdown timer
+            renderData.stopPreGameCountdownTimer();
         }
     }
 }

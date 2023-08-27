@@ -8,6 +8,11 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 
+/**
+ * Callback for the weapon failed sound event
+ *
+ * @author Étienne Muser
+ */
 public class WeaponFailedSoundEventCallback implements ClientPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {

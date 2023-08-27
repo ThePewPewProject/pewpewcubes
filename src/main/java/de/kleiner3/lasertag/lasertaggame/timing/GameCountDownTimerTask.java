@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.lasertaggame.timing;
 
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingNames;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 
 import java.util.TimerTask;
 
@@ -17,7 +17,7 @@ public class GameCountDownTimerTask extends TimerTask {
 
         ++renderData.gameTime;
 
-        if ((LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingNames.PLAY_TIME) * 60L) - renderData.gameTime == 0) {
+        if ((LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAY_TIME) * 60L) - renderData.gameTime == 0) {
             renderData.stopGameTimer();
         }
     }

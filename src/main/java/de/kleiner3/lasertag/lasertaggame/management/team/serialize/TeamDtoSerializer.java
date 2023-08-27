@@ -1,9 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame.management.team.serialize;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import net.minecraft.util.registry.Registry;
 
@@ -26,13 +23,21 @@ public class TeamDtoSerializer {
             public JsonElement serialize(TeamDto teamDto, Type type, JsonSerializationContext jsonSerializationContext) {
                 var jsonObject = new JsonObject();
 
+                // Add id
+                jsonObject.addProperty("id", teamDto.id());
+
                 // Add RGB
                 jsonObject.addProperty("red", teamDto.color().r());
                 jsonObject.addProperty("green", teamDto.color().g());
                 jsonObject.addProperty("blue", teamDto.color().b());
 
                 // Add spawnpoint block
-                jsonObject.addProperty("spawnpointBlock", Registry.BLOCK.getId(teamDto.spawnpointBlock()).toString());
+                var spawnPointBlockId = "null";
+                if (teamDto.spawnpointBlock() != null) {
+                    
+                    spawnPointBlockId = Registry.BLOCK.getId(teamDto.spawnpointBlock()).toString();
+                }
+                jsonObject.addProperty("spawnpointBlock", spawnPointBlockId);
 
                 return jsonObject;
             }

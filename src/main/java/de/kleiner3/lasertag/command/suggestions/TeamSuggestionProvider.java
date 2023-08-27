@@ -40,7 +40,7 @@ public class TeamSuggestionProvider implements SuggestionProvider<ServerCommandS
             inputEmpty = true;
         }
 
-        for (String color :  LasertagGameManager.getInstance().getTeamManager().teamConfig.keySet()) {
+        for (String color :  LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().teamConfig.keySet()) {
             if (inputEmpty || color.toLowerCase().startsWith(input.toLowerCase())) {
                 builder.suggest(color);
             }

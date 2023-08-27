@@ -4,8 +4,6 @@ import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.WallMountLocation;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -24,21 +22,6 @@ public class LaserTargetBlock extends WallMountedBlock implements BlockEntityPro
         setDefaultState(getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(FACE, WallMountLocation.WALL));
     }
 
-    /**
-     * Called when this block got hit by a laser ray
-     *
-     * @param playerEntity The player who hit the target
-     */
-    public void onHitBy(PlayerEntity playerEntity, BlockEntity blockEntity) {
-        // Get the server
-        MinecraftServer server = playerEntity.getServer();
-
-        // Sanity check
-        if (server != null && blockEntity instanceof LaserTargetBlockEntity) {
-            ((LaserTargetBlockEntity)blockEntity).onHitBy(server, playerEntity);
-        }
-    }
-
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(FACING, FACE);
@@ -54,10 +37,10 @@ public class LaserTargetBlock extends WallMountedBlock implements BlockEntityPro
         final float min = 0.1875F;
         final float max = 0.8125F;
 
-        switch ((WallMountLocation)state.get(FACE)) {
+        switch (state.get(FACE)) {
             case FLOOR -> { return VoxelShapes.cuboid(min, 0, min, max, max, max); }
             case WALL -> {
-                switch ((Direction)state.get(FACING)) {
+                switch (state.get(FACING)) {
                     case NORTH -> { return VoxelShapes.cuboid(min, min, min, max, max, 1); }
                     case EAST -> { return VoxelShapes.cuboid(0, min, min, max, max, max); }
                     case SOUTH -> { return VoxelShapes.cuboid(min, min, 0, max, max, max); }

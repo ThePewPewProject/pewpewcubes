@@ -10,7 +10,6 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Mixin into World to provide the fast block iteration method

@@ -5,6 +5,7 @@ import de.kleiner3.lasertag.command.Commands;
 import de.kleiner3.lasertag.entity.Entities;
 import de.kleiner3.lasertag.events.EventListeners;
 import de.kleiner3.lasertag.item.Items;
+import de.kleiner3.lasertag.networking.ServerNetworkingHandlers;
 import de.kleiner3.lasertag.resource.ResourceManagers;
 import de.kleiner3.lasertag.worldgen.chunkgen.ChunkGenerators;
 import net.fabricmc.api.ModInitializer;
@@ -59,5 +60,8 @@ public class LasertagMod implements ModInitializer {
 
         // Register resource manager
         ResourceManagers.register();
+
+        // Register networking handlers
+        ServerNetworkingHandlers.register();
     }
 }

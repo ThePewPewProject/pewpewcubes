@@ -5,9 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.ToNumberPolicy;
 import de.kleiner3.lasertag.lasertaggame.management.deactivation.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.lasertaggame.management.gui.LasertagHudRenderManager;
+import de.kleiner3.lasertag.lasertaggame.management.players.LasertagPlayerNameManager;
 import de.kleiner3.lasertag.lasertaggame.management.score.LasertagScoreManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.LasertagSettingsManager;
-import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
+import de.kleiner3.lasertag.lasertaggame.management.team.LasertagTeamManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamConfigManagerDeserializer;
 import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamDtoSerializer;
@@ -21,7 +22,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import java.util.HashMap;
 
 /**
- * Class to manage the lasertag game
+ * Class to manage the lasertag game. Contains everything which should get synced to the clients.
  *
  * @author Étienne Muser
  */
@@ -51,25 +52,28 @@ public class LasertagGameManager implements IManager {
 
     private LasertagSettingsManager settingsManager;
 
-    private TeamConfigManager teamManager;
+    private LasertagTeamManager teamManager;
 
     private LasertagScoreManager scoreManager;
 
     private LasertagHudRenderManager hudRenderManager;
+
+    private LasertagPlayerNameManager playerManager;
 
     //endregion
 
     private LasertagGameManager() {
         deactivatedManager = new PlayerDeactivatedManager();
         settingsManager = new LasertagSettingsManager();
-        teamManager = new TeamConfigManager();
+        teamManager = new LasertagTeamManager();
         scoreManager = new LasertagScoreManager();
-        hudRenderManager = new LasertagHudRenderManager(teamManager.teamConfig.values());
+        hudRenderManager = new LasertagHudRenderManager();
+        playerManager = new LasertagPlayerNameManager();
     }
 
     //region Public methods
 
-    public TeamConfigManager getTeamManager() {
+    public LasertagTeamManager getTeamManager() {
         return teamManager;
     }
 
@@ -88,6 +92,8 @@ public class LasertagGameManager implements IManager {
     public LasertagScoreManager getScoreManager() {
         return scoreManager;
     }
+
+    public LasertagPlayerNameManager getPlayerManager() { return playerManager; }
 
     @Override
     public void dispose() {
@@ -109,7 +115,6 @@ public class LasertagGameManager implements IManager {
         return builder.create().fromJson(jsonString, LasertagGameManager.class);
     }
 
-    @Override
     public void syncToClient(ServerPlayerEntity client, MinecraftServer server) {
         // Serialize to json
         var jsonString = toJson();
@@ -121,13 +126,13 @@ public class LasertagGameManager implements IManager {
         buf.writeString(jsonString);
 
         // Get if game is running
-        var gameRunning = server.isLasertagGameRunning();
+        var gameRunning = server.getLasertagServerManager().isGameRunning();
 
         // Write to buffer
         buf.writeBoolean(gameRunning);
 
         // Send to client
-        ServerPlayNetworking.send(client, NetworkingConstants.LASERTAG_GAME_MANAGER_SYNC, buf);
+        ServerPlayNetworking.send(client, NetworkingConstants.GAME_MANAGER_SYNC, buf);
     }
 
     //endregion

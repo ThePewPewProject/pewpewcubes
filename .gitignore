@@ -33,6 +33,7 @@ bin/
 # fabric
 
 run/
+logs/
 
 .fabric/
 servertesting/

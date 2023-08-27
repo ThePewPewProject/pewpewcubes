@@ -26,21 +26,9 @@ public class LasertagSettingsMap implements Map<String, Object> {
     public static LasertagSettingsMap createDefaultSettings() {
         var settings = new LasertagSettingsMap();
 
-        settings.put(SettingNames.WEAPON_COOLDOWN, 4L);
-        settings.put(SettingNames.WEAPON_REACH, 50L);
-        settings.put(SettingNames.SHOW_LASER_RAYS, true);
-        settings.put(SettingNames.MAX_TEAM_SIZE, 6L);
-        settings.put(SettingNames.RENDER_TEAM_LIST, true);
-        settings.put(SettingNames.RENDER_TIMER, true);
-        settings.put(SettingNames.LASERTARGET_HIT_SCORE, 100L);
-        settings.put(SettingNames.PLAYER_HIT_SCORE, 20L);
-        settings.put(SettingNames.START_TIME, 10L);
-        settings.put(SettingNames.DEACTIVATE_TIME, 5L);
-        settings.put(SettingNames.LASERTARGET_DEACTIVATE_TIME, 7L);
-        settings.put(SettingNames.PLAY_TIME, 10L);
-        settings.put(SettingNames.GEN_STATS_FILE, true);
-        settings.put(SettingNames.AUTO_OPEN_STATS_FILE, true);
-        settings.put(SettingNames.ORIGIN_SPAWN, true);
+        for (var setting : SettingDescription.values()) {
+            settings.put(setting.getName(), setting.getDefaultValue());
+        }
 
         return settings;
     }

@@ -15,6 +15,9 @@ import java.util.concurrent.TimeUnit;
 public class ThreadUtil {
     /**
      * Correctly shuts down a executor service with timeout = 3 seconds
+     * <p>
+     * ALWAYS DO THIS AS THE LAST OPERATION! This method blocks for 3 seconds!
+     * Do everything you need to do before calling this method!
      * @param service The executor service to shut down
      */
     public static void attemptShutdown(ExecutorService service) {
@@ -23,6 +26,9 @@ public class ThreadUtil {
 
     /**
      * Correctly shuts down a executor service
+     * <p>
+     * ALWAYS DO THIS AS THE LAST OPERATION! This method blocks for <code>timeout</code> seconds!
+     * Do everything you need to do before calling this method!
      * @param service The executor service to shut down
      * @param timeout The timeout in seconds to use when waiting for termination
      */

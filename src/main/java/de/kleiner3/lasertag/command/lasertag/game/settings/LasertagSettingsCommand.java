@@ -27,20 +27,7 @@ public class LasertagSettingsCommand extends ServerFeedbackCommand {
                 .requires(s -> s.hasPermissionLevel(4))
                 .executes(new LasertagSettingsCommand());
 
-        RenderTeamListSettingCommand.register(cmd);
-        RenderTimerSettingCommand.register(cmd);
-        LasertagGameDurationSettingCommand.register(cmd);
-        LasertargetHitScoreSettingCommand.register(cmd);
-        LasertagPlayerHitScoreSettingCommand.register(cmd);
-        ShowLaserRaysSettingCommand.register(cmd);
-        PreLasertagGameCooldownSettingCommand.register(cmd);
-        PlayerDeactivationDurationSettingCommand.register(cmd);
-        LasertargetDeactivationDurationSettingCommand.register(cmd);
-        LasertagWeaponUseCooldownSettingCommand.register(cmd);
-        LasertagWeaponReachSettingCommand.register(cmd);
-        GenerateStatisticsFileSettingCommand.register(cmd);
-        AutoOpenStatisticsFileSettingCommand.register(cmd);
-        OriginSpawnSettingCommand.register(cmd);
+        SettingsCommandBuilder.buildSettingsCommands(cmd);
 
         lab.then(cmd);
     }

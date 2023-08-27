@@ -6,7 +6,7 @@ import de.kleiner3.lasertag.client.hud.HudRenderers;
 import de.kleiner3.lasertag.command.ClientCommands;
 import de.kleiner3.lasertag.entity.render.EntityRenderers;
 import de.kleiner3.lasertag.entity.render.armor.ArmorRenderers;
-import de.kleiner3.lasertag.networking.NetworkingHandlers;
+import de.kleiner3.lasertag.networking.ClientNetworkingHandlers;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -25,7 +25,7 @@ public class LasertagModClient implements ClientModInitializer {
         EntityRenderers.register();
 
         // Register packet recievers
-        NetworkingHandlers.register();
+        ClientNetworkingHandlers.register();
 
         // Register HUD Overlays
         HudRenderers.register();

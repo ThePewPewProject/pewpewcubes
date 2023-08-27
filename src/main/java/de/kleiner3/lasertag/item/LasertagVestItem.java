@@ -1,6 +1,5 @@
 package de.kleiner3.lasertag.item;
 
-import de.kleiner3.lasertag.lasertaggame.ILasertagColorable;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -25,7 +24,7 @@ import java.util.List;
  *
  * @author Étienne Muser
  */
-public class LasertagVestItem extends ArmorItem implements ILasertagColorable, IAnimatable {
+public class LasertagVestItem extends ArmorItem implements IAnimatable {
 
     private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 

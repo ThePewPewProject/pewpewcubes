@@ -5,7 +5,6 @@ import de.kleiner3.lasertag.item.LasertagVestItem;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
@@ -13,11 +12,11 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.processor.IBone;
-import software.bernie.geckolib3.core.util.Color;
 import software.bernie.geckolib3.renderers.geo.GeoArmorRenderer;
 import software.bernie.geckolib3.util.GeoUtils;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Renderer for the lasertag vest
@@ -64,32 +63,26 @@ public class LasertagVestRenderer extends GeoArmorRenderer<LasertagVestItem> {
         }
 
         // Default color is black
-        float r = 0;
-        float g = 0;
-        float b = 0;
+        AtomicReference<Float> r = new AtomicReference<>((float) 0);
+        AtomicReference<Float> g = new AtomicReference<>((float) 0);
+        AtomicReference<Float> b = new AtomicReference<>((float) 0);
 
         // If player is activated
         if (entity instanceof PlayerEntity) {
             boolean isDeactivated = LasertagGameManager.getInstance().getDeactivatedManager().isDeactivated(entity.getUuid());
 
             if (!isDeactivated) {
-                var color = ((LasertagVestItem) Items.LASERTAG_VEST).getColor(stack);
-                r = ((color >> 16) & 0xFF) / 255.0F;
-                g = ((color >> 8) & 0xFF) / 255.0F;
-                b = ((color) & 0xFF) / 255.0F;
+                LasertagGameManager.getInstance().getTeamManager().getTeamOfPlayer(entity.getUuid()).ifPresent(team -> {
+                    var color = team.color();
+
+                    r.set(color.r() / 255.0F);
+                    g.set(color.g() / 255.0F);
+                    b.set(color.b() / 255.0F);
+                });
             }
         }
 
-        this.render(lightsModel, (LasertagVestItem) Items.LASERTAG_VEST, 1.0F, cameo, matrices, vertexConsumers, vertexConsumers.getBuffer(cameo), light, OverlayTexture.DEFAULT_UV, r, g, b, 1.0F);
+        this.render(lightsModel, (LasertagVestItem) Items.LASERTAG_VEST, 1.0F, cameo, matrices, vertexConsumers, vertexConsumers.getBuffer(cameo), light, OverlayTexture.DEFAULT_UV, r.get(), g.get(), b.get(), 1.0F);
         matrices.pop();
-    }
-
-    @Override
-    public Color getRenderColor(LasertagVestItem animatable, float partialTicks, MatrixStack stack, @Nullable VertexConsumerProvider renderTypeBuffer, @Nullable VertexConsumer vertexBuilder, int packedLightIn) {
-        if (getGeoModelProvider() == LIGHTS_MODEL) {
-            var color = animatable.getColor(itemStack);
-            return Color.ofOpaque(color);
-        }
-        return super.getRenderColor(animatable, partialTicks, stack, renderTypeBuffer, vertexBuilder, packedLightIn);
     }
 }

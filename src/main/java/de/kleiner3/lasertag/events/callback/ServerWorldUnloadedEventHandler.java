@@ -15,6 +15,6 @@ public class ServerWorldUnloadedEventHandler {
         LasertagGameManager.reset();
 
         // Dispose server
-        minecraftServer.dispose();
+        minecraftServer.getLasertagServerManager().dispose();
     }
 }
