@@ -23,7 +23,7 @@ import java.io.IOException;
 public enum ArenaType {
     JUNGLE(BiomeKeys.JUNGLE,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/jungle_arena.litematic"),
-            new Vec3i(21, 3, 61),
+            new Vec3i(22, 3, 61),
             "arenaType.jungle"),
     DESERT(BiomeKeys.DESERT,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/desert_arena.litematic"),
