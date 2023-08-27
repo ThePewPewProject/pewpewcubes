@@ -16,6 +16,7 @@
     "IntegratedServerLoaderMixin",
     "ItemRendererMixin",
     "LivingEntityRendererMixin",
+    "MusicTrackerMixin",
     "gui.InGameHudMixin",
     "gui.MoreWorldOptionsDialogMixin",
     "gui.PlayerListHudMixin"
