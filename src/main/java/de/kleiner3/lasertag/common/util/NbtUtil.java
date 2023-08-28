@@ -1,12 +1,6 @@
 package de.kleiner3.lasertag.common.util;
 
-import de.kleiner3.lasertag.LasertagMod;
 import net.minecraft.nbt.*;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static java.util.Map.entry;
 
 /**
  * Util class for NbtCompound operations
@@ -150,9 +144,6 @@ public class NbtUtil {
 
         // Add pos to entity
         entity.put("pos", posList);
-
-        // Remove pos from litematica entity
-        litematicEntity.remove("Pos");
 
         // Add nbt to entity
         entity.put("nbt", litematicEntity);

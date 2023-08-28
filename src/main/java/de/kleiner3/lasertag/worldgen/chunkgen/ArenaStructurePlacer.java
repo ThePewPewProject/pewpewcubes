@@ -3,6 +3,8 @@ package de.kleiner3.lasertag.worldgen.chunkgen;
 import de.kleiner3.lasertag.mixin.IStructureTemplateAccessor;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
+import net.minecraft.nbt.NbtDouble;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
@@ -75,9 +77,13 @@ public class ArenaStructurePlacer {
                     // Get the position
                     var pos = entityInfo.pos;
 
+                    var x = startPos.getX() + pos.x;
+                    var y = startPos.getY() + pos.y;
+                    var z = startPos.getZ() + pos.z;
+
                     // Get the chunk coords
-                    var chunkX = ChunkSectionPos.getSectionCoord(startPos.getX() + pos.x);
-                    var chunkZ = ChunkSectionPos.getSectionCoord(startPos.getZ() + pos.z);
+                    var chunkX = ChunkSectionPos.getSectionCoord(x);
+                    var chunkZ = ChunkSectionPos.getSectionCoord(z);
 
                     // If chunk of entity is not loaded
                     if (!chunkRegion.isChunkLoaded(chunkX, chunkZ)) {
@@ -85,19 +91,29 @@ public class ArenaStructurePlacer {
                         return;
                     }
 
+                    // Overwrite position
+                    var posList = new NbtList();
+                    posList.add(0, NbtDouble.of(x));
+                    posList.add(1, NbtDouble.of(y));
+                    posList.add(2, NbtDouble.of(z));
+                    entityInfo.nbt.put("Pos", posList);
+
+                    var hasTileXYZ = entityInfo.nbt.contains("TileX");
+                    if (hasTileXYZ) {
+                        // Overwrite tile position
+                        var tileX = startPos.getX() + entityInfo.nbt.getInt("TileX");
+                        var tileY = startPos.getY() + entityInfo.nbt.getInt("TileY");
+                        var tileZ = startPos.getZ() + entityInfo.nbt.getInt("TileZ");
+                        entityInfo.nbt.putInt("TileX", tileX);
+                        entityInfo.nbt.putInt("TileY", tileY);
+                        entityInfo.nbt.putInt("TileZ", tileZ);
+                    }
+
                     // Create the entity
                     var entityOptional = EntityType.getEntityFromNbt(entityInfo.nbt, chunkRegion.getServer().getOverworld());
 
-                    // If entity not empty
-                    entityOptional.ifPresent((entity) -> {
-                        // Set the position
-                        entity.setPos(startPos.getX() + pos.x,
-                                      startPos.getY() + pos.y,
-                                      startPos.getZ() + pos.z);
-
-                        // Spawn the entity
-                        chunkRegion.spawnEntity(entity);
-                    });
+                    // Spawn the entity if it is present
+                    entityOptional.ifPresent(chunkRegion::spawnEntity);
                 });
     }
 }
