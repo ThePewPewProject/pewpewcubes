@@ -283,15 +283,6 @@ public class NbtUtil {
             return false;
         }
 
-        var id = TileEntityLookup.lookupBlockName(blockName.asString());
-
-        if (id == null) {
-            LasertagMod.LOGGER.error("tileEntityIdLookupTable did not contain an entry for blockName=" + blockName.asString());
-            return false;
-        }
-
-        litematicTileEntity.putString("id", id);
-
         block.put("nbt", litematicTileEntity);
         return true;
     }
