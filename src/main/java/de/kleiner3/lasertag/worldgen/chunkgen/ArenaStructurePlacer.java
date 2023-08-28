@@ -37,7 +37,7 @@ public class ArenaStructurePlacer {
                 .filter((blockInfo) -> chunkBox.contains(startPos.add(blockInfo.pos)))
                 .forEach((blockInfo) -> {
                     // Get the actual block pos
-                    var actualBlockPos = startPos.add(blockInfo.pos);
+                    var actualBlockPos = new BlockPos(startPos.add(blockInfo.pos));
 
                     // Get the block state
                     var blockState = blockInfo.state;
@@ -48,7 +48,13 @@ public class ArenaStructurePlacer {
                     }
 
                     // Place the block in the world
-                    world.setBlockState(new BlockPos(actualBlockPos), blockState, 2);
+                    world.setBlockState(actualBlockPos, blockState, 2);
+
+                    if (blockInfo.nbt != null) {
+                        var blockEntity = world.getBlockEntity(actualBlockPos);
+
+                        blockEntity.readNbt(blockInfo.nbt);
+                    }
                 });
     }
 
