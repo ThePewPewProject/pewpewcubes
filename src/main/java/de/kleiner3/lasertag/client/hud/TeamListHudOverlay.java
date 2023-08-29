@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.client.hud;
 
 import de.kleiner3.lasertag.common.types.Tuple;
+import de.kleiner3.lasertag.common.types.Vec3;
 import de.kleiner3.lasertag.common.util.AdvancedDrawableHelper;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
@@ -46,24 +47,31 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         drawPlayersWithoutTeam(matrices, scaledWindowWidth, scaledWindowHeight);
         drawSpectators(matrices, scaledWindowHeight);
 
+        var lasertagGameManager = LasertagGameManager.getInstance();
+
         // If render team list setting is disabled
-        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.RENDER_TEAM_LIST)) {
+        if (!lasertagGameManager.getSettingsManager().<Boolean>get(SettingDescription.RENDER_TEAM_LIST)) {
             var text = Text.literal("Render team list setting is disabled").asOrderedText();
             drawCenteredTextWithShadow(matrices, TEXT_RENDERER, text, scaledWindowWidth / 2, NOTE_TOP_PADDING, 0xFFFFFF);
             return;
         }
 
-        var teamManager = LasertagGameManager.getInstance().getTeamManager();
-        var scoreManager = LasertagGameManager.getInstance().getScoreManager();
-        var playerManager = LasertagGameManager.getInstance().getPlayerManager();
+        var teamManager = lasertagGameManager.getTeamManager();
+        var scoreManager = lasertagGameManager.getScoreManager();
+        var playerManager = lasertagGameManager.getPlayerManager();
 
-        // Get a list of Tuple<TeamDto, List<Tuple<String, Long>>> (One entry is a team) which are not empty
+        // Get a list of Tuple<TeamDto, List<Vec3<String, Long, Boolean>>> (One entry is a team) which are not empty
         var teams = teamManager.getTeamMap().entrySet().stream()
                 .filter(entry -> entry.getValue().size() > 0)
                 .filter(entry -> !entry.getKey().equals(TeamConfigManager.SPECTATORS))
                 .map(entry -> {
                     var teamList = entry.getValue().stream()
-                            .map(playerUuid -> new Tuple<>(playerManager.getPlayerUsername(playerUuid), scoreManager.getScore(playerUuid)))
+                            .map(playerUuid -> {
+                                // Try to get player from player list
+                                var player = CLIENT.getNetworkHandler().getPlayerListEntry(playerUuid);
+
+                                return new Vec3<>(playerManager.getPlayerUsername(playerUuid), scoreManager.getScore(playerUuid), player != null);
+                            })
                             .toList();
 
                     return new Tuple<>(entry.getKey(), teamList);
@@ -119,7 +127,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
      * @param teamHeight
      */
     private void drawTeam(MatrixStack matrices,
-                                 Tuple<TeamDto, List<Tuple<String, Long>>> team,
+                                 Tuple<TeamDto, List<Vec3<String, Long, Boolean>>> team,
                                  int startX,
                                  int startY,
                                  int teamHeight) {
@@ -143,8 +151,15 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         var playerY = rectangleStartY + TEXT_PADDING + textHeight + TEXT_PADDING;
         for (var player : team.y()) {
 
+            var playerNamecolor = 0xFFFFFFFF;
+
+            // If the player is not online
+            if (!player.z()) {
+                playerNamecolor = 0xFF808080;
+            }
+
             // Draw player name
-            TEXT_RENDERER.draw(matrices, player.x(), rectangleStartX + TEXT_PADDING + 1, playerY, 0xFFFFFFFF);
+            TEXT_RENDERER.draw(matrices, player.x(), rectangleStartX + TEXT_PADDING + 1, playerY, playerNamecolor);
 
             // Draw player score
             var playerScoreString = Long.toString(player.y());
@@ -198,6 +213,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
                 .findFirst()
                 .get()
                 .getValue().stream()
+                .filter(playerUuid -> CLIENT.getNetworkHandler().getPlayerListEntry(playerUuid) != null)
                 .limit(MAX_NUMBER_PLAYERS_IN_WITHOUT_TEAM_LIST)
                 .toList();
 
@@ -218,7 +234,6 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
 
         var yPos = startY + TEXT_PADDING + TEXT_RENDERER.fontHeight + TEXT_PADDING;
         for (var playerUuid : spectatorTeam) {
-
             // Draw players name
             TEXT_RENDERER.draw(matrices, playerManager.getPlayerUsername(playerUuid), startX + TEXT_PADDING, yPos, 0xFFFFFFFF);
 
