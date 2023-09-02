@@ -1,6 +1,9 @@
 package de.kleiner3.lasertag.lasertaggame.management.team.serialize;
 
-import com.google.gson.*;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import net.minecraft.block.Block;
 import net.minecraft.util.Identifier;

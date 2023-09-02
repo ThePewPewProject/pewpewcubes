@@ -1,6 +1,6 @@
 package de.kleiner3.lasertag.worldgen.chunkgen;
 
-import com.mojang.serialization.*;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 /**
  * Class to hold the arena chunk generator configuration data

@@ -12,7 +12,7 @@ import net.minecraft.util.Rarity;
 import net.minecraft.util.registry.Registry;
 
 /**
- * Class for registerin all items
+ * Class for registering all items
  *
  * @author Étienne Muser
  */
@@ -39,7 +39,7 @@ public class Items {
                 new BlockItem(Blocks.ARENA_BLOCK_SLAB, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
         Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_divider"),
                 new BlockItem(Blocks.ARENA_DIVIDER, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
-        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_pressure_plate"),
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_pressure_plate"),
                 new BlockItem(Blocks.ARENA_PRESSURE_PLATE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
         Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "lasertarget"),
                 new BlockItem(Blocks.LASER_TARGET, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
