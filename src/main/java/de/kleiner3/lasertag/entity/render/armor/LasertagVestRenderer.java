@@ -82,7 +82,7 @@ public class LasertagVestRenderer extends GeoArmorRenderer<LasertagVestItem> {
             }
         }
 
-        this.render(lightsModel, (LasertagVestItem) Items.LASERTAG_VEST, 1.0F, cameo, matrices, vertexConsumers, vertexConsumers.getBuffer(cameo), light, OverlayTexture.DEFAULT_UV, r.get(), g.get(), b.get(), 1.0F);
+        this.render(lightsModel, (LasertagVestItem) Items.LASERTAG_VEST, 1.0F, cameo, matrices, vertexConsumers, vertexConsumers.getBuffer(cameo), 255, OverlayTexture.DEFAULT_UV, r.get(), g.get(), b.get(), 1.0F);
         matrices.pop();
     }
 }
