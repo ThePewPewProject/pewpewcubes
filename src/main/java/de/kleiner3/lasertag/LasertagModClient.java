@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag;
 
 import de.kleiner3.lasertag.block.BlockRenderLayers;
+import de.kleiner3.lasertag.block.entity.BlockEntityRenderers;
 import de.kleiner3.lasertag.block.models.BlockModelProvider;
 import de.kleiner3.lasertag.client.ColorProviders;
 import de.kleiner3.lasertag.client.hud.HudRenderers;
@@ -25,6 +26,9 @@ public class LasertagModClient implements ClientModInitializer {
     public void onInitializeClient() {
         // Register entity renderers
         EntityRenderers.register();
+
+        // Register block entity renderers
+        BlockEntityRenderers.register();
 
         // Register packet recievers
         ClientNetworkingHandlers.register();

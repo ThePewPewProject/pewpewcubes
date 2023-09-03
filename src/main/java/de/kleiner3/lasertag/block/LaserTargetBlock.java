@@ -52,4 +52,9 @@ public class LaserTargetBlock extends WallMountedBlock implements BlockEntityPro
             default -> { return null; }
         }
     }
+
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.ENTITYBLOCK_ANIMATED;
+    }
 }
