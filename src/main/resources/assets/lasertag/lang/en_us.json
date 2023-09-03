@@ -3,6 +3,7 @@
 	"itemGroup.lasertag.lasertag_item_group": "Lasertag",
 	
 	"block.lasertag.arena_block": "Arena Block",
+	"block.lasertag.arena_pillar_block": "Arena Pillar",
 	"block.lasertag.arena_block_dark": "Dark Arena Block",
 	"block.lasertag.arena_block_stairs": "Arena Block Stairs",
 	"block.lasertag.arena_block_slab": "Arena Block Slab",

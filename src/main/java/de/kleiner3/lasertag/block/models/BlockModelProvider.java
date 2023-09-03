@@ -1,10 +1,7 @@
 package de.kleiner3.lasertag.block.models;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.block.models.concrete.ArenaBlockModel;
-import de.kleiner3.lasertag.block.models.concrete.ArenaBlockSlabModel;
-import de.kleiner3.lasertag.block.models.concrete.ArenaBlockStairsModel;
-import de.kleiner3.lasertag.block.models.concrete.ArenaDividerBlockModel;
+import de.kleiner3.lasertag.block.models.concrete.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.model.ModelProviderContext;
@@ -23,6 +20,8 @@ import org.jetbrains.annotations.Nullable;
 public class BlockModelProvider implements ModelResourceProvider {
     public static final Identifier ARENA_BLOCK = new Identifier(LasertagMod.ID, "block/arena_block");
     public static final Identifier ARENA_BLOCK_ITEM = new Identifier(LasertagMod.ID, "item/arena_block");
+    public static final Identifier ARENA_PILLAR_BLOCK = new Identifier(LasertagMod.ID, "block/arena_pillar_block");
+    public static final Identifier ARENA_PILLAR_BLOCK_ITEM = new Identifier(LasertagMod.ID, "item/arena_pillar_block");
     public static final Identifier ARENA_BLOCK_STAIRS = new Identifier(LasertagMod.ID, "block/arena_block_stairs");
     public static final Identifier ARENA_BLOCK_STAIRS_ITEM = new Identifier(LasertagMod.ID, "item/arena_block_stairs");
     public static final Identifier ARENA_DIVIDER = new Identifier(LasertagMod.ID, "block/arena_divider");
@@ -34,6 +33,8 @@ public class BlockModelProvider implements ModelResourceProvider {
     public @Nullable UnbakedModel loadModelResource(Identifier resourceId, ModelProviderContext context) throws ModelProviderException {
         if (resourceId.equals(ARENA_BLOCK) || resourceId.equals(ARENA_BLOCK_ITEM)) {
             return new ArenaBlockModel();
+        } else if (resourceId.equals(ARENA_PILLAR_BLOCK) || resourceId.equals(ARENA_PILLAR_BLOCK_ITEM)) {
+            return new ArenaPillarBlockModel();
         } else if (resourceId.equals(ARENA_BLOCK_STAIRS) || resourceId.equals(ARENA_BLOCK_STAIRS_ITEM)) {
             return new ArenaBlockStairsModel();
         } else if (resourceId.equals(ARENA_DIVIDER) || resourceId.equals(ARENA_DIVIDER_ITEM)) {
