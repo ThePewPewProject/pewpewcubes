@@ -20,6 +20,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockRenderView;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
@@ -31,31 +32,38 @@ import java.util.function.Supplier;
  * @author Étienne Muser
  */
 @Environment(EnvType.CLIENT)
-public class EmissiveSlabModel extends AbstractEmissiveBlockModel {
+public abstract class EmissiveSlabModel extends AbstractEmissiveBlockModel {
 
     private final SpriteIdentifier sideTextureSpriteId;
     private final SpriteIdentifier glowSideTextureSpriteId;
+    private final SpriteIdentifier topTextureSpriteId;
+    private final SpriteIdentifier glowTopTextureSpriteId;
 
     protected Sprite sideTextureSprite;
     protected Sprite glowSideTextureSprite;
+    protected Sprite topTextureSprite;
+    protected Sprite glowTopTextureSprite;
 
-    public EmissiveSlabModel(String texturePath,
-                             String glowTexturePath,
+    public EmissiveSlabModel(String topTexturePath,
+                             String glowTopTexturePath,
                              String sideTexturePath,
                              String glowSideTexturePath) {
-        super(texturePath, glowTexturePath);
 
         sideTextureSpriteId = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(LasertagMod.ID, sideTexturePath));
         glowSideTextureSpriteId = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(LasertagMod.ID, glowSideTexturePath));
+        topTextureSpriteId = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(LasertagMod.ID, topTexturePath));
+        glowTopTextureSpriteId = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(LasertagMod.ID, glowTopTexturePath));
     }
 
     @Override
     public Collection<SpriteIdentifier> getTextureDependencies(Function<Identifier, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences) {
 
-        var textureDependencies = super.getTextureDependencies(unbakedModelGetter, unresolvedTextureReferences);
+        var textureDependencies = new ArrayList<SpriteIdentifier>(4);
 
         textureDependencies.add(sideTextureSpriteId);
         textureDependencies.add(glowSideTextureSpriteId);
+        textureDependencies.add(topTextureSpriteId);
+        textureDependencies.add(glowTopTextureSpriteId);
 
         return textureDependencies;
     }
@@ -63,14 +71,20 @@ public class EmissiveSlabModel extends AbstractEmissiveBlockModel {
     @Override
     protected void getSprites(Function<SpriteIdentifier, Sprite> textureGetter) {
 
-        super.getSprites(textureGetter);
-
         sideTextureSprite = textureGetter.apply(sideTextureSpriteId);
         glowSideTextureSprite = textureGetter.apply(glowSideTextureSpriteId);
+        topTextureSprite = textureGetter.apply(topTextureSpriteId);
+        glowTopTextureSprite = textureGetter.apply(glowTopTextureSpriteId);
     }
 
     @Override
-    protected void addTextureToUnbakedModel(QuadEmitter emitter, Sprite textureSprite) {
+    public Sprite getParticleSprite() {
+        // Block break particle
+        return topTextureSprite;
+    }
+
+    @Override
+    protected void addTextureToUnbakedModel(QuadEmitter emitter) {
         // Do not implement
     }
 
@@ -111,8 +125,8 @@ public class EmissiveSlabModel extends AbstractEmissiveBlockModel {
         for(Direction direction : Direction.values()) {
 
             switch (direction) {
-                case UP -> addTexture(direction, textureSprite, glowTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-                case DOWN -> addTexture(direction, textureSprite, glowTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.5f);
+                case UP -> addTexture(direction, topTextureSprite, glowTopTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                case DOWN -> addTexture(direction, topTextureSprite, glowTopTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.5f);
                 case NORTH, EAST, SOUTH, WEST -> addTextureROI(direction, sideTextureSprite, glowSideTextureSprite, emitter, 0.0f, 0.5f, 1.0f, 1.0f, 0.0f);
             }
         }
@@ -122,8 +136,8 @@ public class EmissiveSlabModel extends AbstractEmissiveBlockModel {
         for(Direction direction : Direction.values()) {
 
             switch (direction) {
-                case UP -> addTexture(direction, textureSprite, glowTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.5f);
-                case DOWN -> addTexture(direction, textureSprite, glowTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                case UP -> addTexture(direction, topTextureSprite, glowTopTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.5f);
+                case DOWN -> addTexture(direction, topTextureSprite, glowTopTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
                 case NORTH, EAST, SOUTH, WEST -> addTextureROI(direction, sideTextureSprite, glowSideTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 0.5f, 0.0f);
             }
         }

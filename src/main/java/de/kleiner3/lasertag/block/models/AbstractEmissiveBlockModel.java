@@ -1,7 +1,5 @@
 package de.kleiner3.lasertag.block.models;
 
-import com.mojang.datafixers.util.Pair;
-import de.kleiner3.lasertag.LasertagMod;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.Renderer;
@@ -21,7 +19,6 @@ import net.minecraft.client.render.model.*;
 import net.minecraft.client.render.model.json.ModelOverrideList;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -30,7 +27,9 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockRenderView;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -42,40 +41,15 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public abstract class AbstractEmissiveBlockModel implements UnbakedModel, BakedModel, FabricBakedModel {
 
-    private final SpriteIdentifier textureSpriteId;
-    private final SpriteIdentifier glowTextureSpriteId;
     private RenderMaterial emissiveMaterial;
 
-    protected Sprite textureSprite;
-    protected Sprite glowTextureSprite;
-
     protected Mesh mesh;
-
-
-
-    public AbstractEmissiveBlockModel(String texturePath, String glowTexturePath) {
-        textureSpriteId = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(LasertagMod.ID, texturePath));
-        glowTextureSpriteId = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(LasertagMod.ID, glowTexturePath));
-    }
 
     @Override
     public Collection<Identifier> getModelDependencies() {
         // This model does not depend on other models.
         return Collections.emptyList();
     }
-
-    @Override
-    public Collection<SpriteIdentifier> getTextureDependencies(Function<Identifier, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences) {
-        // The textures this model (and all its model dependencies, and their dependencies, etc...!) depends on.
-
-        var textureDependencies = new ArrayList<SpriteIdentifier>(2);
-
-        textureDependencies.add(textureSpriteId);
-        textureDependencies.add(glowTextureSpriteId);
-
-        return textureDependencies;
-    }
-
 
     @Override
     public BakedModel bake(ModelLoader loader, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
@@ -94,7 +68,7 @@ public abstract class AbstractEmissiveBlockModel implements UnbakedModel, BakedM
                 .find();
 
         // Add texture - implemented by child class
-        addTextureToUnbakedModel(emitter, textureSprite);
+        addTextureToUnbakedModel(emitter);
 
         mesh = builder.build();
 
@@ -102,17 +76,11 @@ public abstract class AbstractEmissiveBlockModel implements UnbakedModel, BakedM
     }
 
     /**
-     * Child classes can get their textures in this method when overriding.
-     * Call super.getSprites() first!
-     * Also do not forget to override getTextureDependencies!
+     * Get the textures the model needs.
      *
      * @param textureGetter
      */
-    protected void getSprites(Function<SpriteIdentifier, Sprite> textureGetter) {
-
-        textureSprite = textureGetter.apply(textureSpriteId);
-        glowTextureSprite = textureGetter.apply(glowTextureSpriteId);
-    }
+    protected abstract void getSprites(Function<SpriteIdentifier, Sprite> textureGetter);
 
     @Override
     public List<BakedQuad> getQuads(BlockState state, Direction face, net.minecraft.util.math.random.Random random) {
@@ -139,12 +107,6 @@ public abstract class AbstractEmissiveBlockModel implements UnbakedModel, BakedM
     @Override
     public boolean isSideLit() {
         return false;
-    }
-
-    @Override
-    public Sprite getParticleSprite() {
-        // Block break particle
-        return textureSprite;
     }
 
     @Override
@@ -183,9 +145,8 @@ public abstract class AbstractEmissiveBlockModel implements UnbakedModel, BakedM
      * Adds the desired texture to the unbaked model during baking
      *
      * @param emitter
-     * @param textureSprite
      */
-    protected abstract void addTextureToUnbakedModel(QuadEmitter emitter, Sprite textureSprite);
+    protected abstract void addTextureToUnbakedModel(QuadEmitter emitter);
 
     /**
      * Add a single glowing sprite to a texture.

@@ -20,6 +20,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockRenderView;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
@@ -37,35 +38,42 @@ public abstract class EmissiveStairsModel extends AbstractEmissiveBlockModel {
     private final SpriteIdentifier glowStairTextureSpriteId;
     private final SpriteIdentifier sideTextureSpriteId;
     private final SpriteIdentifier glowSideTextureSpriteId;
+    private final SpriteIdentifier backTextureSpriteId;
+    private final SpriteIdentifier glowBackTextureSpriteId;
 
     protected Sprite stairTextureSprite;
     protected Sprite glowStairTextureSprite;
     protected Sprite sideTextureSprite;
     protected Sprite glowSideTextureSprite;
+    protected Sprite backTextureSprite;
+    protected Sprite glowBackTextureSprite;
 
-    public EmissiveStairsModel(String texturePath,
-                               String glowTexturePath,
+    public EmissiveStairsModel(String backTexturePath,
+                               String glowBackTexturePath,
                                String stairTexturePath,
                                String glowStairTexturePath,
                                String sideTexturePath,
                                String glowSideTexturePath) {
-        super(texturePath, glowTexturePath);
 
         stairTextureSpriteId = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(LasertagMod.ID, stairTexturePath));
         glowStairTextureSpriteId = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(LasertagMod.ID, glowStairTexturePath));
         sideTextureSpriteId = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(LasertagMod.ID, sideTexturePath));
         glowSideTextureSpriteId = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(LasertagMod.ID, glowSideTexturePath));
+        backTextureSpriteId = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(LasertagMod.ID, backTexturePath));
+        glowBackTextureSpriteId = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(LasertagMod.ID, glowBackTexturePath));
     }
 
     @Override
     public Collection<SpriteIdentifier> getTextureDependencies(Function<Identifier, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences) {
 
-        var textureDependencies = super.getTextureDependencies(unbakedModelGetter, unresolvedTextureReferences);
+        var textureDependencies = new ArrayList<SpriteIdentifier>(6);
 
         textureDependencies.add(stairTextureSpriteId);
         textureDependencies.add(glowStairTextureSpriteId);
         textureDependencies.add(sideTextureSpriteId);
         textureDependencies.add(glowSideTextureSpriteId);
+        textureDependencies.add(backTextureSpriteId);
+        textureDependencies.add(glowBackTextureSpriteId);
 
         return textureDependencies;
     }
@@ -73,16 +81,22 @@ public abstract class EmissiveStairsModel extends AbstractEmissiveBlockModel {
     @Override
     protected void getSprites(Function<SpriteIdentifier, Sprite> textureGetter) {
 
-        super.getSprites(textureGetter);
-
         stairTextureSprite = textureGetter.apply(stairTextureSpriteId);
         glowStairTextureSprite = textureGetter.apply(glowStairTextureSpriteId);
         sideTextureSprite = textureGetter.apply(sideTextureSpriteId);
         glowSideTextureSprite = textureGetter.apply(glowSideTextureSpriteId);
+        backTextureSprite = textureGetter.apply(backTextureSpriteId);
+        glowBackTextureSprite = textureGetter.apply(glowBackTextureSpriteId);
     }
 
     @Override
-    protected void addTextureToUnbakedModel(QuadEmitter emitter, Sprite textureSprite) {
+    public Sprite getParticleSprite() {
+        // Block break particle
+        return backTextureSprite;
+    }
+
+    @Override
+    protected void addTextureToUnbakedModel(QuadEmitter emitter) {
         // Do not implement
     }
 
@@ -131,7 +145,7 @@ public abstract class EmissiveStairsModel extends AbstractEmissiveBlockModel {
                     // Lower part of the stair
                     addTextureROI(direction, stairTextureSprite, glowStairTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f);
                 }
-                case DOWN, NORTH -> addTexture(direction, textureSprite, glowTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                case DOWN, NORTH -> addTexture(direction, backTextureSprite, glowBackTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
                 case EAST -> {
                     // Base of the side
                     addTextureROI(direction, sideTextureSprite, glowSideTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 0.5f, 0.0f, 1.0f, 0.5f, 0.0f, 1.0f);
@@ -168,7 +182,7 @@ public abstract class EmissiveStairsModel extends AbstractEmissiveBlockModel {
                     // Lower part of the stair
                     addTextureROI(direction, stairTextureSprite, glowStairTextureSprite, emitter, 0.0f, 0.0f, 0.5f, 1.0f, 0.5f, MutableQuadView.BAKE_ROTATE_90);
                 }
-                case DOWN, EAST -> addTexture(direction, textureSprite, glowTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                case DOWN, EAST -> addTexture(direction, backTextureSprite, glowBackTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
                 case SOUTH -> {
                     // Base of the side
                     addTextureROI(direction, sideTextureSprite, glowSideTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 0.5f, 0.0f, 1.0f, 0.5f, 0.0f, 1.0f);
@@ -205,7 +219,7 @@ public abstract class EmissiveStairsModel extends AbstractEmissiveBlockModel {
                     // Upper part of the stair
                     addTextureROI(direction, stairTextureSprite, glowStairTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 0.5f, 0.0f);
                 }
-                case DOWN, SOUTH -> addTexture(direction, textureSprite, glowTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                case DOWN, SOUTH -> addTexture(direction, backTextureSprite, glowBackTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
                 case WEST -> {
                     // Top of the side
                     addTextureROI(direction, sideTextureSprite, glowSideTextureSprite, emitter, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.5f);
@@ -242,7 +256,7 @@ public abstract class EmissiveStairsModel extends AbstractEmissiveBlockModel {
                     // Upper part of the stair
                     addTextureROI(direction, stairTextureSprite, glowStairTextureSprite, emitter, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f, MutableQuadView.BAKE_ROTATE_90);
                 }
-                case DOWN, WEST -> addTexture(direction, textureSprite, glowTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+                case DOWN, WEST -> addTexture(direction, backTextureSprite, glowBackTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
                 case NORTH -> {
                     // Base of the side
                     addTextureROI(direction, sideTextureSprite, glowSideTextureSprite, emitter, 0.0f, 0.0f, 1.0f, 0.5f, 0.0f, 1.0f, 0.5f, 0.0f, 1.0f);
