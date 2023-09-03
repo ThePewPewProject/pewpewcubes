@@ -1,14 +1,49 @@
 {
 
 	"itemGroup.lasertag.lasertag_item_group": "Lasertag",
-	
-	"block.lasertag.arena_block": "Arena Block",
-	"block.lasertag.arena_pillar_block": "Arena Pillar",
-	"block.lasertag.arena_block_dark": "Dark Arena Block",
-	"block.lasertag.arena_block_stairs": "Arena Block Stairs",
-	"block.lasertag.arena_block_slab": "Arena Block Slab",
+
+	"block.lasertag.arena_block_orange": "Orange Arena Block",
+	"block.lasertag.arena_block_pink": "Pink Arena Block",
+	"block.lasertag.arena_block_blue": "Blue Arena Block",
+	"block.lasertag.arena_block_yellow": "Yellow Arena Block",
+	"block.lasertag.arena_block_green": "Green Arena Block",
+	"block.lasertag.arena_block_purple": "Purple Arena Block",
+	"block.lasertag.arena_block_red": "Red Arena Block",
+
+	"block.lasertag.arena_pillar_block_orange": "Orange Arena Pillar",
+	"block.lasertag.arena_pillar_block_pink": "Pink Arena Pillar",
+	"block.lasertag.arena_pillar_block_blue": "Blue Arena Pillar",
+	"block.lasertag.arena_pillar_block_yellow": "Yellow Arena Pillar",
+	"block.lasertag.arena_pillar_block_green": "Green Arena Pillar",
+	"block.lasertag.arena_pillar_block_purple": "Purple Arena Pillar",
+	"block.lasertag.arena_pillar_block_red": "Red Arena Pillar",
+
+	"block.lasertag.arena_block_stairs_orange": "Orange Arena Block Stairs",
+	"block.lasertag.arena_block_stairs_pink": "Pink Arena Block Stairs",
+	"block.lasertag.arena_block_stairs_blue": "Blue Arena Block Stairs",
+	"block.lasertag.arena_block_stairs_yellow": "Yellow Arena Block Stairs",
+	"block.lasertag.arena_block_stairs_green": "Green Arena Block Stairs",
+	"block.lasertag.arena_block_stairs_purple": "Purple Arena Block Stairs",
+	"block.lasertag.arena_block_stairs_red": "Red Arena Block Stairs",
+
+	"block.lasertag.arena_block_slab_orange": "Orange Arena Block Slab",
+	"block.lasertag.arena_block_slab_pink": "Pink Arena Block Slab",
+	"block.lasertag.arena_block_slab_blue": "Blue Arena Block Slab",
+	"block.lasertag.arena_block_slab_yellow": "Yellow Arena Block Slab",
+	"block.lasertag.arena_block_slab_green": "Green Arena Block Slab",
+	"block.lasertag.arena_block_slab_purple": "Purple Arena Block Slab",
+	"block.lasertag.arena_block_slab_red": "Red Arena Block Slab",
+
+	"block.lasertag.arena_divider_orange": "Orange Arena Divider",
+	"block.lasertag.arena_divider_pink": "Pink Arena Divider",
+	"block.lasertag.arena_divider_blue": "Blue Arena Divider",
+	"block.lasertag.arena_divider_yellow": "Yellow Arena Divider",
+	"block.lasertag.arena_divider_green": "Green Arena Divider",
+	"block.lasertag.arena_divider_purple": "Purple Arena Divider",
+	"block.lasertag.arena_divider_red": "Red Arena Divider",
+
 	"block.lasertag.arena_pressure_plate": "Arena Pressure Plate",
-	"block.lasertag.arena_divider": "Arena Divider",
+	"block.lasertag.arena_block_dark": "Dark Arena Block",
 	"block.lasertag.lasertarget": "Lasertarget",
 	
 	"item.lasertag.lasertag_weapon": "Lasertag Weapon",

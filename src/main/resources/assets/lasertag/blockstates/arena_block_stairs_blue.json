@@ -1,0 +1,124 @@
+{
+  "variants": {
+    "facing=east,half=bottom,shape=inner_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=east,half=bottom,shape=inner_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=east,half=bottom,shape=outer_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=east,half=bottom,shape=outer_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=east,half=bottom,shape=straight": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=east,half=top,shape=inner_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=east,half=top,shape=inner_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=east,half=top,shape=outer_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=east,half=top,shape=outer_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=east,half=top,shape=straight": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=north,half=bottom,shape=inner_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=north,half=bottom,shape=inner_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=north,half=bottom,shape=outer_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=north,half=bottom,shape=outer_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=north,half=bottom,shape=straight": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=north,half=top,shape=inner_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=north,half=top,shape=inner_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=north,half=top,shape=outer_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=north,half=top,shape=outer_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=north,half=top,shape=straight": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=south,half=bottom,shape=inner_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=south,half=bottom,shape=inner_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=south,half=bottom,shape=outer_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=south,half=bottom,shape=outer_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=south,half=bottom,shape=straight": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=south,half=top,shape=inner_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=south,half=top,shape=inner_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=south,half=top,shape=outer_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=south,half=top,shape=outer_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=south,half=top,shape=straight": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=west,half=bottom,shape=inner_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=west,half=bottom,shape=inner_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=west,half=bottom,shape=outer_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=west,half=bottom,shape=outer_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=west,half=bottom,shape=straight": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=west,half=top,shape=inner_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=west,half=top,shape=inner_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=west,half=top,shape=outer_left": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=west,half=top,shape=outer_right": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    },
+    "facing=west,half=top,shape=straight": {
+      "model": "lasertag:block/arena_block_stairs_blue"
+    }
+  }
+}

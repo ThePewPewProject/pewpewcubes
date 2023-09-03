@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "lasertag:block/arena_pillar_block_yellow",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "lasertag:block/arena_pillar_block_yellow"
+    },
+    "axis=z": {
+      "model": "lasertag:block/arena_pillar_block_yellow",
+      "x": 90
+    }
+  }
+}

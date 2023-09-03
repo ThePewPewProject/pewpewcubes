@@ -29,18 +29,83 @@ public class Items {
     public static void register() {
 
         // Block items
-        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block"),
-                new BlockItem(Blocks.ARENA_BLOCK, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
-        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_pillar_block"),
-                new BlockItem(Blocks.ARENA_PILLAR_BLOCK, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_orange"),
+                new BlockItem(Blocks.ARENA_BLOCK_ORANGE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_pink"),
+                new BlockItem(Blocks.ARENA_BLOCK_PINK, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_blue"),
+                new BlockItem(Blocks.ARENA_BLOCK_BLUE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_yellow"),
+                new BlockItem(Blocks.ARENA_BLOCK_YELLOW, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_green"),
+                new BlockItem(Blocks.ARENA_BLOCK_GREEN, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_purple"),
+                new BlockItem(Blocks.ARENA_BLOCK_PURPLE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_red"),
+                new BlockItem(Blocks.ARENA_BLOCK_RED, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_pillar_block_orange"),
+                new BlockItem(Blocks.ARENA_PILLAR_BLOCK_ORANGE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_pillar_block_pink"),
+                new BlockItem(Blocks.ARENA_PILLAR_BLOCK_PINK, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_pillar_block_blue"),
+                new BlockItem(Blocks.ARENA_PILLAR_BLOCK_BLUE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_pillar_block_yellow"),
+                new BlockItem(Blocks.ARENA_PILLAR_BLOCK_YELLOW, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_pillar_block_green"),
+                new BlockItem(Blocks.ARENA_PILLAR_BLOCK_GREEN, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_pillar_block_purple"),
+                new BlockItem(Blocks.ARENA_PILLAR_BLOCK_PURPLE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_pillar_block_red"),
+                new BlockItem(Blocks.ARENA_PILLAR_BLOCK_RED, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_stairs_orange"),
+                new BlockItem(Blocks.ARENA_BLOCK_STAIRS_ORANGE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_stairs_pink"),
+                new BlockItem(Blocks.ARENA_BLOCK_STAIRS_PINK, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_stairs_blue"),
+                new BlockItem(Blocks.ARENA_BLOCK_STAIRS_BLUE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_stairs_yellow"),
+                new BlockItem(Blocks.ARENA_BLOCK_STAIRS_YELLOW, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_stairs_green"),
+                new BlockItem(Blocks.ARENA_BLOCK_STAIRS_GREEN, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_stairs_purple"),
+                new BlockItem(Blocks.ARENA_BLOCK_STAIRS_PURPLE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_stairs_red"),
+                new BlockItem(Blocks.ARENA_BLOCK_STAIRS_RED, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_slab_orange"),
+                new BlockItem(Blocks.ARENA_BLOCK_SLAB_ORANGE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_slab_pink"),
+                new BlockItem(Blocks.ARENA_BLOCK_SLAB_PINK, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_slab_blue"),
+                new BlockItem(Blocks.ARENA_BLOCK_SLAB_BLUE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_slab_yellow"),
+                new BlockItem(Blocks.ARENA_BLOCK_SLAB_YELLOW, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_slab_green"),
+                new BlockItem(Blocks.ARENA_BLOCK_SLAB_GREEN, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_slab_purple"),
+                new BlockItem(Blocks.ARENA_BLOCK_SLAB_PURPLE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_slab_red"),
+                new BlockItem(Blocks.ARENA_BLOCK_SLAB_RED, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_divider_orange"),
+                new BlockItem(Blocks.ARENA_DIVIDER_ORANGE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_divider_pink"),
+                new BlockItem(Blocks.ARENA_DIVIDER_PINK, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_divider_blue"),
+                new BlockItem(Blocks.ARENA_DIVIDER_BLUE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_divider_yellow"),
+                new BlockItem(Blocks.ARENA_DIVIDER_YELLOW, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_divider_green"),
+                new BlockItem(Blocks.ARENA_DIVIDER_GREEN, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_divider_purple"),
+                new BlockItem(Blocks.ARENA_DIVIDER_PURPLE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_divider_red"),
+                new BlockItem(Blocks.ARENA_DIVIDER_RED, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+
         Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_dark"),
                 new BlockItem(Blocks.ARENA_BLOCK_DARK, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
-        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_stairs"),
-                new BlockItem(Blocks.ARENA_BLOCK_STAIRS, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
-        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_block_slab"),
-                new BlockItem(Blocks.ARENA_BLOCK_SLAB, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
-        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_divider"),
-                new BlockItem(Blocks.ARENA_DIVIDER, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
         Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "arena_pressure_plate"),
                 new BlockItem(Blocks.ARENA_PRESSURE_PLATE, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
         Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "lasertarget"),

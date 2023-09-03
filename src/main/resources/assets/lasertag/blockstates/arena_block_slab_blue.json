@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "lasertag:block/arena_block_slab_blue"
+    },
+    "type=double": {
+      "model": "lasertag:block/arena_block_blue"
+    },
+    "type=top": {
+      "model": "lasertag:block/arena_block_slab_blue"
+    }
+  }
+}

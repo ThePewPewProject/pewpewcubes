@@ -29,7 +29,7 @@ import java.util.function.Supplier;
  *
  * @author Étienne Muser
  */
-public class EmissivePillarBlockModel extends AbstractEmissiveBlockModel {
+public abstract class EmissivePillarBlockModel extends AbstractEmissiveBlockModel {
 
     private final SpriteIdentifier topTextureSpriteId;
     private final SpriteIdentifier glowTopTextureSpriteId;
