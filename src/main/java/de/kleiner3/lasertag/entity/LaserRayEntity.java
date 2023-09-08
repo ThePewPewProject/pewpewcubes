@@ -38,7 +38,11 @@ public class LaserRayEntity extends Entity {
     }
 
     public LaserRayEntity(World world, LivingEntity owner, int color, HitResult hit) {
-        this(world, owner.getEyePos(), owner.getYaw(), owner.getPitch(), color, hit.getPos());
+        this(world,
+                owner.getEyePos().add(new Vec3d(0.0, -0.2, 0.0)),
+                owner.getYaw(),
+                owner.getPitch(),
+                color, hit.getPos());
     }
 
     public LaserRayEntity(World world, Vec3d startPos, float yaw, float pitch, int color, Vec3d endPos) {

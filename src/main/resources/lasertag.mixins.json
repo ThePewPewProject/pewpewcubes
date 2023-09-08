@@ -16,6 +16,7 @@
     "IntegratedServerLoaderMixin",
     "ItemRendererMixin",
     "LivingEntityRendererMixin",
+    "PlayerEntityRendererMixin",
     "gui.InGameHudMixin",
     "gui.MoreWorldOptionsDialogMixin",
     "gui.PlayerListHudMixin"
