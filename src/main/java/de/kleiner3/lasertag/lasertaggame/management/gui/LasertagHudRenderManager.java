@@ -27,6 +27,8 @@ public class LasertagHudRenderManager implements IManager {
 
     public long startingIn = -1;
 
+    public int lastGameWinnerId = -1;
+
     // The logical size of the window
     public int width;
     public int wMid;
