@@ -24,6 +24,13 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib3.core.PlayState;
+import software.bernie.geckolib3.core.controller.AnimationController;
+import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
+import software.bernie.geckolib3.core.manager.AnimationData;
+import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -33,7 +40,9 @@ import java.util.function.Predicate;
  *
  * @author Étienne Muser
  */
-public class LasertagWeaponItem extends RangedWeaponItem {
+public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable {
+
+    private AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     public LasertagWeaponItem(Settings settings) {
         super(settings);
@@ -191,5 +200,21 @@ public class LasertagWeaponItem extends RangedWeaponItem {
         buf.writeDouble(playerEntity.getZ());
 
         ServerEventSending.sendToEveryone((ServerWorld) playerEntity.world, NetworkingConstants.PLAY_WEAPON_FIRED_SOUND, buf);
+    }
+
+    private PlayState predicate(AnimationEvent<LasertagWeaponItem> event) {
+        // No animation
+
+        return PlayState.CONTINUE;
+    }
+
+    @Override
+    public void registerControllers(AnimationData animationData) {
+        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+    }
+
+    @Override
+    public AnimationFactory getFactory() {
+        return this.factory;
     }
 }
