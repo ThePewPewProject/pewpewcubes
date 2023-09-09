@@ -1,7 +1,9 @@
 package de.kleiner3.lasertag.common.util;
 
-import de.kleiner3.lasertag.LasertagMod;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtInt;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtLongArray;
 
 /**
  * Util class for NbtCompound operations
@@ -16,11 +18,6 @@ public class NbtUtil {
      * @return The converted nbt
      */
     public static NbtCompound convertLitematicToNbt(NbtCompound litematic, String mainRegionName) {
-
-        LasertagMod.LOGGER.info("Starting converting litematic to nbt...");
-
-        // Start time measurement
-        var startTime = System.nanoTime();
 
         // Create new nbt compound
         var nbt = new NbtCompound();
@@ -83,11 +80,6 @@ public class NbtUtil {
         // Add data version int
         nbt.put("DataVersion", litematic.get("MinecraftDataVersion"));
 
-        // Stop time measurement
-        var stopTime = System.nanoTime();
-        var duration = (stopTime - startTime) / 1000000000.0;
-        LasertagMod.LOGGER.info("Litematica conversion took " + duration + "s.");
-
         return nbt;
     }
 
@@ -112,11 +104,6 @@ public class NbtUtil {
     }
 
     private static boolean addEntities(NbtCompound nbt, NbtCompound litematicMainRegion) {
-
-        LasertagMod.LOGGER.info("Adding entities...");
-
-        // Start time measurement
-        var startTime = System.nanoTime();
 
         // Get the entities element
         var entitiesElement = litematicMainRegion.get("Entities");
@@ -144,11 +131,6 @@ public class NbtUtil {
 
         // Put
         nbt.put("entities", list);
-
-        // Stop time measurement
-        var stopTime = System.nanoTime();
-        var duration = (stopTime - startTime) / 1000000000.0;
-        LasertagMod.LOGGER.info("Adding entities took " + duration + "s.");
 
         return true;
     }
@@ -180,11 +162,6 @@ public class NbtUtil {
 
     private static boolean addTileEntities(NbtCompound nbt, NbtCompound litematicMainRegion, NbtCompound size) {
 
-        LasertagMod.LOGGER.info("Adding tile entities...");
-
-        // Start time measurement
-        var startTime = System.nanoTime();
-
         // Get the tile entities element
         var tileEntitiesElement = litematicMainRegion.get("TileEntities");
 
@@ -213,11 +190,6 @@ public class NbtUtil {
                 return false;
             }
         }
-
-        // Stop time measurement
-        var stopTime = System.nanoTime();
-        var duration = (stopTime - startTime) / 1000000000.0;
-        LasertagMod.LOGGER.info("Adding tile entities took " + duration + "s.");
 
         return true;
     }
@@ -268,11 +240,6 @@ public class NbtUtil {
     }
 
     private static boolean addBlockList(NbtCompound nbt, NbtCompound litematicMainRegion, NbtCompound size, NbtList palette) {
-
-        LasertagMod.LOGGER.info("Adding block list...");
-
-        // Start time measurement
-        var startTime = System.nanoTime();
 
         // Create block list
         var list = new NbtList();
@@ -330,11 +297,6 @@ public class NbtUtil {
 
         // Add block list to nbt
         nbt.put("blocks", list);
-
-        // Stop time measurement
-        var stopTime = System.nanoTime();
-        var duration = (stopTime - startTime) / 1000000000.0;
-        LasertagMod.LOGGER.info("Adding block list took " + duration + "s.");
 
         return true;
     }
