@@ -12,6 +12,7 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 
 import java.util.UUID;
@@ -52,6 +53,9 @@ public class PlayerJoinEventHandler {
 
         // Set players spawnpoint
         player.setSpawnPoint(World.OVERWORLD, new BlockPos(0, 1, 0), 0.0F, true, false);
+
+        // Set to adventure game mode
+        player.changeGameMode(GameMode.ADVENTURE);
     }
 
     private static void sendPlayerJoinedNetworkEvent(ServerWorld world, UUID playerUuid, String playerName) {
