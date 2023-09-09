@@ -53,5 +53,6 @@
 	"selectWorld.arenaType": "Arena",
 	"arenaType.jungle": "Jungle",
 	"arenaType.desert": "Desert",
-	"arenaType.flower_forest": "Flower Forest"
+	"arenaType.flower_forest": "Flower Forest",
+	"arenaType.medieval_city": "Medieval City"
 }
