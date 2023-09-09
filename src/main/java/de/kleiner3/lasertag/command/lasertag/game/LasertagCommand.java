@@ -22,6 +22,7 @@ public class LasertagCommand {
         LeaveLasertagTeamCommand.register(cmd);
         LasertagSettingsCommand.register(cmd);
         ResetSettingsCommand.register(cmd);
+        KickPlayerCommand.register(cmd);
 
         dispatcher.register(cmd);
     }
