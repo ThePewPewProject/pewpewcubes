@@ -179,19 +179,29 @@ public class LasertagTeamManager implements IManager {
      */
     public void playerLeaveHisTeam(ServerWorld world, PlayerEntity player) {
 
+        playerLeaveHisTeam(world, player.getUuid());
+    }
+
+    /**
+     * Force remove a player from his team
+     *
+     * @param playerUuid The id of the player to leave his team
+     */
+    public void playerLeaveHisTeam(ServerWorld world, UUID playerUuid) {
+
         // For each team
         for (var team : teamMap.entrySet()) {
 
             // If the player is in the team
-            if (team.getValue().contains(player.getUuid())) {
+            if (team.getValue().contains(playerUuid)) {
 
                 // Leave the team
-                team.getValue().remove(player.getUuid());
+                team.getValue().remove(playerUuid);
 
                 // Uptade player-team cache
-                playerTeamMap.put(player.getUuid(), null);
+                playerTeamMap.put(playerUuid, null);
 
-                notifyPlayersAboutUpdate(world, player.getUuid(), teamConfigManager.getTeamOfId(team.getKey()).get(), null);
+                notifyPlayersAboutUpdate(world, playerUuid, teamConfigManager.getTeamOfId(team.getKey()).get(), null);
 
                 return;
             }
