@@ -354,7 +354,7 @@ public class LasertagServerManager implements IManager, ITickable {
                 continue;
             }
 
-            // Set player to adventure gamemode
+            // Set player to spectator gamemode
             player.changeGameMode(GameMode.SPECTATOR);
 
             // Get all spawnpoints
@@ -387,8 +387,16 @@ public class LasertagServerManager implements IManager, ITickable {
             var destination = spawnpoints.get(idx);
             player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
 
-            // Set player to adventure gamemode
-            player.changeGameMode(GameMode.ADVENTURE);
+            // Set player to survival by default -> player can break blocks
+            var newGamemode = GameMode.SURVIVAL;
+
+            // If setting miningFatigueEnabled is true
+            if (LasertagGameManager.getInstance().getSettingsManager().get(SettingDescription.MINING_FATIGUE_ENABLED)) {
+                // Set player to adventure game mode -> player can't break blocks
+                newGamemode = GameMode.ADVENTURE;
+            }
+
+            player.changeGameMode(newGamemode);
 
             // Get spawn pos
             var spawnPos = new BlockPos(destination.getX(), destination.getY() + 1, destination.getZ());
@@ -492,7 +500,6 @@ public class LasertagServerManager implements IManager, ITickable {
                     World.OVERWORLD,
                     origin, 0.0F, true, false);
 
-            // Set player to adventure gamemode
             player.changeGameMode(GameMode.ADVENTURE);
         }));
 
