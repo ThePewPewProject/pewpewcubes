@@ -23,6 +23,10 @@ public class LasertagSettingsMap implements Map<String, Object> {
         hashMap = new HashMap<>();
     }
 
+    public LasertagSettingsMap(LasertagSettingsMap other) {
+        hashMap = new HashMap<>(other.hashMap);
+    }
+
     public static LasertagSettingsMap createDefaultSettings() {
         var settings = new LasertagSettingsMap();
 

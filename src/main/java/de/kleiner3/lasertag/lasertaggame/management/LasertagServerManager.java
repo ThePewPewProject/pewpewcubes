@@ -7,6 +7,7 @@ import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.ITickable;
 import de.kleiner3.lasertag.lasertaggame.management.lasertargets.LasertargetManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.management.settings.presets.LasertagSettingsPresetsManager;
 import de.kleiner3.lasertag.lasertaggame.management.spawnpoints.LasertagSpawnpointManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
@@ -51,6 +52,8 @@ public class LasertagServerManager implements IManager, ITickable {
 
     private LasertagSpawnpointManager spawnpointManager;
 
+    private LasertagSettingsPresetsManager settingsPresetsManager;
+
     //endregion
 
     //region Private fields
@@ -66,6 +69,7 @@ public class LasertagServerManager implements IManager, ITickable {
 
         lasertargetManager = new LasertargetManager();
         spawnpointManager = new LasertagSpawnpointManager();
+        settingsPresetsManager = new LasertagSettingsPresetsManager();
 
         isRunning = false;
     }
@@ -336,6 +340,10 @@ public class LasertagServerManager implements IManager, ITickable {
     public void endTick() {
 
         lasertagGameOver();
+    }
+
+    public LasertagSettingsPresetsManager getSettingsPresetsManager() {
+        return this.settingsPresetsManager;
     }
 
     //endregion
