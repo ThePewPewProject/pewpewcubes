@@ -206,10 +206,10 @@ public class LasertagCreditsScreen extends Screen {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-        bufferBuilder.vertex(0.0, this.height, this.getZOffset()).texture(0.0f, f * 0.015625f).color(k, k, k, 1.0f).next();
-        bufferBuilder.vertex(i, this.height, this.getZOffset()).texture((float)i * 0.015625f, f * 0.015625f).color(k, k, k, 1.0f).next();
-        bufferBuilder.vertex(i, 0.0, this.getZOffset()).texture((float)i * 0.015625f, g * 0.015625f).color(k, k, k, 1.0f).next();
-        bufferBuilder.vertex(0.0, 0.0, this.getZOffset()).texture(0.0f, g * 0.015625f).color(k, k, k, 1.0f).next();
+        bufferBuilder.vertex(0.0,    this.height, this.getZOffset()).texture(0.0f,                 f * 0.015625f).color(k, k, k, 1.0f).next();
+        bufferBuilder.vertex(i,         this.height, this.getZOffset()).texture((float)i * 0.015625f, f * 0.015625f).color(k, k, k, 1.0f).next();
+        bufferBuilder.vertex(i,      0.0,         this.getZOffset()).texture((float)i * 0.015625f, g * 0.015625f).color(k, k, k, 1.0f).next();
+        bufferBuilder.vertex(0.0, 0.0,         this.getZOffset()).texture(0.0f,                 g * 0.015625f).color(k, k, k, 1.0f).next();
         tessellator.draw();
     }
 

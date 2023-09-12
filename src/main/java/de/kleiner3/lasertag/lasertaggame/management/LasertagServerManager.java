@@ -6,6 +6,7 @@ import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.ITickable;
 import de.kleiner3.lasertag.lasertaggame.management.lasertargets.LasertargetManager;
+import de.kleiner3.lasertag.lasertaggame.management.map.LasertagMapManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.management.settings.presets.LasertagSettingsPresetsManager;
 import de.kleiner3.lasertag.lasertaggame.management.spawnpoints.LasertagSpawnpointManager;
@@ -54,6 +55,8 @@ public class LasertagServerManager implements IManager, ITickable {
 
     private LasertagSettingsPresetsManager settingsPresetsManager;
 
+    private LasertagMapManager mapManager;
+
     //endregion
 
     //region Private fields
@@ -70,6 +73,7 @@ public class LasertagServerManager implements IManager, ITickable {
         lasertargetManager = new LasertargetManager();
         spawnpointManager = new LasertagSpawnpointManager();
         settingsPresetsManager = new LasertagSettingsPresetsManager();
+        mapManager = new LasertagMapManager(server);
 
         isRunning = false;
     }
@@ -346,6 +350,8 @@ public class LasertagServerManager implements IManager, ITickable {
         return this.settingsPresetsManager;
     }
 
+    public LasertagMapManager getMapManager() { return this.mapManager; }
+
     //endregion
 
     //region Private methods
@@ -489,7 +495,7 @@ public class LasertagServerManager implements IManager, ITickable {
         // Deactivate every player
         LasertagGameManager.getInstance().getDeactivatedManager().deactivateAll(world, server.getPlayerManager());
 
-        // Teleport players back to spawn
+        // Teleport players to origin
         LasertagGameManager.getInstance().getTeamManager().forEachPlayer(((team, playerUuid) -> {
             var player = server.getPlayerManager().getPlayer(playerUuid);
 

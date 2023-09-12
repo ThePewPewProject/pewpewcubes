@@ -31,4 +31,16 @@ public class LasertagPlayerNameManager implements IManager {
     public void dispose() {
         // Nothing to dispose
     }
+
+    /**
+     * Executes the given callback for every player currently registered.
+     *
+     * @param callback
+     */
+    public void forEachPlayer(IForEachPlayerCallback callback) {
+
+        for (var playerUuid : playerUsernameCache.keySet()) {
+            callback.execute(playerUuid);
+        }
+    }
 }

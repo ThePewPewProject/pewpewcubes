@@ -5,6 +5,9 @@ accessible class net/minecraft/world/gen/WorldPresets$Registrar
 
 # Methods
 accessible method net/minecraft/client/gui/screen/world/CreateWorldScreen addDrawableChild (Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;
+accessible method net/minecraft/server/world/ThreadedAnvilChunkStorage sendChunkDataPackets (Lnet/minecraft/server/network/ServerPlayerEntity;Lorg/apache/commons/lang3/mutable/MutableObject;Lnet/minecraft/world/chunk/WorldChunk;)V
 
 # Fields
 accessible field net/minecraft/entity/Entity dimensions Lnet/minecraft/entity/EntityDimensions;
+accessible field net/minecraft/world/dimension/DimensionOptions chunkGenerator Lnet/minecraft/world/gen/chunk/ChunkGenerator;
+mutable field net/minecraft/world/gen/chunk/ChunkGenerator biomeSource Lnet/minecraft/world/biome/source/BiomeSource;

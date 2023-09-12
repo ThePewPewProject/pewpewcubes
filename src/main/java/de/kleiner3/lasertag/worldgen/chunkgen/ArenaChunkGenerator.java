@@ -47,7 +47,7 @@ public class ArenaChunkGenerator extends ChunkGenerator {
                 .forGetter(ArenaChunkGenerator::getConfig))
             .apply(instance, instance.stable(ArenaChunkGenerator::new)));
 
-    private final ArenaChunkGeneratorConfig config;
+    private ArenaChunkGeneratorConfig config;
     private final Registry<Biome> biomeRegistry;
 
     /**
@@ -165,5 +165,10 @@ public class ArenaChunkGenerator extends ChunkGenerator {
     @Override
     protected Codec<? extends ArenaChunkGenerator> getCodec() {
         return CODEC;
+    }
+
+    public void setConfig(ArenaChunkGeneratorConfig newConfig) {
+        this.config = newConfig;
+        this.biomeSource = new FixedBiomeSource(biomeRegistry.getOrCreateEntry(config.getType().biome));
     }
 }

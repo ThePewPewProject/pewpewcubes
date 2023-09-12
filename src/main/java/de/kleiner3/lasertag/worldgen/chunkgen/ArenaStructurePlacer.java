@@ -91,29 +91,36 @@ public class ArenaStructurePlacer {
                         return;
                     }
 
-                    // Overwrite position
-                    var posList = new NbtList();
-                    posList.add(0, NbtDouble.of(x));
-                    posList.add(1, NbtDouble.of(y));
-                    posList.add(2, NbtDouble.of(z));
-                    entityInfo.nbt.put("Pos", posList);
+                    var isAlreadyAdapted = entityInfo.nbt.contains("lasertag:tileAdapted");
 
-                    var hasTileXYZ = entityInfo.nbt.contains("TileX");
-                    if (hasTileXYZ) {
-                        // Overwrite tile position
-                        var tileX = startPos.getX() + entityInfo.nbt.getInt("TileX");
-                        var tileY = startPos.getY() + entityInfo.nbt.getInt("TileY");
-                        var tileZ = startPos.getZ() + entityInfo.nbt.getInt("TileZ");
-                        entityInfo.nbt.putInt("TileX", tileX);
-                        entityInfo.nbt.putInt("TileY", tileY);
-                        entityInfo.nbt.putInt("TileZ", tileZ);
+                    if (!isAlreadyAdapted) {
+
+                        // Overwrite position
+                        var posList = new NbtList();
+                        posList.add(0, NbtDouble.of(x));
+                        posList.add(1, NbtDouble.of(y));
+                        posList.add(2, NbtDouble.of(z));
+                        entityInfo.nbt.put("Pos", posList);
+
+                        var hasTileXYZ = entityInfo.nbt.contains("TileX");
+                        if (hasTileXYZ) {
+                            // Overwrite tile position
+                            var tileX = startPos.getX() + entityInfo.nbt.getInt("TileX");
+                            var tileY = startPos.getY() + entityInfo.nbt.getInt("TileY");
+                            var tileZ = startPos.getZ() + entityInfo.nbt.getInt("TileZ");
+                            entityInfo.nbt.putInt("TileX", tileX);
+                            entityInfo.nbt.putInt("TileY", tileY);
+                            entityInfo.nbt.putInt("TileZ", tileZ);
+                        }
+
+                        entityInfo.nbt.putBoolean("lasertag:tileAdapted", true);
                     }
 
                     // Create the entity
                     var entityOptional = EntityType.getEntityFromNbt(entityInfo.nbt, chunkRegion.getServer().getOverworld());
 
                     // Spawn the entity if it is present
-                    entityOptional.ifPresent(chunkRegion::spawnEntity);
+                    entityOptional.ifPresent(chunkRegion.getServer().getOverworld()::spawnEntity);
                 });
     }
 }

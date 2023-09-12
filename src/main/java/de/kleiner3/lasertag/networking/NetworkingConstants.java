@@ -20,6 +20,7 @@ public class NetworkingConstants {
     public static final Identifier GAME_MANAGER_SYNC = new Identifier(LasertagMod.ID, "game_manager_sync");
     public static final Identifier PLAYER_DEACTIVATED_STATUS_CHANGED = new Identifier(LasertagMod.ID, "player_deactivated_status_changed");
     public static final Identifier GAME_STATISTICS = new Identifier(LasertagMod.ID, "game_statistics");
+    public static final Identifier MAP_LOADING_EVENT = new Identifier(LasertagMod.ID, "map_loading");
 
 
     // ===== General ================

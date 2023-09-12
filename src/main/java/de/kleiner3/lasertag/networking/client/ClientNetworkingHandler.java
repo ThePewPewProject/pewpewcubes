@@ -18,7 +18,6 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_PLAYER_SCORED_SOUND, new PlayerScoredSoundEventCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_PLAYER_DEACTIVATED_SOUND, new PlayerDeactivatedSoundEventCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAY_PLAYER_ACTIVATED_SOUND, new PlayerActivatedSoundEventCallback());
-
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.SCORE_UPDATE, new ScoreUpdateCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.TEAM_UPDATE, new TeamUpdateCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_STARTED, new LasertagGameStartedCallback());
@@ -32,5 +31,6 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_DEACTIVATED_STATUS_CHANGED, new PlayerDeactivatedStatusChangedCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_STATISTICS, new GameStatisticsIncomingCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_JOINED, new PlayerJoinedCallback());
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.MAP_LOADING_EVENT, new MapLoadingEventCallback());
     }
 }
