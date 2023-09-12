@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class LasertagSpawnpointManager implements IManager {
 
-    private HashMap<TeamDto, ArrayList<BlockPos>> spawnpointCache = null;
+    private final HashMap<TeamDto, ArrayList<BlockPos>> spawnpointCache = new HashMap<>();
 
 
     /**
@@ -51,10 +51,14 @@ public class LasertagSpawnpointManager implements IManager {
 
     public void initSpawnpointCacheIfNecessary(ServerWorld world, boolean scanSpawnpoints) {
 
-        if (spawnpointCache == null || scanSpawnpoints) {
+        if (spawnpointCache.isEmpty() || scanSpawnpoints) {
 
             initSpawnpointCache(world);
         }
+    }
+
+    public void clearSpawnpointCache() {
+        this.spawnpointCache.clear();
     }
 
     @Override
@@ -68,8 +72,7 @@ public class LasertagSpawnpointManager implements IManager {
      */
     private void initSpawnpointCache(ServerWorld world) {
 
-        // Initialize cache
-        spawnpointCache = new HashMap<>();
+        this.spawnpointCache.clear();
 
         var teamConfig = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().teamConfig;
 

@@ -73,6 +73,11 @@ public class LasertagMapManager implements IManager {
             var oldArenaBounds = this.calculateBounds(oldArenaType);
             this.removeOldBlocks(oldArenaBounds);
 
+            // Step 3: Clear spawn-point cache if necessary
+            if (!oldArenaType.equals(newArenaType)) {
+                server.getLasertagServerManager().getSpawnpointManager().clearSpawnpointCache();
+            }
+
             // Step 3: Remove all entities except the players
             this.removeEntities();
 

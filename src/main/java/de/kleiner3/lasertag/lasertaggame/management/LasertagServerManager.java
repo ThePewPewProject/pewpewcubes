@@ -352,6 +352,8 @@ public class LasertagServerManager implements IManager, ITickable {
 
     public LasertagMapManager getMapManager() { return this.mapManager; }
 
+    public LasertagSpawnpointManager getSpawnpointManager() { return this.spawnpointManager; }
+
     //endregion
 
     //region Private methods
