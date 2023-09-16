@@ -21,18 +21,27 @@ import java.io.IOException;
  * @author Étienne Muser
  */
 public enum ArenaType {
+    PROCEDURAL(BiomeKeys.THE_VOID,
+            new Identifier(LasertagMod.ID, "structures/procedural_arenas"),
+            null,
+            "arenaType.procedural",
+            new ProceduralArenaStructurePlacer()),
     JUNGLE(BiomeKeys.JUNGLE,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/jungle_arena.litematic"),
-            new Vec3i(21, 3, 61),
+            new Vec3i(22, 3, 61),
             "arenaType.jungle"),
     DESERT(BiomeKeys.DESERT,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/desert_arena.litematic"),
-            new Vec3i(55, 7, 99),
+            new Vec3i(55, 26, 99),
             "arenaType.desert"),
     FLOWER_FOREST(BiomeKeys.FLOWER_FOREST,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/flower_forest_arena.litematic"),
-            new Vec3i(49, 1, 70),
-            "arenaType.flower_forest");
+            new Vec3i(49, 2, 70),
+            "arenaType.flower_forest"),
+    MEDIEVAL_CITY(BiomeKeys.PLAINS,
+            new Identifier(LasertagMod.ID, "structures/prebuild_arenas/medieval_city_arena.litematic"),
+            new Vec3i(116, 13, 73),
+            "arenaType.medieval_city");
 
     /**
      * Enum Constructor
@@ -41,12 +50,18 @@ public enum ArenaType {
      * @param nbtFileId The id of the nbt file where the arena data is stored. Size has to be >0 in x, y and z! If this is a .litematic file the used region has to be called "main"
      * @param placementOffset The offset with which to place the arena. Insert the coordinates of the world spawn point block so that this block is 0, 0, 0
      *                        (To calculate: Generate arena with offset 0,0,0 and use the targeted block coordinates of the desired spawn point block as the offset)
+     * @param translatableName The name used for translation
      */
     ArenaType(RegistryKey<Biome> biome, Identifier nbtFileId, Vec3i placementOffset, String translatableName) {
+        this(biome, nbtFileId, placementOffset, translatableName, new ArenaStructurePlacer());
+    }
+
+    ArenaType(RegistryKey<Biome> biome, Identifier nbtFileId, Vec3i placementOffset, String translatableName, ArenaStructurePlacer arenaPlacer) {
         this.biome = biome;
         this.nbtFileId = nbtFileId;
         this.placementOffset = placementOffset;
         this.translatableName = translatableName;
+        this.arenaPlacer = arenaPlacer;
     }
 
     public final RegistryKey<Biome> biome;
@@ -54,10 +69,17 @@ public enum ArenaType {
     public final  Vec3i placementOffset;
     public final String translatableName;
 
+    public final ArenaStructurePlacer arenaPlacer;
+
     private StructureTemplate arenaTemplate = null;
     private Vec3i arenaSize = null;
 
     public StructureTemplate getArenaTemplate() {
+        // If is procedural arena
+        if (placementOffset == null) {
+            throw new UnsupportedOperationException("Cannot get template of procedural arena");
+        }
+
         if (arenaTemplate == null) {
             initArenaTemplate();
         }
@@ -65,12 +87,26 @@ public enum ArenaType {
         return arenaTemplate;
     }
 
-    public Vec3i getArenaSize() {
+    public Vec3i getArenaSize(ProceduralArenaType proceduralArenaType) {
+        // If is procedural arena
+        if (placementOffset == null) {
+            return ((ProceduralArenaStructurePlacer)this.arenaPlacer).getCompleteSize(proceduralArenaType);
+        }
+
         if (arenaSize == null) {
             initArenaTemplate();
         }
 
         return arenaSize;
+    }
+
+    public Vec3i getCompleteOffset(ProceduralArenaType proceduralArenaType) {
+        // If is procedural arena
+        if (placementOffset == null) {
+            return ((ProceduralArenaStructurePlacer)this.arenaPlacer).getCompleteOffset(proceduralArenaType);
+        }
+
+        return this.placementOffset;
     }
 
     /**

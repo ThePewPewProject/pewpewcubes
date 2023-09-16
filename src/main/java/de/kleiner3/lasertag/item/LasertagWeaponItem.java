@@ -1,14 +1,11 @@
 package de.kleiner3.lasertag.item;
 
-import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.LaserTargetBlock;
-import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.common.util.RaycastUtil;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
-import de.kleiner3.lasertag.networking.ClientNetworkingHandlers;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
@@ -19,7 +16,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.RangedWeaponItem;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -28,6 +24,13 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib3.core.PlayState;
+import software.bernie.geckolib3.core.controller.AnimationController;
+import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
+import software.bernie.geckolib3.core.manager.AnimationData;
+import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -37,7 +40,9 @@ import java.util.function.Predicate;
  *
  * @author Étienne Muser
  */
-public class LasertagWeaponItem extends RangedWeaponItem {
+public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable {
+
+    private AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     public LasertagWeaponItem(Settings settings) {
         super(settings);
@@ -195,5 +200,21 @@ public class LasertagWeaponItem extends RangedWeaponItem {
         buf.writeDouble(playerEntity.getZ());
 
         ServerEventSending.sendToEveryone((ServerWorld) playerEntity.world, NetworkingConstants.PLAY_WEAPON_FIRED_SOUND, buf);
+    }
+
+    private PlayState predicate(AnimationEvent<LasertagWeaponItem> event) {
+        // No animation
+
+        return PlayState.CONTINUE;
+    }
+
+    @Override
+    public void registerControllers(AnimationData animationData) {
+        animationData.addAnimationController(new AnimationController(this, "controller", 0, this::predicate));
+    }
+
+    @Override
+    public AnimationFactory getFactory() {
+        return this.factory;
     }
 }

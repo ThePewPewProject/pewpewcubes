@@ -6,7 +6,9 @@ import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.ITickable;
 import de.kleiner3.lasertag.lasertaggame.management.lasertargets.LasertargetManager;
+import de.kleiner3.lasertag.lasertaggame.management.map.LasertagMapManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.management.settings.presets.LasertagSettingsPresetsManager;
 import de.kleiner3.lasertag.lasertaggame.management.spawnpoints.LasertagSpawnpointManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
@@ -51,6 +53,10 @@ public class LasertagServerManager implements IManager, ITickable {
 
     private LasertagSpawnpointManager spawnpointManager;
 
+    private LasertagSettingsPresetsManager settingsPresetsManager;
+
+    private LasertagMapManager mapManager;
+
     //endregion
 
     //region Private fields
@@ -66,6 +72,8 @@ public class LasertagServerManager implements IManager, ITickable {
 
         lasertargetManager = new LasertargetManager();
         spawnpointManager = new LasertagSpawnpointManager();
+        settingsPresetsManager = new LasertagSettingsPresetsManager();
+        mapManager = new LasertagMapManager(server);
 
         isRunning = false;
     }
@@ -338,6 +346,14 @@ public class LasertagServerManager implements IManager, ITickable {
         lasertagGameOver();
     }
 
+    public LasertagSettingsPresetsManager getSettingsPresetsManager() {
+        return this.settingsPresetsManager;
+    }
+
+    public LasertagMapManager getMapManager() { return this.mapManager; }
+
+    public LasertagSpawnpointManager getSpawnpointManager() { return this.spawnpointManager; }
+
     //endregion
 
     //region Private methods
@@ -354,7 +370,7 @@ public class LasertagServerManager implements IManager, ITickable {
                 continue;
             }
 
-            // Set player to adventure gamemode
+            // Set player to spectator gamemode
             player.changeGameMode(GameMode.SPECTATOR);
 
             // Get all spawnpoints
@@ -387,8 +403,16 @@ public class LasertagServerManager implements IManager, ITickable {
             var destination = spawnpoints.get(idx);
             player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
 
-            // Set player to adventure gamemode
-            player.changeGameMode(GameMode.ADVENTURE);
+            // Set player to survival by default -> player can break blocks
+            var newGamemode = GameMode.SURVIVAL;
+
+            // If setting miningFatigueEnabled is true
+            if (LasertagGameManager.getInstance().getSettingsManager().get(SettingDescription.MINING_FATIGUE_ENABLED)) {
+                // Set player to adventure game mode -> player can't break blocks
+                newGamemode = GameMode.ADVENTURE;
+            }
+
+            player.changeGameMode(newGamemode);
 
             // Get spawn pos
             var spawnPos = new BlockPos(destination.getX(), destination.getY() + 1, destination.getZ());
@@ -473,7 +497,7 @@ public class LasertagServerManager implements IManager, ITickable {
         // Deactivate every player
         LasertagGameManager.getInstance().getDeactivatedManager().deactivateAll(world, server.getPlayerManager());
 
-        // Teleport players back to spawn
+        // Teleport players to origin
         LasertagGameManager.getInstance().getTeamManager().forEachPlayer(((team, playerUuid) -> {
             var player = server.getPlayerManager().getPlayer(playerUuid);
 
@@ -492,7 +516,6 @@ public class LasertagServerManager implements IManager, ITickable {
                     World.OVERWORLD,
                     origin, 0.0F, true, false);
 
-            // Set player to adventure gamemode
             player.changeGameMode(GameMode.ADVENTURE);
         }));
 

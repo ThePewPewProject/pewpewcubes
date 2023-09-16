@@ -135,6 +135,11 @@ public class LasertagGameManager implements IManager {
         ServerPlayNetworking.send(client, NetworkingConstants.GAME_MANAGER_SYNC, buf);
     }
 
+    public void reloadTeamConfig() {
+        teamManager.dispose();
+        teamManager = new LasertagTeamManager();
+    }
+
     //endregion
 
     //region Private methods

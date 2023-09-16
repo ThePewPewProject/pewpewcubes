@@ -22,7 +22,9 @@ public enum SettingDescription {
     GEN_STATS_FILE("generateStatsFile", true, SettingDataType.BOOL, "value", null, null),
     AUTO_OPEN_STATS_FILE("autoOpenStatsFile", true, SettingDataType.BOOL, "value", null, null),
     DO_ORIGIN_SPAWN("doOriginSpawn", true, SettingDataType.BOOL, "value", null, null),
-    DEATH_PENALTY("deathPenalty", 500L, SettingDataType.LONG, "points", null, null);
+    DEATH_PENALTY("deathPenalty", 500L, SettingDataType.LONG, "points", null, null),
+    SHOW_NAMETAGS_OF_TEAMMATES("showNametagsOfTeammates", true, SettingDataType.BOOL, "value", null, null),
+    MINING_FATIGUE_ENABLED("miningFatigueEnabled", true, SettingDataType.BOOL, "value", null, null);
 
     private final String name;
     private final Object defaultValue;

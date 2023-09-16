@@ -2,11 +2,12 @@ package de.kleiner3.lasertag.networking.client.callbacks;
 
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.statistics.GameStats;
 import de.kleiner3.lasertag.lasertaggame.statistics.WebStatisticsVisualizer;
 import de.kleiner3.lasertag.resource.ResourceManagers;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.mightypork.rpack.utils.DesktopApi;
@@ -18,6 +19,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Callback to handle the game statistics incoming network event
@@ -32,6 +34,18 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
 
         // Unpack json
         var stats = new Gson().fromJson(json, GameStats.class);
+
+        if (!stats.teamScores.isEmpty()) {
+            var winnerName = stats.teamScores.get(0).x();
+            var winnerTeamOptional = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfName(winnerName);
+            winnerTeamOptional.ifPresent(t -> LasertagGameManager.getInstance().getHudRenderManager().lastGameWinnerId = t.id());
+
+            var gameOverOverlayTimer = ThreadUtil.createScheduledExecutor("lasertag-client-game-over-timer-%d");
+            gameOverOverlayTimer.schedule(() -> {
+                LasertagGameManager.getInstance().getHudRenderManager().lastGameWinnerId = -1;
+                gameOverOverlayTimer.shutdownNow();
+            }, 5, TimeUnit.SECONDS);
+        }
 
         // If should generate file
         if (LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.GEN_STATS_FILE)) {

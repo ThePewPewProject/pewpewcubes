@@ -2,11 +2,11 @@ package de.kleiner3.lasertag.lasertaggame.statistics;
 
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.resource.WebResourceManager;
 import de.kleiner3.lasertag.common.util.FileIO;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.PlayerInfoDto;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.ProfileTextureDto;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.SessionPlayerProfileDto;
+import de.kleiner3.lasertag.resource.WebResourceManager;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 

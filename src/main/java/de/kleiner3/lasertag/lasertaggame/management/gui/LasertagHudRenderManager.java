@@ -25,7 +25,12 @@ public class LasertagHudRenderManager implements IManager {
 
     public double progress = 0.0;
 
+    public String mapLoadingStepString = "";
+    public double mapLoadingProgress = -1.0;
+
     public long startingIn = -1;
+
+    public int lastGameWinnerId = -1;
 
     // The logical size of the window
     public int width;
