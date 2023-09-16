@@ -6,15 +6,14 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.NbtDouble;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.structure.StructureTemplate;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
 import net.minecraft.world.ChunkRegion;
+import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.StructureWorldAccess;
+import net.minecraft.world.chunk.Chunk;
 
 /**
- * Helper class to place all blocks of a arena
+ * Helper class to place all blocks of an arena
  *
  * @author Étienne Muser
  */
@@ -22,53 +21,47 @@ public class ArenaStructurePlacer {
 
     /**
      * Places all blocks of an arena in the specified chunk
-     * @param arenaTemplate
-     * @param chunkBox
-     * @param startPos
+     * @param arenaType
+     * @param proceduralArenaType
+     * @param chunk
      * @param world
      */
-    public static void placeArenaChunkSegment(StructureTemplate arenaTemplate,
-                                              BlockBox chunkBox,
-                                              Vec3i startPos,
-                                              StructureWorldAccess world) {
-        // Get block infos
-        var blockInfos = ((IStructureTemplateAccessor)arenaTemplate).getBlockInfoLists().get(0).getAll();
+    public void placeArenaChunkSegment(ArenaType arenaType,
+                                       ProceduralArenaType proceduralArenaType,
+                                       Chunk chunk,
+                                       StructureWorldAccess world,
+                                       long seed) {
 
-        // For every block in the chunkbox
-        blockInfos.stream()
-                .filter((blockInfo) -> chunkBox.contains(startPos.add(blockInfo.pos)))
-                .forEach((blockInfo) -> {
-                    // Get the actual block pos
-                    var actualBlockPos = new BlockPos(startPos.add(blockInfo.pos));
+        // Get the current chunks block box
+        var chunkBox = getBlockBoxForChunk(chunk);
 
-                    // Get the block state
-                    var blockState = blockInfo.state;
+        // Get the arena size
+        var size = arenaType.getArenaSize(proceduralArenaType);
 
-                    // Optimization: If the block is air, then do nothing
-                    if (blockState.equals(Blocks.AIR.getDefaultState())) {
-                        return;
-                    }
+        // Get the startPos
+        var startPos = BlockPos.ORIGIN.subtract(arenaType.placementOffset);
 
-                    // Place the block in the world
-                    world.setBlockState(actualBlockPos, blockState, 2);
+        // If chunk does not intersect with arena bounding box, do nothing
+        if (chunkBox.getMaxX() < startPos.getX() || chunkBox.getMinX() > (startPos.getX() + size.getX()) ||
+                chunkBox.getMaxZ() < startPos.getZ() || chunkBox.getMinZ() > (startPos.getZ() + size.getZ())) {
+            return;
+        }
 
-                    if (blockInfo.nbt != null) {
-                        var blockEntity = world.getBlockEntity(actualBlockPos);
+        var arenaTemplate = arenaType.getArenaTemplate();
 
-                        blockEntity.readNbt(blockInfo.nbt);
-                    }
-                });
+        this.placeArenaChunkSegment(arenaTemplate, chunkBox, startPos, world);
     }
 
     /**
      * Spawns all entites of an arena
-     * @param arenaTemplate
-     * @param startPos
+     * @param type
      * @param chunkRegion
      */
-    public static void spawnEntitiesOfArena(StructureTemplate arenaTemplate,
-                                            Vec3i startPos,
-                                            ChunkRegion chunkRegion) {
+    public void spawnEntitiesOfArena(ArenaType type, ChunkRegion chunkRegion) {
+
+        var arenaTemplate = type.getArenaTemplate();
+        var startPos = BlockPos.ORIGIN.subtract(type.placementOffset);
+
         // Get the entity infos
         var entityInfos = ((IStructureTemplateAccessor)arenaTemplate).getEntities();
 
@@ -122,5 +115,52 @@ public class ArenaStructurePlacer {
                     // Spawn the entity if it is present
                     entityOptional.ifPresent(chunkRegion.getServer().getOverworld()::spawnEntity);
                 });
+    }
+
+    public void reset() {
+        // Nothing to reset
+    }
+
+    protected void placeArenaChunkSegment(StructureTemplate template,
+                                          BlockBox chunkBox,
+                                          Vec3i startPos,
+                                          StructureWorldAccess world) {
+        // Get block infos
+        var blockInfos = ((IStructureTemplateAccessor)template).getBlockInfoLists().get(0).getAll();
+
+        // For every block in the chunkbox
+        blockInfos.stream()
+                .filter((blockInfo) -> chunkBox.contains(startPos.add(blockInfo.pos)))
+                .forEach((blockInfo) -> {
+                    // Get the actual block pos
+                    var actualBlockPos = new BlockPos(startPos.add(blockInfo.pos));
+
+                    // Get the block state
+                    var blockState = blockInfo.state;
+
+                    // Optimization: If the block is air, then do nothing
+                    if (blockState.equals(Blocks.AIR.getDefaultState())) {
+                        return;
+                    }
+
+                    // Place the block in the world
+                    world.setBlockState(actualBlockPos, blockState, 2);
+
+                    if (blockInfo.nbt != null) {
+                        var blockEntity = world.getBlockEntity(actualBlockPos);
+
+                        blockEntity.readNbt(blockInfo.nbt);
+                    }
+                });
+    }
+
+    protected static BlockBox getBlockBoxForChunk(Chunk chunk) {
+        ChunkPos chunkPos = chunk.getPos();
+        int startX = chunkPos.getStartX();
+        int startZ = chunkPos.getStartZ();
+        HeightLimitView heightLimitView = chunk.getHeightLimitView();
+        int startY = heightLimitView.getBottomY() + 1;
+        int endY = heightLimitView.getTopY() - 1;
+        return new BlockBox(startX, startY, startZ, startX + 15, endY, startZ + 15);
     }
 }

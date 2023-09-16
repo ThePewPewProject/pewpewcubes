@@ -7,6 +7,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.ProceduralArenaType;
 import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.concurrent.CompletableFuture;
@@ -41,8 +42,16 @@ public class MapSuggestionProvider implements SuggestionProvider<ServerCommandSo
         }
 
         for (var map : ArenaType.values()) {
-            if (inputEmpty || map.translatableName.toLowerCase().contains(input.toLowerCase())) {
-                builder.suggest(map.translatableName);
+            if (map == ArenaType.PROCEDURAL) {
+                for (var proceduralMap : ProceduralArenaType.values()) {
+                    if (inputEmpty || proceduralMap.translatableName.toLowerCase().contains(input.toLowerCase())) {
+                        builder.suggest(proceduralMap.translatableName);
+                    }
+                }
+            } else {
+                if (inputEmpty || map.translatableName.toLowerCase().contains(input.toLowerCase())) {
+                    builder.suggest(map.translatableName);
+                }
             }
         }
 

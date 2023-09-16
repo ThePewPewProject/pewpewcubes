@@ -8,6 +8,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +29,12 @@ public class StructureResourceManager implements SimpleSynchronousResourceReload
 
     public Resource get(Identifier id) {
         return structureResources.get(id);
+    }
+
+    public List<Map.Entry<Identifier, Resource>> getFolder(Identifier folderId) {
+        return structureResources.entrySet().stream()
+                .filter(entry -> entry.getKey().getPath().startsWith(folderId.getPath()))
+                .toList();
     }
 
     @Override

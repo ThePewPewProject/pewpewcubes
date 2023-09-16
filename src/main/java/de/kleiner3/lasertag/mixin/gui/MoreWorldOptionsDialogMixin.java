@@ -2,6 +2,7 @@ package de.kleiner3.lasertag.mixin.gui;
 
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaChunkGenerator;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.ProceduralArenaType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -19,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Mixin into the MoreOptionsDialog class to implement the arena selection
@@ -30,6 +32,8 @@ import java.util.Arrays;
 public abstract class MoreWorldOptionsDialogMixin {
 
     private CyclingButtonWidget<ArenaType> arenaTypeButton;
+
+    private CyclingButtonWidget<ProceduralArenaType> proceduralArenaTypeButton;
 
     @Shadow
     private GeneratorOptionsHolder generatorOptionsHolder;
@@ -66,18 +70,45 @@ public abstract class MoreWorldOptionsDialogMixin {
 
                            // Set arena type
                            arenaChunkGenerator.getConfig().setType(arenaType.ordinal());
+
+                           parent.setMoreOptionsOpen();
                        });
         this.arenaTypeButton.visible = false;
 
+        this.proceduralArenaTypeButton = CyclingButtonWidget
+                .builder(MoreWorldOptionsDialogMixin::getProceduralArenaTypeText)
+                .values(Arrays.stream(ProceduralArenaType.values()).toList())
+                .build(leftPadding, 120,
+                        standardButtonWidth, standardButtonHeight,
+                        Text.translatable("selectWorld.proceduralType"),
+
+                        // Button click handler
+                        (button, arenaType) -> {
+                            // Get the chunk generator
+                            var chunkGenerator = this.generatorOptionsHolder.generatorOptions().getChunkGenerator();
+
+                            // Cast to ArenaChunkGenerator
+                            var arenaChunkGenerator = (ArenaChunkGenerator)chunkGenerator;
+
+                            // Set arena type
+                            arenaChunkGenerator.getConfig().setProceduralType(arenaType.ordinal());
+
+                            // Set to random seed
+                            arenaChunkGenerator.getConfig().setSeed((new Random()).nextLong());
+                        });
+        this.proceduralArenaTypeButton.visible = false;
+
         parent.addDrawableChild(this.arenaTypeButton);
+        parent.addDrawableChild(this.proceduralArenaTypeButton);
     }
 
     @Inject(method = "setVisible", at = @At("TAIL"))
     private void setVisibleOverwrite(boolean visible, CallbackInfo ci) {
         this.arenaTypeButton.visible = false;
+        this.proceduralArenaTypeButton.visible = false;
 
         // If lasertag arena chunk generator is selected
-        if (this.generatorOptionsHolder.generatorOptions().getChunkGenerator() instanceof ArenaChunkGenerator) {
+        if (this.generatorOptionsHolder.generatorOptions().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator) {
             // Show arena type button
             this.arenaTypeButton.visible = visible;
 
@@ -86,10 +117,17 @@ public abstract class MoreWorldOptionsDialogMixin {
             this.bonusItemsButton.visible = false;
             this.customizeTypeButton.visible = false;
             this.importSettingsButton.visible = false;
+
+            // If procedural arena is selected
+            if(arenaChunkGenerator.getConfig().getType() == ArenaType.PROCEDURAL) {
+                this.proceduralArenaTypeButton.visible = visible;
+            }
         }
     }
 
     private static Text getArenaTypeText(ArenaType arenaType) {
         return Text.translatable(arenaType.translatableName);
     }
+
+    private static Text getProceduralArenaTypeText(ProceduralArenaType proceduralArenaType) { return Text.translatable(proceduralArenaType.translatableName); }
 }

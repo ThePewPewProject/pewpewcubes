@@ -11,6 +11,7 @@ import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaChunkGenerator;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaChunkGeneratorConfig;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.ProceduralArenaType;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -23,6 +24,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.thread.TaskExecutor;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -34,6 +36,7 @@ import org.apache.commons.lang3.mutable.MutableObject;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,7 +55,7 @@ public class LasertagMapManager implements IManager {
 
     //region Public methods
 
-    public void loadMap(ArenaType newArenaType) {
+    public void loadMap(ArenaType newArenaType, ProceduralArenaType newProceduralArenaType) {
 
         // Step 0: Check if this is an arena world
         var chunkGenerator = Objects.requireNonNull(server.getSaveProperties().getGeneratorOptions().getDimensions().get(DimensionOptions.OVERWORLD)).chunkGenerator;
@@ -70,22 +73,24 @@ public class LasertagMapManager implements IManager {
         try {
             // Step 2: Remove all blocks of the old arena
             var oldArenaType = arenaChunkGenerator.getConfig().getType();
-            var oldArenaBounds = this.calculateBounds(oldArenaType);
+            var oldArenaProceduralType = arenaChunkGenerator.getConfig().getProceduralType();
+            var oldArenaBounds = this.calculateBounds(oldArenaType, oldArenaProceduralType);
             this.removeOldBlocks(oldArenaBounds);
 
-            // Step 3: Clear spawn-point cache if necessary
+            // Step 3: Clear spawn-point cache if necessary and reset arena structure placer
             if (!oldArenaType.equals(newArenaType)) {
                 server.getLasertagServerManager().getSpawnpointManager().clearSpawnpointCache();
             }
+            newArenaType.arenaPlacer.reset();
 
             // Step 3: Remove all entities except the players
             this.removeEntities();
 
             // Step 4: Set new arena chunk generator config
-            arenaChunkGenerator.setConfig(new ArenaChunkGeneratorConfig(newArenaType.ordinal()));
+            arenaChunkGenerator.setConfig(new ArenaChunkGeneratorConfig(newArenaType.ordinal(), newProceduralArenaType.ordinal(), (new Random()).nextLong()));
 
             // Step 5: Generate new arena
-            var newArenaBounds = this.calculateBounds(newArenaType);
+            var newArenaBounds = this.calculateBounds(newArenaType, newProceduralArenaType);
             this.generateArena(newArenaBounds);
 
             // Step 6: Mark all changed chunks for update
@@ -311,10 +316,10 @@ public class LasertagMapManager implements IManager {
      * @param arenaType The arena type to calculate the bounds for
      * @return The calculated arena bounds dto
      */
-    private ArenaBoundsDto calculateBounds(ArenaType arenaType) {
+    private ArenaBoundsDto calculateBounds(ArenaType arenaType, ProceduralArenaType proceduralArenaType) {
 
-        var arenaSize = arenaType.getArenaSize();
-        var arenaOffset = arenaType.placementOffset;
+        var arenaSize = arenaType.getArenaSize(proceduralArenaType);
+        Vec3i arenaOffset = arenaType.getCompleteOffset(proceduralArenaType);
         var startZ = -arenaOffset.getZ();
         var startX = -arenaOffset.getX();
         var endZ = startZ + arenaSize.getZ();

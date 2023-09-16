@@ -7,6 +7,7 @@ import de.kleiner3.lasertag.command.CommandFeedback;
 import de.kleiner3.lasertag.command.ServerFeedbackCommand;
 import de.kleiner3.lasertag.command.suggestions.MapSuggestionProvider;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.ProceduralArenaType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -34,13 +35,22 @@ public class LoadMapCommand extends ServerFeedbackCommand {
                 .filter(m -> m.translatableName.equals(mapTranslatableName))
                 .findFirst();
 
+        var proceduralTypeOptional = Arrays.stream(ProceduralArenaType.values())
+                .filter(m -> m.translatableName.equals(mapTranslatableName))
+                .findFirst();
+
+        // If is procedural map
+        if (proceduralTypeOptional.isPresent()) {
+            arenaTypeOptional = Optional.of(ArenaType.PROCEDURAL);
+        }
+
         if (arenaTypeOptional.isEmpty()) {
 
             return Optional.of(new CommandFeedback(Text.literal("Could not find map.").formatted(Formatting.RED), false, false));
         }
 
         try {
-            server.getLasertagServerManager().getMapManager().loadMap(arenaTypeOptional.get());
+            server.getLasertagServerManager().getMapManager().loadMap(arenaTypeOptional.get(), ProceduralArenaType.SMALL_2V2);
         } catch (Exception e) {
             return Optional.of(new CommandFeedback(Text.literal("Unexpected error while loading map: " + e.getMessage()).formatted(Formatting.RED), false, false));
         }

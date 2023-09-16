@@ -7,9 +7,7 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.structure.StructureSet;
 import net.minecraft.util.collection.Pool;
 import net.minecraft.util.dynamic.RegistryOps;
-import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.ChunkRegion;
@@ -63,36 +61,12 @@ public class ArenaChunkGenerator extends ChunkGenerator {
 
     @Override
     public void generateFeatures(StructureWorldAccess world, Chunk chunk, StructureAccessor structureAccessor) {
-        // Get the current chunks block box
-        var bBox = getBlockBoxForChunk(chunk);
 
         // Get the arena chunk generator config type
         var type = config.getType();
 
-        // Calculate the start pos
-        var startPos = BlockPos.ORIGIN.subtract(type.placementOffset);
-
-        // Get the arena size
-        var size = type.getArenaSize();
-
-        // If chunk does not intersect with arena bounding box, do nothing
-        if (bBox.getMaxX() < startPos.getX() || bBox.getMinX() > (startPos.getX() + size.getX()) ||
-                bBox.getMaxZ() < startPos.getZ() || bBox.getMinZ() > (startPos.getZ() + size.getZ())) {
-            return;
-        }
-
         // Place the arena
-        ArenaStructurePlacer.placeArenaChunkSegment(type.getArenaTemplate(), bBox, startPos, world);
-    }
-
-    private static BlockBox getBlockBoxForChunk(Chunk chunk) {
-        ChunkPos chunkPos = chunk.getPos();
-        int startX = chunkPos.getStartX();
-        int startZ = chunkPos.getStartZ();
-        HeightLimitView heightLimitView = chunk.getHeightLimitView();
-        int startY = heightLimitView.getBottomY() + 1;
-        int endY = heightLimitView.getTopY() - 1;
-        return new BlockBox(startX, startY, startZ, startX + 15, endY, startZ + 15);
+        type.arenaPlacer.placeArenaChunkSegment(type, config.getProceduralType(), chunk, world, config.getSeed());
     }
 
     public ArenaChunkGeneratorConfig getConfig() {
@@ -144,7 +118,7 @@ public class ArenaChunkGenerator extends ChunkGenerator {
     public void populateEntities(ChunkRegion region) {
 
         // Place the arena entities
-        ArenaStructurePlacer.spawnEntitiesOfArena(config.getType().getArenaTemplate(), BlockPos.ORIGIN.subtract(config.getType().placementOffset), region);
+        config.getType().arenaPlacer.spawnEntitiesOfArena(config.getType(), region);
     }
 
     @Override
