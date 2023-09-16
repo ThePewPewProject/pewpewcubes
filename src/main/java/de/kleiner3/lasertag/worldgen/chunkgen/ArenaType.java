@@ -40,7 +40,7 @@ public enum ArenaType {
             "arenaType.flower_forest"),
     MEDIEVAL_CITY(BiomeKeys.PLAINS,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/medieval_city_arena.litematic"),
-            new Vec3i(116, 14, 73),
+            new Vec3i(116, 13, 73),
             "arenaType.medieval_city");
 
     /**
