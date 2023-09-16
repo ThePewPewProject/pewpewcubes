@@ -106,7 +106,7 @@ public class LasertagGameManager implements IManager {
     public static LasertagGameManager fromJson(String jsonString) {
         var builder = new GsonBuilder();
 
-        // Set number stategy
+        // Set number strategy
         builder.setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE);
 
         // Register team serializer

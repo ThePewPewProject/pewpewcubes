@@ -16,4 +16,9 @@ public interface ITickable {
      * Called on the last tick
      */
     void endTick();
+
+    /**
+     * Called 30 seconds before end
+     */
+    void thirtySecondsTick();
 }

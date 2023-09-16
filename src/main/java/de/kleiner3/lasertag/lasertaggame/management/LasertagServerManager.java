@@ -7,6 +7,7 @@ import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.ITickable;
 import de.kleiner3.lasertag.lasertaggame.management.lasertargets.LasertargetManager;
 import de.kleiner3.lasertag.lasertaggame.management.map.LasertagMapManager;
+import de.kleiner3.lasertag.lasertaggame.management.music.LasertagMusicManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.management.settings.presets.LasertagSettingsPresetsManager;
 import de.kleiner3.lasertag.lasertaggame.management.spawnpoints.LasertagSpawnpointManager;
@@ -18,6 +19,7 @@ import de.kleiner3.lasertag.lasertaggame.statistics.StatsCalculator;
 import de.kleiner3.lasertag.lasertaggame.timing.GameTickTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
+import de.kleiner3.lasertag.worldgen.chunkgen.ArenaChunkGenerator;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
@@ -55,6 +57,8 @@ public class LasertagServerManager implements IManager, ITickable {
 
     private LasertagSettingsPresetsManager settingsPresetsManager;
 
+    private LasertagMusicManager musicManager;
+
     private LasertagMapManager mapManager;
 
     //endregion
@@ -73,6 +77,7 @@ public class LasertagServerManager implements IManager, ITickable {
         lasertargetManager = new LasertargetManager();
         spawnpointManager = new LasertagSpawnpointManager();
         settingsPresetsManager = new LasertagSettingsPresetsManager();
+        musicManager = new LasertagMusicManager(server);
         mapManager = new LasertagMapManager(server);
 
         isRunning = false;
@@ -136,6 +141,10 @@ public class LasertagServerManager implements IManager, ITickable {
         var preGameDelayTimer = ThreadUtil.createScheduledExecutor("lasertag-server-pregame-delay-timer-thread-%d");
         var preGameDelay = LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PREGAME_DURATION);
 
+        if (server.getOverworld().getChunkManager().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator) {
+            musicManager.playIntro(arenaChunkGenerator.getConfig().getType());
+        }
+
         preGameDelayTimer.schedule(() -> {
 
             // Activate every player
@@ -154,7 +163,7 @@ public class LasertagServerManager implements IManager, ITickable {
 
             // Start game tick timer
             gameTickTimer = ThreadUtil.createScheduledExecutor("lasertag-server-game-tick-timer-thread-%d");
-            gameTickTimer.scheduleAtFixedRate(new GameTickTimerTask(this), 0, 1, TimeUnit.MINUTES);
+            gameTickTimer.scheduleAtFixedRate(new GameTickTimerTask(this), 0, 1, TimeUnit.SECONDS);
 
             // Stop the pre game delay timer
             preGameDelayTimer.shutdownNow();
@@ -337,13 +346,24 @@ public class LasertagServerManager implements IManager, ITickable {
      */
     @Override
     public void doTick() {
-        // Here the music can be started
+        if (!(server.getOverworld().getChunkManager().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator)) {
+            return;
+        }
+        this.musicManager.tick(arenaChunkGenerator.getConfig().getType());
     }
 
     @Override
     public void endTick() {
 
         lasertagGameOver();
+    }
+
+    @Override
+    public void thirtySecondsTick() {
+        if (!(server.getOverworld().getChunkManager().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator)) {
+            return;
+        }
+        this.musicManager.playOutro(arenaChunkGenerator.getConfig().getType());
     }
 
     public LasertagSettingsPresetsManager getSettingsPresetsManager() {

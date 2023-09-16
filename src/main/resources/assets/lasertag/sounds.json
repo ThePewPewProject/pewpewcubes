@@ -1,0 +1,54 @@
+{
+  "procedural_arena_intro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "procedural_arena_music": {
+    "subtitle": "subtitles.lasertag.music",
+    "sounds": [
+      "lasertag:procedural_arena_music_0"
+    ]
+  },
+  "procedural_arena_outro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+
+  "jungle_arena_intro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "jungle_arena_music": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "jungle_arena_outro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+
+  "desert_arena_intro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "desert_arena_music": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "desert_arena_outro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+
+  "flower_forest_arena_intro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "flower_forest_arena_music": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "flower_forest_arena_outro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+
+  "medieval_city_arena_intro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "medieval_city_arena_music": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "medieval_city_arena_outro": {
+    "subtitle": "subtitles.lasertag.music"
+  }
+}

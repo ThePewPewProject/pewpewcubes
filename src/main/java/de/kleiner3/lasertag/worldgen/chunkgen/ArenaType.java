@@ -1,11 +1,13 @@
 package de.kleiner3.lasertag.worldgen.chunkgen;
 
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.client.SoundEvents;
 import de.kleiner3.lasertag.common.util.NbtUtil;
 import de.kleiner3.lasertag.resource.ResourceManagers;
 import de.kleiner3.lasertag.resource.StructureResourceManager;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
@@ -25,23 +27,38 @@ public enum ArenaType {
             new Identifier(LasertagMod.ID, "structures/procedural_arenas"),
             null,
             "arenaType.procedural",
-            new ProceduralArenaStructurePlacer()),
+            new ProceduralArenaStructurePlacer(),
+            SoundEvents.PROCEDURAL_ARENA_INTRO_MUSIC_SOUND_EVENT,
+            SoundEvents.PROCEDURAL_ARENA_MUSIC_SOUND_EVENT,
+            SoundEvents.PROCEDURAL_ARENA_OUTRO_MUSIC_SOUND_EVENT),
     JUNGLE(BiomeKeys.JUNGLE,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/jungle_arena.litematic"),
             new Vec3i(22, 3, 61),
-            "arenaType.jungle"),
+            "arenaType.jungle",
+            SoundEvents.JUNGLE_ARENA_INTRO_MUSIC_SOUND_EVENT,
+            SoundEvents.JUNGLE_ARENA_MUSIC_SOUND_EVENT,
+            SoundEvents.JUNGLE_ARENA_OUTRO_MUSIC_SOUND_EVENT),
     DESERT(BiomeKeys.DESERT,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/desert_arena.litematic"),
             new Vec3i(55, 26, 99),
-            "arenaType.desert"),
+            "arenaType.desert",
+            SoundEvents.DESERT_ARENA_INTRO_MUSIC_SOUND_EVENT,
+            SoundEvents.DESERT_ARENA_MUSIC_SOUND_EVENT,
+            SoundEvents.DESERT_ARENA_OUTRO_MUSIC_SOUND_EVENT),
     FLOWER_FOREST(BiomeKeys.FLOWER_FOREST,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/flower_forest_arena.litematic"),
             new Vec3i(49, 2, 70),
-            "arenaType.flower_forest"),
+            "arenaType.flower_forest",
+            SoundEvents.FLOWER_FOREST_ARENA_INTRO_MUSIC_SOUND_EVENT,
+            SoundEvents.FLOWER_FOREST_ARENA_MUSIC_SOUND_EVENT,
+            SoundEvents.FLOWER_FOREST_ARENA_OUTRO_MUSIC_SOUND_EVENT),
     MEDIEVAL_CITY(BiomeKeys.PLAINS,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/medieval_city_arena.litematic"),
             new Vec3i(116, 13, 73),
-            "arenaType.medieval_city");
+            "arenaType.medieval_city",
+            SoundEvents.MEDIEVAL_CITY_ARENA_INTRO_MUSIC_SOUND_EVENT,
+            SoundEvents.MEDIEVAL_CITY_ARENA_MUSIC_SOUND_EVENT,
+            SoundEvents.MEDIEVAL_CITY_ARENA_OUTRO_MUSIC_SOUND_EVENT);
 
     /**
      * Enum Constructor
@@ -52,16 +69,32 @@ public enum ArenaType {
      *                        (To calculate: Generate arena with offset 0,0,0 and use the targeted block coordinates of the desired spawn point block as the offset)
      * @param translatableName The name used for translation
      */
-    ArenaType(RegistryKey<Biome> biome, Identifier nbtFileId, Vec3i placementOffset, String translatableName) {
-        this(biome, nbtFileId, placementOffset, translatableName, new ArenaStructurePlacer());
+    ArenaType(RegistryKey<Biome> biome,
+              Identifier nbtFileId,
+              Vec3i placementOffset,
+              String translatableName,
+              SoundEvent introMusic,
+              SoundEvent music,
+              SoundEvent outroMusic) {
+        this(biome, nbtFileId, placementOffset, translatableName, new ArenaStructurePlacer(), introMusic, music, outroMusic);
     }
 
-    ArenaType(RegistryKey<Biome> biome, Identifier nbtFileId, Vec3i placementOffset, String translatableName, ArenaStructurePlacer arenaPlacer) {
+    ArenaType(RegistryKey<Biome> biome,
+              Identifier nbtFileId,
+              Vec3i placementOffset,
+              String translatableName,
+              ArenaStructurePlacer arenaPlacer,
+              SoundEvent introMusic,
+              SoundEvent music,
+              SoundEvent outroMusic) {
         this.biome = biome;
         this.nbtFileId = nbtFileId;
         this.placementOffset = placementOffset;
         this.translatableName = translatableName;
         this.arenaPlacer = arenaPlacer;
+        this.introMusic = introMusic;
+        this.outroMusic = outroMusic;
+        this.music = music;
     }
 
     public final RegistryKey<Biome> biome;
@@ -70,6 +103,10 @@ public enum ArenaType {
     public final String translatableName;
 
     public final ArenaStructurePlacer arenaPlacer;
+
+    public final SoundEvent introMusic;
+    public final SoundEvent music;
+    public final SoundEvent outroMusic;
 
     private StructureTemplate arenaTemplate = null;
     private Vec3i arenaSize = null;
