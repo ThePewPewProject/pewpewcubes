@@ -196,7 +196,7 @@ public class LasertagMapManager implements IManager {
         serverChunkManager.threadedAnvilChunkStorage.verifyChunkGenerator();
 
         // For every chunk generation step necessary
-        for(var chunkStatus : ImmutableList.of(ChunkStatus.BIOMES, ChunkStatus.FEATURES, ChunkStatus.SPAWN)) {
+        for(var chunkStatus : ImmutableList.of(ChunkStatus.BIOMES, ChunkStatus.FEATURES, ChunkStatus.LIGHT, ChunkStatus.SPAWN)) {
 
             // Init progress variables
             var currentStepChunkIndex = new AtomicInteger(0);
@@ -219,6 +219,9 @@ public class LasertagMapManager implements IManager {
                         // Don't do this weird stuff in the else-block for the spawn entities
                         // step, or otherwise the entities will try to spawn multiple times
                         if (chunkStatus == ChunkStatus.SPAWN) {
+                            chunkList.add(worldChunk);
+                        } else if (chunkStatus == ChunkStatus.LIGHT) {
+                            worldChunk.setLightOn(false);
                             chunkList.add(worldChunk);
                         } else {
                             // Weird stuff needed in order for the arena generation to work
