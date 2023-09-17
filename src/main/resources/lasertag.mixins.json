@@ -8,6 +8,7 @@
     "MinecraftServerMixin",
     "PlayerEntityMixin",
     "ServerPlayerEntityMixin",
+    "ServerPlayNetworkHandlerMixin",
     "WorldPresetsMixin",
     "fastiter.WorldMixin"
   ],
@@ -23,6 +24,7 @@
     "gui.PlayerListHudMixin"
   ],
   "server": [
+    "DedicatedServerWatchdogMixin"
   ],
   "injectors": {
     "defaultRequire": 1

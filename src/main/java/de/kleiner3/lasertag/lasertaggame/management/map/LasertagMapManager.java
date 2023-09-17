@@ -49,6 +49,8 @@ public class LasertagMapManager implements IManager {
 
     private final MinecraftServer server;
 
+    private boolean isLoading = false;
+
     public LasertagMapManager(MinecraftServer server) {
         this.server = server;
     }
@@ -56,6 +58,8 @@ public class LasertagMapManager implements IManager {
     //region Public methods
 
     public void loadMap(ArenaType newArenaType, ProceduralArenaType newProceduralArenaType) {
+
+        this.isLoading = true;
 
         // Step 0: Check if this is an arena world
         var chunkGenerator = Objects.requireNonNull(server.getSaveProperties().getGeneratorOptions().getDimensions().get(DimensionOptions.OVERWORLD)).chunkGenerator;
@@ -103,12 +107,18 @@ public class LasertagMapManager implements IManager {
         } finally {
             // In case of unexpected exception: Close all loading screens on the clients
             this.sendMapLoadProgressEvent("", -1.0);
+
+            this.isLoading = false;
         }
     }
 
     @Override
     public void dispose() {
         // Nothing to dispose
+    }
+
+    public boolean isLoading() {
+        return this.isLoading;
     }
 
     //endregion
