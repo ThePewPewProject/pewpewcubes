@@ -143,7 +143,6 @@ public class LasertagMapManager implements IManager {
         // Get chunk manager
         var serverWorld = server.getOverworld();
         var serverChunkManager = serverWorld.getChunkManager();
-        serverChunkManager.threadedAnvilChunkStorage.verifyChunkGenerator();
 
         // Init progress variables
         var currentStepString = "Removing blocks from old arena";
@@ -194,6 +193,7 @@ public class LasertagMapManager implements IManager {
         // Get chunk manager
         var serverWorld = server.getOverworld();
         var serverChunkManager = serverWorld.getChunkManager();
+        serverChunkManager.threadedAnvilChunkStorage.verifyChunkGenerator();
 
         // For every chunk generation step necessary
         for(var chunkStatus : ImmutableList.of(ChunkStatus.BIOMES, ChunkStatus.FEATURES, ChunkStatus.SPAWN)) {
