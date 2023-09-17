@@ -154,7 +154,7 @@ public class LasertagMapManager implements IManager {
         for(var chunkZ = oldArenaBounds.startZ(); chunkZ <= oldArenaBounds.endZ(); ++chunkZ) {
             for(var chunkX = oldArenaBounds.startX(); chunkX <= oldArenaBounds.endX(); ++chunkX) {
                 var chunkPos = new ChunkPos(chunkX, chunkZ);
-                var worldChunk = serverChunkManager.getWorldChunk(chunkX, chunkZ, false);
+                var worldChunk = serverChunkManager.getWorldChunk(chunkX, chunkZ, true);
                 if (worldChunk != null) {
 
                     for (BlockPos blockPos : BlockPos.iterate(chunkPos.getStartX(), serverWorld.getBottomY(), chunkPos.getStartZ(), chunkPos.getEndX(), serverWorld.getTopY() - 1, chunkPos.getEndZ())) {
@@ -211,7 +211,7 @@ public class LasertagMapManager implements IManager {
             for(var z = newArenaBounds.startZ(); z <= newArenaBounds.endZ(); ++z) {
                 for(var x = newArenaBounds.startX(); x <= newArenaBounds.endX(); ++x) {
                     var chunkPos = new ChunkPos(x, z);
-                    var worldChunk = serverChunkManager.getWorldChunk(x, z, false);
+                    var worldChunk = serverChunkManager.getWorldChunk(x, z, true);
                     if (worldChunk != null) {
                         List<Chunk> chunkList = Lists.newArrayList();
                         int taskMargin = Math.max(1, chunkStatus.getTaskMargin());
@@ -243,7 +243,8 @@ public class LasertagMapManager implements IManager {
                                     serverWorld,
                                     serverChunkManager.getChunkGenerator(),
                                     serverWorld.getStructureTemplateManager(),
-                                    serverChunkManager.getLightingProvider(), (chunk) -> {
+                                    serverChunkManager.getLightingProvider(),
+                                    (chunk) -> {
                                         throw new UnsupportedOperationException("Not creating full chunks here");
                                     },
                                     chunkList,
