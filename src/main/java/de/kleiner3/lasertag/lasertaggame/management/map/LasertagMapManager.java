@@ -170,6 +170,8 @@ public class LasertagMapManager implements IManager {
                         // Set block to air. Block.FORCE_STATE so that no items drop (Flowers, seeds, etc)
                         serverWorld.setBlockState(blockPos, Blocks.AIR.getDefaultState(), Block.FORCE_STATE);
                     }
+                } else {
+                    LasertagMod.LOGGER.warn("Load arena, remove old arena - Could not get chunk (" + chunkX + ", " + chunkZ + ")");
                 }
 
                 this.sendMapLoadProgressEvent(currentStepString, (double)(++removeBlocksChunkIndex) / (double)oldArenaBounds.numChunks());
@@ -218,10 +220,10 @@ public class LasertagMapManager implements IManager {
 
             CompletableFuture<Unit> completableFuture = CompletableFuture.supplyAsync(() -> Unit.INSTANCE, taskExecutor::send);
 
-            for(var z = newArenaBounds.startZ(); z <= newArenaBounds.endZ(); ++z) {
-                for(var x = newArenaBounds.startX(); x <= newArenaBounds.endX(); ++x) {
-                    var chunkPos = new ChunkPos(x, z);
-                    var worldChunk = serverChunkManager.getWorldChunk(x, z, true);
+            for(var chunkZ = newArenaBounds.startZ(); chunkZ <= newArenaBounds.endZ(); ++chunkZ) {
+                for(var chunkX = newArenaBounds.startX(); chunkX <= newArenaBounds.endX(); ++chunkX) {
+                    var chunkPos = new ChunkPos(chunkX, chunkZ);
+                    var worldChunk = serverChunkManager.getWorldChunk(chunkX, chunkZ, true);
                     if (worldChunk != null) {
                         List<Chunk> chunkList = Lists.newArrayList();
                         int taskMargin = Math.max(1, chunkStatus.getTaskMargin());
@@ -269,6 +271,8 @@ public class LasertagMapManager implements IManager {
 
                             return generationTask;
                         }, taskExecutor::send);
+                    } else {
+                        LasertagMod.LOGGER.warn("Load arena, " + chunkStatus.getId() + " - Could not get chunk (" + chunkX + ", " + chunkZ + ")");
                     }
                 }
             }
@@ -295,10 +299,10 @@ public class LasertagMapManager implements IManager {
         var serverChunkManager = serverWorld.getChunkManager();
 
         // For every chunk
-        for(var z = bounds.startZ(); z <= bounds.endZ(); ++z) {
-            for(var x = bounds.startX(); x <= bounds.endX(); ++x) {
-                var chunkPos = new ChunkPos(x, z);
-                var worldChunk = serverChunkManager.getWorldChunk(x, z, false);
+        for(var chunkZ = bounds.startZ(); chunkZ <= bounds.endZ(); ++chunkZ) {
+            for(var chunkX = bounds.startX(); chunkX <= bounds.endX(); ++chunkX) {
+                var chunkPos = new ChunkPos(chunkX, chunkZ);
+                var worldChunk = serverChunkManager.getWorldChunk(chunkX, chunkZ, false);
 
                 if (worldChunk != null) {
 
@@ -312,6 +316,9 @@ public class LasertagMapManager implements IManager {
                     for (var blockPos : BlockPos.iterate(chunkPos.getStartX(), serverWorld.getBottomY(), chunkPos.getStartZ(), chunkPos.getEndX(), serverWorld.getTopY() - 1, chunkPos.getEndZ())) {
                         serverChunkManager.markForUpdate(blockPos);
                     }
+                }
+                else {
+                    LasertagMod.LOGGER.warn("Load arena, mark for update - Could not get chunk (" + chunkX + ", " + chunkZ + ")");
                 }
 
                 this.sendMapLoadProgressEvent(currentStepString, (double)(++markUpdateChunkIndex) / (double)bounds.numChunks());
