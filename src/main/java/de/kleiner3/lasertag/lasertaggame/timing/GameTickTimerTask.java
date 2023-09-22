@@ -41,7 +41,7 @@ public class GameTickTimerTask extends TimerTask {
 
         // Else do regular tick every 60 seconds
         if (seconds % 60 == 0) {
-            game.doTick();
+            game.doTick(gameDurationSeconds - seconds == 60);
         }
     }
 }

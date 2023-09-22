@@ -345,11 +345,11 @@ public class LasertagServerManager implements IManager, ITickable {
      * This method is called every minute when the game is running
      */
     @Override
-    public void doTick() {
+    public void doTick(boolean isLastNormalTick) {
         if (!(server.getOverworld().getChunkManager().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator)) {
             return;
         }
-        this.musicManager.tick(arenaChunkGenerator.getConfig().getType());
+        this.musicManager.tick(arenaChunkGenerator.getConfig().getType(), isLastNormalTick);
     }
 
     @Override
