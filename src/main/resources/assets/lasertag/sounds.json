@@ -50,5 +50,21 @@
   },
   "medieval_city_arena_outro": {
     "subtitle": "subtitles.lasertag.music"
+  },
+
+  "laserweapon_fire_sound": {
+    "subtitle": "subtitles.lasertag.weapon_fire_sound",
+    "sounds": [
+      "lasertag:fire_sound_1",
+      "lasertag:fire_sound_2",
+      "lasertag:fire_sound_3",
+      "lasertag:fire_sound_4",
+      "lasertag:fire_sound_5",
+      "lasertag:fire_sound_6",
+      "lasertag:fire_sound_7",
+      "lasertag:fire_sound_8",
+      "lasertag:fire_sound_9",
+      "lasertag:fire_sound_10"
+    ]
   }
 }

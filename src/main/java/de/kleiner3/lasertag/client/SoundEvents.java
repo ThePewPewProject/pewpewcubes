@@ -12,6 +12,7 @@ import net.minecraft.util.registry.Registry;
  */
 public class SoundEvents {
 
+    // ===== Music =====
     public static final Identifier PROCEDURAL_ARENA_INTRO_MUSIC_ID = new Identifier(LasertagMod.ID, "procedural_arena_intro");
     public static final SoundEvent PROCEDURAL_ARENA_INTRO_MUSIC_SOUND_EVENT = new SoundEvent(PROCEDURAL_ARENA_INTRO_MUSIC_ID, Float.MAX_VALUE);
     public static final Identifier PROCEDURAL_ARENA_MUSIC_ID = new Identifier(LasertagMod.ID, "procedural_arena_music");
@@ -47,7 +48,12 @@ public class SoundEvents {
     public static final Identifier MEDIEVAL_CITY_ARENA_OUTRO_MUSIC_ID = new Identifier(LasertagMod.ID, "medieval_city_arena_outro");
     public static final SoundEvent MEDIEVAL_CITY_ARENA_OUTRO_MUSIC_SOUND_EVENT = new SoundEvent(MEDIEVAL_CITY_ARENA_OUTRO_MUSIC_ID, Float.MAX_VALUE);
 
+    // ===== Sound effects =====
+    public static final Identifier LASERWEAPON_FIRE_SOUND_ID = new Identifier(LasertagMod.ID, "laserweapon_fire_sound");
+    public static final SoundEvent LASERWEAPON_FIRE_SOUND_EVENT = new SoundEvent(LASERWEAPON_FIRE_SOUND_ID);
+
     public static void register() {
+        // Music
         Registry.register(Registry.SOUND_EVENT, PROCEDURAL_ARENA_OUTRO_MUSIC_ID, PROCEDURAL_ARENA_OUTRO_MUSIC_SOUND_EVENT);
         Registry.register(Registry.SOUND_EVENT, PROCEDURAL_ARENA_MUSIC_ID, PROCEDURAL_ARENA_MUSIC_SOUND_EVENT);
         Registry.register(Registry.SOUND_EVENT, PROCEDURAL_ARENA_INTRO_MUSIC_ID, PROCEDURAL_ARENA_INTRO_MUSIC_SOUND_EVENT);
@@ -67,5 +73,8 @@ public class SoundEvents {
         Registry.register(Registry.SOUND_EVENT, MEDIEVAL_CITY_ARENA_OUTRO_MUSIC_ID, MEDIEVAL_CITY_ARENA_OUTRO_MUSIC_SOUND_EVENT);
         Registry.register(Registry.SOUND_EVENT, MEDIEVAL_CITY_ARENA_MUSIC_ID, MEDIEVAL_CITY_ARENA_MUSIC_SOUND_EVENT);
         Registry.register(Registry.SOUND_EVENT, MEDIEVAL_CITY_ARENA_INTRO_MUSIC_ID, MEDIEVAL_CITY_ARENA_INTRO_MUSIC_SOUND_EVENT);
+
+        // Sound effects
+        Registry.register(Registry.SOUND_EVENT, LASERWEAPON_FIRE_SOUND_ID, LASERWEAPON_FIRE_SOUND_EVENT);
     }
 }

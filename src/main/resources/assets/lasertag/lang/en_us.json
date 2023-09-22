@@ -60,5 +60,6 @@
 	"arenaType.procedural.small_two_team": "Small 2 Teams",
 	"arenaType.procedural.medium_four_team": "Medium 4 Teams",
 
-	"subtitles.lasertag.music": "Thrilling music"
+	"subtitles.lasertag.music": "Thrilling music",
+	"subtitles.lasertag.weapon_fire_sound": "Laserweapon firing"
 }
