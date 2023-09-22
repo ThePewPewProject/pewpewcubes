@@ -542,6 +542,9 @@ public class LasertagServerManager implements IManager, ITickable {
         // Reset lasertargets
         lasertargetManager.resetLasertargets();
 
+        // Reset music manager
+        musicManager.reset();
+
         try {
             // Calculate stats
             var stats = StatsCalculator.calcStats(LasertagGameManager.getInstance().getPlayerManager());

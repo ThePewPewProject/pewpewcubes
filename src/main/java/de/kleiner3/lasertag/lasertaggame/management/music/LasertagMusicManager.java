@@ -47,4 +47,8 @@ public class LasertagMusicManager implements IManager {
     public void playOutro(ArenaType arenaType) {
         server.getOverworld().playSound(null, new BlockPos(0, 0, 0), arenaType.outroMusic, SoundCategory.MUSIC, 1.0f, 1.0f);
     }
+
+    public void reset() {
+        this.playingThisMinute = false;
+    }
 }
