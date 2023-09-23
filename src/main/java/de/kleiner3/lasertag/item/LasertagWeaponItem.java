@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.item;
 
 import de.kleiner3.lasertag.block.LaserTargetBlock;
+import de.kleiner3.lasertag.client.SoundEvents;
 import de.kleiner3.lasertag.common.util.RaycastUtil;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
@@ -17,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.RangedWeaponItem;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
@@ -69,7 +71,9 @@ public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable 
 
         // Check that player is active
         if (LasertagGameManager.getInstance().getDeactivatedManager().isDeactivated(playerEntity.getUuid())) {
-            playWeaponFailSound(playerEntity);
+            if (!world.isClient) {
+                world.playSound(null, playerEntity.getBlockPos(), net.minecraft.sound.SoundEvents.BLOCK_BAMBOO_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+            }
             return TypedActionResult.fail(laserweaponStack);
         }
 
@@ -77,7 +81,9 @@ public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable 
         var team = LasertagGameManager.getInstance().getTeamManager().getTeamOfPlayer(playerEntity.getUuid());
 
         if (team.isEmpty()) {
-            playWeaponFailSound(playerEntity);
+            if (!world.isClient) {
+                world.playSound(null, playerEntity.getBlockPos(), net.minecraft.sound.SoundEvents.BLOCK_BAMBOO_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+            }
             return TypedActionResult.fail(laserweaponStack);
         }
 
@@ -87,7 +93,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable 
 
     private void fireWeapon(World world, PlayerEntity playerEntity, int color) {
         if (!world.isClient) {
-            playWeaponFireSound(playerEntity);
+            world.playSound(null, playerEntity.getBlockPos(), SoundEvents.LASERWEAPON_FIRE_SOUND_EVENT, SoundCategory.PLAYERS, 1.0f, 1.0f);
         }
 
         // Raycast the crosshair
@@ -168,38 +174,6 @@ public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable 
         buf.writeUuid(target.getUuid());
 
         ClientPlayNetworking.send(NetworkingConstants.PLAYER_HIT_PLAYER, buf);
-    }
-
-    private static void playWeaponFailSound(PlayerEntity playerEntity) {
-        if (playerEntity.world.isClient) {
-            return;
-        }
-
-        // Create packet byte buffer
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-
-        // Put position of sound event into packet
-        buf.writeDouble(playerEntity.getX());
-        buf.writeDouble(playerEntity.getY());
-        buf.writeDouble(playerEntity.getZ());
-
-        ServerEventSending.sendToEveryone((ServerWorld) playerEntity.world, NetworkingConstants.PLAY_WEAPON_FAILED_SOUND, buf);
-    }
-
-    private static void playWeaponFireSound(PlayerEntity playerEntity) {
-        if (playerEntity.world.isClient) {
-            return;
-        }
-
-        // Create packet byte buffer
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-
-        // Put position of sound event into packet
-        buf.writeDouble(playerEntity.getX());
-        buf.writeDouble(playerEntity.getY());
-        buf.writeDouble(playerEntity.getZ());
-
-        ServerEventSending.sendToEveryone((ServerWorld) playerEntity.world, NetworkingConstants.PLAY_WEAPON_FIRED_SOUND, buf);
     }
 
     private PlayState predicate(AnimationEvent<LasertagWeaponItem> event) {

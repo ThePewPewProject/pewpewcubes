@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag;
 
 import de.kleiner3.lasertag.block.Blocks;
+import de.kleiner3.lasertag.client.SoundEvents;
 import de.kleiner3.lasertag.command.Commands;
 import de.kleiner3.lasertag.entity.Entities;
 import de.kleiner3.lasertag.events.EventListeners;
@@ -63,5 +64,8 @@ public class LasertagMod implements ModInitializer {
 
         // Register networking handlers
         ServerNetworkingHandlers.register();
+
+        // Register sound events
+        SoundEvents.register();
     }
 }
