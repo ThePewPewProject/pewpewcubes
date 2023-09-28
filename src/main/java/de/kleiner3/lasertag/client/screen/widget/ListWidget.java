@@ -14,7 +14,8 @@ import java.util.function.Supplier;
 /**
  * A complex list widget with caching of the cell contents and scrolling. Mouse scroll events must be forwarded
  * to the list for the scrolling to work. Mouse dragged events must be forwarded for the scrollbar to work.
- * The tick event must be forwarded if the list contains text field widgets.
+ * The tick event must be forwarded if the list contains text field widgets. The mouse click event must be
+ * forwarded to text field widgets to work.
  *
  * @param <T> The type of the values
  * @param <R> The type of the id of the values

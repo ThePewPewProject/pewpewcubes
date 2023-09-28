@@ -54,6 +54,12 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        // Forward the mouse clicked event to the list
+        return this.list.mouseClicked(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
     public void tick() {
         // Forward the tick to the list - the list contains text field widgets
         this.list.tick();
