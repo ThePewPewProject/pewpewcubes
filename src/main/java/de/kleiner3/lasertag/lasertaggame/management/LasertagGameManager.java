@@ -8,6 +8,7 @@ import de.kleiner3.lasertag.lasertaggame.management.gui.LasertagHudRenderManager
 import de.kleiner3.lasertag.lasertaggame.management.players.LasertagPlayerNameManager;
 import de.kleiner3.lasertag.lasertaggame.management.score.LasertagScoreManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.management.settings.presets.LasertagSettingsPresetsNameManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.LasertagTeamManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamConfigManagerDeserializer;
@@ -52,6 +53,8 @@ public class LasertagGameManager implements IManager {
 
     private LasertagSettingsManager settingsManager;
 
+    private LasertagSettingsPresetsNameManager presetsNameManager;
+
     private LasertagTeamManager teamManager;
 
     private LasertagScoreManager scoreManager;
@@ -65,6 +68,7 @@ public class LasertagGameManager implements IManager {
     private LasertagGameManager() {
         deactivatedManager = new PlayerDeactivatedManager();
         settingsManager = new LasertagSettingsManager();
+        presetsNameManager = new LasertagSettingsPresetsNameManager();
         teamManager = new LasertagTeamManager();
         scoreManager = new LasertagScoreManager();
         hudRenderManager = new LasertagHudRenderManager();
@@ -79,6 +83,10 @@ public class LasertagGameManager implements IManager {
 
     public LasertagSettingsManager getSettingsManager() {
         return settingsManager;
+    }
+
+    public LasertagSettingsPresetsNameManager getPresetsNameManager() {
+        return presetsNameManager;
     }
 
     public LasertagHudRenderManager getHudRenderManager() {

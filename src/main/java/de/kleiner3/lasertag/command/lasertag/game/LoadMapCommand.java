@@ -50,7 +50,7 @@ public class LoadMapCommand extends ServerFeedbackCommand {
         }
 
         try {
-            server.getLasertagServerManager().getMapManager().loadMap(arenaTypeOptional.get(), ProceduralArenaType.SMALL_2V2);
+            server.getLasertagServerManager().getMapManager().loadMap(arenaTypeOptional.get(), proceduralTypeOptional.orElse(ProceduralArenaType.SMALL_2V2));
         } catch (Exception e) {
             return Optional.of(new CommandFeedback(Text.literal("Unexpected error while loading map: " + e.getMessage()).formatted(Formatting.RED), false, false));
         }

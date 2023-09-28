@@ -27,8 +27,6 @@ public class NetworkingConstants {
     public static final Identifier ERROR_MESSAGE = new Identifier(LasertagMod.ID, "error_message");
 
     // ===== Events =================
-    public static final Identifier PLAY_WEAPON_FIRED_SOUND = new Identifier(LasertagMod.ID, "play_weapon_fired_sound");
-    public static final Identifier PLAY_WEAPON_FAILED_SOUND = new Identifier(LasertagMod.ID, "play_weapon_failed_sound");
     public static final Identifier PLAY_PLAYER_SCORED_SOUND = new Identifier(LasertagMod.ID, "play_player_scored_sound");
     public static final Identifier PLAY_PLAYER_DEACTIVATED_SOUND = new Identifier(LasertagMod.ID, "play_player_deactivated_sound");
     public static final Identifier PLAY_PLAYER_ACTIVATED_SOUND = new Identifier(LasertagMod.ID, "play_player_activated_sound");
@@ -40,4 +38,16 @@ public class NetworkingConstants {
     public static final Identifier PLAYER_HIT_LASERTARGET = new Identifier(LasertagMod.ID, "player_hit_lasertarget");
     public static final Identifier PLAYER_HIT_PLAYER = new Identifier(LasertagMod.ID, "player_hit_player");
     public static final Identifier PLAYER_JOINED = new Identifier(LasertagMod.ID, "player_joined");
+    public static final Identifier SETTINGS_PRESET_ADDED = new Identifier(LasertagMod.ID, "settings_preset_added");
+    public static final Identifier SETTINGS_PRESET_REMOVED = new Identifier(LasertagMod.ID, "settings_preset_removed");
+    public static final Identifier CLIENT_TRIGGER_GAME_START = new Identifier(LasertagMod.ID, "client_trigger_game_start");
+    public static final Identifier CLIENT_TRIGGER_RELOAD_TEAM_CONFIG = new Identifier(LasertagMod.ID, "client_trigger_reload_team_config");
+    public static final Identifier CLIENT_TRIGGER_SETTING_RESET = new Identifier(LasertagMod.ID, "client_trigger_setting_reset");
+    public static final Identifier CLIENT_TRIGGER_SETTINGS_RESET = new Identifier(LasertagMod.ID, "client_trigger_settings_reset");
+    public static final Identifier CLIENT_TRIGGER_SETTING_CHANGE = new Identifier(LasertagMod.ID, "client_trigger_setting_change");
+    public static final Identifier CLIENT_TRIGGER_SAVE_PRESET = new Identifier(LasertagMod.ID, "client_trigger_save_preset");
+    public static final Identifier CLIENT_TRIGGER_LOAD_PRESET = new Identifier(LasertagMod.ID, "client_trigger_load_preset");
+    public static final Identifier CLIENT_TRIGGER_DELETE_PRESET = new Identifier(LasertagMod.ID, "client_trigger_delete_preset");
+    public static final Identifier CLIENT_TRIGGER_LOAD_MAP = new Identifier(LasertagMod.ID, "client_trigger_load_map");
+    public static final Identifier CLIENT_TRIGGER_PLAYER_KICK = new Identifier(LasertagMod.ID, "client_trigger_player_kick");
 }

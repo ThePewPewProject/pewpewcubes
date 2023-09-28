@@ -111,6 +111,9 @@ public class Items {
         Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "lasertarget"),
                 new BlockItem(Blocks.LASER_TARGET, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
 
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "game_manager"),
+                new BlockItem(Blocks.LASERTAG_GAME_MANAGER_BLOCK, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+
         // Normal items
         Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "lasertag_weapon"), LASERTAG_WEAPON);
         Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "lasertag_vest"), LASERTAG_VEST);

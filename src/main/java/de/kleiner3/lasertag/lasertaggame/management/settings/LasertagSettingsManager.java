@@ -105,9 +105,18 @@ public class LasertagSettingsManager implements IManager {
         settings = LasertagSettingsMap.fromJson(newSettingsJson);
     }
 
-    public void reset() {
+    public void reset(MinecraftServer s) {
         // Set the default settings
         settings = LasertagSettingsMap.createDefaultSettings();
+
+        persist(s);
+    }
+
+    public void reset(MinecraftServer s, String settingName) {
+        // Create default settings
+        var defaultSettings = LasertagSettingsMap.createDefaultSettings();
+
+        this.set(s, settingName, defaultSettings.get(settingName));
     }
 
     public LasertagSettingsMap getSettingsClone() {

@@ -45,6 +45,8 @@ public class LasertagSettingsPresetsManager {
                 LasertagMod.LOGGER.warn("Creation of new lasertag settings presets file in '" + lasertagSettingsPresetsFilePath + "' failed: " + e.getMessage());
             }
         }
+
+        presets.keySet().stream().forEach(s -> LasertagGameManager.getInstance().getPresetsNameManager().addPresetName(null, s));
     }
 
     public LasertagSettingsPresetsMap getPresets() {

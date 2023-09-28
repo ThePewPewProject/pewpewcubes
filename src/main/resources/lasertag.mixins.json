@@ -13,6 +13,8 @@
     "fastiter.WorldMixin"
   ],
   "client": [
+    "ClientPlayerEntityMixin",
+    "ClientPlayNetworkHandlerMixin",
     "EntityRendererMixin",
     "IntegratedServerLoaderMixin",
     "ItemRendererMixin",

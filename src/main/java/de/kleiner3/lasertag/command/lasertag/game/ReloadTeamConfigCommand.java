@@ -38,7 +38,7 @@ public class ReloadTeamConfigCommand extends ServerFeedbackCommand {
 
     static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
         lab.then(literal("reloadTeamConfig")
-                .requires(s -> s.hasPermissionLevel(1))
+                .requires(s -> s.hasPermissionLevel(4))
                 .executes(new ReloadTeamConfigCommand()));
     }
 }

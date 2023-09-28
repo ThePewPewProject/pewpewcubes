@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.command.CommandFeedback;
 import de.kleiner3.lasertag.command.ServerFeedbackCommand;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -21,9 +22,9 @@ public class LasertagSettingsPresetCommand extends ServerFeedbackCommand {
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
 
         var builder = new StringBuilder();
-        var presets = context.getSource().getServer().getLasertagServerManager().getSettingsPresetsManager().getPresets();
+        var presetNames = LasertagGameManager.getInstance().getPresetsNameManager().getSettingsPresetNames();
 
-        for (var presetName : presets.keySet()) {
+        for (var presetName : presetNames) {
             builder.append(presetName);
             builder.append(", ");
         }

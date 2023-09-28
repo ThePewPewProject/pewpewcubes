@@ -26,7 +26,7 @@ public class LoadPresetCommand extends ServerFeedbackCommand {
         var presetName = getString(context, "name");
         var server = context.getSource().getServer();
 
-        var successful = server.getLasertagServerManager().getSettingsPresetsManager().loadPreset(presetName, server);
+        var successful = context.getSource().getServer().getLasertagServerManager().getSettingsPresetsManager().loadPreset(presetName, server);
 
         if (successful) {
             return Optional.of(new CommandFeedback(Text.literal("Loaded settings preset '" + presetName + "'"), true, true));

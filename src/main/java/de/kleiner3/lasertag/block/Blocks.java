@@ -62,6 +62,9 @@ public class Blocks {
     public static final Block ARENA_PRESSURE_PLATE = new PressurePlateBlock(PressurePlateBlock.ActivationRule.MOBS, AbstractBlock.Settings.of(Material.STONE).requiresTool().noCollision().strength(0.5f));
     public static final Block LASER_TARGET = new LaserTargetBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f).luminance(2));
 
+    // Interactable blocks
+    public static final Block LASERTAG_GAME_MANAGER_BLOCK = new LasertagGameManagerBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f));
+
     public static void register() {
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "arena_block_orange"), ARENA_BLOCK_ORANGE);
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "arena_block_pink"), ARENA_BLOCK_PINK);
@@ -106,5 +109,7 @@ public class Blocks {
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "arena_block_dark"), ARENA_BLOCK_DARK);
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "arena_pressure_plate"), ARENA_PRESSURE_PLATE);
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "lasertarget"), LASER_TARGET);
+
+        Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "game_manager"), LASERTAG_GAME_MANAGER_BLOCK);
     }
 }

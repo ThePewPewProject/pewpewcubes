@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
+import de.kleiner3.lasertag.client.screen.LasertagGameManagerSettingsScreen;
 import de.kleiner3.lasertag.common.util.ConverterUtil;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -24,5 +25,9 @@ public class LasertagSettingChangedCallback implements ClientPlayNetworking.Play
         var primitive = ConverterUtil.stringToPrimitiveType(value);
 
         LasertagGameManager.getInstance().getSettingsManager().set(null, settingsName, primitive);
+
+        if (client.currentScreen instanceof LasertagGameManagerSettingsScreen lasertagGameManagerSettingsScreen) {
+            lasertagGameManagerSettingsScreen.resetList();
+        }
     }
 }
