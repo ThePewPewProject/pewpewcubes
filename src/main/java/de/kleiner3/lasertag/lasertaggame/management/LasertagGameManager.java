@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.lasertaggame.management;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.GsonBuilder;
 import com.google.gson.ToNumberPolicy;
+import de.kleiner3.lasertag.client.screen.LasertagTeamSelectorScreen;
 import de.kleiner3.lasertag.lasertaggame.management.deactivation.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.lasertaggame.management.gui.LasertagHudRenderManager;
 import de.kleiner3.lasertag.lasertaggame.management.players.LasertagPlayerNameManager;
@@ -14,11 +15,14 @@ import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamConfigManagerDeserializer;
 import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamDtoSerializer;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
+import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 
 import java.util.HashMap;
 
@@ -143,9 +147,28 @@ public class LasertagGameManager implements IManager {
         ServerPlayNetworking.send(client, NetworkingConstants.GAME_MANAGER_SYNC, buf);
     }
 
-    public void reloadTeamConfig() {
+    public void reloadTeamConfig(ServerWorld world) {
         teamManager.dispose();
         teamManager = new LasertagTeamManager();
+
+        var teamConfigJson = teamManager.toJson();
+
+        var buf = new PacketByteBuf(Unpooled.buffer());
+
+        buf.writeString(teamConfigJson);
+
+        ServerEventSending.sendToEveryone(world, NetworkingConstants.TEAM_CONFIG_RELOADED, buf);
+    }
+
+    public void setTeamConfig(LasertagTeamManager newTeamConfig) {
+        teamManager.dispose();
+        teamManager = newTeamConfig;
+
+        // Try to get the minecraft client
+        var client = MinecraftClient.getInstance();
+        if (client != null && client.currentScreen instanceof LasertagTeamSelectorScreen lasertagTeamSelectorScreen) {
+            lasertagTeamSelectorScreen.resetList();
+        }
     }
 
     //endregion

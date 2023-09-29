@@ -47,6 +47,7 @@
 	"block.lasertag.lasertarget": "Lasertarget",
 
 	"block.lasertag.game_manager": "Lasertag Game Manager",
+	"block.lasertag.team_selector": "Lasertag Team Selector",
 
 	"item.lasertag.lasertag_weapon": "Lasertag Weapon",
 	"item.lasertag.lasertag_vest": "Lasertag Vest",
@@ -76,7 +77,9 @@
 	"gui.save": "Save",
 	"gui.delete": "Delete",
 	"gui.kick": "Kick",
+
 	"gui.list_widget.empty": "No data",
+
 	"gui.game_manager.overview_screen_title": "Lasertag Game Manager",
 	"gui.game_manager.settings_button": "Settings...",
 	"gui.game_manager.settings.presets": "Presets...",
@@ -108,5 +111,8 @@
 	"gui.game_manager.start_game_button": "Start game",
 	"gui.game_manager.settings_screen_title": "Lasertag Settings",
 	"gui.game_manager.map_screen_title": "Lasertag Arena",
-	"gui.game_manager.teams_screen_title": "Lasertag Teams"
+	"gui.game_manager.teams_screen_title": "Lasertag Teams",
+
+	"gui.team_selector.title": "Select your team!",
+	"gui.team_selector.join_team": "Join"
 }

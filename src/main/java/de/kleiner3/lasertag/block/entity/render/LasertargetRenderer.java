@@ -2,7 +2,6 @@ package de.kleiner3.lasertag.block.entity.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.WallMountedBlock;
 import net.minecraft.client.render.OverlayTexture;

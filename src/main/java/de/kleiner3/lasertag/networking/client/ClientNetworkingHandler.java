@@ -31,6 +31,7 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_JOINED, new PlayerJoinedCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.MAP_LOADING_EVENT, new MapLoadingEventCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.SETTINGS_PRESET_ADDED, new SettingsPresetNameAddedCallback());
-        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.SETTINGS_PRESET_REMOVED, new SettingsPresetNameRemovedCallback());;
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.SETTINGS_PRESET_REMOVED, new SettingsPresetNameRemovedCallback());
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.TEAM_CONFIG_RELOADED, new TeamConfigReloadedCallback());
     }
 }

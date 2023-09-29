@@ -31,7 +31,7 @@ public class ReloadTeamConfigCommand extends ServerFeedbackCommand {
             playerOptional.ifPresent(playerEntity -> playerEntity.getInventory().clear());
         });
 
-        LasertagGameManager.getInstance().reloadTeamConfig();
+        LasertagGameManager.getInstance().reloadTeamConfig(world);
 
         return Optional.empty();
     }

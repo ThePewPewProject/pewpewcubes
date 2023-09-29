@@ -1,6 +1,6 @@
 package de.kleiner3.lasertag.block;
 
-import de.kleiner3.lasertag.block.entity.LasertagGameManagerBlockEntity;
+import de.kleiner3.lasertag.block.entity.LasertagTeamSelectorBlockEntity;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -13,28 +13,28 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 /**
- * The lasertag game manager block
+ * The lasertag team selector block
  *
  * @author Étienne Muser
  */
-public class LasertagGameManagerBlock extends BlockWithEntity {
+public class LasertagTeamSelectorBlock extends BlockWithEntity {
 
-    public LasertagGameManagerBlock(Settings settings) {
+    protected LasertagTeamSelectorBlock(Settings settings) {
         super(settings);
     }
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof LasertagGameManagerBlockEntity lasertagGameManagerBlockEntity) {
-            lasertagGameManagerBlockEntity.openScreen(player);
+        if (blockEntity instanceof LasertagTeamSelectorBlockEntity lasertagTeamSelectorBlockEntity) {
+            lasertagTeamSelectorBlockEntity.openScreen(player);
         }
         return ActionResult.SUCCESS;
     }
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new LasertagGameManagerBlockEntity(pos, state);
+        return new LasertagTeamSelectorBlockEntity(pos, state);
     }
 
     @Override

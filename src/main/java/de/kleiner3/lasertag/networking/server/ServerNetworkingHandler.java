@@ -23,5 +23,6 @@ public class ServerNetworkingHandler {
         ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.CLIENT_TRIGGER_DELETE_PRESET, new ClientTriggerDeletePresetCallback());
         ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.CLIENT_TRIGGER_LOAD_MAP, new ClientTriggerLoadMapCallback());
         ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.CLIENT_TRIGGER_PLAYER_KICK, new ClientTriggerPlayerKickCallback());
+        ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.CLIENT_TRIGGER_PLAYER_JOIN_TEAM, new ClientTriggerPlayerJoinTeamCallback());
     }
 }

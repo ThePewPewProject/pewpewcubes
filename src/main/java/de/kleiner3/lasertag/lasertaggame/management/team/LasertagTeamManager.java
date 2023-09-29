@@ -1,9 +1,13 @@
 package de.kleiner3.lasertag.lasertaggame.management.team;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.GsonBuilder;
 import de.kleiner3.lasertag.item.Items;
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamConfigManagerDeserializer;
+import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamDtoSerializer;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
@@ -262,6 +266,24 @@ public class LasertagTeamManager implements IManager {
         buffer.writeString(newValueJsonString);
 
         ServerEventSending.sendToEveryone(world, NetworkingConstants.TEAM_UPDATE, buffer);
+    }
+
+    public String toJson() {
+        var builder = new GsonBuilder();
+
+        // Register team serializer
+        builder.registerTypeAdapter(TeamDto.class, TeamDtoSerializer.getSerializer());
+
+        return builder.create().toJson(this);
+    }
+
+    public static LasertagTeamManager fromJson(String jsonString) {
+        var builder = new GsonBuilder();
+
+        // Register team serializer
+        builder.registerTypeAdapter(new TypeToken<HashMap<String, TeamDto>>() {}.getType(), TeamConfigManagerDeserializer.getDeserializer());
+
+        return builder.create().fromJson(jsonString, LasertagTeamManager.class);
     }
 
     @Override

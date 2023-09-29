@@ -32,7 +32,7 @@ public class ClientTriggerReloadTeamConfigCallback implements ServerPlayNetworki
                 playerOptional.ifPresent(playerEntity -> playerEntity.getInventory().clear());
             });
 
-            LasertagGameManager.getInstance().reloadTeamConfig();
+            LasertagGameManager.getInstance().reloadTeamConfig(world);
         });
     }
 }
