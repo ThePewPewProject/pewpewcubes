@@ -22,6 +22,7 @@ import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaChunkGenerator;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.block.Block;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -285,6 +286,9 @@ public class LasertagServerManager implements IManager, ITickable {
             return;
         }
 
+        // Get the old block state
+        var oldBlockState = this.server.getOverworld().getBlockState(target.getPos());
+
         LasertagGameManager.getInstance().getScoreManager().onPlayerScored(server.getOverworld(), shooter, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.LASERTARGET_HIT_SCORE));
         ServerEventSending.sendPlayerSoundEvent(shooter, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND);
 
@@ -297,13 +301,29 @@ public class LasertagServerManager implements IManager, ITickable {
         // Reactivate after configured amount of seconds
         var deactivationThread = ThreadUtil.createScheduledExecutor("lasertag-target-deactivation-thread-%d");
         deactivationThread.schedule(() -> {
+
+            // Get the old block state
+            var oldBlockStateReset = this.server.getOverworld().getBlockState(target.getPos());
+
             target.setDeactivated(false);
+
+            // Get the new block state
+            var newBlockState = this.server.getOverworld().getBlockState(target.getPos());
+
+            // Send lasertag updated to clients
+            this.server.getOverworld().updateListeners(target.getPos(),oldBlockState, newBlockState, Block.NOTIFY_LISTENERS);
 
             deactivationThread.shutdownNow();
         }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.LASERTARGET_DEACTIVATE_TIME), TimeUnit.SECONDS);
 
         // Add player to the players who hit the target
         target.addHitBy(shooter);
+
+        // Get the new block state
+        var newBlockState = this.server.getOverworld().getBlockState(target.getPos());
+
+        // Send lasertag updated to clients
+        this.server.getOverworld().updateListeners(target.getPos(),oldBlockState, newBlockState, Block.NOTIFY_LISTENERS);
     }
 
     /**

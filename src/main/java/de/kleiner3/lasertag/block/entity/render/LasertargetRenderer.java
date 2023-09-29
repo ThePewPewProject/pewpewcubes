@@ -2,6 +2,7 @@ package de.kleiner3.lasertag.block.entity.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.WallMountedBlock;
 import net.minecraft.client.render.OverlayTexture;
@@ -64,6 +65,10 @@ public class LasertargetRenderer extends GeoBlockRenderer<LaserTargetBlockEntity
         var r = 1.0f;
         var g = 0;
         var b = 0;
+
+        if (blockEntity.isDeactivated()) {
+            brightness = 0.0f;
+        }
 
         positionBlock(blockEntity, poseStack);
         this.render(lightsModel, blockEntity, partialTick, cameo, poseStack, bufferSource, bufferSource.getBuffer(cameo), 255, OverlayTexture.DEFAULT_UV, r, g, b, brightness);
