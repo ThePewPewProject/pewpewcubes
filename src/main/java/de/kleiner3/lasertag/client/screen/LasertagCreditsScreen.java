@@ -35,7 +35,7 @@ import java.util.List;
  * @author Étienne Muser
  */
 public class LasertagCreditsScreen extends Screen {
-    private static final Identifier MINECRAFT_TITLE_TEXTURE = new Identifier("textures/gui/title/minecraft.png");
+    private static final Identifier LASERTAG_TITLE_TEXTURE = new Identifier(LasertagMod.ID, "textures/gui/title/lasertag_mod_banner.png");
     private static final Identifier VIGNETTE_TEXTURE = new Identifier("textures/misc/vignette.png");
     private static final Text SEPARATOR_LINE = Text.literal("============").formatted(Formatting.WHITE);
     private static final String CENTERED_LINE_PREFIX = "           ";
@@ -218,20 +218,17 @@ public class LasertagCreditsScreen extends Screen {
         int l;
         this.time += delta * this.speed;
         this.renderBackground();
-        int i = this.width / 2 - 137;
-        int j = this.height + 50;
+        int xPos = this.width / 2 - 137;
+        int yPos = this.height + 50;
         float f = -this.time;
         matrices.push();
         matrices.translate(0.0, f, 0.0);
-        RenderSystem.setShaderTexture(0, MINECRAFT_TITLE_TEXTURE);
+        RenderSystem.setShaderTexture(0, LASERTAG_TITLE_TEXTURE);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.enableBlend();
-        this.drawWithOutline(i, j, (x, y) -> {
-            this.drawTexture(matrices, x, y, 0, 0, 155, 44);
-            this.drawTexture(matrices, x + 155, y, 0, 45, 155, 44);
-        });
+        DrawableHelper.drawTexture(matrices, xPos, yPos, 0, 0, 310, 100, 310, 100);
         RenderSystem.disableBlend();
-        int k = j + 100;
+        int k = yPos + 100;
         for (l = 0; l < this.credits.size(); ++l) {
             float g;
             if (l == this.credits.size() - 1 && (g = (float)k + f - (float)(this.height / 2 - 6)) < 0.0f) {
@@ -240,9 +237,9 @@ public class LasertagCreditsScreen extends Screen {
             if ((float)k + f + 12.0f + 8.0f > 0.0f && (float)k + f < (float)this.height) {
                 OrderedText orderedText = this.credits.get(l);
                 if (this.centeredLines.contains(l)) {
-                    this.textRenderer.drawWithShadow(matrices, orderedText, (float)(i + (274 - this.textRenderer.getWidth(orderedText)) / 2), (float)k, 0xFFFFFF);
+                    this.textRenderer.drawWithShadow(matrices, orderedText, (float)(xPos + (274 - this.textRenderer.getWidth(orderedText)) / 2), (float)k, 0xFFFFFF);
                 } else {
-                    this.textRenderer.drawWithShadow(matrices, orderedText, (float)i, (float)k, 0xFFFFFF);
+                    this.textRenderer.drawWithShadow(matrices, orderedText, (float)xPos, (float)k, 0xFFFFFF);
                 }
             }
             k += 12;
