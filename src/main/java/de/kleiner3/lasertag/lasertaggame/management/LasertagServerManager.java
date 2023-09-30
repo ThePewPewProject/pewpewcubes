@@ -6,7 +6,10 @@ import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.ITickable;
 import de.kleiner3.lasertag.lasertaggame.management.lasertargets.LasertargetManager;
+import de.kleiner3.lasertag.lasertaggame.management.map.LasertagMapManager;
+import de.kleiner3.lasertag.lasertaggame.management.music.LasertagMusicManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.management.settings.presets.LasertagSettingsPresetsManager;
 import de.kleiner3.lasertag.lasertaggame.management.spawnpoints.LasertagSpawnpointManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
@@ -16,8 +19,10 @@ import de.kleiner3.lasertag.lasertaggame.statistics.StatsCalculator;
 import de.kleiner3.lasertag.lasertaggame.timing.GameTickTimerTask;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
+import de.kleiner3.lasertag.worldgen.chunkgen.ArenaChunkGenerator;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.block.Block;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -51,6 +56,12 @@ public class LasertagServerManager implements IManager, ITickable {
 
     private LasertagSpawnpointManager spawnpointManager;
 
+    private LasertagSettingsPresetsManager settingsPresetsManager;
+
+    private LasertagMusicManager musicManager;
+
+    private LasertagMapManager mapManager;
+
     //endregion
 
     //region Private fields
@@ -66,6 +77,9 @@ public class LasertagServerManager implements IManager, ITickable {
 
         lasertargetManager = new LasertargetManager();
         spawnpointManager = new LasertagSpawnpointManager();
+        settingsPresetsManager = new LasertagSettingsPresetsManager();
+        musicManager = new LasertagMusicManager(server);
+        mapManager = new LasertagMapManager(server);
 
         isRunning = false;
     }
@@ -128,6 +142,10 @@ public class LasertagServerManager implements IManager, ITickable {
         var preGameDelayTimer = ThreadUtil.createScheduledExecutor("lasertag-server-pregame-delay-timer-thread-%d");
         var preGameDelay = LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PREGAME_DURATION);
 
+        if (server.getOverworld().getChunkManager().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator) {
+            musicManager.playIntro(arenaChunkGenerator.getConfig().getType());
+        }
+
         preGameDelayTimer.schedule(() -> {
 
             // Activate every player
@@ -146,7 +164,7 @@ public class LasertagServerManager implements IManager, ITickable {
 
             // Start game tick timer
             gameTickTimer = ThreadUtil.createScheduledExecutor("lasertag-server-game-tick-timer-thread-%d");
-            gameTickTimer.scheduleAtFixedRate(new GameTickTimerTask(this), 0, 1, TimeUnit.MINUTES);
+            gameTickTimer.scheduleAtFixedRate(new GameTickTimerTask(this), 0, 1, TimeUnit.SECONDS);
 
             // Stop the pre game delay timer
             preGameDelayTimer.shutdownNow();
@@ -268,6 +286,9 @@ public class LasertagServerManager implements IManager, ITickable {
             return;
         }
 
+        // Get the old block state
+        var oldBlockState = this.server.getOverworld().getBlockState(target.getPos());
+
         LasertagGameManager.getInstance().getScoreManager().onPlayerScored(server.getOverworld(), shooter, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.LASERTARGET_HIT_SCORE));
         ServerEventSending.sendPlayerSoundEvent(shooter, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND);
 
@@ -280,13 +301,29 @@ public class LasertagServerManager implements IManager, ITickable {
         // Reactivate after configured amount of seconds
         var deactivationThread = ThreadUtil.createScheduledExecutor("lasertag-target-deactivation-thread-%d");
         deactivationThread.schedule(() -> {
+
+            // Get the old block state
+            var oldBlockStateReset = this.server.getOverworld().getBlockState(target.getPos());
+
             target.setDeactivated(false);
+
+            // Get the new block state
+            var newBlockState = this.server.getOverworld().getBlockState(target.getPos());
+
+            // Send lasertag updated to clients
+            this.server.getOverworld().updateListeners(target.getPos(),oldBlockState, newBlockState, Block.NOTIFY_LISTENERS);
 
             deactivationThread.shutdownNow();
         }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.LASERTARGET_DEACTIVATE_TIME), TimeUnit.SECONDS);
 
         // Add player to the players who hit the target
         target.addHitBy(shooter);
+
+        // Get the new block state
+        var newBlockState = this.server.getOverworld().getBlockState(target.getPos());
+
+        // Send lasertag updated to clients
+        this.server.getOverworld().updateListeners(target.getPos(),oldBlockState, newBlockState, Block.NOTIFY_LISTENERS);
     }
 
     /**
@@ -328,8 +365,11 @@ public class LasertagServerManager implements IManager, ITickable {
      * This method is called every minute when the game is running
      */
     @Override
-    public void doTick() {
-        // Here the music can be started
+    public void doTick(boolean isLastNormalTick) {
+        if (!(server.getOverworld().getChunkManager().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator)) {
+            return;
+        }
+        this.musicManager.tick(arenaChunkGenerator.getConfig().getType(), isLastNormalTick);
     }
 
     @Override
@@ -337,6 +377,22 @@ public class LasertagServerManager implements IManager, ITickable {
 
         lasertagGameOver();
     }
+
+    @Override
+    public void thirtySecondsTick() {
+        if (!(server.getOverworld().getChunkManager().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator)) {
+            return;
+        }
+        this.musicManager.playOutro(arenaChunkGenerator.getConfig().getType());
+    }
+
+    public LasertagSettingsPresetsManager getSettingsPresetsManager() {
+        return this.settingsPresetsManager;
+    }
+
+    public LasertagMapManager getMapManager() { return this.mapManager; }
+
+    public LasertagSpawnpointManager getSpawnpointManager() { return this.spawnpointManager; }
 
     //endregion
 
@@ -354,7 +410,7 @@ public class LasertagServerManager implements IManager, ITickable {
                 continue;
             }
 
-            // Set player to adventure gamemode
+            // Set player to spectator gamemode
             player.changeGameMode(GameMode.SPECTATOR);
 
             // Get all spawnpoints
@@ -387,8 +443,16 @@ public class LasertagServerManager implements IManager, ITickable {
             var destination = spawnpoints.get(idx);
             player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
 
-            // Set player to adventure gamemode
-            player.changeGameMode(GameMode.ADVENTURE);
+            // Set player to survival by default -> player can break blocks
+            var newGamemode = GameMode.SURVIVAL;
+
+            // If setting miningFatigueEnabled is true
+            if (LasertagGameManager.getInstance().getSettingsManager().get(SettingDescription.MINING_FATIGUE_ENABLED)) {
+                // Set player to adventure game mode -> player can't break blocks
+                newGamemode = GameMode.ADVENTURE;
+            }
+
+            player.changeGameMode(newGamemode);
 
             // Get spawn pos
             var spawnPos = new BlockPos(destination.getX(), destination.getY() + 1, destination.getZ());
@@ -473,7 +537,7 @@ public class LasertagServerManager implements IManager, ITickable {
         // Deactivate every player
         LasertagGameManager.getInstance().getDeactivatedManager().deactivateAll(world, server.getPlayerManager());
 
-        // Teleport players back to spawn
+        // Teleport players to origin
         LasertagGameManager.getInstance().getTeamManager().forEachPlayer(((team, playerUuid) -> {
             var player = server.getPlayerManager().getPlayer(playerUuid);
 
@@ -492,12 +556,14 @@ public class LasertagServerManager implements IManager, ITickable {
                     World.OVERWORLD,
                     origin, 0.0F, true, false);
 
-            // Set player to adventure gamemode
             player.changeGameMode(GameMode.ADVENTURE);
         }));
 
         // Reset lasertargets
         lasertargetManager.resetLasertargets();
+
+        // Reset music manager
+        musicManager.reset();
 
         try {
             // Calculate stats

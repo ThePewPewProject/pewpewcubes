@@ -117,4 +117,17 @@ public class TeamConfigManager {
                 .filter(team -> team.id() == id)
                 .findFirst();
     }
+
+    /**
+     * Gets the team identified by its name
+     *
+     * @param name The name of the team to find
+     * @return
+     */
+    public Optional<TeamDto> getTeamOfName(String name) {
+
+        return teamConfig.values().stream()
+                .filter(team -> team.name().equals(name))
+                .findFirst();
+    }
 }

@@ -19,7 +19,7 @@ import static net.minecraft.server.command.CommandManager.literal;
  */
 public class ResetSettingsCommand extends ServerFeedbackCommand {
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
-        LasertagGameManager.getInstance().getSettingsManager().reset();
+        LasertagGameManager.getInstance().getSettingsManager().reset(context.getSource().getServer());
 
         return Optional.of(new CommandFeedback(Text.literal("Settings are reset."), false, true));
     }

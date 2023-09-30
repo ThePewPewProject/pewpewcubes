@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
  */
 @Environment(EnvType.CLIENT)
 public class BlockModelProvider implements ModelResourceProvider {
-    // TODO: Register all block model providers
 
     public static final Identifier ORANGE_ARENA_BLOCK = new Identifier(LasertagMod.ID, "block/arena_block_orange");
     public static final Identifier PINK_ARENA_BLOCK = new Identifier(LasertagMod.ID, "block/arena_block_pink");

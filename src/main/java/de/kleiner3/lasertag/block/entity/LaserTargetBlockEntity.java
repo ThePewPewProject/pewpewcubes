@@ -17,7 +17,7 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,11 +28,38 @@ public class LaserTargetBlockEntity extends BlockEntity implements IAnimatable {
     /**
      * Represents the uuids of the players who hit the target already.
      */
-    private List<UUID> hitBy = new LinkedList<>();
+    private List<UUID> hitBy = new ArrayList<>();
     private boolean deactivated = false;
 
     public LaserTargetBlockEntity(BlockPos pos, BlockState state) {
         super(Entities.LASER_TARGET_ENTITY, pos, state);
+    }
+
+    @Override
+    protected void writeNbt(NbtCompound nbt) {
+        nbt.putBoolean("deactivated", deactivated);
+
+        var hitByFlattened = new ArrayList<Long>();
+        for (var uuid : hitBy) {
+            hitByFlattened.add(uuid.getMostSignificantBits());
+            hitByFlattened.add(uuid.getLeastSignificantBits());
+        }
+        nbt.putLongArray("hitBy", hitByFlattened);
+
+        super.writeNbt(nbt);
+    }
+
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+
+        var hitByFlattened = nbt.getLongArray("hitBy");
+        hitBy = new ArrayList<>();
+        for(int i = 0; i < hitByFlattened.length; i += 2) {
+            hitBy.add(new UUID(hitByFlattened[i], hitByFlattened[i+1]));
+        }
+
+        deactivated = nbt.getBoolean("deactivated");
     }
 
     @Override
@@ -47,7 +74,7 @@ public class LaserTargetBlockEntity extends BlockEntity implements IAnimatable {
 
     public void reset() {
         deactivated = false;
-        hitBy = new LinkedList<>();
+        hitBy = new ArrayList<>();
     }
 
     public boolean alreadyHitBy(PlayerEntity p) {
@@ -79,8 +106,7 @@ public class LaserTargetBlockEntity extends BlockEntity implements IAnimatable {
         return PlayState.CONTINUE;
     }
 
-    // All you need to do here is add your animation controllers to the
-    // AnimationData
+    // All you need to do here is add your animation controllers to the AnimationData
     @Override
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController(this, "controller", 16, this::predicate));

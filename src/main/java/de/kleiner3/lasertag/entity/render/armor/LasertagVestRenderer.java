@@ -44,8 +44,10 @@ public class LasertagVestRenderer extends GeoArmorRenderer<LasertagVestItem> {
     @Override
     public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack, LivingEntity entity,
                        EquipmentSlot slot, int light, BipedEntityModel<LivingEntity> contextModel) {
+        this.setModel(VEST_MODEL);
         super.render(matrices, vertexConsumers, stack, entity, slot, light, contextModel);
 
+        this.setModel(LIGHTS_MODEL);
         RenderLayer cameo = RenderLayer.getEyes(LIGHTS_MODEL.getTextureResource(null));
         matrices.push();
 

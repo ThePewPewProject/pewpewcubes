@@ -96,13 +96,31 @@ public class LasertagSettingsManager implements IManager {
         persist(s, key, value.toString());
     }
 
+    public void set(MinecraftServer s, LasertagSettingsMap newSettings) {
+        settings = newSettings;
+        persist(s);
+    }
+
     public void set(String newSettingsJson) {
         settings = LasertagSettingsMap.fromJson(newSettingsJson);
     }
 
-    public void reset() {
+    public void reset(MinecraftServer s) {
         // Set the default settings
         settings = LasertagSettingsMap.createDefaultSettings();
+
+        persist(s);
+    }
+
+    public void reset(MinecraftServer s, String settingName) {
+        // Create default settings
+        var defaultSettings = LasertagSettingsMap.createDefaultSettings();
+
+        this.set(s, settingName, defaultSettings.get(settingName));
+    }
+
+    public LasertagSettingsMap getSettingsClone() {
+        return new LasertagSettingsMap(settings);
     }
 
     //endregion
@@ -128,7 +146,8 @@ public class LasertagSettingsManager implements IManager {
     //region Persistence
 
     /**
-     * Persist the setting changes to the file system.
+     * Persist the setting change to the file system and sends
+     * a setting changed event to every client.
      *
      * @param server The server this is executed on. null if on the client
      * @param key    The name of the setter method which executes the persist method
@@ -147,6 +166,35 @@ public class LasertagSettingsManager implements IManager {
         // Write to packet
         buf.writeString(key);
         buf.writeString(value);
+
+        // Send update to clients
+        ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.SETTING_CHANGED, buf);
+
+        try {
+            persistUnsafe();
+        } catch (IOException e) {
+            LasertagMod.LOGGER.warn("Failed to persist lasertag setting: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Persist the settings change to the file system and sends
+     * a settings changed event to every client.
+     *
+     * @param server The server this is executed on. null if on the client
+     */
+    private void persist(MinecraftServer server) {
+        // Check if this is executed on client
+        if (server == null) {
+            // Do not persist lasertag setting on client
+            return;
+        }
+
+        // Create packet
+        var buf = new PacketByteBuf(Unpooled.buffer());
+
+        // Write to packet
+        buf.writeString(settings.toJson());
 
         // Send update to clients
         ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.SETTINGS_CHANGED, buf);

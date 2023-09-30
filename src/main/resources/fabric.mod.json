@@ -6,13 +6,13 @@
   "name": "Lasertag mod",
   "description": "A mod to play lasertag in minecraft with your friends.",
   "authors": [
-    "Étienne Muser aka Der_fbs aka fibs",
-    "Kevin Janzen aka ZaboKev aka K e v",
-    "Timon Maier aka _Timon aka Dr. Diarrhö",
+    "Etienne Muser",
+    "K e v",
+    "_Timon",
     "ValliHalli"
   ],
   "contributors": [
-    "Robert Senin aka Sogeking_1024",
+    "Robert Senin",
     "Aaron Werner aka Sol Astrum"
   ],
 
@@ -40,7 +40,8 @@
   "custom": {
 	"loom:injected_interfaces": {
 		"net/minecraft/server/MinecraftServer": ["de/kleiner3/lasertag/lasertaggame/ILasertagServerManagerAccessor"],
-		"net/minecraft/entity/player/PlayerEntity": ["de/kleiner3/lasertag/lasertaggame/ILasertagPlayer"],
+		"net/minecraft/entity/player/PlayerEntity": ["de/kleiner3/lasertag/lasertaggame/ILasertagPlayer", "de/kleiner3/lasertag/client/screen/ILasertagGameManagerScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagTeamSelectorScreenOpener"],
+		"net/minecraft/client/network/ClientPlayerEntity": ["de/kleiner3/lasertag/client/screen/ILasertagGameManagerScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagTeamSelectorScreenOpener"],
         "net/minecraft/world/World": ["de/kleiner3/lasertag/common/util/fastiter/IFastWorldIter"]
     }
   },

@@ -65,6 +65,10 @@ public class LasertargetRenderer extends GeoBlockRenderer<LaserTargetBlockEntity
         var g = 0;
         var b = 0;
 
+        if (blockEntity.isDeactivated()) {
+            brightness = 0.0f;
+        }
+
         positionBlock(blockEntity, poseStack);
         this.render(lightsModel, blockEntity, partialTick, cameo, poseStack, bufferSource, bufferSource.getBuffer(cameo), 255, OverlayTexture.DEFAULT_UV, r, g, b, brightness);
         poseStack.pop();

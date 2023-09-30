@@ -1,6 +1,9 @@
 package de.kleiner3.lasertag.common.util;
 
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtInt;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtLongArray;
 
 /**
  * Util class for NbtCompound operations
@@ -15,6 +18,7 @@ public class NbtUtil {
      * @return The converted nbt
      */
     public static NbtCompound convertLitematicToNbt(NbtCompound litematic, String mainRegionName) {
+
         // Create new nbt compound
         var nbt = new NbtCompound();
 
@@ -66,7 +70,7 @@ public class NbtUtil {
         }
 
         // Add tile entities
-        if (!addTileEntities(nbt, mainRegionCompound, paletteList)) {
+        if (!addTileEntities(nbt, mainRegionCompound, sizeCompound)) {
             return null;
         }
 
@@ -100,6 +104,7 @@ public class NbtUtil {
     }
 
     private static boolean addEntities(NbtCompound nbt, NbtCompound litematicMainRegion) {
+
         // Get the entities element
         var entitiesElement = litematicMainRegion.get("Entities");
 
@@ -155,7 +160,8 @@ public class NbtUtil {
     }
 
 
-    private static boolean addTileEntities(NbtCompound nbt, NbtCompound litematicMainRegion, NbtList blockPalette) {
+    private static boolean addTileEntities(NbtCompound nbt, NbtCompound litematicMainRegion, NbtCompound size) {
+
         // Get the tile entities element
         var tileEntitiesElement = litematicMainRegion.get("TileEntities");
 
@@ -180,7 +186,7 @@ public class NbtUtil {
             }
 
             // Add to list
-            if (!addTileEntityToList(blockList, tileEntityCompound, blockPalette)) {
+            if (!addTileEntityToList(blockList, tileEntityCompound, size)) {
                 return false;
             }
         }
@@ -188,7 +194,7 @@ public class NbtUtil {
         return true;
     }
 
-    private static boolean addTileEntityToList(NbtList list, NbtCompound litematicTileEntity, NbtList blockPalette) {
+    private static boolean addTileEntityToList(NbtList list, NbtCompound litematicTileEntity, NbtCompound size) {
         // Get pos of entity
         var xPosElement = litematicTileEntity.get("x");
         var yPosElement = litematicTileEntity.get("y");
@@ -205,72 +211,27 @@ public class NbtUtil {
             return false;
         }
 
+        // Get position
+        var x = xPos.intValue();
+        var y = yPos.intValue();
+        var z = zPos.intValue();
+
         // Remove pos from litematic entity
         litematicTileEntity.remove("x");
         litematicTileEntity.remove("y");
         litematicTileEntity.remove("z");
 
-        // Find the block
-        var blocks = list.stream().filter(nbtElement -> {
-            if (!(nbtElement instanceof NbtCompound nbtCompound)) {
-                return false;
-            }
+        // Get size
+        var sizeY = ((NbtInt)size.get("y")).intValue();
+        var sizeZ = ((NbtInt)size.get("z")).intValue();
 
-            var posElement = nbtCompound.get("pos");
+        // Get index of block in array
+        var blockIndex = (x * sizeZ * sizeY) + (y * sizeZ) + z;
 
-            if (!(posElement instanceof NbtList posList)) {
-                return false;
-            }
-
-            var blockXPosElement = posList.get(0);
-            var blockYPosElement = posList.get(1);
-            var blockZPosElement = posList.get(2);
-
-            if (!(blockXPosElement instanceof NbtInt blockXPos)) {
-                return false;
-            }
-            if (!(blockYPosElement instanceof NbtInt blockYPos)) {
-                return false;
-            }
-            if (!(blockZPosElement instanceof NbtInt blockZPos)) {
-                return false;
-            }
-
-            return blockXPos.equals(xPos) &&
-                    blockYPos.equals(yPos) &&
-                    blockZPos.equals(zPos);
-        });
-
-        var blockElementOptional = blocks.findFirst();
-
-        if (blockElementOptional.isEmpty()) {
-            return false;
-        }
-
-        var blockElement = blockElementOptional.get();
+        // Get the block
+        var blockElement = list.get(blockIndex);
 
         if (!(blockElement instanceof NbtCompound block)) {
-            return false;
-        }
-
-        // Get block state element
-        var blockStateElement = block.get("state");
-
-        if (!(blockStateElement instanceof NbtInt blockState)) {
-            return false;
-        }
-
-        // Get palette element
-        var paletteElement = blockPalette.get(blockState.intValue());
-
-        if (!(paletteElement instanceof NbtCompound paletteBlockState)) {
-            return false;
-        }
-
-        // Get the block name element
-        var blockNameElement = paletteBlockState.get("Name");
-
-        if (!(blockNameElement instanceof NbtString blockName)) {
             return false;
         }
 
@@ -279,6 +240,7 @@ public class NbtUtil {
     }
 
     private static boolean addBlockList(NbtCompound nbt, NbtCompound litematicMainRegion, NbtCompound size, NbtList palette) {
+
         // Create block list
         var list = new NbtList();
 
@@ -302,6 +264,7 @@ public class NbtUtil {
         var maxEntryValue = (1L << bits) - 1L;
 
         // Iterate over every possible block
+        // DO NOT CHANGE THE ORDER OF THIS NESTED LOOP OR IT WILL BREAK THE ADD TILE ENTITY METHOD
         for (long x = 0; x < sizeX; x++) {
             for (long y = 0; y < sizeY; y++) {
                 for (long z = 0; z < sizeZ; z++) {

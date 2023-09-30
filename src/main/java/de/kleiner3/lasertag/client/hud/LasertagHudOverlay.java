@@ -53,6 +53,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
         renderTimer(renderer, matrixStack, renderData);
         renderProgressBar(renderer, matrixStack, renderData);
         renderStartingIn(renderer, matrixStack, renderData);
+        renderGameOver(renderer, matrixStack, renderData);
     }
 
     private void renderStartingIn(TextRenderer renderer, MatrixStack matrices, LasertagHudRenderManager renderData) {
@@ -100,6 +101,44 @@ public class LasertagHudOverlay implements HudRenderCallback {
                 DurationUtils.toString(
                         Duration.ofSeconds((LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAY_TIME) * 60L) - renderData.gameTime)),
                 renderData.wMid, LasertagHudRenderManager.textPadding, 0xFFFFFF);
+    }
+
+    private void renderGameOver(TextRenderer renderer, MatrixStack matrices, LasertagHudRenderManager renderData) {
+
+        var winnerTeamId = renderData.lastGameWinnerId;
+
+        if (winnerTeamId == -1) {
+            return;
+        }
+
+        var winnerTeamOptional = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfId(winnerTeamId);
+
+        winnerTeamOptional.ifPresent(winnerTeam -> {
+
+            matrices.push();
+
+            var textColor = 0xFFFFFFFF;
+
+            matrices.scale(2, 2, 2);
+            DrawableHelper.drawCenteredText(matrices, renderer, "GAME OVER", renderData.wMid / 2, renderData.hMid / 2 - 15, textColor);
+
+            matrices.scale(0.5F, 0.5F, 0.5F);
+            var beginningString = "Team ";
+            var endString = " won!";
+            var beginningAndNameString = beginningString + winnerTeam.name();
+            var wholeString = beginningAndNameString + endString;
+            var widthOfBeginningString = renderer.getWidth(beginningString);
+            var widthOfBeginningAndName = renderer.getWidth(beginningAndNameString);
+            var widthOfWholeString = renderer.getWidth(wholeString);
+            var textStartX = renderData.wMid - (widthOfWholeString / 2);
+            var textY = renderData.hMid + 10;
+
+            renderer.draw(matrices, beginningString, textStartX, textY, textColor);
+            renderer.draw(matrices, winnerTeam.name(), textStartX + widthOfBeginningString, textY, winnerTeam.color().getValue());
+            renderer.draw(matrices, endString, textStartX + widthOfBeginningAndName, textY, textColor);
+
+            matrices.pop();
+        });
     }
 
     //endregion

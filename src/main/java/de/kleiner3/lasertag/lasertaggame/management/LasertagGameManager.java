@@ -3,21 +3,26 @@ package de.kleiner3.lasertag.lasertaggame.management;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.GsonBuilder;
 import com.google.gson.ToNumberPolicy;
+import de.kleiner3.lasertag.client.screen.LasertagTeamSelectorScreen;
 import de.kleiner3.lasertag.lasertaggame.management.deactivation.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.lasertaggame.management.gui.LasertagHudRenderManager;
 import de.kleiner3.lasertag.lasertaggame.management.players.LasertagPlayerNameManager;
 import de.kleiner3.lasertag.lasertaggame.management.score.LasertagScoreManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.LasertagSettingsManager;
+import de.kleiner3.lasertag.lasertaggame.management.settings.presets.LasertagSettingsPresetsNameManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.LasertagTeamManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamConfigManagerDeserializer;
 import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamDtoSerializer;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
+import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 
 import java.util.HashMap;
 
@@ -52,6 +57,8 @@ public class LasertagGameManager implements IManager {
 
     private LasertagSettingsManager settingsManager;
 
+    private LasertagSettingsPresetsNameManager presetsNameManager;
+
     private LasertagTeamManager teamManager;
 
     private LasertagScoreManager scoreManager;
@@ -65,6 +72,7 @@ public class LasertagGameManager implements IManager {
     private LasertagGameManager() {
         deactivatedManager = new PlayerDeactivatedManager();
         settingsManager = new LasertagSettingsManager();
+        presetsNameManager = new LasertagSettingsPresetsNameManager();
         teamManager = new LasertagTeamManager();
         scoreManager = new LasertagScoreManager();
         hudRenderManager = new LasertagHudRenderManager();
@@ -79,6 +87,10 @@ public class LasertagGameManager implements IManager {
 
     public LasertagSettingsManager getSettingsManager() {
         return settingsManager;
+    }
+
+    public LasertagSettingsPresetsNameManager getPresetsNameManager() {
+        return presetsNameManager;
     }
 
     public LasertagHudRenderManager getHudRenderManager() {
@@ -106,7 +118,7 @@ public class LasertagGameManager implements IManager {
     public static LasertagGameManager fromJson(String jsonString) {
         var builder = new GsonBuilder();
 
-        // Set number stategy
+        // Set number strategy
         builder.setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE);
 
         // Register team serializer
@@ -133,6 +145,30 @@ public class LasertagGameManager implements IManager {
 
         // Send to client
         ServerPlayNetworking.send(client, NetworkingConstants.GAME_MANAGER_SYNC, buf);
+    }
+
+    public void reloadTeamConfig(ServerWorld world) {
+        teamManager.dispose();
+        teamManager = new LasertagTeamManager();
+
+        var teamConfigJson = teamManager.toJson();
+
+        var buf = new PacketByteBuf(Unpooled.buffer());
+
+        buf.writeString(teamConfigJson);
+
+        ServerEventSending.sendToEveryone(world, NetworkingConstants.TEAM_CONFIG_RELOADED, buf);
+    }
+
+    public void setTeamConfig(LasertagTeamManager newTeamConfig) {
+        teamManager.dispose();
+        teamManager = newTeamConfig;
+
+        // Try to get the minecraft client
+        var client = MinecraftClient.getInstance();
+        if (client != null && client.currentScreen instanceof LasertagTeamSelectorScreen lasertagTeamSelectorScreen) {
+            lasertagTeamSelectorScreen.resetList();
+        }
     }
 
     //endregion

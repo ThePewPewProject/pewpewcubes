@@ -1,0 +1,70 @@
+{
+  "procedural_arena_intro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "procedural_arena_music": {
+    "subtitle": "subtitles.lasertag.music",
+    "sounds": [
+      "lasertag:procedural_arena_music_0"
+    ]
+  },
+  "procedural_arena_outro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+
+  "jungle_arena_intro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "jungle_arena_music": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "jungle_arena_outro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+
+  "desert_arena_intro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "desert_arena_music": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "desert_arena_outro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+
+  "flower_forest_arena_intro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "flower_forest_arena_music": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "flower_forest_arena_outro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+
+  "medieval_city_arena_intro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "medieval_city_arena_music": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+  "medieval_city_arena_outro": {
+    "subtitle": "subtitles.lasertag.music"
+  },
+
+  "laserweapon_fire_sound": {
+    "subtitle": "subtitles.lasertag.weapon_fire_sound",
+    "sounds": [
+      "lasertag:fire_sound_1",
+      "lasertag:fire_sound_2",
+      "lasertag:fire_sound_3",
+      "lasertag:fire_sound_4",
+      "lasertag:fire_sound_5",
+      "lasertag:fire_sound_6",
+      "lasertag:fire_sound_7",
+      "lasertag:fire_sound_8",
+      "lasertag:fire_sound_9",
+      "lasertag:fire_sound_10"
+    ]
+  }
+}

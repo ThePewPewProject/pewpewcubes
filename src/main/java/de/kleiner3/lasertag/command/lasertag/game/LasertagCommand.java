@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.command.lasertag.game;
 
 import com.mojang.brigadier.CommandDispatcher;
+import de.kleiner3.lasertag.command.lasertag.game.presets.LasertagSettingsPresetCommand;
 import de.kleiner3.lasertag.command.lasertag.game.settings.LasertagSettingsCommand;
 import de.kleiner3.lasertag.command.lasertag.game.settings.ResetSettingsCommand;
 import net.minecraft.server.command.ServerCommandSource;
@@ -22,6 +23,10 @@ public class LasertagCommand {
         LeaveLasertagTeamCommand.register(cmd);
         LasertagSettingsCommand.register(cmd);
         ResetSettingsCommand.register(cmd);
+        KickPlayerCommand.register(cmd);
+        ReloadTeamConfigCommand.register(cmd);
+        LasertagSettingsPresetCommand.register(cmd);
+        LoadMapCommand.register(cmd);
 
         dispatcher.register(cmd);
     }

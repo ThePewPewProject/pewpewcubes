@@ -9,11 +9,18 @@ public interface ITickable {
 
     /**
      * Called on every tick
+     *
+     * @param isLastNormalTick Flag to indicate whether this tick is the last normal tick
      */
-    void doTick();
+    void doTick(boolean isLastNormalTick);
 
     /**
      * Called on the last tick
      */
     void endTick();
+
+    /**
+     * Called 30 seconds before end
+     */
+    void thirtySecondsTick();
 }

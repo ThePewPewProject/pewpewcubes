@@ -8,20 +8,25 @@
     "MinecraftServerMixin",
     "PlayerEntityMixin",
     "ServerPlayerEntityMixin",
+    "ServerPlayNetworkHandlerMixin",
     "WorldPresetsMixin",
     "fastiter.WorldMixin"
   ],
   "client": [
+    "ClientPlayerEntityMixin",
+    "ClientPlayNetworkHandlerMixin",
     "EntityRendererMixin",
     "IntegratedServerLoaderMixin",
     "ItemRendererMixin",
     "LivingEntityRendererMixin",
+    "MusicTrackerMixin",
     "PlayerEntityRendererMixin",
     "gui.InGameHudMixin",
     "gui.MoreWorldOptionsDialogMixin",
     "gui.PlayerListHudMixin"
   ],
   "server": [
+    "DedicatedServerWatchdogMixin"
   ],
   "injectors": {
     "defaultRequire": 1

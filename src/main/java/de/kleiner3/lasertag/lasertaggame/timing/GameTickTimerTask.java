@@ -14,7 +14,7 @@ import java.util.TimerTask;
 public class GameTickTimerTask extends TimerTask {
     private final ITickable game;
 
-    private int tickNo = -1;
+    private int seconds = -1;
 
     public GameTickTimerTask(ITickable game) {
         this.game = game;
@@ -22,13 +22,26 @@ public class GameTickTimerTask extends TimerTask {
 
     @Override
     public void run() {
-        ++tickNo;
-        game.doTick();
+        ++seconds;
 
-        if (tickNo == LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAY_TIME)) {
-            tickNo = -1;
+        var gameDurationSeconds = LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAY_TIME) * 60;
 
+        // If is 30 seconds before end
+        if (gameDurationSeconds - seconds == 30) {
+            game.thirtySecondsTick();
+            return;
+        }
+
+        // If is last tick
+        if (seconds == gameDurationSeconds) {
+            seconds = -1;
             game.endTick();
+            return;
+        }
+
+        // Else do regular tick every 60 seconds
+        if (seconds % 60 == 0) {
+            game.doTick(gameDurationSeconds - seconds == 60);
         }
     }
 }
