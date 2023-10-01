@@ -48,6 +48,7 @@
 
 	"block.lasertag.game_manager": "Lasertag Game Manager",
 	"block.lasertag.team_selector": "Lasertag Team Selector",
+	"block.lasertag.lasertag_credits_button": "Lasertag Credits Button",
 
 	"item.lasertag.lasertag_weapon": "Lasertag Weapon",
 	"item.lasertag.lasertag_vest": "Lasertag Vest",

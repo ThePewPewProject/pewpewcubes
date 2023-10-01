@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.mixin;
 
+import de.kleiner3.lasertag.client.screen.ILasertagCreditsScreenOpener;
 import de.kleiner3.lasertag.client.screen.ILasertagGameManagerScreenOpener;
 import de.kleiner3.lasertag.client.screen.ILasertagTeamSelectorScreenOpener;
 import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
@@ -15,7 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
  * @author Étienne Muser
  */
 @Mixin(PlayerEntity.class)
-public abstract class PlayerEntityMixin implements ILasertagPlayer, ILasertagGameManagerScreenOpener, ILasertagTeamSelectorScreenOpener {
+public abstract class PlayerEntityMixin implements ILasertagPlayer, ILasertagGameManagerScreenOpener, ILasertagTeamSelectorScreenOpener, ILasertagCreditsScreenOpener {
 
     @Override
     public void onDeactivated() {
@@ -43,6 +44,11 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer, ILasertagGam
 
     @Override
     public void openLasertagTeamSelectorScreen() {
+        // Do nothing - may not be a client player
+    }
+
+    @Override
+    public void openLasertagCreditsScreen(PlayerEntity player) {
         // Do nothing - may not be a client player
     }
 }

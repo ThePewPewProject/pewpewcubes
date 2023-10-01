@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.entity;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.Blocks;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
+import de.kleiner3.lasertag.block.entity.LasertagCreditsButtonBlockEntity;
 import de.kleiner3.lasertag.block.entity.LasertagGameManagerBlockEntity;
 import de.kleiner3.lasertag.block.entity.LasertagTeamSelectorBlockEntity;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -23,6 +24,7 @@ public class Entities {
     public static BlockEntityType<LaserTargetBlockEntity> LASER_TARGET_ENTITY;
     public static BlockEntityType<LasertagGameManagerBlockEntity> LASERTAG_GAME_MANAGER_BLOCK_ENTITY;
     public static BlockEntityType<LasertagTeamSelectorBlockEntity> LASERTAG_TEAM_SELECTOR_BLOCK_ENTITY;
+    public static BlockEntityType<LasertagCreditsButtonBlockEntity> LASERTAG_CREDITS_BLOCK_ENTITY;
 
     // Register all entities
     public static EntityType<LaserRayEntity> LASER_RAY;
@@ -47,5 +49,10 @@ public class Entities {
                 Registry.BLOCK_ENTITY_TYPE,
                 new Identifier(LasertagMod.ID, "lasertag_team_selector_block_entity"),
                 FabricBlockEntityTypeBuilder.create(LasertagTeamSelectorBlockEntity::new, Blocks.LASERTAG_TEAM_SELECTOR_BLOCK).build());
+
+        LASERTAG_CREDITS_BLOCK_ENTITY = Registry.register(
+                Registry.BLOCK_ENTITY_TYPE,
+                new Identifier(LasertagMod.ID, "lasertag_credits_button_block_entity"),
+                FabricBlockEntityTypeBuilder.create(LasertagCreditsButtonBlockEntity::new, Blocks.LASERTAG_CREDITS_BUTTON).build());
     }
 }

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/button_pressed",
+  "textures": {
+    "texture": "lasertag:block/lasertag_credits_button"
+  }
+}
