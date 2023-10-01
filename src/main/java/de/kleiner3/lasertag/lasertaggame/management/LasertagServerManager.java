@@ -11,7 +11,6 @@ import de.kleiner3.lasertag.lasertaggame.management.music.LasertagMusicManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.management.settings.presets.LasertagSettingsPresetsManager;
 import de.kleiner3.lasertag.lasertaggame.management.spawnpoints.LasertagSpawnpointManager;
-import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamDtoSerializer;
 import de.kleiner3.lasertag.lasertaggame.statistics.GameStats;
@@ -22,16 +21,11 @@ import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaChunkGenerator;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.block.Block;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.GameMode;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.World;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
@@ -93,15 +87,15 @@ public class LasertagServerManager implements IManager, ITickable {
      */
     public Optional<String> startGame(boolean scanSpawnpoints) {
 
-        var world = server.getOverworld();
+        // Get the game mode
+        var gameMode = LasertagGameManager.getInstance().getGameModeManager().getGameMode();
 
-        // Reset all scores
-        LasertagGameManager.getInstance().getScoreManager().resetScores(world);
+        var world = server.getOverworld();
 
         spawnpointManager.initSpawnpointCacheIfNecessary(world, scanSpawnpoints);
 
         // Check starting conditions
-        var abortReasons = checkStartingConditions();
+        var abortReasons = gameMode.checkStartingConditions(this.server, this.spawnpointManager);
 
         // If should abort
         if (abortReasons.isPresent()) {
@@ -110,31 +104,8 @@ public class LasertagServerManager implements IManager, ITickable {
             return abortReasons;
         }
 
-        // Set gamerules
-        var gameRules = server.getGameRules();
-        gameRules.get(GameRules.KEEP_INVENTORY).set(true, server);
-        gameRules.get(GameRules.DO_IMMEDIATE_RESPAWN).set(true, server);
-
-        // Get the team manager
-        var teamManager = LasertagGameManager.getInstance().getTeamManager();
-
-        // Get the team config manager
-        var teamConfigManager = teamManager.getTeamConfigManager();
-
-        // Teleport players
-        for (var teamDto : teamConfigManager.teamConfig.values()) {
-            var team = teamManager.getPlayersOfTeam(teamDto);
-
-            // Handle spectators
-            if (teamDto.equals(TeamConfigManager.SPECTATORS)) {
-
-                sendSpectatorsToSpawnpoints(team);
-
-                continue;
-            }
-
-            sendTeamToSpawnpoints(teamDto, team);
-        }
+        // Delegate to the game mode
+        gameMode.sendPlayersToSpawnpoints(this.server, this.spawnpointManager);
 
         // Start game
         isRunning = true;
@@ -148,19 +119,8 @@ public class LasertagServerManager implements IManager, ITickable {
 
         preGameDelayTimer.schedule(() -> {
 
-            // Activate every player
-            teamManager.forEachPlayer((teamDto, playerUuid) -> {
-
-                LasertagGameManager.getInstance().getDeactivatedManager().activate(playerUuid, world, server.getPlayerManager());
-                var player = server.getPlayerManager().getPlayer(playerUuid);
-
-                // Sanity check
-                if (player == null) {
-                    return;
-                }
-
-                player.onActivated();
-            });
+            // Delegate to game mode
+            gameMode.onGameStart(this.server);
 
             // Start game tick timer
             gameTickTimer = ThreadUtil.createScheduledExecutor("lasertag-server-game-tick-timer-thread-%d");
@@ -170,6 +130,9 @@ public class LasertagServerManager implements IManager, ITickable {
             preGameDelayTimer.shutdownNow();
 
         }, preGameDelay, TimeUnit.SECONDS);
+
+        // Delegate to the game mode
+        gameMode.onPreGameStart(this.server);
 
         // Notify players
         ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_STARTED, PacketByteBufs.empty());
@@ -223,28 +186,10 @@ public class LasertagServerManager implements IManager, ITickable {
      */
     public void playerHitPlayer(ServerPlayerEntity shooter, ServerPlayerEntity target) {
 
-        var teamManager = LasertagGameManager.getInstance().getTeamManager();
+        // Get the game mode
+        var gameMode = LasertagGameManager.getInstance().getGameModeManager().getGameMode();
 
-        var shooterTeam = teamManager.getTeamOfPlayer(shooter.getUuid());
-        var targetTeam = teamManager.getTeamOfPlayer(target.getUuid());
-
-        // Check that hit player is not in same team as firing player
-        if (shooterTeam.equals(targetTeam)) {
-            return;
-        }
-
-        // Check if player is deactivated
-        if (LasertagGameManager.getInstance().getDeactivatedManager().isDeactivated(target.getUuid())) {
-            return;
-        }
-
-        var world = server.getOverworld();
-
-        // Deactivate player
-        LasertagGameManager.getInstance().getDeactivatedManager().deactivate(target.getUuid(), world, server.getPlayerManager());
-
-        LasertagGameManager.getInstance().getScoreManager().onPlayerScored(world, shooter, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAYER_HIT_SCORE));
-        ServerEventSending.sendPlayerSoundEvent(shooter, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND);
+        gameMode.onPlayerHitPlayer(this.server, shooter, target);
     }
 
     /**
@@ -286,44 +231,14 @@ public class LasertagServerManager implements IManager, ITickable {
             return;
         }
 
-        // Get the old block state
-        var oldBlockState = this.server.getOverworld().getBlockState(target.getPos());
-
-        LasertagGameManager.getInstance().getScoreManager().onPlayerScored(server.getOverworld(), shooter, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.LASERTARGET_HIT_SCORE));
-        ServerEventSending.sendPlayerSoundEvent(shooter, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND);
+        // Get the game mode
+        var gameMode = LasertagGameManager.getInstance().getGameModeManager().getGameMode();
 
         // Register on server
         lasertargetManager.registerLasertarget(target);
 
-        // Deactivate
-        target.setDeactivated(true);
-
-        // Reactivate after configured amount of seconds
-        var deactivationThread = ThreadUtil.createScheduledExecutor("lasertag-target-deactivation-thread-%d");
-        deactivationThread.schedule(() -> {
-
-            // Get the old block state
-            var oldBlockStateReset = this.server.getOverworld().getBlockState(target.getPos());
-
-            target.setDeactivated(false);
-
-            // Get the new block state
-            var newBlockState = this.server.getOverworld().getBlockState(target.getPos());
-
-            // Send lasertag updated to clients
-            this.server.getOverworld().updateListeners(target.getPos(),oldBlockState, newBlockState, Block.NOTIFY_LISTENERS);
-
-            deactivationThread.shutdownNow();
-        }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.LASERTARGET_DEACTIVATE_TIME), TimeUnit.SECONDS);
-
-        // Add player to the players who hit the target
-        target.addHitBy(shooter);
-
-        // Get the new block state
-        var newBlockState = this.server.getOverworld().getBlockState(target.getPos());
-
-        // Send lasertag updated to clients
-        this.server.getOverworld().updateListeners(target.getPos(),oldBlockState, newBlockState, Block.NOTIFY_LISTENERS);
+        // Delegate to game mode
+        gameMode.onPlayerHitLasertarget(this.server, shooter, target);
     }
 
     /**
@@ -366,6 +281,13 @@ public class LasertagServerManager implements IManager, ITickable {
      */
     @Override
     public void doTick(boolean isLastNormalTick) {
+
+        // Get the game mode
+        var gameMode = LasertagGameManager.getInstance().getGameModeManager().getGameMode();
+
+        // Delegate to game mode
+        gameMode.onTick(this.server);
+
         if (!(server.getOverworld().getChunkManager().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator)) {
             return;
         }
@@ -398,166 +320,24 @@ public class LasertagServerManager implements IManager, ITickable {
 
     //region Private methods
 
-    private void sendSpectatorsToSpawnpoints(List<UUID> spectators) {
-
-        for (var playerUuid : spectators) {
-
-            // Get the player
-            var player = server.getPlayerManager().getPlayer(playerUuid);
-
-            // Sanity check
-            if (player == null) {
-                continue;
-            }
-
-            // Set player to spectator gamemode
-            player.changeGameMode(GameMode.SPECTATOR);
-
-            // Get all spawnpoints
-            var spawnpoints = spawnpointManager.getAllSpawnpoints();
-
-            // Get random index
-            var idx = server.getOverworld().getRandom().nextInt(spawnpoints.size());
-
-            var destination = spawnpoints.get(idx);
-            player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
-        }
-    }
-
-    private void sendTeamToSpawnpoints(TeamDto teamDto, List<UUID> playerUuids) {
-
-        for (var playerUuid : playerUuids) {
-
-            // Get spawnpoints
-            var spawnpoints = spawnpointManager.getSpawnpoints(teamDto);
-
-            var player = server.getPlayerManager().getPlayer(playerUuid);
-
-            // Sanity check
-            if (player == null) {
-                continue;
-            }
-
-            int idx = server.getOverworld().getRandom().nextInt(spawnpoints.size());
-
-            var destination = spawnpoints.get(idx);
-            player.requestTeleport(destination.getX() + 0.5, destination.getY() + 1, destination.getZ() + 0.5);
-
-            // Set player to survival by default -> player can break blocks
-            var newGamemode = GameMode.SURVIVAL;
-
-            // If setting miningFatigueEnabled is true
-            if (LasertagGameManager.getInstance().getSettingsManager().get(SettingDescription.MINING_FATIGUE_ENABLED)) {
-                // Set player to adventure game mode -> player can't break blocks
-                newGamemode = GameMode.ADVENTURE;
-            }
-
-            player.changeGameMode(newGamemode);
-
-            // Get spawn pos
-            var spawnPos = new BlockPos(destination.getX(), destination.getY() + 1, destination.getZ());
-
-            // Set players spawnpoint
-            player.setSpawnPoint(
-                    World.OVERWORLD,
-                    spawnPos, 0.0F, true, false);
-        }
-    }
-
-    /**
-     * Checks if all starting conditions are met. If the game can start, this method returns an empty optional
-     * Otherwise it returns the reasons why the game can not start as a string.
-     *
-     * @return Optional containing the abort reasons if there were any. Otherwise Optional.empty()
-     */
-    private Optional<String> checkStartingConditions() {
-        boolean abort = false;
-        var builder = new StringBuilder();
-
-        var teamManager = LasertagGameManager.getInstance().getTeamManager();
-
-        // For every team
-        for (var team : teamManager.getTeamMap().entrySet()) {
-
-            // Skip spectators
-            if (team.getKey().equals(TeamConfigManager.SPECTATORS)) {
-
-                continue;
-            }
-
-            // If the team contains players
-            if (team.getValue().size() > 0) {
-                // Get the spawnpoints for the team
-                var spawnpoints = spawnpointManager.getSpawnpoints(team.getKey());
-
-                // If the team has no spawnpoints
-                if (spawnpoints.size() == 0) {
-                    abort = true;
-                    builder.append("  *No spawnpoints were found for team '" + team.getKey().name() + "'\n");
-                }
-            }
-        }
-
-        // Get the players without team
-        var playersWithoutTeam = server.getPlayerManager().getPlayerList().stream()
-                .filter(playerListEntry -> !teamManager.isPlayerInTeam(playerListEntry.getUuid()))
-                .toList();
-
-        if (playersWithoutTeam.size() > 0) {
-
-            abort = true;
-            for (var player : playersWithoutTeam) {
-
-                builder.append("  *Player '" + player.getLasertagUsername() + "' has no team\n");
-            }
-        }
-
-        if (abort) {
-            return Optional.of(builder.toString());
-        }
-
-        return Optional.empty();
-    }
-
     /**
      * This method is called when the game ends
      */
     private void lasertagGameOver() {
 
+        // Get the game mode
+        var gameMode = LasertagGameManager.getInstance().getGameModeManager().getGameMode();
+
+        // Delegate to game mode
+        gameMode.onGameEnd(this.server);
+
         isRunning = false;
 
-        var world = server.getOverworld();
-
-        ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_OVER, PacketByteBufs.empty());
+        ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.GAME_OVER, PacketByteBufs.empty());
 
         // Reset server internal hud render manager
         LasertagGameManager.getInstance().getHudRenderManager().stopGameTimer();
         LasertagGameManager.getInstance().getHudRenderManager().shouldRenderNameTags = true;
-
-        // Deactivate every player
-        LasertagGameManager.getInstance().getDeactivatedManager().deactivateAll(world, server.getPlayerManager());
-
-        // Teleport players to origin
-        LasertagGameManager.getInstance().getTeamManager().forEachPlayer(((team, playerUuid) -> {
-            var player = server.getPlayerManager().getPlayer(playerUuid);
-
-            // Sanity check
-            if (player == null) {
-                return;
-            }
-
-            player.requestTeleport(0.5F, 1, 0.5F);
-
-            // Create block pos
-            var origin = new BlockPos(0, 1, 0);
-
-            // Set players spawnpoint
-            player.setSpawnPoint(
-                    World.OVERWORLD,
-                    origin, 0.0F, true, false);
-
-            player.changeGameMode(GameMode.ADVENTURE);
-        }));
 
         // Reset lasertargets
         lasertargetManager.resetLasertargets();
@@ -565,7 +345,17 @@ public class LasertagServerManager implements IManager, ITickable {
         // Reset music manager
         musicManager.reset();
 
+        // Generate statistics
+        this.generateStats();
+
+        // Clean up (stop game tick timer)
+        dispose();
+    }
+
+    private void generateStats() {
         try {
+            var world = server.getOverworld();
+
             // Calculate stats
             var stats = StatsCalculator.calcStats(LasertagGameManager.getInstance().getPlayerManager());
 
@@ -592,9 +382,6 @@ public class LasertagServerManager implements IManager, ITickable {
         } catch (Exception e) {
             LasertagMod.LOGGER.error("ERROR:", e);
         }
-
-        // Clean up (stop game tick timer)
-        dispose();
     }
 
     //endregion

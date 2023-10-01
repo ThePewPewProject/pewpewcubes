@@ -66,6 +66,8 @@
 	"arenaType.procedural.medium_four_team": "Medium 4 Teams",
 	"arenaType.procedural.medium_four_team_extended": "Procedural: Medium 4 Teams",
 
+	"gameMode.point_hunter": "Point Hunter",
+
 	"subtitles.lasertag.music": "Thrilling music",
 	"subtitles.lasertag.weapon_fire_sound": "Laserweapon firing",
 
@@ -82,6 +84,7 @@
 	"gui.list_widget.empty": "No data",
 
 	"gui.game_manager.overview_screen_title": "Lasertag Game Manager",
+	"gui.game_manager.game_mode_button": "Gamemode",
 	"gui.game_manager.settings_button": "Settings...",
 	"gui.game_manager.settings.presets": "Presets...",
 	"gui.game_manager.settings.reset_settings": "Reset all settings",

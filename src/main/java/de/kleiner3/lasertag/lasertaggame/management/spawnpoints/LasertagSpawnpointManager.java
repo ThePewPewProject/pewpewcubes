@@ -72,59 +72,72 @@ public class LasertagSpawnpointManager implements IManager {
      */
     private void initSpawnpointCache(ServerWorld world) {
 
-        this.spawnpointCache.clear();
+        try {
+            this.spawnpointCache.clear();
 
-        var teamConfig = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().teamConfig;
+            var teamConfig = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().teamConfig;
 
-        // Initialize team lists
-        for (var team : teamConfig.values()) {
-
-            // Skip spectators
-            if (team.equals(TeamConfigManager.SPECTATORS)) {
-                continue;
-            }
-
-            spawnpointCache.put(team, new ArrayList<>());
-        }
-
-        // Start time measurement
-        var startTime = System.nanoTime();
-
-        // Iterate over blocks and find spawnpoints
-        world.fastSearchBlock((block, pos) -> {
-            for (var teamDto : teamConfig.values()) {
+            // Initialize team lists
+            for (var team : teamConfig.values()) {
 
                 // Skip spectators
-                if (teamDto.equals(TeamConfigManager.SPECTATORS)) {
+                if (team.equals(TeamConfigManager.SPECTATORS)) {
                     continue;
                 }
 
-                if (teamDto.spawnpointBlock().equals(block)) {
-                    var team = spawnpointCache.get(teamDto);
-                    synchronized (teamDto) {
-                        team.add(pos);
+                spawnpointCache.put(team, new ArrayList<>());
+            }
+
+            // Start time measurement
+            var startTime = System.nanoTime();
+
+            // Iterate over blocks and find spawnpoints
+            world.fastSearchBlock((block, pos) -> {
+                for (var teamDto : teamConfig.values()) {
+
+                    // Skip spectators
+                    if (teamDto.equals(TeamConfigManager.SPECTATORS)) {
+                        continue;
                     }
-                    break;
+
+                    if (teamDto.spawnpointBlock().equals(block)) {
+                        var team = spawnpointCache.get(teamDto);
+                        synchronized (teamDto) {
+                            team.add(pos);
+                        }
+                        break;
+                    }
                 }
-            }
-        }, (currChunk, maxChunk) -> {
-            // Only send a progress update every second chunk to not ddos our players
-            if (currChunk % 2 == 0) {
-                return;
-            }
+            }, (currChunk, maxChunk) -> {
+                // Only send a progress update every second chunk to not ddos our players
+                if (currChunk % 2 == 0) {
+                    return;
+                }
+
+                // Create packet buffer
+                var buf = new PacketByteBuf(Unpooled.buffer());
+
+                // Write progress to buffer
+                buf.writeDouble((double) currChunk / (double) maxChunk);
+
+                ServerEventSending.sendToEveryone(world, NetworkingConstants.PROGRESS, buf);
+            });
+
+            // Stop time measurement
+            var stopTime = System.nanoTime();
+            var duration = (stopTime - startTime) / 1000000000.0;
+            LasertagMod.LOGGER.info("Spawnpoint search took " + duration + "s.");
+        } catch (Exception ex) {
+
+            LasertagMod.LOGGER.error("Unexpected error while scanning for spawnpoints: ", ex);
 
             // Create packet buffer
             var buf = new PacketByteBuf(Unpooled.buffer());
 
             // Write progress to buffer
-            buf.writeDouble((double) currChunk / (double) maxChunk);
+            buf.writeDouble(1.0F);
 
             ServerEventSending.sendToEveryone(world, NetworkingConstants.PROGRESS, buf);
-        });
-
-        // Stop time measurement
-        var stopTime = System.nanoTime();
-        var duration = (stopTime - startTime) / 1000000000.0;
-        LasertagMod.LOGGER.info("Spawnpoint search took " + duration + "s.");
+        }
     }
 }

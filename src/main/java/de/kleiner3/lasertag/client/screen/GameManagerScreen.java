@@ -1,6 +1,9 @@
 package de.kleiner3.lasertag.client.screen;
 
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -71,6 +74,29 @@ public abstract class GameManagerScreen extends Screen {
         ++numberOfListedButtons;
 
         return button;
+    }
+
+    /**
+     * Adds a widget to the main button list
+     *
+     * @param buttonGenerator Method creating the button
+     * @param <T> The type of the widget
+     * @return The created widget
+     */
+    protected <T extends Element & Drawable & Selectable> T addListedWidget(IListedButtonGenerator<T> buttonGenerator) {
+        var button = this.addDrawableChild(buttonGenerator.generate(horizontalPadding, verticalPadding + textRenderer.fontHeight + buttonPadding + numberOfListedButtons * (buttonHeight + buttonPadding), buttonWidth, buttonHeight));
+
+        ++numberOfListedButtons;
+
+        return button;
+    }
+
+    /**
+     * Functional interface for generating a widget for <code>addListedWidget</code>
+     * @param <T> The type of the widget to be generated
+     */
+    protected interface IListedButtonGenerator<T extends Element & Drawable & Selectable> {
+        T generate(int x, int y, int width, int height);
     }
 
     private void addBackButton() {

@@ -3,8 +3,8 @@ package de.kleiner3.lasertag.lasertaggame.management.lasertargets;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Class to manage the lasertargets
@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class LasertargetManager implements IManager {
 
-    private List<LaserTargetBlockEntity> lasertargetsToReset = new LinkedList<>();
+    private Set<LaserTargetBlockEntity> lasertargetsToReset = new HashSet<>();
 
     /**
      * Register a lasertarget to be reset after game
@@ -32,7 +32,7 @@ public class LasertargetManager implements IManager {
         for (var lasertarget : lasertargetsToReset) {
             lasertarget.reset();
         }
-        lasertargetsToReset = new LinkedList<>();
+        lasertargetsToReset = new HashSet<>();
     }
 
     @Override

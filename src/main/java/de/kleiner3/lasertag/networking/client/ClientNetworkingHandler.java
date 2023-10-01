@@ -33,5 +33,6 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.SETTINGS_PRESET_ADDED, new SettingsPresetNameAddedCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.SETTINGS_PRESET_REMOVED, new SettingsPresetNameRemovedCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.TEAM_CONFIG_RELOADED, new TeamConfigReloadedCallback());
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_MODE_SYNC, new GameModeSyncCallback());
     }
 }

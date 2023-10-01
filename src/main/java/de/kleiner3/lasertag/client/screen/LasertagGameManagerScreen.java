@@ -1,10 +1,16 @@
 package de.kleiner3.lasertag.client.screen;
 
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import de.kleiner3.lasertag.lasertaggame.management.gamemode.GameModes;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
+import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.CyclingButtonWidget;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.text.Text;
 
 /**
  * The main screen of the lasertag game manager
@@ -13,13 +19,33 @@ import net.minecraft.entity.player.PlayerEntity;
  */
 public class LasertagGameManagerScreen extends GameManagerScreen {
 
+    private CyclingButtonWidget<String> gameModeButton;
+
     public LasertagGameManagerScreen(PlayerEntity player) {
         super(null, "gui.game_manager.overview_screen_title", player);
+    }
+
+    public void reloadGameMode() {
+        this.gameModeButton.setValue(LasertagGameManager.getInstance().getGameModeManager().getGameMode().getTranslatableName());
     }
 
     @Override
     protected void init() {
         super.init();
+
+        this.gameModeButton = this.addListedWidget((x, y, width, height) -> CyclingButtonWidget
+                .builder(this::getGameModeText)
+                .values(GameModes.GAME_MODES.keySet())
+                .initially(LasertagGameManager.getInstance().getGameModeManager().getGameMode().getTranslatableName())
+                .build(x, y, width, height, Text.translatable("gui.game_manager.game_mode_button"),
+                (button, gameModeTranslatableName) -> {
+
+                    // Send event to server
+                    var buf = new PacketByteBuf(Unpooled.buffer());
+                    buf.writeString(gameModeTranslatableName);
+                    ClientPlayNetworking.send(NetworkingConstants.CLIENT_TRIGGER_GAME_MODE_CHANGE, buf);
+                }));
+        this.gameModeButton.active = this.player.hasPermissionLevel(4);
 
         this.addListedButton("gui.game_manager.settings_button", this::onSettingsClick);
 
@@ -58,5 +84,9 @@ public class LasertagGameManagerScreen extends GameManagerScreen {
     private void onStartGameClick(ButtonWidget button) {
         this.close();
         ClientPlayNetworking.send(NetworkingConstants.CLIENT_TRIGGER_GAME_START, PacketByteBufs.empty());
+    }
+
+    private Text getGameModeText(String gameModeTranslatableName) {
+        return Text.translatable(gameModeTranslatableName);
     }
 }
