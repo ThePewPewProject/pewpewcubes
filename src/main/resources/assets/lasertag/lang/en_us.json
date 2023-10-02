@@ -54,6 +54,7 @@
 	"item.lasertag.lasertag_vest": "Lasertag Vest",
 
 	"generator.lasertag.lasertag_arena": "Lasertag Arena",
+	"selectWorld.newArena": "New Arena World",
 	"selectWorld.arenaType": "Arena",
 	"arenaType.procedural": "Procedural",
 	"arenaType.jungle": "Jungle",

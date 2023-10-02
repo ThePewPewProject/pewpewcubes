@@ -21,3 +21,4 @@ accessible field net/minecraft/server/dedicated/DedicatedServerWatchdog maxTickT
 accessible field net/minecraft/server/network/ServerPlayNetworkHandler server Lnet/minecraft/server/MinecraftServer;
 accessible field net/minecraft/client/gui/screen/world/CreateWorldScreen cheatsEnabled Z
 accessible field net/minecraft/client/gui/screen/world/CreateWorldScreen tweakedCheats Z
+accessible field net/minecraft/client/gui/screen/world/CreateWorldScreen levelName Ljava/lang/String;

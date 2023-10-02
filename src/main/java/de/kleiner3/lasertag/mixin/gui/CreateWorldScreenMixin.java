@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.MoreOptionsDialog;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.world.GeneratorOptionsHolder;
 import net.minecraft.resource.*;
 import net.minecraft.server.SaveLoading;
@@ -66,6 +67,7 @@ public abstract class CreateWorldScreenMixin {
         var createWorldScreen = new CreateWorldScreen(parent, DataPackSettings.SAFE_MODE, new MoreOptionsDialog(completableFuture.join(), Optional.of(WorldPresets.DEFAULT), OptionalLong.empty()));
         createWorldScreen.cheatsEnabled = true;
         createWorldScreen.tweakedCheats = true;
+        createWorldScreen.levelName = I18n.translate("selectWorld.newArena");
         client.setScreen(createWorldScreen);
 
         ci.cancel();
