@@ -21,6 +21,7 @@
     "LivingEntityRendererMixin",
     "MusicTrackerMixin",
     "PlayerEntityRendererMixin",
+    "gui.CreateWorldScreenMixin",
     "gui.InGameHudMixin",
     "gui.MoreWorldOptionsDialogMixin",
     "gui.PlayerListHudMixin"

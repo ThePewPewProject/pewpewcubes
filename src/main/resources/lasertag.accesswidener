@@ -3,6 +3,9 @@ accessWidener   v1      named
 # Classes
 accessible class net/minecraft/world/gen/WorldPresets$Registrar
 
+# Constructors
+accessible method net/minecraft/client/gui/screen/world/CreateWorldScreen <init> (Lnet/minecraft/client/gui/screen/Screen;Lnet/minecraft/resource/DataPackSettings;Lnet/minecraft/client/gui/screen/world/MoreOptionsDialog;)V
+
 # Methods
 accessible method net/minecraft/client/gui/screen/world/CreateWorldScreen addDrawableChild (Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;
 accessible method net/minecraft/server/world/ThreadedAnvilChunkStorage sendChunkDataPackets (Lnet/minecraft/server/network/ServerPlayerEntity;Lorg/apache/commons/lang3/mutable/MutableObject;Lnet/minecraft/world/chunk/WorldChunk;)V
@@ -16,3 +19,5 @@ accessible field net/minecraft/server/dedicated/DedicatedServerWatchdog LOGGER L
 accessible field net/minecraft/server/dedicated/DedicatedServerWatchdog server Lnet/minecraft/server/dedicated/MinecraftDedicatedServer;
 accessible field net/minecraft/server/dedicated/DedicatedServerWatchdog maxTickTime J
 accessible field net/minecraft/server/network/ServerPlayNetworkHandler server Lnet/minecraft/server/MinecraftServer;
+accessible field net/minecraft/client/gui/screen/world/CreateWorldScreen cheatsEnabled Z
+accessible field net/minecraft/client/gui/screen/world/CreateWorldScreen tweakedCheats Z
