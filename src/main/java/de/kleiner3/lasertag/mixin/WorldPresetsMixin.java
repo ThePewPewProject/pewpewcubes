@@ -1,11 +1,8 @@
 package de.kleiner3.lasertag.mixin;
 
-import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaChunkGenerator;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaChunkGeneratorConfig;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.BuiltinRegistries;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.dimension.DimensionOptions;
@@ -21,8 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(WorldPresets.Registrar.class)
 public abstract class WorldPresetsMixin {
 
-    private static final RegistryKey<WorldPreset> ARENA = RegistryKey.of(Registry.WORLD_PRESET_KEY, new Identifier(LasertagMod.ID, "lasertag_arena"));
-
     @Shadow
     protected abstract RegistryEntry<WorldPreset> register(RegistryKey<WorldPreset> key, DimensionOptions dimensionOptions);
     @Shadow protected abstract DimensionOptions createOverworldOptions(ChunkGenerator chunkGenerator);
@@ -30,6 +25,6 @@ public abstract class WorldPresetsMixin {
 
     @Inject(method = "initAndGetDefault", at = @At("RETURN"))
     private void addPresets(CallbackInfoReturnable<RegistryEntry<WorldPreset>> cir) {
-        this.register(ARENA, this.createOverworldOptions(new ArenaChunkGenerator(BuiltinRegistries.STRUCTURE_SET, BuiltinRegistries.BIOME, ArenaChunkGeneratorConfig.getDefaultConfig())));
+        this.register(de.kleiner3.lasertag.worldgen.WorldPresets.ARENA, this.createOverworldOptions(new ArenaChunkGenerator(BuiltinRegistries.STRUCTURE_SET, BuiltinRegistries.BIOME, ArenaChunkGeneratorConfig.getDefaultConfig())));
     }
 }

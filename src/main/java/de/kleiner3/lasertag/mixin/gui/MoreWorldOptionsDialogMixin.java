@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.mixin.gui;
 
+import de.kleiner3.lasertag.worldgen.WorldPresets;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaChunkGenerator;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaType;
 import de.kleiner3.lasertag.worldgen.chunkgen.ProceduralArenaType;
@@ -13,6 +14,10 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CyclingButtonWidget;
 import net.minecraft.client.world.GeneratorOptionsHolder;
 import net.minecraft.text.Text;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.gen.WorldPreset;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,6 +25,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Arrays;
+import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Random;
 
 /**
@@ -46,6 +53,9 @@ public abstract class MoreWorldOptionsDialogMixin {
     private ButtonWidget customizeTypeButton;
     @Shadow
     private ButtonWidget importSettingsButton;
+
+    @Shadow
+    private Optional<RegistryEntry<WorldPreset>> presetEntry;
 
     @Inject(method = "init", at = @At("HEAD"))
     private void initCustomButtons(CreateWorldScreen parent, MinecraftClient client, TextRenderer textRenderer, CallbackInfo ci) {
@@ -123,6 +133,21 @@ public abstract class MoreWorldOptionsDialogMixin {
                 this.proceduralArenaTypeButton.visible = visible;
             }
         }
+    }
+
+    @Inject(method = "<init>(Lnet/minecraft/client/world/GeneratorOptionsHolder;Ljava/util/Optional;Ljava/util/OptionalLong;)V", at = @At("TAIL"))
+    private void createArenaPresetEntryIfDefault(GeneratorOptionsHolder generatorOptionsHolder, Optional<RegistryKey<WorldPreset>> presetKey, OptionalLong seed, CallbackInfo ci) {
+        presetKey.ifPresent(presetKeyValue -> {
+            if (presetKeyValue.equals(net.minecraft.world.gen.WorldPresets.DEFAULT)) {
+
+                var entryOptional = Optional.of(WorldPresets.ARENA).flatMap((key) -> this.generatorOptionsHolder.dynamicRegistryManager().get(Registry.WORLD_PRESET_KEY).getEntry(key));
+
+                entryOptional.ifPresent(entry -> {
+                    this.generatorOptionsHolder = this.generatorOptionsHolder.apply(genOpt -> entry.value().createGeneratorOptions(genOpt));
+                    this.presetEntry = entryOptional;
+                });
+            }
+        });
     }
 
     private static Text getArenaTypeText(ArenaType arenaType) {
