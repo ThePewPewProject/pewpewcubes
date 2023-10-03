@@ -59,10 +59,6 @@ public class LasertagGameManagerScreen extends GameManagerScreen {
         if (this.player.hasPermissionLevel(4)) {
             this.addListedButton("gui.game_manager.reload_team_config_button", this::onReloadTeamConfigClick);
         }
-
-        if (this.player.hasPermissionLevel(1)) {
-            this.addListedButton("gui.game_manager.start_game_button", this::onStartGameClick);
-        }
     }
 
     private void onSettingsClick(ButtonWidget button) {
@@ -79,11 +75,6 @@ public class LasertagGameManagerScreen extends GameManagerScreen {
 
     private void onReloadTeamConfigClick(ButtonWidget button) {
         ClientPlayNetworking.send(NetworkingConstants.CLIENT_TRIGGER_RELOAD_TEAM_CONFIG, PacketByteBufs.empty());
-    }
-
-    private void onStartGameClick(ButtonWidget button) {
-        this.close();
-        ClientPlayNetworking.send(NetworkingConstants.CLIENT_TRIGGER_GAME_START, PacketByteBufs.empty());
     }
 
     private Text getGameModeText(String gameModeTranslatableName) {

@@ -49,6 +49,7 @@
 	"block.lasertag.game_manager": "Lasertag Game Manager",
 	"block.lasertag.team_selector": "Lasertag Team Selector",
 	"block.lasertag.lasertag_credits_button": "Lasertag Credits Button",
+	"block.lasertag.lasertag_start_game_button": "Lasertag Start Game Button",
 
 	"item.lasertag.lasertag_weapon": "Lasertag Weapon",
 	"item.lasertag.lasertag_vest": "Lasertag Vest",
@@ -113,11 +114,12 @@
 	"gui.game_manager.map_button": "Arena...",
 	"gui.game_manager.teams_button": "Teams...",
 	"gui.game_manager.reload_team_config_button": "Reload team config",
-	"gui.game_manager.start_game_button": "Start game",
 	"gui.game_manager.settings_screen_title": "Lasertag Settings",
 	"gui.game_manager.map_screen_title": "Lasertag Arena",
 	"gui.game_manager.teams_screen_title": "Lasertag Teams",
 
 	"gui.team_selector.title": "Select your team!",
-	"gui.team_selector.join_team": "Join"
+	"gui.team_selector.join_team": "Join",
+
+	"render.start_game_button_text": "Start Game"
 }

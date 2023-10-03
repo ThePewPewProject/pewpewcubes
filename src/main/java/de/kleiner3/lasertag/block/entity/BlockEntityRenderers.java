@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.block.entity;
 
+import de.kleiner3.lasertag.block.entity.render.LasertagStartGameButtonBlockEntityRenderer;
 import de.kleiner3.lasertag.block.entity.render.LasertargetRenderer;
 import de.kleiner3.lasertag.entity.Entities;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
@@ -12,5 +13,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 public class BlockEntityRenderers {
     public static void register() {
         BlockEntityRendererRegistry.register(Entities.LASER_TARGET_ENTITY, LasertargetRenderer::new);
+        BlockEntityRendererRegistry.register(Entities.LASERTAG_START_GAME_BUTTON_ENTITY, LasertagStartGameButtonBlockEntityRenderer::new);
     }
 }

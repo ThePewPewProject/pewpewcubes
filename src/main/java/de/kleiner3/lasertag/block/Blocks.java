@@ -66,6 +66,7 @@ public class Blocks {
     public static final Block LASERTAG_GAME_MANAGER_BLOCK = new LasertagGameManagerBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f));
     public static final Block LASERTAG_TEAM_SELECTOR_BLOCK = new LasertagTeamSelectorBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f));
     public static final Block LASERTAG_CREDITS_BUTTON = new LasertagCreditsButton(FabricBlockSettings.of(Material.METAL).strength(4.0f));
+    public static final Block LASERTAG_START_GAME_BUTTON = new LasertagStartGameButton(FabricBlockSettings.of(Material.STONE).strength(4.0f));
 
     public static void register() {
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "arena_block_orange"), ARENA_BLOCK_ORANGE);
@@ -115,5 +116,6 @@ public class Blocks {
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "game_manager"), LASERTAG_GAME_MANAGER_BLOCK);
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "team_selector"), LASERTAG_TEAM_SELECTOR_BLOCK);
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "lasertag_credits_button"), LASERTAG_CREDITS_BUTTON);
+        Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "lasertag_start_game_button"), LASERTAG_START_GAME_BUTTON);
     }
 }
