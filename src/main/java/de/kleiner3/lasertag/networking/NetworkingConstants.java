@@ -42,7 +42,6 @@ public class NetworkingConstants {
     public static final Identifier SETTINGS_PRESET_REMOVED = new Identifier(LasertagMod.ID, "settings_preset_removed");
     public static final Identifier TEAM_CONFIG_RELOADED = new Identifier(LasertagMod.ID, "team_config_reloaded");
     public static final Identifier GAME_MODE_SYNC = new Identifier(LasertagMod.ID, "game_mode_sync");
-    public static final Identifier CLIENT_TRIGGER_GAME_START = new Identifier(LasertagMod.ID, "client_trigger_game_start");
     public static final Identifier CLIENT_TRIGGER_RELOAD_TEAM_CONFIG = new Identifier(LasertagMod.ID, "client_trigger_reload_team_config");
     public static final Identifier CLIENT_TRIGGER_SETTING_RESET = new Identifier(LasertagMod.ID, "client_trigger_setting_reset");
     public static final Identifier CLIENT_TRIGGER_SETTINGS_RESET = new Identifier(LasertagMod.ID, "client_trigger_settings_reset");
