@@ -40,8 +40,8 @@
   "custom": {
 	"loom:injected_interfaces": {
 		"net/minecraft/server/MinecraftServer": ["de/kleiner3/lasertag/lasertaggame/ILasertagServerManagerAccessor"],
-		"net/minecraft/entity/player/PlayerEntity": ["de/kleiner3/lasertag/lasertaggame/ILasertagPlayer", "de/kleiner3/lasertag/client/screen/ILasertagGameManagerScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagTeamSelectorScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagCreditsScreenOpener"],
-		"net/minecraft/client/network/ClientPlayerEntity": ["de/kleiner3/lasertag/client/screen/ILasertagGameManagerScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagTeamSelectorScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagCreditsScreenOpener"],
+		"net/minecraft/entity/player/PlayerEntity": ["de/kleiner3/lasertag/lasertaggame/ILasertagPlayer", "de/kleiner3/lasertag/client/screen/ILasertagGameManagerScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagTeamSelectorScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagCreditsScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagTeamZoneGeneratorScreenOpener"],
+		"net/minecraft/client/network/ClientPlayerEntity": ["de/kleiner3/lasertag/client/screen/ILasertagGameManagerScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagTeamSelectorScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagCreditsScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagTeamZoneGeneratorScreenOpener"],
         "net/minecraft/world/World": ["de/kleiner3/lasertag/common/util/fastiter/IFastWorldIter"]
     }
   },

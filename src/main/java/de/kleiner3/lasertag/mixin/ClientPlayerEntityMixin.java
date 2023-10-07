@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.mixin;
 
+import de.kleiner3.lasertag.block.entity.LasertagTeamZoneGeneratorBlockEntity;
 import de.kleiner3.lasertag.client.screen.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -14,7 +15,7 @@ import org.spongepowered.asm.mixin.Shadow;
  * @author Étienne Muser
  */
 @Mixin(ClientPlayerEntity.class)
-public class ClientPlayerEntityMixin implements ILasertagGameManagerScreenOpener, ILasertagTeamSelectorScreenOpener, ILasertagCreditsScreenOpener {
+public class ClientPlayerEntityMixin implements ILasertagGameManagerScreenOpener, ILasertagTeamSelectorScreenOpener, ILasertagCreditsScreenOpener, ILasertagTeamZoneGeneratorScreenOpener {
     @Shadow @Final protected MinecraftClient client;
 
     @Override
@@ -30,5 +31,10 @@ public class ClientPlayerEntityMixin implements ILasertagGameManagerScreenOpener
     @Override
     public void openLasertagCreditsScreen(PlayerEntity player) {
         this.client.setScreen(new LasertagCreditsScreen());
+    }
+
+    @Override
+    public void openLasertagTeamZoneGeneratorScreen(LasertagTeamZoneGeneratorBlockEntity teamZoneGenerator) {
+        this.client.setScreen(new LasertagTeamZoneGeneratorScreen(teamZoneGenerator));
     }
 }

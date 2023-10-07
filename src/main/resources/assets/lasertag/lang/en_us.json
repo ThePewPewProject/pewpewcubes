@@ -50,6 +50,7 @@
 	"block.lasertag.team_selector": "Lasertag Team Selector",
 	"block.lasertag.lasertag_credits_button": "Lasertag Credits Button",
 	"block.lasertag.lasertag_start_game_button": "Lasertag Start Game Button",
+	"block.lasertag.team_zone_generator": "Lasertag Team Zone Generator",
 
 	"item.lasertag.lasertag_weapon": "Lasertag Weapon",
 	"item.lasertag.lasertag_vest": "Lasertag Vest",
@@ -120,6 +121,12 @@
 
 	"gui.team_selector.title": "Select your team!",
 	"gui.team_selector.join_team": "Join",
+
+	"gui.team_zone_generator.title": "Team Zone Generator",
+	"gui.team_zone_generator.team_name": "Team Name",
+	"gui.team_zone_generator.generate": "Generate",
+	"gui.team_zone_generator.warning_label_text": "WARNING: Do not touch this unless you know what you are doing!",
+	"gui.team_zone_generator.change_info_text": "This value should only be changed if a team name got changed.",
 
 	"render.start_game_button_text": "Start Game"
 }

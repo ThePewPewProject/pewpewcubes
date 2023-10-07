@@ -53,4 +53,5 @@ public class NetworkingConstants {
     public static final Identifier CLIENT_TRIGGER_PLAYER_KICK = new Identifier(LasertagMod.ID, "client_trigger_player_kick");
     public static final Identifier CLIENT_TRIGGER_PLAYER_JOIN_TEAM = new Identifier(LasertagMod.ID, "client_trigger_player_join_team");
     public static final Identifier CLIENT_TRIGGER_GAME_MODE_CHANGE = new Identifier(LasertagMod.ID, "client_trigger_game_mode_change");
+    public static final Identifier CLIENT_TRIGGER_GENERATE_ZONE = new Identifier(LasertagMod.ID, "set_team_zone_generator_block_team_name");
 }

@@ -24,5 +24,6 @@ public class ServerNetworkingHandler {
         ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.CLIENT_TRIGGER_PLAYER_KICK, new ClientTriggerPlayerKickCallback());
         ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.CLIENT_TRIGGER_PLAYER_JOIN_TEAM, new ClientTriggerPlayerJoinTeamCallback());
         ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.CLIENT_TRIGGER_GAME_MODE_CHANGE, new ClientTriggerGameModeChangeCallback());
+        ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.CLIENT_TRIGGER_GENERATE_ZONE, new ClientTriggerGenerateZoneCallback());
     }
 }
