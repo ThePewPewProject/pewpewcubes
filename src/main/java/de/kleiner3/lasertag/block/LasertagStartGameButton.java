@@ -27,6 +27,14 @@ public class LasertagStartGameButton extends StoneButtonBlock implements BlockEn
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+
+        // If player does not have permission to start the game
+        if (!player.hasPermissionLevel(1)) {
+            // Send feedback
+            player.sendMessage(Text.literal("You do not have enough permissions to start a game.").formatted(Formatting.RED), true);
+            return ActionResult.FAIL;
+        }
+
         if (!world.isClient) {
             var server = world.getServer();
             var abortReasons = server.getLasertagServerManager().startGame(false);
