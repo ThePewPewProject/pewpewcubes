@@ -17,6 +17,7 @@ public class LasertagHudRenderManager implements IManager {
     //region Public fields
 
     public boolean shouldRenderNameTags = true;
+    public boolean isGameRunning = false;
 
     /**
      * The time in seconds that has already elapsed

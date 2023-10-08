@@ -15,8 +15,10 @@ import net.minecraft.network.PacketByteBuf;
 public class LasertagGameOverCallback implements ClientPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        LasertagGameManager.getInstance().getHudRenderManager().stopGameTimer();
 
-        LasertagGameManager.getInstance().getHudRenderManager().shouldRenderNameTags = true;
+        var hudRenderManager = LasertagGameManager.getInstance().getHudRenderManager();
+        hudRenderManager.stopGameTimer();
+        hudRenderManager.shouldRenderNameTags = true;
+        hudRenderManager.isGameRunning = false;
     }
 }

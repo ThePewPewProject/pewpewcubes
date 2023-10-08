@@ -145,6 +145,7 @@ public class LasertagServerManager implements IManager, ITickable {
 
             renderData.progress = 0.0;
             renderData.shouldRenderNameTags = false;
+            renderData.isGameRunning = true;
 
             // Start pregame count down timer
             renderData.startPreGameCountdownTimer(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PREGAME_DURATION));
@@ -336,8 +337,10 @@ public class LasertagServerManager implements IManager, ITickable {
         ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.GAME_OVER, PacketByteBufs.empty());
 
         // Reset server internal hud render manager
-        LasertagGameManager.getInstance().getHudRenderManager().stopGameTimer();
-        LasertagGameManager.getInstance().getHudRenderManager().shouldRenderNameTags = true;
+        var hudRenderManager = LasertagGameManager.getInstance().getHudRenderManager();
+        hudRenderManager.stopGameTimer();
+        hudRenderManager.shouldRenderNameTags = true;
+        hudRenderManager.isGameRunning = false;
 
         // Reset lasertargets
         lasertargetManager.resetLasertargets();

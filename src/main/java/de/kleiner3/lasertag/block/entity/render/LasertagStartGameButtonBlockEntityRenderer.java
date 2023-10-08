@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.block.entity.render;
 
 import de.kleiner3.lasertag.block.entity.LasertagStartGameButtonBlockEntity;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.AbstractButtonBlock;
@@ -32,6 +33,12 @@ public class LasertagStartGameButtonBlockEntityRenderer implements BlockEntityRe
 
     @Override
     public void render(LasertagStartGameButtonBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+
+        // If a game is running, do not render the name tags
+        if (LasertagGameManager.getInstance().getHudRenderManager().isGameRunning) {
+            return;
+        }
+
         var blockPos = entity.getPos();
         double d = this.dispatcher.getSquaredDistanceToCamera(blockPos.getX(), blockPos.getY(), blockPos.getZ());
         if (d <= 4096.0) {
