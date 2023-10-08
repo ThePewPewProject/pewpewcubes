@@ -16,6 +16,7 @@ import net.minecraft.server.SaveLoading;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.registry.DynamicRegistryManager;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.gen.WorldPresets;
 import org.spongepowered.asm.mixin.Final;
@@ -51,8 +52,16 @@ public abstract class CreateWorldScreenMixin {
         return null;
     }
 
+    /**
+     * Overwrites the create world default values.
+     * Sets cheats enabled to true, new world name to "New Arena World" and difficulty to peaceful.
+     *
+     * @param client
+     * @param parent
+     * @param ci
+     */
     @Inject(method = "create(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/gui/screen/Screen;)V", at = @At("HEAD"),cancellable = true)
-    private static void setCheatsEnabledTrue(MinecraftClient client, Screen parent, CallbackInfo ci) {
+    private static void setArenaDefaults(MinecraftClient client, Screen parent, CallbackInfo ci) {
 
         showMessage(client, PREPARING_TEXT);
         ResourcePackManager resourcePackManager = new ResourcePackManager(ResourceType.SERVER_DATA, new VanillaDataPackProvider());
@@ -71,6 +80,7 @@ public abstract class CreateWorldScreenMixin {
         createWorldScreen.cheatsEnabled = true;
         createWorldScreen.tweakedCheats = true;
         createWorldScreen.levelName = I18n.translate("selectWorld.newArena");
+        createWorldScreen.currentDifficulty = Difficulty.PEACEFUL;
         client.setScreen(createWorldScreen);
 
         ci.cancel();

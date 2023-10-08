@@ -22,3 +22,4 @@ accessible field net/minecraft/server/network/ServerPlayNetworkHandler server Ln
 accessible field net/minecraft/client/gui/screen/world/CreateWorldScreen cheatsEnabled Z
 accessible field net/minecraft/client/gui/screen/world/CreateWorldScreen tweakedCheats Z
 accessible field net/minecraft/client/gui/screen/world/CreateWorldScreen levelName Ljava/lang/String;
+accessible field net/minecraft/client/gui/screen/world/CreateWorldScreen currentDifficulty Lnet/minecraft/world/Difficulty;
