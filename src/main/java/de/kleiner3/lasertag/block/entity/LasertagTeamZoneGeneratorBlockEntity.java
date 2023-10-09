@@ -252,7 +252,7 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements
         var minZ = entityPos.getZ() - this.radius;
         var maxZ = entityPos.getZ() + this.radius;
         var minY = Math.max(entityPos.getY() - this.height, -64);
-        var maxY = Math.min(entityPos.getX() + this.height, 320);
+        var maxY = Math.min(entityPos.getY() + this.height, 320);
 
         // Initialize the stack
         var stack = new Stack<BlockPos>();
