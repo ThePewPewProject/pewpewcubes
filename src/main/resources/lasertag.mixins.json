@@ -9,6 +9,7 @@
     "PlayerEntityMixin",
     "ServerPlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin",
+    "WorldMixin",
     "WorldPresetsMixin",
     "fastiter.WorldMixin"
   ],

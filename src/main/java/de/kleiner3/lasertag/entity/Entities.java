@@ -23,6 +23,7 @@ public class Entities {
     public static BlockEntityType<LasertagTeamSelectorBlockEntity> LASERTAG_TEAM_SELECTOR_BLOCK_ENTITY;
     public static BlockEntityType<LasertagCreditsButtonBlockEntity> LASERTAG_CREDITS_BLOCK_ENTITY;
     public static BlockEntityType<LasertagStartGameButtonBlockEntity> LASERTAG_START_GAME_BUTTON_ENTITY;
+    public static BlockEntityType<LasertagTeamZoneGeneratorBlockEntity> LASERTAG_TEAM_ZONE_GENERATOR_BLOCK_ENTITY;
 
     // Register all entities
     public static EntityType<LaserRayEntity> LASER_RAY;
@@ -57,5 +58,10 @@ public class Entities {
                 Registry.BLOCK_ENTITY_TYPE,
                 new Identifier(LasertagMod.ID, "lasertag_start_game_button_block_entity"),
                 FabricBlockEntityTypeBuilder.create(LasertagStartGameButtonBlockEntity::new, Blocks.LASERTAG_START_GAME_BUTTON).build());
+
+        LASERTAG_TEAM_ZONE_GENERATOR_BLOCK_ENTITY = Registry.register(
+                Registry.BLOCK_ENTITY_TYPE,
+                new Identifier(LasertagMod.ID, "lasertag_team_zone_generator_block_entity"),
+                FabricBlockEntityTypeBuilder.create(LasertagTeamZoneGeneratorBlockEntity::new, Blocks.LASERTAG_TEAM_ZONE_GENERATOR_BLOCK).build());
     }
 }

@@ -35,7 +35,7 @@ public class JoinLasertagTeamCommand extends ServerFeedbackCommand {
         var player = context.getSource().getPlayer();
 
         // Get team
-        var teamDto =  LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().teamConfig.get(teamName);
+        var teamDto = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().teamConfig.get(teamName);
 
         // If team was not found
         if (teamDto == null) {
