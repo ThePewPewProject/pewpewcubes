@@ -19,6 +19,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.TypeFilter;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -167,6 +168,20 @@ public class LasertagMapManager implements IManager {
                 if (worldChunk != null) {
 
                     for (BlockPos blockPos : BlockPos.iterate(chunkPos.getStartX(), serverWorld.getBottomY(), chunkPos.getStartZ(), chunkPos.getEndX(), serverWorld.getTopY() - 1, chunkPos.getEndZ())) {
+
+                        // get the current block state
+                        var currentBlockState = serverWorld.getBlockState(blockPos);
+
+                        // If is already air
+                        if (currentBlockState.equals(Blocks.AIR.getDefaultState())) {
+                            // Continue with the next block
+                            continue;
+                        }
+
+                        // Clear block entity
+                        var blockEntity = serverWorld.getBlockEntity(blockPos);
+                        Clearable.clear(blockEntity);
+
                         // Set block to air. Block.FORCE_STATE so that no items drop (Flowers, seeds, etc)
                         serverWorld.setBlockState(blockPos, Blocks.AIR.getDefaultState(), Block.FORCE_STATE);
                     }

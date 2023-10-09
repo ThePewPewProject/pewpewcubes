@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.worldgen.chunkgen;
 
 import de.kleiner3.lasertag.mixin.IStructureTemplateAccessor;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.NbtDouble;
@@ -143,13 +144,23 @@ public class ArenaStructurePlacer {
                         return;
                     }
 
+                    // Post process the state
+                    var postProcessState = Block.postProcessState(blockInfo.state, world, actualBlockPos);
+                    if (postProcessState.isAir()) {
+                        postProcessState = blockInfo.state;
+                    }
+
                     // Place the block in the world
-                    world.setBlockState(actualBlockPos, blockState, 2);
+                    if (!world.setBlockState(actualBlockPos, postProcessState, Block.FORCE_STATE)) {
+                        return;
+                    }
 
                     if (blockInfo.nbt != null) {
                         var blockEntity = world.getBlockEntity(actualBlockPos);
 
-                        blockEntity.readNbt(blockInfo.nbt);
+                        if (blockEntity != null) {
+                            blockEntity.readNbt(blockInfo.nbt);
+                        }
                     }
                 });
     }
