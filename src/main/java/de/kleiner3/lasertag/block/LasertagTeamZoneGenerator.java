@@ -1,7 +1,5 @@
 package de.kleiner3.lasertag.block;
 
-import de.kleiner3.lasertag.block.entity.LasertagBlockEntityTicker;
-import de.kleiner3.lasertag.block.entity.LasertagCustomBlockTickable;
 import de.kleiner3.lasertag.block.entity.LasertagTeamZoneGeneratorBlockEntity;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;

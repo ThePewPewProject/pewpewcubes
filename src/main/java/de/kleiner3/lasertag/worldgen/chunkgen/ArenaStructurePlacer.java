@@ -1,13 +1,11 @@
 package de.kleiner3.lasertag.worldgen.chunkgen;
 
-import de.kleiner3.lasertag.block.entity.LasertagCustomBlockTickable;
 import de.kleiner3.lasertag.mixin.IStructureTemplateAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.NbtDouble;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.math.*;
 import net.minecraft.world.ChunkRegion;

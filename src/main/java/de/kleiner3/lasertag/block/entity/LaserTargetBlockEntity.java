@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.block.entity;
 
 import de.kleiner3.lasertag.entity.Entities;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -30,14 +31,20 @@ public class LaserTargetBlockEntity extends BlockEntity implements IAnimatable {
      */
     private List<UUID> hitBy = new ArrayList<>();
     private boolean deactivated = false;
+    private long lastHitTime = 0;
 
     public LaserTargetBlockEntity(BlockPos pos, BlockState state) {
         super(Entities.LASER_TARGET_ENTITY, pos, state);
     }
 
+    public long getTimeSinceLastHit() {
+        return Math.max(0, this.world.getTime() - lastHitTime);
+    }
+
     @Override
     protected void writeNbt(NbtCompound nbt) {
         nbt.putBoolean("deactivated", deactivated);
+        nbt.putLong("lastHitTime", lastHitTime);
 
         var hitByFlattened = new ArrayList<Long>();
         for (var uuid : hitBy) {
@@ -60,6 +67,7 @@ public class LaserTargetBlockEntity extends BlockEntity implements IAnimatable {
         }
 
         deactivated = nbt.getBoolean("deactivated");
+        lastHitTime = nbt.getLong("lastHitTime");
     }
 
     @Override
@@ -91,6 +99,21 @@ public class LaserTargetBlockEntity extends BlockEntity implements IAnimatable {
 
     public void addHitBy(PlayerEntity p) {
         hitBy.add(p.getUuid());
+    }
+
+    /**
+     * Sets the last hit time of this lasertarget to now
+     */
+    public void setHit() {
+        lastHitTime = world.getTime() + 2;
+
+        if (world.isClient) {
+            return;
+        }
+
+        // Send lasertag updated to clients
+        var state = this.getCachedState();
+        world.getServer().getOverworld().updateListeners(this.pos, state, state, Block.NOTIFY_LISTENERS);
     }
 
     public void setDeactivated(boolean deactivated) {

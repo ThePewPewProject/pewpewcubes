@@ -29,6 +29,9 @@ public class LasertargetRenderer extends GeoBlockRenderer<LaserTargetBlockEntity
     // Period length int game ticks of blinking lights
     private static final double PERIOD = 32.0;
 
+    // The duration of a hit-flash in game ticks
+    private static final double FLASH_DURATION = 1.0;
+
     public LasertargetRenderer(BlockEntityRendererFactory.Context context) {
         super(MODEL);
     }
@@ -62,11 +65,25 @@ public class LasertargetRenderer extends GeoBlockRenderer<LaserTargetBlockEntity
         float brightness = doSineWave(blockEntity.getWorld().getTime());
 
         var r = 1.0f;
-        var g = 0;
-        var b = 0;
+        var g = 0.0f;
+        var b = 0.0f;
 
         if (blockEntity.isDeactivated()) {
             brightness = 0.0f;
+        }
+
+        var timeSinceLastHit = blockEntity.getTimeSinceLastHit();
+        //LasertagMod.LOGGER.info("Time since last hit: {}", timeSinceLastHit);
+        if (timeSinceLastHit <= FLASH_DURATION) {
+            if (blockEntity.isDeactivated()) {
+                g = 1.0f;
+                b = 1.0f;
+            } else {
+                r = 0.0f;
+                b = 1.0f;
+            }
+
+            brightness = doFlash(timeSinceLastHit);
         }
 
         positionBlock(blockEntity, poseStack);
@@ -113,5 +130,9 @@ public class LasertargetRenderer extends GeoBlockRenderer<LaserTargetBlockEntity
 
     private float doSineWave(long x) {
         return ((float)Math.cos((x * Math.PI * 2.0) / PERIOD) + 1.0f) * 0.5f;
+    }
+
+    private float doFlash(long x) {
+        return ((float)Math.cos((x * Math.PI * 2.0) / (FLASH_DURATION * 2.0)) + 1.0f) * 0.5f;
     }
 }

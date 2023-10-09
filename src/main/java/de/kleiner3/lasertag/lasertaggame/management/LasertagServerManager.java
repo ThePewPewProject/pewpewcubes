@@ -226,6 +226,8 @@ public class LasertagServerManager implements IManager, ITickable {
      */
     public void playerHitLasertarget(ServerPlayerEntity shooter, LaserTargetBlockEntity target) {
 
+        target.setHit();
+
         // Check that target is activated
         if (target.isDeactivated()) {
             return;
