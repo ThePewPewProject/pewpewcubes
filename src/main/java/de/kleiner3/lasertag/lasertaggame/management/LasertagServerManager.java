@@ -5,6 +5,7 @@ import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.ITickable;
+import de.kleiner3.lasertag.lasertaggame.management.blocktick.LasertagBlockTickManager;
 import de.kleiner3.lasertag.lasertaggame.management.lasertargets.LasertargetManager;
 import de.kleiner3.lasertag.lasertaggame.management.map.LasertagMapManager;
 import de.kleiner3.lasertag.lasertaggame.management.music.LasertagMusicManager;
@@ -56,6 +57,8 @@ public class LasertagServerManager implements IManager, ITickable {
 
     private LasertagMapManager mapManager;
 
+    private LasertagBlockTickManager blockTickManager;
+
     //endregion
 
     //region Private fields
@@ -74,6 +77,7 @@ public class LasertagServerManager implements IManager, ITickable {
         settingsPresetsManager = new LasertagSettingsPresetsManager();
         musicManager = new LasertagMusicManager(server);
         mapManager = new LasertagMapManager(server);
+        blockTickManager = new LasertagBlockTickManager(server);
 
         isRunning = false;
     }
@@ -315,6 +319,10 @@ public class LasertagServerManager implements IManager, ITickable {
     public LasertagMapManager getMapManager() { return this.mapManager; }
 
     public LasertagSpawnpointManager getSpawnpointManager() { return this.spawnpointManager; }
+
+    public LasertagBlockTickManager getBlockTickManager() {
+        return this.blockTickManager;
+    }
 
     //endregion
 

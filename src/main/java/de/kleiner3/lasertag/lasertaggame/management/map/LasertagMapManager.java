@@ -151,6 +151,9 @@ public class LasertagMapManager implements IManager {
      */
     private void removeOldBlocks(ArenaBoundsDto oldArenaBounds) {
 
+        // Reset custom block tickers
+        server.getLasertagServerManager().getBlockTickManager().clear();
+
         // Get chunk manager
         var serverWorld = server.getOverworld();
         var serverChunkManager = serverWorld.getChunkManager();
@@ -185,6 +188,8 @@ public class LasertagMapManager implements IManager {
                         // Set block to air. Block.FORCE_STATE so that no items drop (Flowers, seeds, etc)
                         serverWorld.setBlockState(blockPos, Blocks.AIR.getDefaultState(), Block.FORCE_STATE);
                     }
+
+                    worldChunk.clear();
                 } else {
                     LasertagMod.LOGGER.warn("Load arena, remove old arena - Could not get chunk (" + chunkX + ", " + chunkZ + ")");
                 }

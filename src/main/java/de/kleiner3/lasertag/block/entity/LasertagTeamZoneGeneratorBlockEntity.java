@@ -28,8 +28,7 @@ import java.util.*;
 /**
  * @author Étienne Muser
  */
-public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity {
-    // TODO: Block entities dont receive tick after map reload
+public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements LasertagCustomBlockTickable {
 
     private int radius = 5;
     private int height = 10;
@@ -44,19 +43,15 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity {
         zoneCache = new HashSet<>();
     }
 
-    public static void serverTick(World world, BlockPos pos, BlockState state, LasertagTeamZoneGeneratorBlockEntity blockEntity) {
-
-        if (!(world instanceof ServerWorld serverWorld)) {
-            return;
-        }
+    public void serverTick(ServerWorld world) {
 
         // Do nothing if a game is running
-        if (serverWorld.getServer().getLasertagServerManager().isGameRunning()) {
+        if (world.getServer().getLasertagServerManager().isGameRunning()) {
             return;
         }
 
         // Get all players
-        var players = serverWorld.getPlayers();
+        var players = world.getPlayers();
 
         // For every player
         playerLoop: for (var player : players) {
@@ -65,7 +60,7 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity {
             var playerBoundingBox = player.getBoundingBox();
 
             // Go through every border block to check if player intersects the border
-            for (var borderBlock : blockEntity.borderCache) {
+            for (var borderBlock : this.borderCache) {
 
                 // Get the blocks position
                 var blockPos = borderBlock.x();
@@ -78,10 +73,10 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity {
                 if (playerBoundingBox.intersects(blockBoundingBox)) {
 
                     // Get the team
-                    var teamOptional = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfName(blockEntity.teamName);
+                    var teamOptional = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfName(this.teamName);
 
                     // Join the team
-                    teamOptional.ifPresent(team -> playerJoinTeamIfNecessary(serverWorld, player, team));
+                    teamOptional.ifPresent(team -> playerJoinTeamIfNecessary(world, player, team));
 
                     // Continue with next player
                     continue playerLoop;
@@ -92,7 +87,7 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity {
             // Since the first loop went fully through, the player does not intersect the border. If the player
             // intersects only the first block outside the border and not the border itself, he will be thrown out of
             // his team.
-            for (var borderBlock : blockEntity.borderCache) {
+            for (var borderBlock : this.borderCache) {
                 // Get the block position of the first block outside the border
                 var blockPos = borderBlock.x().add(borderBlock.y().getVector());
 
@@ -108,7 +103,7 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity {
 
                     // Leave the team
                     teamOptional.ifPresent(team -> {
-                        LasertagGameManager.getInstance().getTeamManager().playerLeaveHisTeam(serverWorld, player.getUuid());
+                        LasertagGameManager.getInstance().getTeamManager().playerLeaveHisTeam(world, player.getUuid());
                         player.getInventory().clear();
                         player.sendMessage(Text.literal("You left your team"), true);
                     });
@@ -168,6 +163,18 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity {
         nbt.put("borders", borderList);
 
         super.writeNbt(nbt);
+    }
+
+    @Override
+    public void setWorld(World world) {
+        super.setWorld(world);
+
+        if (world.isClient) {
+            return;
+        }
+
+        // Register this as a ticker
+        world.getServer().getLasertagServerManager().getBlockTickManager().registerTicker(this);
     }
 
     @Override

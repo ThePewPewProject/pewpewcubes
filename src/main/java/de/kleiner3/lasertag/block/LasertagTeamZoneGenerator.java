@@ -1,13 +1,12 @@
 package de.kleiner3.lasertag.block;
 
+import de.kleiner3.lasertag.block.entity.LasertagBlockEntityTicker;
+import de.kleiner3.lasertag.block.entity.LasertagCustomBlockTickable;
 import de.kleiner3.lasertag.block.entity.LasertagTeamZoneGeneratorBlockEntity;
-import de.kleiner3.lasertag.entity.Entities;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
@@ -44,11 +43,6 @@ public class LasertagTeamZoneGenerator extends BlockWithEntity {
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new LasertagTeamZoneGeneratorBlockEntity(pos, state);
-    }
-
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world.isClient ? null : checkType(type, Entities.LASERTAG_TEAM_ZONE_GENERATOR_BLOCK_ENTITY, LasertagTeamZoneGeneratorBlockEntity::serverTick);
     }
 
     @Override
