@@ -15,7 +15,6 @@ import net.minecraft.util.math.Direction;
  * @author Étienne Muser
  */
 public class LasertagTeamZoneGeneratorBlockEntityRenderer implements BlockEntityRenderer<LasertagTeamZoneGeneratorBlockEntity> {
-    // TODO: Zone border gets culled
 
     // Period length int game ticks of blinking border when team was not found
     private static final double PERIOD = 32.0;
@@ -24,7 +23,6 @@ public class LasertagTeamZoneGeneratorBlockEntityRenderer implements BlockEntity
     public LasertagTeamZoneGeneratorBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {
 
     }
-
 
     @Override
     public void render(LasertagTeamZoneGeneratorBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
@@ -131,5 +129,10 @@ public class LasertagTeamZoneGeneratorBlockEntityRenderer implements BlockEntity
 
     private static float doSineWave(long x) {
         return ((float)Math.cos((x * Math.PI * 2.0) / PERIOD) + 1.0f) * 0.5f;
+    }
+
+    @Override
+    public boolean rendersOutsideBoundingBox(LasertagTeamZoneGeneratorBlockEntity blockEntity) {
+        return true;
     }
 }
