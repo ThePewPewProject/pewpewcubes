@@ -33,7 +33,7 @@ public enum ArenaType {
             SoundEvents.PROCEDURAL_ARENA_OUTRO_MUSIC_SOUND_EVENT),
     JUNGLE(BiomeKeys.JUNGLE,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/jungle_arena.litematic"),
-            new Vec3i(22, 3, 61),
+            new Vec3i(21, 3, 61),
             "arenaType.jungle",
             SoundEvents.JUNGLE_ARENA_INTRO_MUSIC_SOUND_EVENT,
             SoundEvents.JUNGLE_ARENA_MUSIC_SOUND_EVENT,
