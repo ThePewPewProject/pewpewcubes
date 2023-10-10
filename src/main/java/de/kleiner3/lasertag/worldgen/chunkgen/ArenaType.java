@@ -47,7 +47,7 @@ public enum ArenaType {
             SoundEvents.DESERT_ARENA_OUTRO_MUSIC_SOUND_EVENT),
     FLOWER_FOREST(BiomeKeys.FLOWER_FOREST,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/flower_forest_arena.litematic"),
-            new Vec3i(49, 2, 70),
+            new Vec3i(49, 1, 70),
             "arenaType.flower_forest",
             SoundEvents.FLOWER_FOREST_ARENA_INTRO_MUSIC_SOUND_EVENT,
             SoundEvents.FLOWER_FOREST_ARENA_MUSIC_SOUND_EVENT,
