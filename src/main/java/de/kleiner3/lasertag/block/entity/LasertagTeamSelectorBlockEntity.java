@@ -18,7 +18,7 @@ public class LasertagTeamSelectorBlockEntity extends BlockEntity {
 
     public void openScreen(PlayerEntity player) {
         if (player.getEntityWorld().isClient) {
-            player.openLasertagTeamSelectorScreen();
+            player.openLasertagTeamSelectorScreen(player);
         }
     }
 }

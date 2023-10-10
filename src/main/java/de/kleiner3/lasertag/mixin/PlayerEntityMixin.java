@@ -45,7 +45,7 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer, ILasertagGam
     }
 
     @Override
-    public void openLasertagTeamSelectorScreen() {
+    public void openLasertagTeamSelectorScreen(PlayerEntity player) {
         // Do nothing - may not be a client player
     }
 

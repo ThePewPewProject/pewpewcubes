@@ -12,6 +12,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 
@@ -34,8 +35,12 @@ public class LasertagTeamSelectorScreen extends Screen {
 
     private ListWidget<TeamDto, Integer> list;
 
-    public LasertagTeamSelectorScreen() {
+    private final PlayerEntity player;
+
+    public LasertagTeamSelectorScreen(PlayerEntity player) {
         super(TITLE);
+
+        this.player = player;
     }
 
     /**
@@ -92,10 +97,19 @@ public class LasertagTeamSelectorScreen extends Screen {
      * @return The cell template
      */
     private Drawable getTeamNameColumn(ListCell<TeamDto> desc) {
+
+        // Get the team of the player
+        var playersTeam = LasertagGameManager.getInstance().getTeamManager().getTeamOfPlayer(this.player.getUuid());
+
         var teamDto = desc.value();
         var teamName = teamDto.name();
+        if (playersTeam.isPresent() && playersTeam.get().equals(teamDto)) {
+            teamName = "Your team: " + teamName;
+        }
+
         var teamColor = teamDto.color().getValue();
         var startY = desc.y() + (desc.height() / 2) - (this.textRenderer.fontHeight / 2);
+
         return new LabelWidget(desc.x() + 5, startY, this.textRenderer, Text.literal(teamName), teamColor);
     }
 

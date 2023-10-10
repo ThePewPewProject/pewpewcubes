@@ -24,8 +24,8 @@ public class ClientPlayerEntityMixin implements ILasertagGameManagerScreenOpener
     }
 
     @Override
-    public void openLasertagTeamSelectorScreen() {
-        this.client.setScreen(new LasertagTeamSelectorScreen());
+    public void openLasertagTeamSelectorScreen(PlayerEntity player) {
+        this.client.setScreen(new LasertagTeamSelectorScreen(player));
     }
 
     @Override

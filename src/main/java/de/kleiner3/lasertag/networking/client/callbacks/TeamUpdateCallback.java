@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
 import de.kleiner3.lasertag.client.screen.LasertagGameManagerTeamsScreen;
+import de.kleiner3.lasertag.client.screen.LasertagTeamSelectorScreen;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -38,6 +39,10 @@ public class TeamUpdateCallback implements ClientPlayNetworking.PlayChannelHandl
 
         if (client.currentScreen instanceof LasertagGameManagerTeamsScreen lasertagGameManagerTeamsScreen) {
             lasertagGameManagerTeamsScreen.resetList();
+        }
+
+        if (client.currentScreen instanceof LasertagTeamSelectorScreen lasertagTeamSelectorScreen) {
+            lasertagTeamSelectorScreen.resetList();
         }
     }
 }
