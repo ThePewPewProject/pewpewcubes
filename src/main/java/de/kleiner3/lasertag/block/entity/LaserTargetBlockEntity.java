@@ -105,7 +105,7 @@ public class LaserTargetBlockEntity extends BlockEntity implements IAnimatable {
      * Sets the last hit time of this lasertarget to now
      */
     public void setHit() {
-        lastHitTime = world.getTime() + 2;
+        lastHitTime = world.getTime();
 
         if (world.isClient) {
             return;
