@@ -144,14 +144,8 @@ public class ArenaStructurePlacer {
                         return;
                     }
 
-                    // Post process the state
-                    var postProcessState = Block.postProcessState(blockInfo.state, world, actualBlockPos);
-                    if (postProcessState.isAir()) {
-                        postProcessState = blockInfo.state;
-                    }
-
                     // Place the block in the world
-                    if (!world.setBlockState(actualBlockPos, postProcessState, Block.NOTIFY_LISTENERS)) {
+                    if (!world.setBlockState(actualBlockPos, blockState, Block.NOTIFY_LISTENERS)) {
                         return;
                     }
 
