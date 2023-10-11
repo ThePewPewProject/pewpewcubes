@@ -25,6 +25,7 @@ classes/
 bin/
 .classpath
 .project
+.VSCodeCounter/
 
 # macos
 
