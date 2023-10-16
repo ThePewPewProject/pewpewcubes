@@ -38,6 +38,12 @@ public abstract class HandledScreenMixin {
                 }
             }
             case THROW -> {
+
+                // If no item stack was selected
+                if (slot == null) {
+                    return;
+                }
+
                 // If is lasertag weapon
                 if (slot.getStack().isOf(Items.LASERTAG_WEAPON)) {
 
