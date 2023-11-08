@@ -382,6 +382,7 @@ public class LasertagServerManager implements IManager, ITickable {
 
         // Reset server internal hud render manager
         var hudRenderManager = LasertagGameManager.getInstance().getHudRenderManager();
+        var gameTime = hudRenderManager.gameTime;
         hudRenderManager.stopGameTimer();
         hudRenderManager.shouldRenderNameTags = true;
         hudRenderManager.isGameRunning = false;
@@ -393,18 +394,18 @@ public class LasertagServerManager implements IManager, ITickable {
         musicManager.reset();
 
         // Generate statistics
-        this.generateStats();
+        this.generateStats(gameTime);
 
         // Clean up (stop game tick timer)
         dispose();
     }
 
-    private void generateStats() {
+    private void generateStats(long gameTime) {
         try {
             var world = server.getOverworld();
 
             // Calculate stats
-            var stats = StatsCalculator.calcStats(LasertagGameManager.getInstance().getPlayerManager());
+            var stats = StatsCalculator.calcStats(LasertagGameManager.getInstance().getPlayerManager(), gameTime);
 
             // Create packet
             var buf = new PacketByteBuf(Unpooled.buffer());

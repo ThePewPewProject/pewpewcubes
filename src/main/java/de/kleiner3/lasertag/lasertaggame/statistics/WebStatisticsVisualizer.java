@@ -2,6 +2,7 @@ package de.kleiner3.lasertag.lasertaggame.statistics;
 
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.common.util.DurationUtils;
 import de.kleiner3.lasertag.common.util.FileIO;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.PlayerInfoDto;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.ProfileTextureDto;
@@ -17,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.Base64;
 
 /**
@@ -115,7 +117,15 @@ public class WebStatisticsVisualizer {
     }
 
     private static void buildTeamScores(StringBuilder builder, GameStats stats) {
-        buildTableHeader(builder, "Team scores", "Team");
+
+        String gameDurationString = null;
+        if (stats.gameDurationSeconds != 0L) {
+            gameDurationString = "Game duration: " +
+                    DurationUtils.toMinuteString(Duration.ofSeconds(stats.gameDurationSeconds)) +
+                    " minutes";
+        }
+
+        buildTableHeader(builder, "Team scores", "Team", gameDurationString);
 
         int teamNo = 1;
         for (var team : stats.teamScores) {
@@ -126,7 +136,7 @@ public class WebStatisticsVisualizer {
     }
 
     private static void buildPlayerScores(StringBuilder builder, GameStats stats) {
-        buildTableHeader(builder, "Player scores", "Player");
+        buildTableHeader(builder, "Player scores", "Player", null);
 
         int playerNo = 1;
         for (var player : stats.playerScores) {
@@ -140,7 +150,7 @@ public class WebStatisticsVisualizer {
 
     private static void buildTeamByPlayersScores(StringBuilder builder, GameStats stats) {
         for (var team : stats.teamPlayerScores.entrySet()) {
-            buildTableHeader(builder, team.getKey(), "Player");
+            buildTableHeader(builder, team.getKey(), "Player", null);
 
             int playerNo = 1;
             for (var player : team.getValue()) {
@@ -163,8 +173,14 @@ public class WebStatisticsVisualizer {
         builder.append("</td></tr>");
     }
 
-    private static void buildTableHeader(StringBuilder builder, String tableTitle, String nameColHeader) {
-        builder.append("<div class=\"container py-5\"><h5 class=\"h5\">");
+    private static void buildTableHeader(StringBuilder builder, String tableTitle, String nameColHeader, String headerAddition) {
+        builder.append("<div class=\"container py-5\">");
+        if (headerAddition != null) {
+            builder.append("<div class=\"header-addition\">");
+            builder.append(headerAddition);
+            builder.append("</div>");
+        }
+        builder.append("<h5 class=\"h5\">");
         builder.append(tableTitle);
         builder.append("</h5><table class=\"table text-light\"><col width=\"15%\"/><thead><tr><th scope=\"col\">#</th><th scope=\"col\">");
         builder.append(nameColHeader);

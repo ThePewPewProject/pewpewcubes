@@ -29,3 +29,7 @@ table {
     margin: -24px 0 0 -24px;
     image-rendering: pixelated;
 }
+
+.header-addition {
+    float: right;
+}

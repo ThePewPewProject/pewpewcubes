@@ -17,7 +17,7 @@ import java.util.HashMap;
  */
 public class StatsCalculator {
 
-    public static GameStats calcStats(LasertagPlayerNameManager playerManager) {
+    public static GameStats calcStats(LasertagPlayerNameManager playerManager, long gameTime) {
 
         // Get the managers
         var gameManager = LasertagGameManager.getInstance();
@@ -74,6 +74,12 @@ public class StatsCalculator {
         // Convert team player scores
         for (var entry : teamPlayerScores.entrySet()) {
             stats.teamPlayerScores.put(entry.getKey(), new ArrayList<>(entry.getValue().stream().map(v -> new Tuple<>(v.x(), v.y().getValueString())).toList()));
+        }
+
+        // If is game mode with infinite time
+        if (gameMode.hasInfiniteTime()) {
+            // Safe the game duration
+            stats.gameDurationSeconds = gameTime;
         }
 
         return stats;

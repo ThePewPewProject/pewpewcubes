@@ -12,6 +12,12 @@ import java.util.List;
  * @author Étienne Muser
  */
 public class GameStats {
+
+    /**
+     * The game duration in seconds
+     */
+    public long gameDurationSeconds = 0L;
+
     /**
      * Map every team to the teams combined score ordered by score
      */
