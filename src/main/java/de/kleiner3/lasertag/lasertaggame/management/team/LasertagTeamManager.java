@@ -113,8 +113,8 @@ public class LasertagTeamManager implements IManager {
         // Get new team
         var newTeam = teamMap.get(newTeamDto.id());
 
-        // Check if team is full
-        if (newTeam.size() >= LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.MAX_TEAM_SIZE)) {
+        // Check if team is full (team size ignored for spectators)
+        if (!newTeamDto.equals(TeamConfigManager.SPECTATORS) && newTeam.size() >= LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.MAX_TEAM_SIZE)) {
             // If is Server
             if (player instanceof ServerPlayerEntity) {
                 ServerEventSending.sendErrorMessageToClient((ServerPlayerEntity) player, "Team " + newTeamDto.name() + " is full.");
