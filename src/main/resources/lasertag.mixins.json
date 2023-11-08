@@ -21,6 +21,7 @@
   "client": [
     "ClientPlayerEntityMixin",
     "ClientPlayNetworkHandlerMixin",
+    "DeathScreenMixin",
     "EntityRendererMixin",
     "GameRendererMixin",
     "HandledScreenMixin",

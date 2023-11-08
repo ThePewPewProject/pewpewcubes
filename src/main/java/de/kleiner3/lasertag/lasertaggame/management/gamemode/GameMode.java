@@ -176,7 +176,13 @@ public abstract class GameMode {
         // Set gamerules
         var gameRules = server.getGameRules();
         gameRules.get(GameRules.KEEP_INVENTORY).set(true, server);
-        gameRules.get(GameRules.DO_IMMEDIATE_RESPAWN).set(true, server);
+
+        var doImmediateRespawn = false;
+        long respawnCooldownSetting = LasertagGameManager.getInstance().getSettingsManager().get(SettingDescription.RESPAWN_PENALTY);
+        if (respawnCooldownSetting == 0L) {
+            doImmediateRespawn = true;
+        }
+        gameRules.get(GameRules.DO_IMMEDIATE_RESPAWN).set(doImmediateRespawn, server);
     }
 
     /**
