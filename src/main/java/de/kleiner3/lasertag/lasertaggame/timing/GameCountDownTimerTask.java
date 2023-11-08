@@ -13,11 +13,17 @@ import java.util.TimerTask;
 public class GameCountDownTimerTask extends TimerTask {
     @Override
     public void run() {
-        var renderData = LasertagGameManager.getInstance().getHudRenderManager();
+
+        // Get the managers
+        var gameManager = LasertagGameManager.getInstance();
+        var renderData = gameManager.getHudRenderManager();
 
         ++renderData.gameTime;
 
-        if ((LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAY_TIME) * 60L) - renderData.gameTime == 0) {
+        // Get the game mode
+        var gameMode = gameManager.getGameModeManager().getGameMode();
+
+        if (!gameMode.hasInfiniteTime() && (gameManager.getSettingsManager().<Long>get(SettingDescription.PLAY_TIME) * 60L) - renderData.gameTime == 0) {
             renderData.stopGameTimer();
         }
     }

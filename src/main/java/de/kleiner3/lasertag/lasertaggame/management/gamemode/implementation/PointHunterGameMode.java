@@ -1,17 +1,20 @@
 package de.kleiner3.lasertag.lasertaggame.management.gamemode.implementation;
 
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
-import de.kleiner3.lasertag.common.util.ThreadUtil;
+import de.kleiner3.lasertag.common.types.ScoreHolding;
+import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.gamemode.GameMode;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
-import de.kleiner3.lasertag.networking.NetworkingConstants;
-import de.kleiner3.lasertag.networking.server.ServerEventSending;
-import net.minecraft.block.Block;
+import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Comparator;
+import java.util.UUID;
 
 /**
  * The default game mode. Point hunter. Team-based, time-limited game mode. You earn points for your team
@@ -21,7 +24,15 @@ import java.util.concurrent.TimeUnit;
  */
 public class PointHunterGameMode extends GameMode {
     public PointHunterGameMode() {
-        super("gameMode.point_hunter", false, true);
+        super("gameMode.point_hunter", false, true, false);
+    }
+
+    @Override
+    public void onPreGameStart(MinecraftServer server) {
+        super.onPreGameStart(server);
+
+        // Reset scores
+        LasertagGameManager.getInstance().getScoreManager().resetScores(server.getOverworld());
     }
 
     @Override
@@ -32,41 +43,8 @@ public class PointHunterGameMode extends GameMode {
     @Override
     public void onPlayerHitLasertarget(MinecraftServer server, ServerPlayerEntity shooter, LaserTargetBlockEntity target) {
 
-        // Get the old block state
-        var oldBlockState = server.getOverworld().getBlockState(target.getPos());
-
         LasertagGameManager.getInstance().getScoreManager().onPlayerScored(server.getOverworld(), shooter, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.LASERTARGET_HIT_SCORE));
-        ServerEventSending.sendPlayerSoundEvent(shooter, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND);
-
-        // Deactivate
-        target.setDeactivated(true);
-
-        // Reactivate after configured amount of seconds
-        var deactivationThread = ThreadUtil.createScheduledExecutor("lasertag-target-deactivation-thread-%d");
-        deactivationThread.schedule(() -> {
-
-            // Get the old block state
-            var oldBlockStateReset = server.getOverworld().getBlockState(target.getPos());
-
-            target.setDeactivated(false);
-
-            // Get the new block state
-            var newBlockState = server.getOverworld().getBlockState(target.getPos());
-
-            // Send lasertag updated to clients
-            server.getOverworld().updateListeners(target.getPos(), oldBlockStateReset, newBlockState, Block.NOTIFY_LISTENERS);
-
-            deactivationThread.shutdownNow();
-        }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.LASERTARGET_DEACTIVATE_TIME), TimeUnit.SECONDS);
-
-        // Add player to the players who hit the target
-        target.addHitBy(shooter);
-
-        // Get the new block state
-        var newBlockState = server.getOverworld().getBlockState(target.getPos());
-
-        // Send lasertag updated to clients
-        server.getOverworld().updateListeners(target.getPos(), oldBlockState, newBlockState, Block.NOTIFY_LISTENERS);
+        super.onPlayerHitLasertarget(server, shooter, target);
     }
 
     @Override
@@ -93,6 +71,78 @@ public class PointHunterGameMode extends GameMode {
         LasertagGameManager.getInstance().getDeactivatedManager().deactivate(target.getUuid(), world, server.getPlayerManager());
 
         LasertagGameManager.getInstance().getScoreManager().onPlayerScored(world, shooter, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAYER_HIT_SCORE));
-        ServerEventSending.sendPlayerSoundEvent(shooter, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND);
+        super.onPlayerHitPlayer(server, shooter, target);
+    }
+
+    @Override
+    public void onPlayerDeath(MinecraftServer server, ServerPlayerEntity player, DamageSource ignored) {
+        // Give the player the death penalty
+        var deathPenalty = -LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.DEATH_PENALTY);
+        LasertagGameManager.getInstance().getScoreManager().onPlayerScored(server.getOverworld(), player, deathPenalty);
+    }
+
+    @Override
+    public int getWinnerTeamId() {
+
+        // Get the managers
+        var gameManager = LasertagGameManager.getInstance();
+        var teamManager = gameManager.getTeamManager();
+        var scoreManager = gameManager.getScoreManager();
+
+        return teamManager.getTeamMap().entrySet().stream()
+                .map(entry -> new Tuple<>(entry.getKey(), entry.getValue().stream().map(scoreManager::getScore).reduce(Long::sum).get()))
+                .max(Comparator.comparingLong(Tuple::y))
+                .map(tuple -> tuple.x().id())
+                .orElse(-1);
+    }
+
+    @Override
+    public Text getTeamScoreText(TeamDto team) {
+        var scoreManager = LasertagGameManager.getInstance().getScoreManager();
+        var teamScore = LasertagGameManager.getInstance().getTeamManager().getPlayersOfTeam(team).stream()
+                .mapToLong(scoreManager::getScore).sum();
+        return Text.literal(Long.toString(teamScore));
+    }
+
+    @Override
+    public Text getPlayerScoreText(UUID playerUuid) {
+        return Text.literal(Long.toString(LasertagGameManager.getInstance().getScoreManager().getScore(playerUuid)));
+    }
+
+    @Override
+    public ScoreHolding getTeamFinalScore(TeamDto team) {
+        var scoreManager = LasertagGameManager.getInstance().getScoreManager();
+        var teamScore = (Long) LasertagGameManager.getInstance().getTeamManager().getPlayersOfTeam(team).stream()
+                .mapToLong(scoreManager::getScore).sum();
+        return new PointHunterScore(teamScore);
+    }
+
+    @Override
+    public ScoreHolding getPlayerFinalScore(UUID playerUuid) {
+        return new PointHunterScore(LasertagGameManager.getInstance().getScoreManager().getScore(playerUuid));
+    }
+
+    public static class PointHunterScore implements ScoreHolding {
+
+        private final Long value;
+
+        public PointHunterScore(long value) {
+            this.value = value;
+        }
+
+        @Override
+        public String getValueString() {
+            return Long.toString(this.value);
+        }
+
+        @Override
+        public int compareTo(@NotNull ScoreHolding o) {
+
+            if (!(o instanceof PointHunterScore otherPointHunterScore)) {
+                return 0;
+            }
+
+            return this.value.compareTo(otherPointHunterScore.value);
+        }
     }
 }

@@ -31,7 +31,8 @@ public abstract class HandledScreenMixin {
                 var itemStack = ((HandledScreen)(Object)this).getScreenHandler().getCursorStack();
 
                 // If is lasertag weapon
-                if (itemStack.isOf(Items.LASERTAG_WEAPON)) {
+                if (itemStack.isOf(Items.LASERTAG_WEAPON) ||
+                    itemStack.isOf(Items.LASERTAG_FLAG)) {
 
                     // Don't drop it
                     ci.cancel();
@@ -45,7 +46,8 @@ public abstract class HandledScreenMixin {
                 }
 
                 // If is lasertag weapon
-                if (slot.getStack().isOf(Items.LASERTAG_WEAPON)) {
+                if (slot.getStack().isOf(Items.LASERTAG_WEAPON) ||
+                    slot.getStack().isOf(Items.LASERTAG_FLAG)) {
 
                     // Don't drop it
                     ci.cancel();

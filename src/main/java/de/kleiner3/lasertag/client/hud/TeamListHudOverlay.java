@@ -1,7 +1,6 @@
 package de.kleiner3.lasertag.client.hud;
 
 import de.kleiner3.lasertag.common.types.Tuple;
-import de.kleiner3.lasertag.common.types.Vec3;
 import de.kleiner3.lasertag.common.util.AdvancedDrawableHelper;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
@@ -14,6 +13,7 @@ import net.minecraft.text.Text;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Class to implement the team list hud overlay
@@ -57,25 +57,12 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         }
 
         var teamManager = lasertagGameManager.getTeamManager();
-        var scoreManager = lasertagGameManager.getScoreManager();
-        var playerManager = lasertagGameManager.getPlayerManager();
 
-        // Get a list of Tuple<TeamDto, List<Vec3<String, Long, Boolean>>> (One entry is a team) which are not empty
+        // Get a list of Tuple<TeamDto, List<UUID>> (One entry is a team which is not empty)
         var teams = teamManager.getTeamMap().entrySet().stream()
-                .filter(entry -> entry.getValue().size() > 0)
+                .filter(entry -> !entry.getValue().isEmpty())
                 .filter(entry -> !entry.getKey().equals(TeamConfigManager.SPECTATORS))
-                .map(entry -> {
-                    var teamList = entry.getValue().stream()
-                            .map(playerUuid -> {
-                                // Try to get player from player list
-                                var player = CLIENT.getNetworkHandler().getPlayerListEntry(playerUuid);
-
-                                return new Vec3<>(playerManager.getPlayerUsername(playerUuid), scoreManager.getScore(playerUuid), player != null);
-                            })
-                            .toList();
-
-                    return new Tuple<>(entry.getKey(), teamList);
-                })
+                .map(entry -> new Tuple<>(entry.getKey(), entry.getValue()))
                 .toList();
         var numberOfTeams = teams.size();
 
@@ -127,15 +114,19 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
      * @param teamHeight
      */
     private void drawTeam(MatrixStack matrices,
-                                 Tuple<TeamDto, List<Vec3<String, Long, Boolean>>> team,
+                                 Tuple<TeamDto, List<UUID>> team,
                                  int startX,
                                  int startY,
                                  int teamHeight) {
         var rectangleStartX = startX + TEAM_PADDING;
         var rectangleStartY = startY + TEAM_PADDING;
         var teamDto = team.x();
-        var teamScore = team.y().stream().mapToLong(t -> t.y()).sum();
         var textHeight = TEXT_RENDERER.fontHeight;
+
+        // Get the managers
+        var gameManager = LasertagGameManager.getInstance();
+        var gameMode = gameManager.getGameModeManager().getGameMode();
+        var playerManager = gameManager.getPlayerManager();
 
         // Draw rectangle of team
         drawRectangle(matrices, rectangleStartX, rectangleStartY, rectangleStartX + TEAM_WIDTH, rectangleStartY + teamHeight, 0xAAFFFFFF);
@@ -144,27 +135,32 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         drawWithShadow(matrices, TEXT_RENDERER, Text.literal(teamDto.name()).asOrderedText(), rectangleStartX + TEXT_PADDING + 1, rectangleStartY + TEXT_PADDING + 1, teamDto.color().getValue());
 
         // Draw team score
-        var teamScoreString = Long.toString(teamScore);
-        var scoreStartX = rectangleStartX + TEAM_WIDTH - TEXT_RENDERER.getWidth(teamScoreString) - TEXT_PADDING;
-        drawWithShadow(matrices, TEXT_RENDERER, Text.literal(teamScoreString).asOrderedText(), scoreStartX, rectangleStartY + TEXT_PADDING + 1, 0xFFFFFFFF);
+        var teamScoreText = gameMode.getTeamScoreText(teamDto);
+        var scoreStartX = rectangleStartX + TEAM_WIDTH - TEXT_RENDERER.getWidth(teamScoreText) - TEXT_PADDING;
+        drawWithShadow(matrices, TEXT_RENDERER, teamScoreText.asOrderedText(), scoreStartX, rectangleStartY + TEXT_PADDING + 1, 0xFFFFFFFF);
 
         var playerY = rectangleStartY + TEXT_PADDING + textHeight + TEXT_PADDING;
-        for (var player : team.y()) {
+        for (var playerUuid : team.y()) {
 
+            // Try to get player from player list
+            var networkPlayer = CLIENT.getNetworkHandler().getPlayerListEntry(playerUuid);
+
+            // Set default text color to white
             var playerNamecolor = 0xFFFFFFFF;
 
             // If the player is not online
-            if (!player.z()) {
+            if (networkPlayer == null) {
+                // Set text color to gray
                 playerNamecolor = 0xFF808080;
             }
 
             // Draw player name
-            TEXT_RENDERER.draw(matrices, player.x(), rectangleStartX + TEXT_PADDING + 1, playerY, playerNamecolor);
+            TEXT_RENDERER.draw(matrices, playerManager.getPlayerUsername(playerUuid), rectangleStartX + TEXT_PADDING + 1, playerY, playerNamecolor);
 
             // Draw player score
-            var playerScoreString = Long.toString(player.y());
-            var playerScoreStartX = rectangleStartX + TEAM_WIDTH - TEXT_RENDERER.getWidth(playerScoreString) - TEXT_PADDING;
-            TEXT_RENDERER.draw(matrices, playerScoreString, playerScoreStartX, playerY, 0xFFFFFFFF);
+            var playerScoreText = gameMode.getPlayerScoreText(playerUuid);
+            var playerScoreStartX = rectangleStartX + TEAM_WIDTH - TEXT_RENDERER.getWidth(playerScoreText) - TEXT_PADDING;
+            TEXT_RENDERER.draw(matrices, playerScoreText, playerScoreStartX, playerY, 0xFFFFFFFF);
 
             playerY += (INTRA_PLAYER_PADDING + textHeight);
         }

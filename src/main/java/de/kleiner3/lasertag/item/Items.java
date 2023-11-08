@@ -25,6 +25,8 @@ public class Items {
     public static final Item LASERTAG_WEAPON = new LasertagWeaponItem(new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP).maxCount(1).rarity(Rarity.EPIC));
     public static final Item LASERTAG_VEST = new LasertagVestItem(LASERVEST_MATERIAL, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP).rarity(Rarity.EPIC));
 
+    // Block items
+    public static final Item LASERTAG_FLAG = new LasertagFlagItem();
 
     public static void register() {
 
@@ -121,6 +123,8 @@ public class Items {
                 new BlockItem(Blocks.LASERTAG_START_GAME_BUTTON, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
         Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "team_zone_generator"),
                 new BlockItem(Blocks.LASERTAG_TEAM_ZONE_GENERATOR_BLOCK, new FabricItemSettings().group(ItemGroups.LASERTAG_ITEM_GROUP)));
+
+        Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "lasertag_flag"), LASERTAG_FLAG);
 
         // Normal items
         Registry.register(Registry.ITEM, new Identifier(LasertagMod.ID, "lasertag_weapon"), LASERTAG_WEAPON);

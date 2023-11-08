@@ -10,6 +10,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+import static de.kleiner3.lasertag.lasertaggame.management.settings.SettingDataType.BOOL;
+import static de.kleiner3.lasertag.lasertaggame.management.settings.SettingDataType.LONG;
+
 /**
  * Callback for the client trigger setting change network event
  *
@@ -25,10 +28,14 @@ public class ClientTriggerSettingChangeCallback implements ServerPlayNetworking.
         var settingDescription = SettingDescription.valueOf(settingEnumName);
 
         Object settingValue = null;
-        switch (settingDescription.getDataType()) {
-            case BOOL -> settingValue = buf.readBoolean();
-            case LONG -> settingValue = buf.readLong();
-            default -> LasertagMod.LOGGER.error("ClientTriggerSettingChangeCallback: Unrecognised setting datatype '{}'", settingDescription.getDataType());
+        if (settingDescription.getDataType().equals(BOOL)) {
+            settingValue = buf.readBoolean();
+        } else if (settingDescription.getDataType().equals(LONG)) {
+            settingValue = buf.readLong();
+        } else if (settingDescription.getDataType().isEnum()) {
+            settingValue = buf.readString();
+        } else {
+            LasertagMod.LOGGER.error("ClientTriggerSettingChangeCallback: Unrecognised setting datatype '{}'", settingDescription.getDataType());
         }
 
         if (settingValue != null) {

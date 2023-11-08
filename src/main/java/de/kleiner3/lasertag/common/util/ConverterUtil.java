@@ -8,7 +8,7 @@ package de.kleiner3.lasertag.common.util;
 public class ConverterUtil {
     /**
      * Converts a string to the correct primitive type.
-     * Currently only supports int and boolean
+     * Currently only supports long and boolean
      * @param value The string to convert
      * @return The converted primitive type
      */

@@ -91,15 +91,30 @@ public class LasertagHudOverlay implements HudRenderCallback {
     }
 
     private void renderTimer(TextRenderer renderer, MatrixStack matrices, LasertagHudRenderManager renderData) {
+
+        // Get the managers
+        var gameManager = LasertagGameManager.getInstance();
+        var settingsManager = gameManager.getSettingsManager();
+
         // If game time should not be rendered
-        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.RENDER_TIMER)) {
+        if (!settingsManager.<Boolean>get(SettingDescription.RENDER_TIMER)) {
             // Abort
             return;
         }
 
+        // Get the game mode
+        var gameMode = gameManager.getGameModeManager().getGameMode();
+
+        // Init seconds to show with the time the game is already running
+        var secondsToShow = renderData.gameTime;
+
+        // If game mode has no infinite time
+        if (!gameMode.hasInfiniteTime()) {
+            secondsToShow = (settingsManager.<Long>get(SettingDescription.PLAY_TIME) * 60L) - secondsToShow;
+        }
+
         DrawableHelper.drawCenteredText(matrices, renderer,
-                DurationUtils.toString(
-                        Duration.ofSeconds((LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAY_TIME) * 60L) - renderData.gameTime)),
+                DurationUtils.toString(Duration.ofSeconds(secondsToShow)),
                 renderData.wMid, LasertagHudRenderManager.textPadding, 0xFFFFFF);
     }
 

@@ -4,6 +4,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.GsonBuilder;
 import com.google.gson.ToNumberPolicy;
 import de.kleiner3.lasertag.client.screen.LasertagTeamSelectorScreen;
+import de.kleiner3.lasertag.lasertaggame.management.capturetheflag.CaptureTheFlagManager;
 import de.kleiner3.lasertag.lasertaggame.management.deactivation.PlayerDeactivatedManager;
 import de.kleiner3.lasertag.lasertaggame.management.gamemode.LasertagGameModeManager;
 import de.kleiner3.lasertag.lasertaggame.management.gui.LasertagHudRenderManager;
@@ -64,6 +65,8 @@ public class LasertagGameManager implements IManager {
 
     private LasertagScoreManager scoreManager;
 
+    private CaptureTheFlagManager flagManager;
+
     private LasertagHudRenderManager hudRenderManager;
 
     private LasertagPlayerNameManager playerManager;
@@ -78,6 +81,7 @@ public class LasertagGameManager implements IManager {
         presetsNameManager = new LasertagSettingsPresetsNameManager();
         teamManager = new LasertagTeamManager();
         scoreManager = new LasertagScoreManager();
+        flagManager = new CaptureTheFlagManager();
         hudRenderManager = new LasertagHudRenderManager();
         playerManager = new LasertagPlayerNameManager();
         gameModeManager = new LasertagGameModeManager();
@@ -108,6 +112,8 @@ public class LasertagGameManager implements IManager {
     public LasertagScoreManager getScoreManager() {
         return scoreManager;
     }
+
+    public CaptureTheFlagManager getFlagManager() { return flagManager; }
 
     public LasertagPlayerNameManager getPlayerManager() { return playerManager; }
 

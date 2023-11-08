@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame.statistics;
 
+import de.kleiner3.lasertag.common.types.ScoreHolding;
 import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.players.LasertagPlayerNameManager;
@@ -7,6 +8,7 @@ import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 
 /**
  * Class to calculate the lasertag game stats
@@ -17,11 +19,16 @@ public class StatsCalculator {
 
     public static GameStats calcStats(LasertagPlayerNameManager playerManager) {
 
-        var stats = new GameStats();
+        // Get the managers
+        var gameManager = LasertagGameManager.getInstance();
+        var gameMode = gameManager.getGameModeManager().getGameMode();
 
-        var scoreManager = LasertagGameManager.getInstance().getScoreManager();
+        // Init lists for sorting
+        var playerScores = new ArrayList<Tuple<String, ScoreHolding>>();
+        var teamScores = new ArrayList<Tuple<String, ScoreHolding>>();
+        var teamPlayerScores = new HashMap<String, ArrayList<Tuple<String, ScoreHolding>>>();
 
-        for (var team : LasertagGameManager.getInstance().getTeamManager().getTeamMap().entrySet()) {
+        for (var team : gameManager.getTeamManager().getTeamMap().entrySet()) {
 
             var teamDto = team.getKey();
 
@@ -30,30 +37,43 @@ public class StatsCalculator {
                 continue;
             }
 
-            var teamScore = 0L;
-
-            var playersOfThisTeam = new ArrayList<Tuple<String, Long>>();
+            var playersOfThisTeam = new ArrayList<Tuple<String, ScoreHolding>>();
             for (var playerUuid : team.getValue()) {
 
-                var score = scoreManager.getScore(playerUuid);
+                var score = gameMode.getPlayerFinalScore(playerUuid);
                 var playerScoreTuple = new Tuple<>(playerManager.getPlayerUsername(playerUuid), score);
 
-                teamScore += score;
-                stats.playerScores.add(playerScoreTuple);
+                playerScores.add(playerScoreTuple);
                 playersOfThisTeam.add(playerScoreTuple);
             }
 
-            if (playersOfThisTeam.size() > 0) {
-                stats.teamPlayerScores.put(teamDto.name(), playersOfThisTeam);
-                stats.teamScores.add(new Tuple<>(teamDto.name(), teamScore));
+            var teamScore = gameMode.getTeamFinalScore(teamDto);
+
+            if (!playersOfThisTeam.isEmpty()) {
+                teamPlayerScores.put(teamDto.name(), playersOfThisTeam);
+                teamScores.add(new Tuple<>(teamDto.name(), teamScore));
             }
         }
 
         // Sort stats
-        stats.teamScores.sort(Comparator.<Tuple<String, Long>>comparingLong(t -> t.y()).reversed());
-        stats.playerScores.sort(Comparator.<Tuple<String, Long>>comparingLong(t -> t.y()).reversed());
-        for (var team : stats.teamPlayerScores.values()) {
-            team.sort(Comparator.<Tuple<String, Long>>comparingLong(t -> t.y()).reversed());
+        teamScores.sort(Comparator.<Tuple<String, ScoreHolding>, ScoreHolding>comparing(Tuple::y).reversed());
+        playerScores.sort(Comparator.<Tuple<String, ScoreHolding>, ScoreHolding>comparing(Tuple::y).reversed());
+        for (var team : teamPlayerScores.values()) {
+            team.sort(Comparator.<Tuple<String, ScoreHolding>, ScoreHolding>comparing(Tuple::y).reversed());
+        }
+
+        // Create stats object
+        var stats = new GameStats();
+
+        // Convert team scores
+        stats.teamScores.addAll(teamScores.stream().map(v -> new Tuple<>(v.x(), v.y().getValueString())).toList());
+
+        // Convert player scores
+        stats.playerScores.addAll(playerScores.stream().map(v -> new Tuple<>(v.x(), v.y().getValueString())).toList());
+
+        // Convert team player scores
+        for (var entry : teamPlayerScores.entrySet()) {
+            stats.teamPlayerScores.put(entry.getKey(), new ArrayList<>(entry.getValue().stream().map(v -> new Tuple<>(v.x(), v.y().getValueString())).toList()));
         }
 
         return stats;

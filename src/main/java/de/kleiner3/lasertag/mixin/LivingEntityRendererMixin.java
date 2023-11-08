@@ -2,7 +2,7 @@ package de.kleiner3.lasertag.mixin;
 
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
-import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
+import de.kleiner3.lasertag.lasertaggame.management.settings.valuetypes.CTFFlagHoldingPlayerVisibility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.entity.LivingEntity;
@@ -11,8 +11,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Mixin into the LivingEntityRenderer class
@@ -54,13 +52,24 @@ public abstract class LivingEntityRendererMixin {
             }
         }
 
+        // If capture the flag setting "flagHoldingPlayerVisibility" is set to NAMETAG
+        if (settingsManager.getEnum(SettingDescription.CTF_FLAG_HOLDING_PLAYER_VISIBILITY) == CTFFlagHoldingPlayerVisibility.NAMETAG) {
+
+            // Get the team of the flag the player is holding
+            var teamOptional = gameManager.getFlagManager().getPlayerHoldingFlagTeam(renderedPlayer.getUuid());
+
+            // If player is holding a flag
+            if (teamOptional.isPresent()) {
+                return;
+            }
+        }
+
         if (hudManager.shouldRenderNameTags) {
             return;
         }
 
-        AtomicBoolean isSpectator = new AtomicBoolean(false);
-        playersTeam.ifPresent(t -> isSpectator.set(t.equals(TeamConfigManager.SPECTATORS)));
-        if (isSpectator.get()) {
+        // Always render name tags if player is in spectator game mode
+        if (thisPlayer.isSpectator()) {
             return;
         }
 

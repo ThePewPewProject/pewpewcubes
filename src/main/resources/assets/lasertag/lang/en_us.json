@@ -52,6 +52,8 @@
 	"block.lasertag.lasertag_start_game_button": "Lasertag Start Game Button",
 	"block.lasertag.team_zone_generator": "Lasertag Team Zone Generator",
 
+	"block.lasertag.lasertag_flag": "Lasertag Flag",
+
 	"item.lasertag.lasertag_weapon": "Lasertag Weapon",
 	"item.lasertag.lasertag_vest": "Lasertag Vest",
 
@@ -70,6 +72,7 @@
 	"arenaType.procedural.medium_four_team_extended": "Procedural: Medium 4 Teams",
 
 	"gameMode.point_hunter": "Point Hunter",
+	"gameMode.capture_the_flag": "Capture The Flag",
 
 	"subtitles.lasertag.music": "Thrilling music",
 	"subtitles.lasertag.weapon_fire_sound": "Laserweapon firing",
@@ -112,6 +115,10 @@
 	"gui.game_manager.settings.showNametagsOfTeammates": "Show nametags of teammates",
 	"gui.game_manager.settings.weaponCooldown": "Weapon cooldown",
 	"gui.game_manager.settings.weaponReach": "Weapon reach",
+	"gui.game_manager.settings.laserDamage": "Laser damage",
+	"gui.game_manager.settings.lasertargetHeal": "Lasertarget heal",
+	"gui.game_manager.settings.numberOfFlags": "Number of flags",
+	"gui.game_manager.settings.flagHoldingPlayerVisibility": "Flag-holding player visibility",
 	"gui.game_manager.map_button": "Arena...",
 	"gui.game_manager.teams_button": "Teams...",
 	"gui.game_manager.reload_team_config_button": "Reload team config",
@@ -128,5 +135,12 @@
 	"gui.team_zone_generator.warning_label_text": "WARNING: Do not touch this unless you know what you are doing!",
 	"gui.team_zone_generator.change_info_text": "This value should only be changed if a team name got changed.",
 
-	"render.start_game_button_text": "Start Game"
+	"CTF_FLAG_HOLDING_PLAYER_VISIBILITY.NONE": "Player not visible",
+	"CTF_FLAG_HOLDING_PLAYER_VISIBILITY.NAMETAG": "Nametag visible",
+	"CTF_FLAG_HOLDING_PLAYER_VISIBILITY.GLOW": "Player glowing",
+
+	"render.start_game_button_text": "Start Game",
+
+	"death.attack.laser": "%s was reset",
+	"death.attack.laser.player": "%s was reset"
 }

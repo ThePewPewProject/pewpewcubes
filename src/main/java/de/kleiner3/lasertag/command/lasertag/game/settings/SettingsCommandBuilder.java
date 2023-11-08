@@ -3,12 +3,14 @@ package de.kleiner3.lasertag.command.lasertag.game.settings;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import de.kleiner3.lasertag.command.suggestions.EnumSettingSuggestionProvider;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDataType;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import net.minecraft.server.command.ServerCommandSource;
 
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
 import static com.mojang.brigadier.arguments.LongArgumentType.longArg;
+import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -33,15 +35,21 @@ public class SettingsCommandBuilder {
 
     private static void addSetting(LiteralArgumentBuilder<ServerCommandSource> cmd, SettingDescription setting) {
 
-        if (setting.getDataType() == SettingDataType.LONG) {
+        // Get the setting data type
+        var dataType = setting.getDataType();
+
+        if (dataType == SettingDataType.LONG) {
 
             buildLongSetting(cmd, setting);
-        } else if (setting.getDataType() == SettingDataType.BOOL) {
+        } else if (dataType == SettingDataType.BOOL) {
 
             buildBoolSetting(cmd, setting);
+        } else if (dataType.isEnum()) {
+
+            buildEnumSetting(cmd, setting);
         } else {
 
-            throw new IllegalArgumentException("DataType " + setting.getDataType().name() + " is not supported by SettingsCommandBuilder.");
+            throw new IllegalArgumentException("DataType " + setting.getDataType().getValueType().getName() + " is not supported by SettingsCommandBuilder.");
         }
     }
 
@@ -76,6 +84,15 @@ public class SettingsCommandBuilder {
 
         cmd.then(literal(setting.getName())
                 .then(argument(setting.getSettingValueName(), argumentType)
+                        .executes(command)));
+    }
+
+    private static void buildEnumSetting(LiteralArgumentBuilder<ServerCommandSource> cmd, SettingDescription setting) {
+        var command = new EnumSettingCommand(setting.getName(), setting.getSettingValueName());
+
+        cmd.then(literal(setting.getName())
+                .then(argument(setting.getSettingValueName(), word())
+                        .suggests(new EnumSettingSuggestionProvider(setting.getDataType().getValueType()))
                         .executes(command)));
     }
 }

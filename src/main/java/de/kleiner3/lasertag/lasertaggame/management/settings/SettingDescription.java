@@ -1,5 +1,10 @@
 package de.kleiner3.lasertag.lasertaggame.management.settings;
 
+import de.kleiner3.lasertag.lasertaggame.management.settings.valuetypes.CTFFlagHoldingPlayerVisibility;
+
+import java.util.Arrays;
+import java.util.Optional;
+
 /**
  * DTO holding all information about a setting
  *
@@ -24,7 +29,26 @@ public enum SettingDescription {
     DO_ORIGIN_SPAWN("doOriginSpawn", true, SettingDataType.BOOL, "value", null, null),
     DEATH_PENALTY("deathPenalty", 500L, SettingDataType.LONG, "points", null, null),
     SHOW_NAMETAGS_OF_TEAMMATES("showNametagsOfTeammates", true, SettingDataType.BOOL, "value", null, null),
-    MINING_FATIGUE_ENABLED("miningFatigueEnabled", true, SettingDataType.BOOL, "value", null, null);
+    MINING_FATIGUE_ENABLED("miningFatigueEnabled", true, SettingDataType.BOOL, "value", null, null),
+
+    // Capture the flag specific
+    LASER_RAY_DAMAGE("laserDamage", 5L, SettingDataType.LONG, "amount", 0L, 20L),
+    LASERTARGET_HEAL("lasertargetHeal", 2L, SettingDataType.LONG, "amount", 0L, 20L),
+    PLAYER_RESET_HEAL("playerResetHeal", 20L, SettingDataType.LONG, "amount", 0L, 20L),
+    FLAG_COUNT("numberOfFlags", 3L, SettingDataType.LONG, "number", 0L, null),
+    CTF_FLAG_HOLDING_PLAYER_VISIBILITY("flagHoldingPlayerVisibility", CTFFlagHoldingPlayerVisibility.GLOW, SettingDataType.ofEnum(CTFFlagHoldingPlayerVisibility.class), "visibility", null, null);
+
+    /**
+     * Get a SettingDescription given its name.
+     *
+     * @param settingName The configured name of the SettingDescription
+     * @return Optional containing the SettingDescription or Optional.empty()
+     */
+    public static Optional<SettingDescription> byName(String settingName) {
+        return Arrays.stream(SettingDescription.values())
+                .filter(sd -> sd.name.equals(settingName))
+                .findFirst();
+    }
 
     private final String name;
     private final Object defaultValue;

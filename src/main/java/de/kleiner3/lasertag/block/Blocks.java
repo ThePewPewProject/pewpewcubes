@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.block;
 import de.kleiner3.lasertag.LasertagMod;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -65,9 +66,12 @@ public class Blocks {
     // Interactable blocks
     public static final Block LASERTAG_GAME_MANAGER_BLOCK = new LasertagGameManagerBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f));
     public static final Block LASERTAG_TEAM_SELECTOR_BLOCK = new LasertagTeamSelectorBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f));
-    public static final Block LASERTAG_CREDITS_BUTTON = new LasertagCreditsButton(FabricBlockSettings.of(Material.METAL).strength(4.0f));
-    public static final Block LASERTAG_START_GAME_BUTTON = new LasertagStartGameButton(FabricBlockSettings.of(Material.STONE).strength(4.0f));
+    public static final Block LASERTAG_CREDITS_BUTTON = new LasertagCreditsButton(FabricBlockSettings.of(Material.DECORATION).noCollision().strength(4.0f));
+    public static final Block LASERTAG_START_GAME_BUTTON = new LasertagStartGameButton(FabricBlockSettings.of(Material.DECORATION).noCollision().strength(4.0f));
     public static final Block LASERTAG_TEAM_ZONE_GENERATOR_BLOCK = new LasertagTeamZoneGenerator(FabricBlockSettings.of(Material.METAL).strength(4.0f));
+
+    // Other
+    public static final Block LASERTAG_FLAG_BLOCK = new LasertagFlagBlock(FabricBlockSettings.of(Material.DECORATION).noCollision().strength(0.05f).sounds(BlockSoundGroup.WOOL));
 
     public static void register() {
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "arena_block_orange"), ARENA_BLOCK_ORANGE);
@@ -119,5 +123,7 @@ public class Blocks {
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "lasertag_credits_button"), LASERTAG_CREDITS_BUTTON);
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "lasertag_start_game_button"), LASERTAG_START_GAME_BUTTON);
         Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "team_zone_generator"), LASERTAG_TEAM_ZONE_GENERATOR_BLOCK);
+
+        Registry.register(Registry.BLOCK, new Identifier(LasertagMod.ID, "lasertag_flag"), LASERTAG_FLAG_BLOCK);
     }
 }

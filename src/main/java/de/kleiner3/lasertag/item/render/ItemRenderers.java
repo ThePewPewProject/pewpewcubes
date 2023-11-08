@@ -11,5 +11,6 @@ import software.bernie.geckolib3.renderers.geo.GeoItemRenderer;
 public class ItemRenderers {
     public static void register() {
         GeoItemRenderer.registerItemRenderer(Items.LASERTAG_WEAPON, new LasertagWeaponRenderer());
+        GeoItemRenderer.registerItemRenderer(Items.LASERTAG_FLAG, new LasertagFlagItemRenderer());
     }
 }

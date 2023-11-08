@@ -29,6 +29,12 @@ import java.util.concurrent.TimeUnit;
 public class GameStatisticsIncomingCallback implements ClientPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
+
+        // Get the managers
+        var gameManager = LasertagGameManager.getInstance();
+        var hudRenderManager = gameManager.getHudRenderManager();
+        var settingManager = gameManager.getSettingsManager();
+
         // Read from buffer
         var json = buf.readString();
 
@@ -36,19 +42,27 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
         var stats = new Gson().fromJson(json, GameStats.class);
 
         if (!stats.teamScores.isEmpty()) {
-            var winnerName = stats.teamScores.get(0).x();
-            var winnerTeamOptional = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfName(winnerName);
-            winnerTeamOptional.ifPresent(t -> LasertagGameManager.getInstance().getHudRenderManager().lastGameWinnerId = t.id());
+
+            // Get the winner team id
+            var winnerTeamId = gameManager.getGameModeManager().getGameMode().getWinnerTeamId();
+
+            // If something went wrong
+            if (winnerTeamId == -1) {
+                LasertagMod.LOGGER.warn("Something went wrong while deciding what team won.");
+            }
+
+            // Set the winner team id
+            hudRenderManager.lastGameWinnerId = winnerTeamId;
 
             var gameOverOverlayTimer = ThreadUtil.createScheduledExecutor("lasertag-client-game-over-timer-%d");
             gameOverOverlayTimer.schedule(() -> {
-                LasertagGameManager.getInstance().getHudRenderManager().lastGameWinnerId = -1;
+                hudRenderManager.lastGameWinnerId = -1;
                 gameOverOverlayTimer.shutdownNow();
             }, 5, TimeUnit.SECONDS);
         }
 
         // If should generate file
-        if (LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.GEN_STATS_FILE)) {
+        if (settingManager.<Boolean>get(SettingDescription.GEN_STATS_FILE)) {
 
             // Generate file
             var generatedFilePath = WebStatisticsVisualizer.build(stats, ResourceManagers.WEB_RESOURCE_MANAGER);
@@ -65,7 +79,7 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
             }
 
             // If should automatically open file
-            if (LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.AUTO_OPEN_STATS_FILE)) {
+            if (settingManager.<Boolean>get(SettingDescription.AUTO_OPEN_STATS_FILE)) {
 
                 try {
                     DesktopApi.open(new File(generatedFilePath));

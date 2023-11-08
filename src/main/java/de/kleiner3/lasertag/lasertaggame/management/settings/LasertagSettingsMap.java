@@ -31,7 +31,11 @@ public class LasertagSettingsMap implements Map<String, Object> {
         var settings = new LasertagSettingsMap();
 
         for (var setting : SettingDescription.values()) {
-            settings.put(setting.getName(), setting.getDefaultValue());
+            if (setting.getDataType().isEnum()) {
+                settings.put(setting.getName(), ((Enum<?>)setting.getDefaultValue()).name());
+            } else {
+                settings.put(setting.getName(), setting.getDefaultValue());
+            }
         }
 
         return settings;

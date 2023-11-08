@@ -43,13 +43,16 @@ public class ServerEventSending {
      * @param buf The data to send
      */
     public static void sendToEveryone(ServerWorld world, Identifier id, PacketByteBuf buf) {
-        // Get all players
-        List<ServerPlayerEntity> players = world.getPlayers();
 
-        // For each player
-        for (ServerPlayerEntity player : players) {
-            ServerPlayNetworking.send(player, id, buf);
-        }
+        world.getServer().execute(() -> {
+            // Get all players
+            List<ServerPlayerEntity> players = world.getPlayers();
+
+            // For each player
+            for (ServerPlayerEntity player : players) {
+                ServerPlayNetworking.send(player, id, buf);
+            }
+        });
     }
 
     /**

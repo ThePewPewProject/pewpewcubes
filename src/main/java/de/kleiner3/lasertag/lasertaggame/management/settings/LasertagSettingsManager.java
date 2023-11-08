@@ -66,6 +66,13 @@ public class LasertagSettingsManager implements IManager {
 
     //region Public methods
 
+    /**
+     * Get the value of the setting. Only for non-enum values.
+     *
+     * @param setting The setting description of the setting
+     * @return The value of the setting
+     * @param <T> The type of the value of the setting
+     */
     public <T> T get(SettingDescription setting) {
 
         var key = setting.getName();
@@ -75,7 +82,29 @@ public class LasertagSettingsManager implements IManager {
             putDefault(key);
         }
 
+        // Get value from dictionary
         return (T)settings.get(key);
+    }
+
+    /**
+     * Get the enum value of a setting. Only for enum values.
+     *
+     * @param setting The setting description of the setting
+     * @return The value of the setting
+     * @param <T> The type of the value of the setting
+     */
+    public <T extends Enum<T>> T getEnum(SettingDescription setting) {
+        var key = setting.getName();
+
+        // If key not in settings
+        if (!settings.containsKey(key)) {
+            putDefault(key);
+        }
+
+        // Get value from dictionary
+        var value = settings.get(key);
+
+        return Enum.valueOf((Class<T>) setting.getDataType().getValueType(), (String)value);
     }
 
     @Override
@@ -92,6 +121,12 @@ public class LasertagSettingsManager implements IManager {
     }
 
     public void set(MinecraftServer s, String key, Object value) {
+
+        // If is enum setting
+        if (value instanceof Enum<?> enumValue) {
+            value = enumValue.name();
+        }
+
         settings.put(key, value);
         persist(s, key, value.toString());
     }

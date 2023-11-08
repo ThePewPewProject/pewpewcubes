@@ -24,24 +24,41 @@ public class GameTickTimerTask extends TimerTask {
     public void run() {
         ++seconds;
 
-        var gameDurationSeconds = LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAY_TIME) * 60;
+        // Get the managers
+        var gameManager = LasertagGameManager.getInstance();
 
-        // If is 30 seconds before end
-        if (gameDurationSeconds - seconds == 30) {
-            game.thirtySecondsTick();
-            return;
-        }
+        // Get the game mode
+        var gameMode = gameManager.getGameModeManager().getGameMode();
 
-        // If is last tick
-        if (seconds == gameDurationSeconds) {
-            seconds = -1;
-            game.endTick();
-            return;
-        }
+        // If game mode has infinite time
+        if (gameMode.hasInfiniteTime()) {
 
-        // Else do regular tick every 60 seconds
-        if (seconds % 60 == 0) {
-            game.doTick(gameDurationSeconds - seconds == 60);
+            // Do regular tick every 60 seconds
+            if (seconds % 60 == 0) {
+                game.doTick(false);
+            }
+        } else {
+
+            // Get the total duration of the game
+            var gameDurationSeconds = gameManager.getSettingsManager().<Long>get(SettingDescription.PLAY_TIME) * 60;
+
+            // If is 30 seconds before end
+            if (gameDurationSeconds - seconds == 30) {
+                game.thirtySecondsTick();
+                return;
+            }
+
+            // If is last tick
+            if (seconds == gameDurationSeconds) {
+                seconds = -1;
+                game.endTick();
+                return;
+            }
+
+            // Else do regular tick every 60 seconds
+            if (seconds % 60 == 0) {
+                game.doTick(gameDurationSeconds - seconds == 60);
+            }
         }
     }
 }

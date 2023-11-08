@@ -153,7 +153,7 @@ public class WebStatisticsVisualizer {
         }
     }
 
-    private static void buildTableRow(StringBuilder builder, int place, String nameHtml, long score) {
+    private static void buildTableRow(StringBuilder builder, int place, String nameHtml, String score) {
         builder.append("<tr><th scope=\"row\">");
         builder.append(place);
         builder.append("</th><td>");

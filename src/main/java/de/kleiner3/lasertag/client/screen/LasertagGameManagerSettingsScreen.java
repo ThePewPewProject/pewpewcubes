@@ -21,6 +21,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import static de.kleiner3.lasertag.lasertaggame.management.settings.SettingDataType.BOOL;
+import static de.kleiner3.lasertag.lasertaggame.management.settings.SettingDataType.LONG;
+
 /**
  * The settings screen of the lasertag game manager
  *
@@ -106,18 +109,17 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
      */
     private Drawable getValueCellTemplate(ListCell<Tuple<SettingDescription, Object>> desc) {
 
-        switch (desc.value().x().getDataType()) {
-            case BOOL -> {
-                return this.getBooleanSettingInput(desc.x()+1, desc.y()+1, desc.width()-1, desc.height()-2, desc.value().x().toString(), (Boolean)desc.value().y());
-            }
-            case LONG -> {
-                return this.getLongSettingInput(desc.x()+2, desc.y()+2, desc.width()-4, desc.height()-4, desc.value().x().toString(), (long)desc.value().y());
-            }
-            default -> {
-                // Default empty drawable
-                return (matrices, mouseX, mouseY, delta) -> {};
-            }
+        var dataType = desc.value().x().getDataType();
+        if (dataType.equals(BOOL)) {
+            return this.getBooleanSettingInput(desc.x() + 1, desc.y() + 1, desc.width() - 1, desc.height() - 2, desc.value().x().toString(), (Boolean) desc.value().y());
+        } else if (dataType.equals(LONG)) {
+            return this.getLongSettingInput(desc.x() + 2, desc.y() + 2, desc.width() - 4, desc.height() - 4, desc.value().x().toString(), (long) desc.value().y());
+        } else if (dataType.isEnum()) {
+            return this.getEnumSettingInput(desc.x() + 1, desc.y() + 1, desc.width() - 1, desc.height() - 2, desc.value().x().toString(), (Enum<?>)desc.value().y());
         }
+
+        // Default empty drawable
+        return (matrices, mouseX, mouseY, delta) -> {};
     }
 
     /**
@@ -155,7 +157,17 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
     private List<Tuple<SettingDescription, Object>> getSettingDescriptions() {
         return Arrays.stream(SettingDescription.values())
                 .sorted(Comparator.comparing(SettingDescription::getName))
-                .map(s -> new Tuple<>(s, LasertagGameManager.getInstance().getSettingsManager().get(s))).toList();
+                .map(s -> {
+
+                    Object value;
+                    if (s.getDataType().isEnum()) {
+                        value = LasertagGameManager.getInstance().getSettingsManager().getEnum(s);
+                    } else {
+                        value = LasertagGameManager.getInstance().getSettingsManager().get(s);
+                    }
+
+                    return new Tuple<>(s, value);
+                }).toList();
     }
 
     /**
@@ -245,6 +257,36 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
         } else {
             var startY = y + (height / 2) - (this.textRenderer.fontHeight / 2);
             return new LabelWidget(x + 5, startY, this.textRenderer, Text.literal(Long.toString(initialValue)));
+        }
+    }
+
+    private Drawable getEnumSettingInput(int x, int y, int width, int height, String settingEnumName, Enum<?> initialValue) {
+        if (player.hasPermissionLevel(4)) {
+
+            // Get the setting description
+            var settingDescription = SettingDescription.valueOf(settingEnumName);
+
+            // Get the enum values
+            var enumValues = settingDescription.getDataType().getValueType().getEnumConstants();
+
+            return new CyclingValueButtonWidget<>(x, y, width, height, initialValue,
+                    value -> Text.translatable(settingEnumName + "." + ((Enum<?>)value).name()),
+                    Arrays.stream(enumValues).toList(),
+                    value -> {
+                        // Get the enum value as a string
+                        var enumValueString = ((Enum<?>)value).name();
+
+                        // Create packet buffer
+                        var buf = new PacketByteBuf(Unpooled.buffer());
+
+                        buf.writeString(settingEnumName);
+                        buf.writeString(enumValueString);
+
+                        ClientPlayNetworking.send(NetworkingConstants.CLIENT_TRIGGER_SETTING_CHANGE, buf);
+                    });
+        } else {
+            var startY = y + (height / 2) - (this.textRenderer.fontHeight / 2);
+            return new LabelWidget(x + 5, startY, this.textRenderer, Text.translatable(settingEnumName + "." + initialValue.name()));
         }
     }
 

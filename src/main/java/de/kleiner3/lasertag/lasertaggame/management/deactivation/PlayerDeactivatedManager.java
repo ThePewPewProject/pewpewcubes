@@ -59,6 +59,17 @@ public class PlayerDeactivatedManager implements IManager {
      * @param world The world which the player is in
      */
     public void deactivate(UUID playerUuid, World world, PlayerManager playerManager) {
+        this.deactivate(playerUuid, world, playerManager, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAYER_DEACTIVATE_TIME));
+    }
+
+    /**
+     * Deactivates a player, activates him again after the specified duration
+     *
+     * @param playerUuid The uuid of the player to deactivate
+     * @param world The world which the player is in
+     * @param deactivationDuration The amount of time in seconds the player will be deactivated
+     */
+    public void deactivate(UUID playerUuid, World world, PlayerManager playerManager, long deactivationDuration) {
 
         // Deactivate player
         deactivatedMap.put(playerUuid, true);
@@ -70,7 +81,7 @@ public class PlayerDeactivatedManager implements IManager {
 
             activate(playerUuid, world, playerManager);
             deactivationThread.shutdownNow();
-        }, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAYER_DEACTIVATE_TIME), TimeUnit.SECONDS);
+        }, deactivationDuration, TimeUnit.SECONDS);
 
         var player = playerManager.getPlayer(playerUuid);
 

@@ -22,7 +22,8 @@ public abstract class PlayerInventoryMixin {
         var mainHandStack = ((PlayerInventory)(Object)this).getMainHandStack();
 
         // If is lasertag weapon
-        if (mainHandStack.isOf(Items.LASERTAG_WEAPON)) {
+        if (mainHandStack.isOf(Items.LASERTAG_WEAPON) ||
+            mainHandStack.isOf(Items.LASERTAG_FLAG)) {
 
             // Don't drop it
             cir.setReturnValue(ItemStack.EMPTY);

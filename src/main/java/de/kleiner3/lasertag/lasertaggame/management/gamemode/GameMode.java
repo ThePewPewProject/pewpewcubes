@@ -1,13 +1,19 @@
 package de.kleiner3.lasertag.lasertaggame.management.gamemode;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
+import de.kleiner3.lasertag.common.types.ScoreHolding;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.management.spawnpoints.LasertagSpawnpointManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
+import de.kleiner3.lasertag.networking.NetworkingConstants;
+import de.kleiner3.lasertag.networking.server.ServerEventSending;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
@@ -27,20 +33,28 @@ public abstract class GameMode {
      * The translatable name of the game mode. Also acts as an unique identifier for the game mode.
      */
     private final String translatableName;
+
     /**
      * Flag whether this game mode has infinite time (Game ends based on other game events)
      * or not (Game ends after X minutes)
      */
     private final boolean infiniteTime;
+
     /**
      * Flag whether this game mode uses teams or is an 'everyone vs. everyone' game mode
      */
     private final boolean teamsActive;
 
-    public GameMode(String translatableName, boolean infiniteTime, boolean teamsActive) {
+    /**
+     * Flag to indicate if lasertargets can be hit multiple times by the same player
+     */
+    private final boolean lasertargetsCanBeHitMultipleTimes;
+
+    public GameMode(String translatableName, boolean infiniteTime, boolean teamsActive, boolean lasertargetsCanBeHitMultipleTimes) {
         this.translatableName = translatableName;
         this.infiniteTime = infiniteTime;
         this.teamsActive = teamsActive;
+        this.lasertargetsCanBeHitMultipleTimes = lasertargetsCanBeHitMultipleTimes;
     }
 
     //region Interface methods
@@ -147,8 +161,8 @@ public abstract class GameMode {
     }
 
     /**
-     * Sets the state to be ready for a new lasertag game. The default implementation
-     * resets the scores and sets the game rules.
+     * Sets the state to be ready for a new lasertag game. Resets scores and states.
+     * The default implementation sets the game rules keepInventory to true and doImmediateRespawn to true.
      * <br>
      * Override this method if the game mode needs special preparation.
      * <br>
@@ -158,12 +172,6 @@ public abstract class GameMode {
      * @param server The server this game runs on
      */
     public void onPreGameStart(MinecraftServer server) {
-
-        // Get the overworld
-        var world = server.getOverworld();
-
-        // Reset all scores
-        LasertagGameManager.getInstance().getScoreManager().resetScores(world);
 
         // Set gamerules
         var gameRules = server.getGameRules();
@@ -213,22 +221,50 @@ public abstract class GameMode {
     public abstract void onTick(MinecraftServer server);
 
     /**
-     * The game mode's logic for if a player hits a lasertarget
+     * The game mode's logic for if a player hits a lasertarget. The default implementation triggers the score sound
+     * event for the shooting player.
      *
      * @param server The server this game runs on
      * @param shooter The player who fired the laser ray
      * @param target The lasertarget that got hit
      */
-    public abstract void onPlayerHitLasertarget(MinecraftServer server, ServerPlayerEntity shooter, LaserTargetBlockEntity target);
+    public void onPlayerHitLasertarget(MinecraftServer server, ServerPlayerEntity shooter, LaserTargetBlockEntity target) {
+        ServerEventSending.sendPlayerSoundEvent(shooter, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND);
+    }
 
     /**
-     * The game mode's logic for if a player hits another player
+     * The game mode's logic for if a player hits another player. the default implementation triggers the score sound
+     * event for the shooting player.
      *
      * @param server The server this game runs on
      * @param shooter The player who fired the laser ray
      * @param target The player who got hit
      */
-    public abstract void onPlayerHitPlayer(MinecraftServer server, ServerPlayerEntity shooter, ServerPlayerEntity target);
+    public void onPlayerHitPlayer(MinecraftServer server, ServerPlayerEntity shooter, ServerPlayerEntity target) {
+        ServerEventSending.sendPlayerSoundEvent(shooter, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND);
+    }
+
+    /**
+     * The game mode's logic for if a player dies. Implement this if the game mode requires custom player death logic.
+     *
+     * @param server The server this game runs on
+     * @param player The player who died
+     * @param source The damage source which resulted in the player dying
+     */
+    public abstract void onPlayerDeath(MinecraftServer server, ServerPlayerEntity player, DamageSource source);
+
+    /**
+     * Checks the game over conditions and ends the game if they are met. Only used for game modes that are not
+     * time-limited. Must be called every time a game over condition changes.
+     * <br>
+     * The default implementation just prints an error message as this must be implemented by the concrete game mode
+     * or should not be used.
+     *
+     * @param server The server this game runs on
+     */
+    public void checkGameOver(MinecraftServer server) {
+        LasertagMod.LOGGER.error("checkGameOver not implemented.", new Exception("Not implemented"));
+    }
 
     /**
      * Cleans up the game. The default implementation deactivates every player and teleports them back into the lobby.
@@ -267,12 +303,70 @@ public abstract class GameMode {
         }));
     }
 
+    /**
+     * Gets the team id of the winning team or -1 if something went wrong.
+     *
+     * @return The id of the winning team
+     */
+    public abstract int getWinnerTeamId();
+
+    /**
+     * Get the team score text for the team list. This will be rendered beside the team name if teams are active
+     * in the currently selected game mode.
+     * <br>
+     * This can for example be a simple text containing the score or a text containing the number of flags a team has
+     * with an icon.
+     *
+     * @param team The team to get the score text of
+     * @return The text containing the team score
+     */
+    public abstract Text getTeamScoreText(TeamDto team);
+
+    /**
+     * Get the player score text for the team list. This will be rendered beside the player name.
+     * <br>
+     * This can for example be a simple text containing the score of the player of an icon of a flag if the player
+     * is holding a flag.
+     *
+     * @param playerUuid The UUID of the player to get the score text of
+     * @return The text containing the player score
+     */
+    public abstract Text getPlayerScoreText(UUID playerUuid);
+
+    /**
+     * Get the final score of a team. Used for statistics calculation.
+     *
+     * @param team The team to get the score of
+     * @return A ScoreHolding object holding the score of the team
+     */
+    public abstract ScoreHolding getTeamFinalScore(TeamDto team);
+
+    /**
+     * Get the final score of a player. Used for statistics calculation.
+     *
+     * @param playerUuid The uuid of the player to get the score of
+     * @return A ScoreHolding object holding the score of the player
+     */
+    public abstract ScoreHolding getPlayerFinalScore(UUID playerUuid);
+
     //endregion
 
     //region Public methods
 
     public String getTranslatableName() {
         return this.translatableName;
+    }
+
+    public boolean hasInfiniteTime() {
+        return this.infiniteTime;
+    }
+
+    public boolean areTeamsActive() {
+        return this.teamsActive;
+    }
+
+    public boolean canLasertargetsBeHitMutlipleTimes() {
+        return this.lasertargetsCanBeHitMultipleTimes;
     }
 
     //endregion

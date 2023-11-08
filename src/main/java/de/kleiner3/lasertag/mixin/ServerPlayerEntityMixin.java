@@ -1,9 +1,7 @@
 package de.kleiner3.lasertag.mixin;
 
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,13 +19,12 @@ public class ServerPlayerEntityMixin {
 
     @Inject(method = "onDeath", at = @At("TAIL"))
     private void onPlayerDeath(DamageSource damageSource, CallbackInfo ci) {
-        PlayerEntity player = ((PlayerEntity)(Object)this);
+        ServerPlayerEntity player = ((ServerPlayerEntity)(Object)this);
 
         // Get the server
         MinecraftServer server = player.getServer();
         if (server != null) {
-            var deathPenalty = -LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.DEATH_PENALTY);
-            LasertagGameManager.getInstance().getScoreManager().onPlayerScored(server.getOverworld(), player, deathPenalty);
+            server.execute(() -> LasertagGameManager.getInstance().getGameModeManager().getGameMode().onPlayerDeath(server, player, damageSource));
         }
     }
 }

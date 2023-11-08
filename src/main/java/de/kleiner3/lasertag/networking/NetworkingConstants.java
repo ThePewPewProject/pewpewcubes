@@ -14,6 +14,8 @@ public class NetworkingConstants {
 
     // ===== Lasertag game ==========
     public static final Identifier SCORE_UPDATE = new Identifier(LasertagMod.ID, "score_update");
+    public static final Identifier CTF_NUMBER_OF_FLAGS_UPDATE = new Identifier(LasertagMod.ID, "ctf_number_of_flags_update");
+    public static final Identifier CTF_FLAG_HOLDING_UPDATE = new Identifier(LasertagMod.ID, "ctf_flag_holding_update");
     public static final Identifier TEAM_UPDATE = new Identifier(LasertagMod.ID, "team_update");
     public static final Identifier SETTING_CHANGED = new Identifier(LasertagMod.ID, "setting_changed");
     public static final Identifier SETTINGS_CHANGED = new Identifier(LasertagMod.ID, "settings_changed");
@@ -35,6 +37,7 @@ public class NetworkingConstants {
     public static final Identifier GAME_OVER = new Identifier(LasertagMod.ID, "game_over");
     public static final Identifier PROGRESS = new Identifier(LasertagMod.ID, "progress");
     public static final Identifier SCORE_RESET = new Identifier(LasertagMod.ID, "score_reset");
+    public static final Identifier FLAG_RESET = new Identifier(LasertagMod.ID, "flag_reset");
     public static final Identifier PLAYER_HIT_LASERTARGET = new Identifier(LasertagMod.ID, "player_hit_lasertarget");
     public static final Identifier PLAYER_HIT_PLAYER = new Identifier(LasertagMod.ID, "player_hit_player");
     public static final Identifier PLAYER_JOINED = new Identifier(LasertagMod.ID, "player_joined");
