@@ -28,13 +28,13 @@ public enum SettingDescription {
     AUTO_OPEN_STATS_FILE("autoOpenStatsFile", true, SettingDataType.BOOL, "value", null, null),
     DO_ORIGIN_SPAWN("doOriginSpawn", true, SettingDataType.BOOL, "value", null, null),
     DEATH_PENALTY("deathPenalty", 500L, SettingDataType.LONG, "points", null, null),
-    RESPAWN_PENALTY("respawnPenalty", 5L, SettingDataType.LONG, "seconds", 0L, null),
+    RESPAWN_PENALTY("respawnPenalty", 0L, SettingDataType.LONG, "seconds", 0L, null),
     SHOW_NAMETAGS_OF_TEAMMATES("showNametagsOfTeammates", true, SettingDataType.BOOL, "value", null, null),
     MINING_FATIGUE_ENABLED("miningFatigueEnabled", true, SettingDataType.BOOL, "value", null, null),
 
     // Capture the flag specific
     LASER_RAY_DAMAGE("laserDamage", 5L, SettingDataType.LONG, "amount", 0L, 20L),
-    LASERTARGET_HEAL("lasertargetHeal", 2L, SettingDataType.LONG, "amount", 0L, 20L),
+    LASERTARGET_HEAL("lasertargetHeal", 5L, SettingDataType.LONG, "amount", 0L, 20L),
     PLAYER_RESET_HEAL("playerResetHeal", 20L, SettingDataType.LONG, "amount", 0L, 20L),
     FLAG_COUNT("numberOfFlags", 3L, SettingDataType.LONG, "number", 0L, null),
     CTF_FLAG_HOLDING_PLAYER_VISIBILITY("flagHoldingPlayerVisibility", CTFFlagHoldingPlayerVisibility.GLOW, SettingDataType.ofEnum(CTFFlagHoldingPlayerVisibility.class), "visibility", null, null);
@@ -52,20 +52,20 @@ public enum SettingDescription {
     }
 
     private final String name;
-    private final Object defaultValue;
+    private final Object baseValue;
     private final SettingDataType dataType;
     private final String settingValueName;
     private final Object minValue;
     private final Object maxValue;
 
     SettingDescription(String name,
-                       Object defaultValue,
+                       Object baseValue,
                        SettingDataType dataType,
                        String settingValueName,
                        Object minValue,
                        Object maxValue) {
         this.name = name;
-        this.defaultValue = defaultValue;
+        this.baseValue = baseValue;
         this.dataType = dataType;
         this.settingValueName = settingValueName;
         this.minValue = minValue;
@@ -76,8 +76,8 @@ public enum SettingDescription {
         return name;
     }
 
-    public Object getDefaultValue() {
-        return defaultValue;
+    public Object getBaseValue() {
+        return baseValue;
     }
 
     public SettingDataType getDataType() {

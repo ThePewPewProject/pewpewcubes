@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.common.util.FileIO;
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
+import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
@@ -48,7 +49,7 @@ public class LasertagSettingsManager implements IManager {
 
             try {
                 // Use default settings
-                settings = LasertagSettingsMap.createDefaultSettings();
+                settings = LasertagGameManager.getInstance().getGameModeManager().getGameMode().createDefaultSettings();
 
                 // Log that default settings is being used
                 LasertagMod.LOGGER.info("Default lasertag settings is being used.");
@@ -142,14 +143,14 @@ public class LasertagSettingsManager implements IManager {
 
     public void reset(MinecraftServer s) {
         // Set the default settings
-        settings = LasertagSettingsMap.createDefaultSettings();
+        settings = LasertagGameManager.getInstance().getGameModeManager().getGameMode().createDefaultSettings();
 
         persist(s);
     }
 
     public void reset(MinecraftServer s, String settingName) {
         // Create default settings
-        var defaultSettings = LasertagSettingsMap.createDefaultSettings();
+        var defaultSettings = LasertagGameManager.getInstance().getGameModeManager().getGameMode().createDefaultSettings();
 
         this.set(s, settingName, defaultSettings.get(settingName));
     }
@@ -162,7 +163,7 @@ public class LasertagSettingsManager implements IManager {
 
     private void putDefault(String key) {
         // Get default settings
-        var defaultSettings = LasertagSettingsMap.createDefaultSettings();
+        var defaultSettings = LasertagGameManager.getInstance().getGameModeManager().getGameMode().createDefaultSettings();
 
         // Get the default value
         var defaultValue = defaultSettings.get(key);
@@ -219,6 +220,7 @@ public class LasertagSettingsManager implements IManager {
      * @param server The server this is executed on. null if on the client
      */
     private void persist(MinecraftServer server) {
+
         // Check if this is executed on client
         if (server == null) {
             // Do not persist lasertag setting on client

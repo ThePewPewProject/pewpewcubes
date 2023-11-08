@@ -27,14 +27,14 @@ public class LasertagSettingsMap implements Map<String, Object> {
         hashMap = new HashMap<>(other.hashMap);
     }
 
-    public static LasertagSettingsMap createDefaultSettings() {
+    public static LasertagSettingsMap createBaseSettings() {
         var settings = new LasertagSettingsMap();
 
         for (var setting : SettingDescription.values()) {
             if (setting.getDataType().isEnum()) {
-                settings.put(setting.getName(), ((Enum<?>)setting.getDefaultValue()).name());
+                settings.put(setting.getName(), ((Enum<?>)setting.getBaseValue()).name());
             } else {
-                settings.put(setting.getName(), setting.getDefaultValue());
+                settings.put(setting.getName(), setting.getBaseValue());
             }
         }
 

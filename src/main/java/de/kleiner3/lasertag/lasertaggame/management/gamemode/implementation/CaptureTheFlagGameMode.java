@@ -9,6 +9,7 @@ import de.kleiner3.lasertag.common.util.DurationUtils;
 import de.kleiner3.lasertag.damage.DamageSources;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.gamemode.GameMode;
+import de.kleiner3.lasertag.lasertaggame.management.settings.LasertagSettingsMap;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.management.spawnpoints.LasertagSpawnpointManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
@@ -64,6 +65,18 @@ public class CaptureTheFlagGameMode extends GameMode {
 
     public CaptureTheFlagGameMode() {
         super("gameMode.capture_the_flag", true, true, true);
+    }
+
+    @Override
+    public LasertagSettingsMap createDefaultSettings() {
+        var map = super.createDefaultSettings();
+
+        map.put(SettingDescription.WEAPON_COOLDOWN.getName(), 10L);
+        map.put(SettingDescription.PLAYER_DEACTIVATE_TIME.getName(), 10L);
+        map.put(SettingDescription.LASERTARGET_DEACTIVATE_TIME.getName(), 4L);
+        map.put(SettingDescription.RESPAWN_PENALTY.getName(), 5L);
+
+        return map;
     }
 
     @Override

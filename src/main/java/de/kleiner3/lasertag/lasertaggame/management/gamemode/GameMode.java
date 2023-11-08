@@ -4,6 +4,7 @@ import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.common.types.ScoreHolding;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import de.kleiner3.lasertag.lasertaggame.management.settings.LasertagSettingsMap;
 import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.management.spawnpoints.LasertagSpawnpointManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
@@ -60,10 +61,24 @@ public abstract class GameMode {
     //region Interface methods
 
     /**
+     * Creates a settings map containing the default setting values for this game mode.
+     * The default implementation simply returns the base settings.
+     * <br>
+     * Override if the game mode has special default settings.
+     * <br>
+     * This method is called when switching the game mode or resetting the settings.
+     *
+     * @return The default settings map
+     */
+    public LasertagSettingsMap createDefaultSettings() {
+        return LasertagSettingsMap.createBaseSettings();
+    }
+
+    /**
      * Checks if all starting conditions are met. If the game can start, this method returns an empty optional
      * Otherwise it returns the reasons why the game can not start as a string.
      * <br>
-     * Override if the game modes has other or additional starting conditions.
+     * Override if the game mode has other or additional starting conditions.
      * <br>
      * This method is called as the first step when starting a lasertag game.
      *
