@@ -130,6 +130,6 @@ public class LasertargetRenderer extends GeoBlockRenderer<LaserTargetBlockEntity
     }
 
     private float doFlash(long x) {
-        return 1.0f - ((float)Math.cos((x * Math.PI * 2.0) / (FLASH_DURATION * 2.0)) + 1.0f) * 0.5f;
+        return 1.0f - ((float)Math.cos((x * Math.PI * 2.0) / FLASH_DURATION) + 1.0f) * 0.5f;
     }
 }
