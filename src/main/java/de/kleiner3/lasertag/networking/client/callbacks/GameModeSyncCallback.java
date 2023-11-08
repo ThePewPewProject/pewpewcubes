@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
 import de.kleiner3.lasertag.client.screen.LasertagGameManagerScreen;
+import de.kleiner3.lasertag.client.screen.LasertagGameManagerSettingsScreen;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.gamemode.GameModes;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -30,6 +31,8 @@ public class GameModeSyncCallback implements ClientPlayNetworking.PlayChannelHan
         // If client has game manager screen open
         if (client.currentScreen instanceof LasertagGameManagerScreen lasertagGameManagerScreen) {
             lasertagGameManagerScreen.reloadGameMode();
+        } else if (client.currentScreen instanceof LasertagGameManagerSettingsScreen lasertagGameManagerSettingsScreen) {
+            lasertagGameManagerSettingsScreen.resetList();
         }
     }
 }

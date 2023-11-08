@@ -24,6 +24,7 @@ import net.minecraft.world.GameRules;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -77,6 +78,22 @@ public class CaptureTheFlagGameMode extends GameMode {
         map.put(SettingDescription.RESPAWN_PENALTY.getName(), 5L);
 
         return map;
+    }
+
+    @Override
+    public List<SettingDescription> getRelevantSettings() {
+        var list = super.getRelevantSettings();
+
+        // From damage based
+        list.add(SettingDescription.LASER_RAY_DAMAGE);
+        list.add(SettingDescription.LASERTARGET_HEAL);
+        list.add(SettingDescription.PLAYER_RESET_HEAL);
+
+        // From CTF specific
+        list.add(SettingDescription.FLAG_COUNT);
+        list.add(SettingDescription.CTF_FLAG_HOLDING_PLAYER_VISIBILITY);
+
+        return list;
     }
 
     @Override

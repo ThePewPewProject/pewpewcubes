@@ -155,7 +155,7 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
      * @return The setting descriptions and values
      */
     private List<Tuple<SettingDescription, Object>> getSettingDescriptions() {
-        return Arrays.stream(SettingDescription.values())
+        return LasertagGameManager.getInstance().getGameModeManager().getGameMode().getRelevantSettings().stream()
                 .sorted(Comparator.comparing(SettingDescription::getName))
                 .map(s -> {
 

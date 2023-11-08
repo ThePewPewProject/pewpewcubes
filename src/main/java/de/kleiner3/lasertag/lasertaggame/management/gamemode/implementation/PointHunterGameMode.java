@@ -14,6 +14,7 @@ import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -25,6 +26,21 @@ import java.util.UUID;
 public class PointHunterGameMode extends GameMode {
     public PointHunterGameMode() {
         super("gameMode.point_hunter", false, true, false);
+    }
+
+    @Override
+    public List<SettingDescription> getRelevantSettings() {
+        var list = super.getRelevantSettings();
+
+        // From time limited
+        list.add(SettingDescription.PLAY_TIME);
+
+        // From point based
+        list.add(SettingDescription.LASERTARGET_HIT_SCORE);
+        list.add(SettingDescription.PLAYER_HIT_SCORE);
+        list.add(SettingDescription.DEATH_PENALTY);
+
+        return list;
     }
 
     @Override

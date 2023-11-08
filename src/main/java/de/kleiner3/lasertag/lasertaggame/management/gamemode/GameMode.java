@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -75,6 +76,36 @@ public abstract class GameMode {
     }
 
     /**
+     * Gets the settings which have an effect in this game mode.
+     * The default implementation returns the settings that are used by all game modes.
+     * <br>
+     * This method gets used in the game managers settings screen.
+     *
+     * @return The settings having an effect in this game mode.
+     */
+    public List<SettingDescription> getRelevantSettings() {
+        var list = new ArrayList<SettingDescription>();
+
+        list.add(SettingDescription.WEAPON_COOLDOWN);
+        list.add(SettingDescription.WEAPON_REACH);
+        list.add(SettingDescription.SHOW_LASER_RAYS);
+        list.add(SettingDescription.MAX_TEAM_SIZE);
+        list.add(SettingDescription.RENDER_TEAM_LIST);
+        list.add(SettingDescription.RENDER_TIMER);
+        list.add(SettingDescription.PREGAME_DURATION);
+        list.add(SettingDescription.PLAYER_DEACTIVATE_TIME);
+        list.add(SettingDescription.LASERTARGET_DEACTIVATE_TIME);
+        list.add(SettingDescription.GEN_STATS_FILE);
+        list.add(SettingDescription.AUTO_OPEN_STATS_FILE);
+        list.add(SettingDescription.DO_ORIGIN_SPAWN);
+        list.add(SettingDescription.RESPAWN_PENALTY);
+        list.add(SettingDescription.SHOW_NAMETAGS_OF_TEAMMATES);
+        list.add(SettingDescription.MINING_FATIGUE_ENABLED);
+
+        return list;
+    }
+
+    /**
      * Checks if all starting conditions are met. If the game can start, this method returns an empty optional
      * Otherwise it returns the reasons why the game can not start as a string.
      * <br>
@@ -82,9 +113,8 @@ public abstract class GameMode {
      * <br>
      * This method is called as the first step when starting a lasertag game.
      *
-     * @param server The server this game runs on
+     * @param server            The server this game runs on
      * @param spawnpointManager The lasertag spawnpoint manager of the server
-     *
      * @return Optional containing the abort reasons if there were any. Otherwise Optional.empty()
      */
     public Optional<String> checkStartingConditions(MinecraftServer server, LasertagSpawnpointManager spawnpointManager) {
@@ -148,7 +178,7 @@ public abstract class GameMode {
      * This method is being called if the starting conditions are met and just before
      * executing the <code>onPreGameStart</code> method.
      *
-     * @param server The server this game runs on
+     * @param server            The server this game runs on
      * @param spawnpointManager The lasertag spawnpoint manager of the server
      */
     public void sendPlayersToSpawnpoints(MinecraftServer server, LasertagSpawnpointManager spawnpointManager) {
@@ -245,9 +275,9 @@ public abstract class GameMode {
      * The game mode's logic for if a player hits a lasertarget. The default implementation triggers the score sound
      * event for the shooting player.
      *
-     * @param server The server this game runs on
+     * @param server  The server this game runs on
      * @param shooter The player who fired the laser ray
-     * @param target The lasertarget that got hit
+     * @param target  The lasertarget that got hit
      */
     public void onPlayerHitLasertarget(MinecraftServer server, ServerPlayerEntity shooter, LaserTargetBlockEntity target) {
         ServerEventSending.sendPlayerSoundEvent(shooter, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND);
@@ -257,9 +287,9 @@ public abstract class GameMode {
      * The game mode's logic for if a player hits another player. the default implementation triggers the score sound
      * event for the shooting player.
      *
-     * @param server The server this game runs on
+     * @param server  The server this game runs on
      * @param shooter The player who fired the laser ray
-     * @param target The player who got hit
+     * @param target  The player who got hit
      */
     public void onPlayerHitPlayer(MinecraftServer server, ServerPlayerEntity shooter, ServerPlayerEntity target) {
         ServerEventSending.sendPlayerSoundEvent(shooter, NetworkingConstants.PLAY_PLAYER_SCORED_SOUND);
