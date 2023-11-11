@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaType;
 import de.kleiner3.lasertag.worldgen.chunkgen.ProceduralArenaType;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -21,30 +22,36 @@ public class ClientTriggerLoadMapCallback implements ServerPlayNetworking.PlayCh
     @Override
     public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
-        // Get the arena name
-        var mapTranslatableName = buf.readString();
+        try {
 
-        var arenaTypeOptional = Arrays.stream(ArenaType.values())
-                .filter(m -> m.translatableName.equals(mapTranslatableName))
-                .findFirst();
+            // Get the arena name
+            var mapTranslatableName = buf.readString();
 
-        var proceduralTypeOptional = Arrays.stream(ProceduralArenaType.values())
-                .filter(m -> m.translatableName.equals(mapTranslatableName))
-                .findFirst();
+            var arenaTypeOptional = Arrays.stream(ArenaType.values())
+                    .filter(m -> m.translatableName.equals(mapTranslatableName))
+                    .findFirst();
 
-        // If is procedural map
-        if (proceduralTypeOptional.isPresent()) {
-            arenaTypeOptional = Optional.of(ArenaType.PROCEDURAL);
+            var proceduralTypeOptional = Arrays.stream(ProceduralArenaType.values())
+                    .filter(m -> m.translatableName.equals(mapTranslatableName))
+                    .findFirst();
+
+            // If is procedural map
+            if (proceduralTypeOptional.isPresent()) {
+                arenaTypeOptional = Optional.of(ArenaType.PROCEDURAL);
+            }
+
+            if (arenaTypeOptional.isEmpty()) {
+
+                return;
+            }
+
+            var finalArenaTypeOptional = arenaTypeOptional;
+            server.execute(() -> {
+                server.getLasertagServerManager().getMapManager().loadMap(finalArenaTypeOptional.get(), proceduralTypeOptional.orElse(ProceduralArenaType.SMALL_2V2));
+            });
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in ClientTriggerLoadMapCallback", ex);
+            throw ex;
         }
-
-        if (arenaTypeOptional.isEmpty()) {
-
-            return;
-        }
-
-        var finalArenaTypeOptional = arenaTypeOptional;
-        server.execute(() -> {
-            server.getLasertagServerManager().getMapManager().loadMap(finalArenaTypeOptional.get(), proceduralTypeOptional.orElse(ProceduralArenaType.SMALL_2V2));
-        });
     }
 }

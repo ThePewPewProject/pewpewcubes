@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.screen.LasertagTeamSelectorScreen;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.team.LasertagTeamManager;
@@ -14,19 +15,25 @@ import net.minecraft.network.PacketByteBuf;
  *
  * @author Étienne Muser
  */
-public class TeamConfigReloadedCallback implements ClientPlayNetworking.PlayChannelHandler{
+public class TeamConfigReloadedCallback implements ClientPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
-        var jsonString = buf.readString();
+        try {
 
-        // Deserialize team config
-        var teamConfig = LasertagTeamManager.fromJson(jsonString);
+            var jsonString = buf.readString();
 
-        LasertagGameManager.getInstance().setTeamConfig(teamConfig);
+            // Deserialize team config
+            var teamConfig = LasertagTeamManager.fromJson(jsonString);
 
-        if (client.currentScreen instanceof LasertagTeamSelectorScreen lasertagTeamSelectorScreen) {
-            lasertagTeamSelectorScreen.resetList();
+            LasertagGameManager.getInstance().setTeamConfig(teamConfig);
+
+            if (client.currentScreen instanceof LasertagTeamSelectorScreen lasertagTeamSelectorScreen) {
+                lasertagTeamSelectorScreen.resetList();
+            }
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in TeamConfigReloadedCallback", ex);
+            throw ex;
         }
     }
 }

@@ -21,25 +21,32 @@ import static de.kleiner3.lasertag.lasertaggame.management.settings.SettingDataT
 public class ClientTriggerSettingChangeCallback implements ServerPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        // Get the setting name
-        var settingEnumName = buf.readString();
 
-        // Get the setting description
-        var settingDescription = SettingDescription.valueOf(settingEnumName);
+        try {
 
-        Object settingValue = null;
-        if (settingDescription.getDataType().equals(BOOL)) {
-            settingValue = buf.readBoolean();
-        } else if (settingDescription.getDataType().equals(LONG)) {
-            settingValue = buf.readLong();
-        } else if (settingDescription.getDataType().isEnum()) {
-            settingValue = buf.readString();
-        } else {
-            LasertagMod.LOGGER.error("ClientTriggerSettingChangeCallback: Unrecognised setting datatype '{}'", settingDescription.getDataType());
-        }
+            // Get the setting name
+            var settingEnumName = buf.readString();
 
-        if (settingValue != null) {
-            LasertagGameManager.getInstance().getSettingsManager().set(server, settingDescription.getName(), settingValue);
+            // Get the setting description
+            var settingDescription = SettingDescription.valueOf(settingEnumName);
+
+            Object settingValue = null;
+            if (settingDescription.getDataType().equals(BOOL)) {
+                settingValue = buf.readBoolean();
+            } else if (settingDescription.getDataType().equals(LONG)) {
+                settingValue = buf.readLong();
+            } else if (settingDescription.getDataType().isEnum()) {
+                settingValue = buf.readString();
+            } else {
+                LasertagMod.LOGGER.error("ClientTriggerSettingChangeCallback: Unrecognised setting datatype '{}'", settingDescription.getDataType());
+            }
+
+            if (settingValue != null) {
+                LasertagGameManager.getInstance().getSettingsManager().set(server, settingDescription.getName(), settingValue);
+            }
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in ClientTriggerSettingChangeCallback", ex);
+            throw ex;
         }
     }
 }

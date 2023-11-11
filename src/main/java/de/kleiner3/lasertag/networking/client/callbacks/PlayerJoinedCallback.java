@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -15,9 +16,16 @@ import net.minecraft.network.PacketByteBuf;
 public class PlayerJoinedCallback implements ClientPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        var playerUuid = buf.readUuid();
-        var playerName = buf.readString();
 
-        LasertagGameManager.getInstance().getPlayerManager().putPlayer(playerUuid, playerName);
+        try {
+
+            var playerUuid = buf.readUuid();
+            var playerName = buf.readString();
+
+            LasertagGameManager.getInstance().getPlayerManager().putPlayer(playerUuid, playerName);
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in PlayerJoinedCallback", ex);
+            throw ex;
+        }
     }
 }

@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
@@ -16,9 +17,15 @@ public class ClientTriggerLoadPresetCallback implements ServerPlayNetworking.Pla
     @Override
     public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
-        // Get the preset name
-        var presetName = buf.readString();
+        try {
 
-        server.getLasertagServerManager().getSettingsPresetsManager().loadPreset(presetName, server);
+            // Get the preset name
+            var presetName = buf.readString();
+
+            server.getLasertagServerManager().getSettingsPresetsManager().loadPreset(presetName, server);
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in ClientTriggerLoadPresetCallback", ex);
+            throw ex;
+        }
     }
 }

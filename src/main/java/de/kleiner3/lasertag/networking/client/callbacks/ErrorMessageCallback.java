@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -17,7 +18,14 @@ import net.minecraft.util.Formatting;
 public class ErrorMessageCallback implements ClientPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        client.player.sendMessage(Text.translatable(buf.readString())
-                .fillStyle(Style.EMPTY.withColor(Formatting.RED)), true);
+
+        try {
+
+            client.player.sendMessage(Text.translatable(buf.readString())
+                    .fillStyle(Style.EMPTY.withColor(Formatting.RED)), true);
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in ErrorMessageCallback", ex);
+            throw ex;
+        }
     }
 }

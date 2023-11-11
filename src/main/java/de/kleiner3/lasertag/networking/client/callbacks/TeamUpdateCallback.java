@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.screen.LasertagGameManagerTeamsScreen;
 import de.kleiner3.lasertag.client.screen.LasertagTeamSelectorScreen;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
@@ -19,30 +20,36 @@ public class TeamUpdateCallback implements ClientPlayNetworking.PlayChannelHandl
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
-        var playerUuid = buf.readUuid();
+        try {
 
-        var oldValueString = buf.readString();
-        TeamDto oldValue = null;
-        if (!oldValueString.equals("null")) {
+            var playerUuid = buf.readUuid();
 
-            oldValue = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfId(Integer.parseInt(oldValueString)).get();
-        }
+            var oldValueString = buf.readString();
+            TeamDto oldValue = null;
+            if (!oldValueString.equals("null")) {
 
-        var newValueString = buf.readString();
-        TeamDto newValue = null;
-        if (!newValueString.equals("null")) {
+                oldValue = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfId(Integer.parseInt(oldValueString)).get();
+            }
 
-            newValue = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfId(Integer.parseInt(newValueString)).get();
-        }
+            var newValueString = buf.readString();
+            TeamDto newValue = null;
+            if (!newValueString.equals("null")) {
 
-        LasertagGameManager.getInstance().getTeamManager().updateTeam(playerUuid, oldValue, newValue);
+                newValue = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfId(Integer.parseInt(newValueString)).get();
+            }
 
-        if (client.currentScreen instanceof LasertagGameManagerTeamsScreen lasertagGameManagerTeamsScreen) {
-            lasertagGameManagerTeamsScreen.resetList();
-        }
+            LasertagGameManager.getInstance().getTeamManager().updateTeam(playerUuid, oldValue, newValue);
 
-        if (client.currentScreen instanceof LasertagTeamSelectorScreen lasertagTeamSelectorScreen) {
-            lasertagTeamSelectorScreen.resetList();
+            if (client.currentScreen instanceof LasertagGameManagerTeamsScreen lasertagGameManagerTeamsScreen) {
+                lasertagGameManagerTeamsScreen.resetList();
+            }
+
+            if (client.currentScreen instanceof LasertagTeamSelectorScreen lasertagTeamSelectorScreen) {
+                lasertagTeamSelectorScreen.resetList();
+            }
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in TeamUpdateCallback", ex);
+            throw ex;
         }
     }
 }

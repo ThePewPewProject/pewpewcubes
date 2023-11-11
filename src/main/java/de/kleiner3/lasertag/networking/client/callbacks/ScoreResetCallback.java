@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -16,6 +17,13 @@ public class ScoreResetCallback implements ClientPlayNetworking.PlayChannelHandl
 
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        LasertagGameManager.getInstance().getScoreManager().resetScores();
+
+        try {
+
+            LasertagGameManager.getInstance().getScoreManager().resetScores();
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in ScoreResetCallback", ex);
+            throw ex;
+        }
     }
 }

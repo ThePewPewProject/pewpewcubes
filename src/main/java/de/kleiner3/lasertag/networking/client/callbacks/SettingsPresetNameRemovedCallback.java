@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.screen.LasertagGameManagerSettingsPresetsScreen;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -16,10 +17,17 @@ import net.minecraft.network.PacketByteBuf;
 public class SettingsPresetNameRemovedCallback implements ClientPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        LasertagGameManager.getInstance().getPresetsNameManager().removePresetName(null, buf.readString());
 
-        if (client.currentScreen instanceof LasertagGameManagerSettingsPresetsScreen lasertagGameManagerSettingsPresetsScreen) {
-            lasertagGameManagerSettingsPresetsScreen.resetList();
+        try {
+
+            LasertagGameManager.getInstance().getPresetsNameManager().removePresetName(null, buf.readString());
+
+            if (client.currentScreen instanceof LasertagGameManagerSettingsPresetsScreen lasertagGameManagerSettingsPresetsScreen) {
+                lasertagGameManagerSettingsPresetsScreen.resetList();
+            }
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in SettingsPresetNameRemovedCallback", ex);
+            throw ex;
         }
     }
 }

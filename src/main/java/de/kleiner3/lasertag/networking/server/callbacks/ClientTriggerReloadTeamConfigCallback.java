@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -19,20 +20,26 @@ public class ClientTriggerReloadTeamConfigCallback implements ServerPlayNetworki
     @Override
     public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
-        server.execute(() -> {
+        try {
 
-            var world = server.getOverworld();
-            var teamManager = LasertagGameManager.getInstance().getTeamManager();
+            server.execute(() -> {
 
-            // Throw every player out of his team
-            teamManager.forEachPlayer((team, playerUuid) -> {
-                teamManager.playerLeaveHisTeam(world, playerUuid);
+                var world = server.getOverworld();
+                var teamManager = LasertagGameManager.getInstance().getTeamManager();
 
-                var playerOptional = Optional.ofNullable(world.getPlayerByUuid(playerUuid));
-                playerOptional.ifPresent(playerEntity -> playerEntity.getInventory().clear());
+                // Throw every player out of his team
+                teamManager.forEachPlayer((team, playerUuid) -> {
+                    teamManager.playerLeaveHisTeam(world, playerUuid);
+
+                    var playerOptional = Optional.ofNullable(world.getPlayerByUuid(playerUuid));
+                    playerOptional.ifPresent(playerEntity -> playerEntity.getInventory().clear());
+                });
+
+                LasertagGameManager.getInstance().reloadTeamConfig(world);
             });
-
-            LasertagGameManager.getInstance().reloadTeamConfig(world);
-        });
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in ClientTriggerReloadTeamConfigCallback", ex);
+            throw ex;
+        }
     }
 }

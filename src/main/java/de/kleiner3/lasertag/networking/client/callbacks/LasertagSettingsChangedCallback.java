@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.screen.LasertagGameManagerSettingsScreen;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -16,12 +17,19 @@ import net.minecraft.network.PacketByteBuf;
 public class LasertagSettingsChangedCallback implements ClientPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        var newSettingsJson = buf.readString();
 
-        LasertagGameManager.getInstance().getSettingsManager().set(newSettingsJson);
+        try {
 
-        if (client.currentScreen instanceof LasertagGameManagerSettingsScreen lasertagGameManagerSettingsScreen) {
-            lasertagGameManagerSettingsScreen.resetList();
+            var newSettingsJson = buf.readString();
+
+            LasertagGameManager.getInstance().getSettingsManager().set(newSettingsJson);
+
+            if (client.currentScreen instanceof LasertagGameManagerSettingsScreen lasertagGameManagerSettingsScreen) {
+                lasertagGameManagerSettingsScreen.resetList();
+            }
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in LasertagSettingsChangedCallback", ex);
+            throw ex;
         }
     }
 }

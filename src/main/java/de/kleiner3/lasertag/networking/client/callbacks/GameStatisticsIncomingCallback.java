@@ -30,75 +30,81 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
-        // Get the managers
-        var gameManager = LasertagGameManager.getInstance();
-        var hudRenderManager = gameManager.getHudRenderManager();
-        var settingManager = gameManager.getSettingsManager();
+        try {
 
-        // Read from buffer
-        var json = buf.readString();
+            // Get the managers
+            var gameManager = LasertagGameManager.getInstance();
+            var hudRenderManager = gameManager.getHudRenderManager();
+            var settingManager = gameManager.getSettingsManager();
 
-        // Unpack json
-        var stats = new Gson().fromJson(json, GameStats.class);
+            // Read from buffer
+            var json = buf.readString();
 
-        if (!stats.teamScores.isEmpty()) {
+            // Unpack json
+            var stats = new Gson().fromJson(json, GameStats.class);
 
-            // Get the winner team id
-            var winnerTeamId = gameManager.getGameModeManager().getGameMode().getWinnerTeamId();
+            if (!stats.teamScores.isEmpty()) {
 
-            // If something went wrong
-            if (winnerTeamId == -1) {
-                LasertagMod.LOGGER.warn("Something went wrong while deciding what team won.");
-            }
+                // Get the winner team id
+                var winnerTeamId = gameManager.getGameModeManager().getGameMode().getWinnerTeamId();
 
-            // Set the winner team id
-            hudRenderManager.lastGameWinnerId = winnerTeamId;
-
-            var gameOverOverlayTimer = ThreadUtil.createScheduledExecutor("lasertag-client-game-over-timer-%d");
-            gameOverOverlayTimer.schedule(() -> {
-                hudRenderManager.lastGameWinnerId = -1;
-                gameOverOverlayTimer.shutdownNow();
-            }, 5, TimeUnit.SECONDS);
-        }
-
-        // If should generate file
-        if (settingManager.<Boolean>get(SettingDescription.GEN_STATS_FILE)) {
-
-            // Generate file
-            var generatedFilePath = WebStatisticsVisualizer.build(stats, ResourceManagers.WEB_RESOURCE_MANAGER);
-
-            // If generation failed
-            if (generatedFilePath == null) {
-                var msg = "Failed to generate statistics file.";
-
-                LasertagMod.LOGGER.error(msg);
-                client.player.sendMessage(Text.translatable(msg)
-                        .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
-
-                return;
-            }
-
-            // If should automatically open file
-            if (settingManager.<Boolean>get(SettingDescription.AUTO_OPEN_STATS_FILE)) {
-
-                try {
-                    DesktopApi.open(new File(generatedFilePath));
-                } catch (Exception e) {
-
-                    // Log error
-                    LasertagMod.LOGGER.error("Failed to open statistics from '" + generatedFilePath + "': " + e.getMessage());
-
-                    // Notify player
-                    client.player.sendMessage(Text.translatable("Failed to open statistics from " + generatedFilePath)
-                            .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
+                // If something went wrong
+                if (winnerTeamId == -1) {
+                    LasertagMod.LOGGER.warn("Something went wrong while deciding what team won.");
                 }
 
-            } else {
+                // Set the winner team id
+                hudRenderManager.lastGameWinnerId = winnerTeamId;
 
-                // Notify player about generation of file
-                client.player.sendMessage(Text.translatable("Game statistics saved to " + generatedFilePath)
-                        .fillStyle(Style.EMPTY.withColor(Formatting.WHITE)), false);
+                var gameOverOverlayTimer = ThreadUtil.createScheduledExecutor("lasertag-client-game-over-timer-%d");
+                gameOverOverlayTimer.schedule(() -> {
+                    hudRenderManager.lastGameWinnerId = -1;
+                    gameOverOverlayTimer.shutdownNow();
+                }, 5, TimeUnit.SECONDS);
             }
+
+            // If should generate file
+            if (settingManager.<Boolean>get(SettingDescription.GEN_STATS_FILE)) {
+
+                // Generate file
+                var generatedFilePath = WebStatisticsVisualizer.build(stats, ResourceManagers.WEB_RESOURCE_MANAGER);
+
+                // If generation failed
+                if (generatedFilePath == null) {
+                    var msg = "Failed to generate statistics file.";
+
+                    LasertagMod.LOGGER.error(msg);
+                    client.player.sendMessage(Text.translatable(msg)
+                            .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
+
+                    return;
+                }
+
+                // If should automatically open file
+                if (settingManager.<Boolean>get(SettingDescription.AUTO_OPEN_STATS_FILE)) {
+
+                    try {
+                        DesktopApi.open(new File(generatedFilePath));
+                    } catch (Exception e) {
+
+                        // Log error
+                        LasertagMod.LOGGER.error("Failed to open statistics from '" + generatedFilePath + "': " + e.getMessage());
+
+                        // Notify player
+                        client.player.sendMessage(Text.translatable("Failed to open statistics from " + generatedFilePath)
+                                .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
+                    }
+
+                } else {
+
+                    // Notify player about generation of file
+                    client.player.sendMessage(Text.translatable("Game statistics saved to " + generatedFilePath)
+                            .fillStyle(Style.EMPTY.withColor(Formatting.WHITE)), false);
+                }
+            }
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in GameStatisticsIncomingCallback", ex);
+            throw ex;
         }
     }
 }

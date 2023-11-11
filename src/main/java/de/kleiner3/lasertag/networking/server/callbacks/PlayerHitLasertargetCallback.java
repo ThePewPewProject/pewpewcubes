@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
@@ -16,14 +17,21 @@ import net.minecraft.util.math.BlockPos;
 public class PlayerHitLasertargetCallback implements ServerPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        var playerUuid = buf.readUuid();
 
-        var targetX = buf.readDouble();
-        var targetY = buf.readDouble();
-        var targetZ = buf.readDouble();
+        try {
 
-        var targetPos = new BlockPos(targetX, targetY, targetZ);
+            var playerUuid = buf.readUuid();
 
-        server.getLasertagServerManager().playerHitLasertarget(playerUuid, targetPos);
+            var targetX = buf.readDouble();
+            var targetY = buf.readDouble();
+            var targetZ = buf.readDouble();
+
+            var targetPos = new BlockPos(targetX, targetY, targetZ);
+
+            server.getLasertagServerManager().playerHitLasertarget(playerUuid, targetPos);
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in PlayerHitLasertargetCallback", ex);
+            throw ex;
+        }
     }
 }

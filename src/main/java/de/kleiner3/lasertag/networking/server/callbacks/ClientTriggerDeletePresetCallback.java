@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -17,10 +18,16 @@ public class ClientTriggerDeletePresetCallback implements ServerPlayNetworking.P
     @Override
     public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
-        // Get the preset name
-        var presetName = buf.readString();
+        try {
 
-        server.getLasertagServerManager().getSettingsPresetsManager().deletePreset(presetName);
-        LasertagGameManager.getInstance().getPresetsNameManager().removePresetName(server, presetName);
+            // Get the preset name
+            var presetName = buf.readString();
+
+            server.getLasertagServerManager().getSettingsPresetsManager().deletePreset(presetName);
+            LasertagGameManager.getInstance().getPresetsNameManager().removePresetName(server, presetName);
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in ClientTriggerDeletePresetCallback", ex);
+            throw ex;
+        }
     }
 }

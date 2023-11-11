@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -18,31 +19,38 @@ import java.util.UUID;
 public class LaserRaySpawnedCallback implements ClientPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        double x = buf.readDouble();
-        double y = buf.readDouble();
-        double z = buf.readDouble();
 
-        double endX = buf.readDouble();
-        double endY = buf.readDouble();
-        double endZ = buf.readDouble();
+        try {
 
-        Vec3d pos = new Vec3d(x, y, z);
-        Vec3d endPos = new Vec3d(endX, endY, endZ);
+            double x = buf.readDouble();
+            double y = buf.readDouble();
+            double z = buf.readDouble();
 
-        float yaw = buf.readFloat();
-        float pitch = buf.readFloat();
+            double endX = buf.readDouble();
+            double endY = buf.readDouble();
+            double endZ = buf.readDouble();
 
-        int entityId = buf.readInt();
-        UUID uuid = buf.readUuid();
+            Vec3d pos = new Vec3d(x, y, z);
+            Vec3d endPos = new Vec3d(endX, endY, endZ);
 
-        int color = buf.readInt();
+            float yaw = buf.readFloat();
+            float pitch = buf.readFloat();
 
-        client.execute(() -> {
-            LaserRayEntity entity = new LaserRayEntity(client.world, pos, yaw, pitch, color, endPos);
-            entity.setId(entityId);
-            entity.setUuid(uuid);
+            int entityId = buf.readInt();
+            UUID uuid = buf.readUuid();
 
-            client.world.addEntity(entityId, entity);
-        });
+            int color = buf.readInt();
+
+            client.execute(() -> {
+                LaserRayEntity entity = new LaserRayEntity(client.world, pos, yaw, pitch, color, endPos);
+                entity.setId(entityId);
+                entity.setUuid(uuid);
+
+                client.world.addEntity(entityId, entity);
+            });
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in LaserRaySpawnedCallback", ex);
+            throw ex;
+        }
     }
 }

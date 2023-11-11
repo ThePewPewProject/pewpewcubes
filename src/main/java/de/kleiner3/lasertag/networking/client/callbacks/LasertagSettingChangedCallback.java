@@ -19,33 +19,40 @@ import net.minecraft.network.PacketByteBuf;
 public class LasertagSettingChangedCallback implements ClientPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        // Read from buffer
-        var settingsName = buf.readString();
-        var value = buf.readString();
 
-        // Get the setting description
-        var settingDescription = SettingDescription.byName(settingsName);
+        try {
 
-        if (settingDescription.isEmpty()) {
+            // Read from buffer
+            var settingsName = buf.readString();
+            var value = buf.readString();
 
-            LasertagMod.LOGGER.error("Unrecognized setting name '{}'", settingsName);
-            return;
-        }
+            // Get the setting description
+            var settingDescription = SettingDescription.byName(settingsName);
 
-        Object primitive;
-        if (settingDescription.get().getDataType().isEnum()) {
+            if (settingDescription.isEmpty()) {
 
-            // If is enum, simply use the string
-            primitive = value;
-        } else {
-            // Convert to primitive type
-            primitive = ConverterUtil.stringToPrimitiveType(value);
-        }
+                LasertagMod.LOGGER.error("Unrecognized setting name '{}'", settingsName);
+                return;
+            }
 
-        LasertagGameManager.getInstance().getSettingsManager().set(null, settingsName, primitive);
+            Object primitive;
+            if (settingDescription.get().getDataType().isEnum()) {
 
-        if (client.currentScreen instanceof LasertagGameManagerSettingsScreen lasertagGameManagerSettingsScreen) {
-            lasertagGameManagerSettingsScreen.resetList();
+                // If is enum, simply use the string
+                primitive = value;
+            } else {
+                // Convert to primitive type
+                primitive = ConverterUtil.stringToPrimitiveType(value);
+            }
+
+            LasertagGameManager.getInstance().getSettingsManager().set(null, settingsName, primitive);
+
+            if (client.currentScreen instanceof LasertagGameManagerSettingsScreen lasertagGameManagerSettingsScreen) {
+                lasertagGameManagerSettingsScreen.resetList();
+            }
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in LasertagSettingChangedCallback", ex);
+            throw ex;
         }
     }
 }

@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.screen.LasertagLoadingScreen;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -17,22 +18,28 @@ public class MapLoadingEventCallback implements ClientPlayNetworking.PlayChannel
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
-        var stepString = buf.readString();
-        var newProgress = buf.readDouble();
+        try {
 
-        var renderData = LasertagGameManager.getInstance().getHudRenderManager();
+            var stepString = buf.readString();
+            var newProgress = buf.readDouble();
 
-        var oldProgress = renderData.mapLoadingProgress;
-        renderData.mapLoadingStepString = stepString;
-        renderData.mapLoadingProgress = newProgress;
+            var renderData = LasertagGameManager.getInstance().getHudRenderManager();
 
-        if (oldProgress == -1 && newProgress >= 0) {
-            client.execute(() -> client.setScreen(new LasertagLoadingScreen()));
-            return;
-        }
+            var oldProgress = renderData.mapLoadingProgress;
+            renderData.mapLoadingStepString = stepString;
+            renderData.mapLoadingProgress = newProgress;
 
-        if (oldProgress >= 0 && newProgress == -1) {
-            client.execute(() -> client.setScreen(null));
+            if (oldProgress == -1 && newProgress >= 0) {
+                client.execute(() -> client.setScreen(new LasertagLoadingScreen()));
+                return;
+            }
+
+            if (oldProgress >= 0 && newProgress == -1) {
+                client.execute(() -> client.setScreen(null));
+            }
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in MapLoadingEventCallback", ex);
+            throw ex;
         }
     }
 }

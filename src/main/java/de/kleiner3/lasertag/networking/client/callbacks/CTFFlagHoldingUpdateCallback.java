@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -16,17 +17,22 @@ public class CTFFlagHoldingUpdateCallback implements ClientPlayNetworking.PlayCh
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
-        // Get the player uuid
-        var playerUuid = buf.readUuid();
+        try {
+            // Get the player uuid
+            var playerUuid = buf.readUuid();
 
-        // Get the team id
-        Integer teamId = null;
-        var teamIdString = buf.readString();
-        if (!teamIdString.equals("null")) {
-            teamId = Integer.parseInt(teamIdString);
+            // Get the team id
+            Integer teamId = null;
+            var teamIdString = buf.readString();
+            if (!teamIdString.equals("null")) {
+                teamId = Integer.parseInt(teamIdString);
+            }
+
+            // Set the player holding flag
+            LasertagGameManager.getInstance().getFlagManager().updateFlagHolding(playerUuid, teamId);
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in CTFFlagHoldingUpdateCallback", ex);
+            throw ex;
         }
-
-        // Set the player holding flag
-        LasertagGameManager.getInstance().getFlagManager().updateFlagHolding(playerUuid, teamId);
     }
 }

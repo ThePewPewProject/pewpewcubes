@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.gamemode.GameModes;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -18,13 +19,19 @@ public class ClientTriggerGameModeChangeCallback implements ServerPlayNetworking
     @Override
     public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
-        // Get the game mode translatable name
-        var newGameModeTranslatableName = buf.readString();
+        try {
 
-        // Get the new game mode
-        var newGameMode = GameModes.GAME_MODES.get(newGameModeTranslatableName);
+            // Get the game mode translatable name
+            var newGameModeTranslatableName = buf.readString();
 
-        // Set the new game mode
-        LasertagGameManager.getInstance().getGameModeManager().setGameMode(server, newGameMode);
+            // Get the new game mode
+            var newGameMode = GameModes.GAME_MODES.get(newGameModeTranslatableName);
+
+            // Set the new game mode
+            LasertagGameManager.getInstance().getGameModeManager().setGameMode(server, newGameMode);
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in ClientTriggerGameModeChangeCallback", ex);
+            throw ex;
+        }
     }
 }

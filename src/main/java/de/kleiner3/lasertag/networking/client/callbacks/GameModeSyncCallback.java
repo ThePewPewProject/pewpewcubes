@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.screen.LasertagGameManagerScreen;
 import de.kleiner3.lasertag.client.screen.LasertagGameManagerSettingsScreen;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
@@ -19,20 +20,26 @@ public class GameModeSyncCallback implements ClientPlayNetworking.PlayChannelHan
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
-        // Get the game mode translatable name
-        var gameModeTranslatableName = buf.readString();
+        try {
 
-        // Get the new game mode
-        var newGameMode = GameModes.GAME_MODES.get(gameModeTranslatableName);
+            // Get the game mode translatable name
+            var gameModeTranslatableName = buf.readString();
 
-        // Set the new game mode
-        LasertagGameManager.getInstance().getGameModeManager().setGameMode(null, newGameMode);
+            // Get the new game mode
+            var newGameMode = GameModes.GAME_MODES.get(gameModeTranslatableName);
 
-        // If client has game manager screen open
-        if (client.currentScreen instanceof LasertagGameManagerScreen lasertagGameManagerScreen) {
-            lasertagGameManagerScreen.reloadGameMode();
-        } else if (client.currentScreen instanceof LasertagGameManagerSettingsScreen lasertagGameManagerSettingsScreen) {
-            lasertagGameManagerSettingsScreen.resetList();
+            // Set the new game mode
+            LasertagGameManager.getInstance().getGameModeManager().setGameMode(null, newGameMode);
+
+            // If client has game manager screen open
+            if (client.currentScreen instanceof LasertagGameManagerScreen lasertagGameManagerScreen) {
+                lasertagGameManagerScreen.reloadGameMode();
+            } else if (client.currentScreen instanceof LasertagGameManagerSettingsScreen lasertagGameManagerSettingsScreen) {
+                lasertagGameManagerSettingsScreen.resetList();
+            }
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in GameModeSyncCallback", ex);
+            throw ex;
         }
     }
 }

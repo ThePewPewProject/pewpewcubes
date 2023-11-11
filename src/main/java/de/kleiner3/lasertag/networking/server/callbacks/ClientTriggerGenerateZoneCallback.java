@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.entity.LasertagTeamZoneGeneratorBlockEntity;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -11,30 +12,36 @@ import net.minecraft.server.network.ServerPlayerEntity;
 /**
  * @author Étienne Muser
  */
-public class ClientTriggerGenerateZoneCallback implements ServerPlayNetworking.PlayChannelHandler{
+public class ClientTriggerGenerateZoneCallback implements ServerPlayNetworking.PlayChannelHandler {
     @Override
     public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
-        // Get the block pos
-        var blockPos = buf.readBlockPos();
+        try {
 
-        // Get the team name
-        var newTeamName = buf.readString();
+            // Get the block pos
+            var blockPos = buf.readBlockPos();
 
-        server.execute(() -> {
-            // Get the block entity
-            var blockEntity = server.getOverworld().getBlockEntity(blockPos);
+            // Get the team name
+            var newTeamName = buf.readString();
 
-            // If it is not an team zone generator block entity
-            if (!(blockEntity instanceof LasertagTeamZoneGeneratorBlockEntity lasertagTeamZoneGeneratorBlockEntity)) {
-                return;
-            }
+            server.execute(() -> {
+                // Get the block entity
+                var blockEntity = server.getOverworld().getBlockEntity(blockPos);
 
-            // Set the team name
-            lasertagTeamZoneGeneratorBlockEntity.setTeamName(newTeamName);
+                // If it is not an team zone generator block entity
+                if (!(blockEntity instanceof LasertagTeamZoneGeneratorBlockEntity lasertagTeamZoneGeneratorBlockEntity)) {
+                    return;
+                }
 
-            // Do the floodfill
-            lasertagTeamZoneGeneratorBlockEntity.generateZone();
-        });
+                // Set the team name
+                lasertagTeamZoneGeneratorBlockEntity.setTeamName(newTeamName);
+
+                // Do the floodfill
+                lasertagTeamZoneGeneratorBlockEntity.generateZone();
+            });
+        } catch (Exception ex) {
+            LasertagMod.LOGGER.error("Error in ClientTriggerGenerateZoneCallback", ex);
+            throw ex;
+        }
     }
 }
