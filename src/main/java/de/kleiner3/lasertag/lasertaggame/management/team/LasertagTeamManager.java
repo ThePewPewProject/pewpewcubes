@@ -220,7 +220,7 @@ public class LasertagTeamManager implements IManager {
      */
     public boolean isPlayerInTeam(UUID uuid) {
 
-        return playerTeamMap.containsKey(uuid);
+        return playerTeamMap.containsKey(uuid) && playerTeamMap.get(uuid) != null;
     }
 
     /**
