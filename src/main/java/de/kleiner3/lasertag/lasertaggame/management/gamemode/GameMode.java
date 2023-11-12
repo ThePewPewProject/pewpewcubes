@@ -241,25 +241,8 @@ public abstract class GameMode {
      */
     public void onGameStart(MinecraftServer server) {
 
-        // Get the overworld
-        var world = server.getOverworld();
-
-        // Get the team manager
-        var teamManager = LasertagGameManager.getInstance().getTeamManager();
-
         // Activate every player
-        teamManager.forEachPlayer((teamDto, playerUuid) -> {
-
-            LasertagGameManager.getInstance().getDeactivatedManager().activate(playerUuid, world, server.getPlayerManager());
-            var player = server.getPlayerManager().getPlayer(playerUuid);
-
-            // Sanity check
-            if (player == null) {
-                return;
-            }
-
-            player.onActivated();
-        });
+        LasertagGameManager.getInstance().getDeactivatedManager().activateAll(server);
     }
 
     /**
@@ -329,7 +312,7 @@ public abstract class GameMode {
     public void onGameEnd(MinecraftServer server) {
 
         // Deactivate every player
-        LasertagGameManager.getInstance().getDeactivatedManager().deactivateAll(server.getOverworld(), server.getPlayerManager());
+        LasertagGameManager.getInstance().getDeactivatedManager().deactivateAll(server);
 
         // Teleport players to origin
         LasertagGameManager.getInstance().getTeamManager().forEachPlayer(((team, playerUuid) -> {

@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.lasertaggame.management.deactivation;
 
 import com.google.gson.Gson;
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
@@ -8,7 +9,10 @@ import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
@@ -35,6 +39,7 @@ public class PlayerDeactivatedManager implements IManager {
      * @return If the player is currently deactivated
      */
     public boolean isDeactivated(UUID uuid) {
+
         // If not already in map
         if (!deactivatedMap.containsKey(uuid)) {
             deactivatedMap.put(uuid, true);
@@ -48,7 +53,10 @@ public class PlayerDeactivatedManager implements IManager {
      *
      * @param deactivated If the player is deactivated
      */
+    @Environment(EnvType.CLIENT)
     public void setDeactivated(UUID uuid, boolean deactivated) {
+
+        LasertagMod.LOGGER.info("[Client] Setting the player with uuid '" + uuid + "' to deactivated: " + deactivated);
         deactivatedMap.put(uuid, deactivated);
     }
 
@@ -56,92 +64,104 @@ public class PlayerDeactivatedManager implements IManager {
      * Deactivates a player, activates him again after the configured time
      *
      * @param playerUuid The uuid of the player to deactivate
-     * @param world The world which the player is in
+     * @param server     The server on which the game is running
      */
-    public void deactivate(UUID playerUuid, World world, PlayerManager playerManager) {
-        this.deactivate(playerUuid, world, playerManager, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAYER_DEACTIVATE_TIME));
+
+    public void deactivateAndReactivate(UUID playerUuid, MinecraftServer server) {
+
+        this.deactivateAndReactivate(playerUuid, server, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAYER_DEACTIVATE_TIME));
     }
 
     /**
      * Deactivates a player, activates him again after the specified duration
      *
-     * @param playerUuid The uuid of the player to deactivate
-     * @param world The world which the player is in
+     * @param playerUuid           The uuid of the player to deactivate
+     * @param server               The server on which the game is running
      * @param deactivationDuration The amount of time in seconds the player will be deactivated
      */
-    public void deactivate(UUID playerUuid, World world, PlayerManager playerManager, long deactivationDuration) {
+    public void deactivateAndReactivate(UUID playerUuid, MinecraftServer server, long deactivationDuration) {
+
+        LasertagMod.LOGGER.info("[Server] Setting the player with uuid '" + playerUuid + "' to deactivated: true for " + deactivationDuration + " seconds.");
 
         // Deactivate player
-        deactivatedMap.put(playerUuid, true);
-        sendDeactivatedToClients(world, playerUuid, true);
+        this.setDeactivatedOnServer(server, playerUuid, true);
 
         // Reactivate player after configured amount of time
         var deactivationThread = ThreadUtil.createScheduledExecutor("lasertag-player-deactivation-thread-%d");
         deactivationThread.schedule(() -> {
 
-            activate(playerUuid, world, playerManager);
+            LasertagMod.LOGGER.info("[Server] Setting the player with uuid '" + playerUuid + "' to deactivated: false after timer ran out");
+            this.setDeactivatedOnServer(server, playerUuid, false);
             deactivationThread.shutdownNow();
         }, deactivationDuration, TimeUnit.SECONDS);
-
-        var player = playerManager.getPlayer(playerUuid);
-
-        // Sanity check
-        if (player == null) {
-            return;
-        }
-
-        player.onDeactivated();
     }
 
     /**
-     * Activates the player referenced by uuid
+     * Deactivates all players without time limit
      *
-     * @param uuid The uuid of the player to activate
-     * @param world The world which the player is in
+     * @param server The server on which the game is running
      */
-    public void activate(UUID uuid, World world, PlayerManager playerManager) {
-        deactivatedMap.put(uuid, false);
-        sendDeactivatedToClients(world, uuid, false);
+    public void deactivateAll(MinecraftServer server) {
 
-        var player = playerManager.getPlayer(uuid);
-
-        // Sanity check
-        if (player == null) {
-            return;
-        }
-
-        player.onActivated();
+        LasertagMod.LOGGER.info("[Server] Deactivating all players");
+        this.setAll(server, true);
     }
 
     /**
-     * Deactivates a given player
+     * Activates all players without time limit
      *
-     * @param playerUuid The uuid of the player to deactivate
-     * @param world The world he is in
-     * @param forever Bool if he should be deactivated without reactivation count down
+     * @param server The server on which the game is running
      */
-    public void deactivate(UUID playerUuid, World world, boolean forever, PlayerManager playerManager) {
-        if (forever) {
-            deactivatedMap.put(playerUuid, true);
-            sendDeactivatedToClients(world, playerUuid, true);
-        } else {
-            deactivate(playerUuid, world, playerManager);
-        }
+    public void activateAll(MinecraftServer server) {
+
+        LasertagMod.LOGGER.info("[Server] Activating all players");
+        this.setAll(server, false);
     }
 
-    /**
-     * Deactivates all players forever
-     *
-     * @param world The world the game is in
-     */
-    public void deactivateAll(ServerWorld world, PlayerManager playerManager) {
+    //endregion
+
+    //region Private methods
+
+    private void setAll(MinecraftServer server, boolean deactivated) {
 
         var teamManager = LasertagGameManager.getInstance().getTeamManager();
 
-        teamManager.forEachPlayer((team, playerUuid) -> {
-            deactivate(playerUuid, world, true, playerManager);
-        });
+        teamManager.forEachPlayer((team, playerUuid) -> setDeactivatedOnServer(server, playerUuid, deactivated));
     }
+
+    private void setDeactivatedOnServer(MinecraftServer server, UUID playerUuid, boolean deactivated) {
+
+        LasertagMod.LOGGER.info("[Server] Setting the player with uuid '" + playerUuid + "' to deactivated: " + deactivated);
+        deactivatedMap.put(playerUuid, deactivated);
+        sendDeactivatedToClients(server.getOverworld(), playerUuid, deactivated);
+
+        var player = server.getPlayerManager().getPlayer(playerUuid);
+
+        // Sanity check
+        if (player == null) {
+            return;
+        }
+
+        if (deactivated) {
+            player.onDeactivated();
+        } else {
+            player.onActivated();
+        }
+    }
+
+    private static void sendDeactivatedToClients(ServerWorld world, UUID uuid, boolean deactivated) {
+
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+
+        buf.writeUuid(uuid);
+        buf.writeBoolean(deactivated);
+
+        ServerEventSending.sendToEveryone(world, NetworkingConstants.PLAYER_DEACTIVATED_STATUS_CHANGED, buf);
+    }
+
+    // endregion
+
+    //region Unused methods
 
     @Override
     public void dispose() {
@@ -153,20 +173,4 @@ public class PlayerDeactivatedManager implements IManager {
     }
 
     //endregion
-
-    //region Private methods
-
-    private static void sendDeactivatedToClients(World world, UUID uuid, boolean deactivated) {
-        if (world instanceof ServerWorld serverWorld) {
-
-            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-
-            buf.writeUuid(uuid);
-            buf.writeBoolean(deactivated);
-
-            ServerEventSending.sendToEveryone(serverWorld, NetworkingConstants.PLAYER_DEACTIVATED_STATUS_CHANGED, buf);
-        }
-    }
-
-    // endregion
 }

@@ -84,7 +84,7 @@ public class PointHunterGameMode extends GameMode {
         var world = server.getOverworld();
 
         // Deactivate player
-        LasertagGameManager.getInstance().getDeactivatedManager().deactivate(target.getUuid(), world, server.getPlayerManager());
+        LasertagGameManager.getInstance().getDeactivatedManager().deactivateAndReactivate(target.getUuid(), server);
 
         LasertagGameManager.getInstance().getScoreManager().onPlayerScored(world, shooter, LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAYER_HIT_SCORE));
         super.onPlayerHitPlayer(server, shooter, target);

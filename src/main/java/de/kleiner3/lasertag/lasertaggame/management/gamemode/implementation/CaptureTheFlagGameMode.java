@@ -169,10 +169,7 @@ public class CaptureTheFlagGameMode extends GameMode {
             shooter.heal(healAmount);
         }
 
-        deactivatedManager.deactivate(player.getUuid(),
-                server.getOverworld(),
-                server.getPlayerManager(),
-                LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PLAYER_DEACTIVATE_TIME));
+        deactivatedManager.deactivateAndReactivate(player.getUuid(), server);
 
         // Get the team of the flag the player is currently holding
         var teamOptional = flagManager.getPlayerHoldingFlagTeam(player.getUuid());
