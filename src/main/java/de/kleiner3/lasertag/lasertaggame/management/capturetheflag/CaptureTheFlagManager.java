@@ -150,6 +150,9 @@ public class CaptureTheFlagManager implements IManager {
      * @param team The team he picked up the flag of
      */
     public void playerPickedUpFlag(ServerWorld world, ServerPlayerEntity player, TeamDto team) {
+
+        this.sendTeamFlagStolenMessage(world, team);
+
         this.playerHoldingFlagMap.put(player.getUuid(), team.id());
 
         // If flag holding players should glow
@@ -333,6 +336,15 @@ public class CaptureTheFlagManager implements IManager {
         buffer.writeString(teamIdString);
 
         ServerEventSending.sendToEveryone(world, NetworkingConstants.CTF_FLAG_HOLDING_UPDATE, buffer);
+    }
+
+    private void sendTeamFlagStolenMessage(ServerWorld world, TeamDto team) {
+
+        var msg = Text.literal("Flag of Team ");
+        var teamName = Text.literal(team.name()).setStyle(Style.EMPTY.withColor(team.color().getValue()));
+        msg.append(teamName);
+        msg.append(" got stolen!");
+        world.getServer().getPlayerManager().broadcast(msg, false);
     }
 
     private void sendTeamFlagCapturedMessage(ServerWorld world, TeamDto team) {
