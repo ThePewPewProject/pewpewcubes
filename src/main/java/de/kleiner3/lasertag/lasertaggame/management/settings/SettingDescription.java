@@ -44,7 +44,10 @@ public enum SettingDescription {
 
     // Capture the flag specific
     FLAG_COUNT("numberOfFlags", 3L, SettingDataType.LONG, "number", 0L, null),
-    CTF_FLAG_HOLDING_PLAYER_VISIBILITY("flagHoldingPlayerVisibility", CTFFlagHoldingPlayerVisibility.GLOW, SettingDataType.ofEnum(CTFFlagHoldingPlayerVisibility.class), "visibility", null, null);
+    CTF_FLAG_HOLDING_PLAYER_VISIBILITY("flagHoldingPlayerVisibility", CTFFlagHoldingPlayerVisibility.GLOW, SettingDataType.ofEnum(CTFFlagHoldingPlayerVisibility.class), "visibility", null, null),
+    SEND_FLAG_STOLEN_MESSAGE("sendFlagStolenMessage", true, SettingDataType.BOOL, "value", null, null),
+    SEND_FLAG_CAPTURED_MESSAGE("sendFlagCapturedMessage", true, SettingDataType.BOOL, "value", null, null),
+    SEND_TEAM_OUT_MESSAGE("sendTeamOutMessage", true, SettingDataType.BOOL, "value", null, null);
 
     /**
      * Get a SettingDescription given its name.

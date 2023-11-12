@@ -92,6 +92,9 @@ public class CaptureTheFlagGameMode extends GameMode {
         // From CTF specific
         list.add(SettingDescription.FLAG_COUNT);
         list.add(SettingDescription.CTF_FLAG_HOLDING_PLAYER_VISIBILITY);
+        list.add(SettingDescription.SEND_FLAG_STOLEN_MESSAGE);
+        list.add(SettingDescription.SEND_FLAG_CAPTURED_MESSAGE);
+        list.add(SettingDescription.SEND_TEAM_OUT_MESSAGE);
 
         return list;
     }

@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame.management.capturetheflag;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.item.Items;
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
@@ -340,6 +341,11 @@ public class CaptureTheFlagManager implements IManager {
 
     private void sendTeamFlagStolenMessage(ServerWorld world, TeamDto team) {
 
+        boolean sendMessage = LasertagGameManager.getInstance().getSettingsManager().get(SettingDescription.SEND_FLAG_STOLEN_MESSAGE);
+        if (!sendMessage) {
+            return;
+        }
+
         var msg = Text.literal("Flag of Team ");
         var teamName = Text.literal(team.name()).setStyle(Style.EMPTY.withColor(team.color().getValue()));
         msg.append(teamName);
@@ -349,6 +355,11 @@ public class CaptureTheFlagManager implements IManager {
 
     private void sendTeamFlagCapturedMessage(ServerWorld world, TeamDto team) {
 
+        boolean sendMessage = LasertagGameManager.getInstance().getSettingsManager().get(SettingDescription.SEND_FLAG_CAPTURED_MESSAGE);
+        if (!sendMessage) {
+            return;
+        }
+
         var msg = Text.literal("Flag of Team ");
         var teamName = Text.literal(team.name()).setStyle(Style.EMPTY.withColor(team.color().getValue()));
         msg.append(teamName);
@@ -357,6 +368,11 @@ public class CaptureTheFlagManager implements IManager {
     }
 
     private void sendTeamIsOutMessage(ServerWorld world, TeamDto team) {
+
+        boolean sendMessage = LasertagGameManager.getInstance().getSettingsManager().get(SettingDescription.SEND_TEAM_OUT_MESSAGE);
+        if (!sendMessage) {
+            return;
+        }
 
         var msg = Text.literal("Team ");
         var teamName = Text.literal(team.name()).setStyle(Style.EMPTY.withColor(team.color().getValue()));
