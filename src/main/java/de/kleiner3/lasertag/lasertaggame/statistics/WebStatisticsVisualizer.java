@@ -3,7 +3,6 @@ package de.kleiner3.lasertag.lasertaggame.statistics;
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.common.util.DurationUtils;
-import de.kleiner3.lasertag.common.util.FileIO;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.PlayerInfoDto;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.ProfileTextureDto;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.SessionPlayerProfileDto;
@@ -18,8 +17,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.stream.Collectors;
 
 /**
  * Builds a web page to visualize game statistics
@@ -45,9 +46,9 @@ public class WebStatisticsVisualizer {
 
     private static final Identifier REPLACE_ID = new Identifier(LasertagMod.ID, "statistics_go_here");
 
-    public static String build(GameStats stats, WebResourceManager resourceManager) {
+    public static Path build(GameStats stats, WebResourceManager resourceManager) {
         // The path to the generated index.html file
-        String resultPath = null;
+        Path resultPath = null;
 
         // Get web page template from resource manager
         var template = resourceManager.getWebSite(new Identifier("web/statistics_template"));
@@ -65,22 +66,22 @@ public class WebStatisticsVisualizer {
                 // Read the file
                 String fileContents;
                 try {
-                    fileContents = FileIO.readAllFile(fileTuple.y().getInputStream());
+                    fileContents = fileTuple.y().getReader().lines().collect(Collectors.joining());
                 } catch (IOException ex) {
-                    LasertagMod.LOGGER.error("Exception in WebStatisticsVisualizer.build:", ex);
+                    LasertagMod.LOGGER.error("Reading of statistics template failed:", ex);
                     return null;
                 }
 
                 fileContents = buildHtml(fileContents, stats);
 
                 // Write file
-                resultPath = Path.of(TARGET_PATH.toString(), fileTuple.x().getPath()).toString();
+                resultPath = TARGET_PATH.resolve(fileTuple.x().getPath());
                 try {
-                    var ignored = FileIO.createNewFile(resultPath);
 
-                    Files.writeString(Path.of(resultPath), fileContents);
+                    Files.createDirectories(resultPath.getParent());
+                    Files.writeString(resultPath, fileContents, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
                 } catch (IOException ex) {
-                    LasertagMod.LOGGER.error("Exception in WebStatisticsVisualizer.build:", ex);
+                    LasertagMod.LOGGER.error("Writing of statistics file failed:", ex);
                     return null;
                 }
 
@@ -88,13 +89,12 @@ public class WebStatisticsVisualizer {
             }
 
             try {
-                var copyToPath = Path.of(TARGET_PATH.toString(), fileTuple.x().getPath());
+                var copyToPath = TARGET_PATH.resolve(fileTuple.x().getPath());
 
-                var ignored = FileIO.createNewFile(copyToPath.toString());
-
+                Files.createDirectories(copyToPath.getParent());
                 Files.copy(fileTuple.y().getInputStream(), copyToPath, StandardCopyOption.REPLACE_EXISTING);
             } catch (Exception ex) {
-                LasertagMod.LOGGER.error("Failed to copy file '" + fileTuple.y().toString() + "' of statistics visualization.", ex);
+                LasertagMod.LOGGER.error("Failed to copy file '" + fileTuple.x().getPath() + "' of statistics visualization.", ex);
                 return null;
             }
         }

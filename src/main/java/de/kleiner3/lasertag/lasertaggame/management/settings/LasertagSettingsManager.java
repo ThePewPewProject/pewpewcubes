@@ -3,17 +3,19 @@ package de.kleiner3.lasertag.lasertaggame.management.settings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.common.util.FileIO;
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import de.kleiner3.lasertag.lasertaggame.management.gamemode.GameMode;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 /**
  * Manages the lasertag settings
@@ -25,19 +27,18 @@ public class LasertagSettingsManager implements IManager {
     private LasertagSettingsMap settings;
 
     // Get path to lasertag settings file
-    private static final String lasertagSettingsFilePath = LasertagMod.configFolderPath + "\\lasertagSettings.json";
+    private static final Path lasertagSettingsFilePath = LasertagMod.configFolderPath.resolve("lasertagSettings.json");
 
-    // Create file object
-    private static final File lasertagSettingsFile = new File(lasertagSettingsFilePath);
 
     //endregion
 
-    public LasertagSettingsManager() {
-        if (lasertagSettingsFile.exists()) {
+    public LasertagSettingsManager(GameMode gameMode) {
+
+        if (Files.exists(lasertagSettingsFilePath)) {
 
             try {
                 // Read settings file
-                var settingsFileContents = FileIO.readAllFile(lasertagSettingsFile);
+                var settingsFileContents = Files.readString(lasertagSettingsFilePath);
 
                 // Parse file
                 settings = LasertagSettingsMap.fromJson(settingsFileContents);
@@ -47,21 +48,14 @@ public class LasertagSettingsManager implements IManager {
 
         } else {
 
-            try {
-                // Use default settings
-                settings = LasertagGameManager.getInstance().getGameModeManager().getGameMode().createDefaultSettings();
+            // Use default settings
+            settings = gameMode.createDefaultSettings();
 
-                // Log that default settings is being used
-                LasertagMod.LOGGER.info("Default lasertag settings is being used.");
+            // Log that default settings is being used
+            LasertagMod.LOGGER.info("Default lasertag settings is being used.");
 
-                // Create settings file
-                var ignored = FileIO.createNewFile(lasertagSettingsFilePath);
-
-                // Write to settings file
-                persistUnsafe();
-            } catch (IOException e) {
-                LasertagMod.LOGGER.warn("Creation of new lasertag settings file in '" + lasertagSettingsFilePath + "' failed: " + e.getMessage());
-            }
+            // Write to settings file
+            persist();
         }
     }
 
@@ -71,8 +65,8 @@ public class LasertagSettingsManager implements IManager {
      * Get the value of the setting. Only for non-enum values.
      *
      * @param setting The setting description of the setting
+     * @param <T>     The type of the value of the setting
      * @return The value of the setting
-     * @param <T> The type of the value of the setting
      */
     public <T> T get(SettingDescription setting) {
 
@@ -84,15 +78,15 @@ public class LasertagSettingsManager implements IManager {
         }
 
         // Get value from dictionary
-        return (T)settings.get(key);
+        return (T) settings.get(key);
     }
 
     /**
      * Get the enum value of a setting. Only for enum values.
      *
      * @param setting The setting description of the setting
+     * @param <T>     The type of the value of the setting
      * @return The value of the setting
-     * @param <T> The type of the value of the setting
      */
     public <T extends Enum<T>> T getEnum(SettingDescription setting) {
         var key = setting.getName();
@@ -105,7 +99,7 @@ public class LasertagSettingsManager implements IManager {
         // Get value from dictionary
         var value = settings.get(key);
 
-        return Enum.valueOf((Class<T>) setting.getDataType().getValueType(), (String)value);
+        return Enum.valueOf((Class<T>) setting.getDataType().getValueType(), (String) value);
     }
 
     @Override
@@ -129,12 +123,12 @@ public class LasertagSettingsManager implements IManager {
         }
 
         settings.put(key, value);
-        persist(s, key, value.toString());
+        sync(s, key, value.toString());
     }
 
     public void set(MinecraftServer s, LasertagSettingsMap newSettings) {
         settings = newSettings;
-        persist(s);
+        sync(s);
     }
 
     public void set(String newSettingsJson) {
@@ -145,7 +139,7 @@ public class LasertagSettingsManager implements IManager {
         // Set the default settings
         settings = LasertagGameManager.getInstance().getGameModeManager().getGameMode().createDefaultSettings();
 
-        persist(s);
+        sync(s);
     }
 
     public void reset(MinecraftServer s, String settingName) {
@@ -171,12 +165,8 @@ public class LasertagSettingsManager implements IManager {
         // Put the default value in this settings
         settings.put(key, defaultValue);
 
-        try {
-            // Write to settings file
-            persistUnsafe();
-        } catch (IOException ex) {
-            LasertagMod.LOGGER.warn("Persisting of lasertag settings file in '" + lasertagSettingsFilePath + "' failed: " + ex.getMessage());
-        }
+        // Write to settings file
+        persist();
     }
 
     //region Persistence
@@ -189,7 +179,7 @@ public class LasertagSettingsManager implements IManager {
      * @param key    The name of the setter method which executes the persist method
      * @param value  The new value of the setting as a string
      */
-    private void persist(MinecraftServer server, String key, String value) {
+    private void sync(MinecraftServer server, String key, String value) {
         // Check if this is executed on client
         if (server == null) {
             // Do not persist lasertag setting on client
@@ -206,11 +196,8 @@ public class LasertagSettingsManager implements IManager {
         // Send update to clients
         ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.SETTING_CHANGED, buf);
 
-        try {
-            persistUnsafe();
-        } catch (IOException e) {
-            LasertagMod.LOGGER.warn("Failed to persist lasertag setting: " + e.getMessage());
-        }
+        // Persist in file
+        persist();
     }
 
     /**
@@ -219,7 +206,7 @@ public class LasertagSettingsManager implements IManager {
      *
      * @param server The server this is executed on. null if on the client
      */
-    private void persist(MinecraftServer server) {
+    private void sync(MinecraftServer server) {
 
         // Check if this is executed on client
         if (server == null) {
@@ -236,19 +223,22 @@ public class LasertagSettingsManager implements IManager {
         // Send update to clients
         ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.SETTINGS_CHANGED, buf);
 
+        // Persist in file
+        persist();
+    }
+
+    private void persist() {
+
         try {
-            persistUnsafe();
+            // Parse to json string
+            var jsonString = settings.toJson();
+
+            // Write to file
+            Files.createDirectories(lasertagSettingsFilePath.getParent());
+            Files.writeString(lasertagSettingsFilePath, jsonString, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         } catch (IOException e) {
             LasertagMod.LOGGER.warn("Failed to persist lasertag setting: " + e.getMessage());
         }
-    }
-
-    private void persistUnsafe() throws IOException {
-        // Parse to json string
-        var jsonString = settings.toJson();
-
-        // Write to file
-        FileIO.writeAllFile(lasertagSettingsFile, jsonString);
     }
 
     //endregion

@@ -1,6 +1,5 @@
 package de.kleiner3.lasertag.lasertaggame.management.capturetheflag;
 
-import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.item.Items;
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;

@@ -18,7 +18,6 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -84,7 +83,7 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
                 if (settingManager.<Boolean>get(SettingDescription.AUTO_OPEN_STATS_FILE)) {
 
                     try {
-                        DesktopApi.open(new File(generatedFilePath));
+                        DesktopApi.open(generatedFilePath.toFile());
                     } catch (Exception e) {
 
                         // Log error

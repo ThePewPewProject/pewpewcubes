@@ -77,7 +77,6 @@ public class LasertagGameManager implements IManager {
 
     private LasertagGameManager() {
         deactivatedManager = new PlayerDeactivatedManager();
-        settingsManager = new LasertagSettingsManager();
         presetsNameManager = new LasertagSettingsPresetsNameManager();
         teamManager = new LasertagTeamManager();
         scoreManager = new LasertagScoreManager();
@@ -85,6 +84,7 @@ public class LasertagGameManager implements IManager {
         hudRenderManager = new LasertagHudRenderManager();
         playerManager = new LasertagPlayerNameManager();
         gameModeManager = new LasertagGameModeManager();
+        settingsManager = new LasertagSettingsManager(gameModeManager.getGameMode());
     }
 
     //region Public methods

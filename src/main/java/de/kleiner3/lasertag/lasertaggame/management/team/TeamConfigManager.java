@@ -3,13 +3,14 @@ package de.kleiner3.lasertag.lasertaggame.management.team;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.common.util.FileIO;
 import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamConfigManagerDeserializer;
 import de.kleiner3.lasertag.lasertaggame.management.team.serialize.TeamDtoSerializer;
 import net.minecraft.block.Blocks;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -20,21 +21,18 @@ import java.util.Optional;
  */
 public class TeamConfigManager {
 
-    private static final String teamConfigFilePath = LasertagMod.configFolderPath + "\\teamConfig.json";
+    private static final Path teamConfigFilePath = LasertagMod.configFolderPath.resolve("teamConfig.json");
 
     public static final TeamDto SPECTATORS = new TeamDto(0, "Spectators", 128, 128, 128, null);
     public HashMap<String, TeamDto> teamConfig = null;
 
     public TeamConfigManager() {
 
-        // Get config file
-        var teamConfigFile = new File(teamConfigFilePath);
-
         // If the config file exists
-        if (teamConfigFile.exists()) {
+        if (Files.exists(teamConfigFilePath)) {
             try {
                 // Read config file
-                var configFileContents = FileIO.readAllFile(teamConfigFile);
+                var configFileContents = Files.readString(teamConfigFilePath);
 
                 // get gson builder
                 var gsonBuilder = new GsonBuilder();
@@ -82,20 +80,9 @@ public class TeamConfigManager {
 
             // Persist
             try {
-                var dir = new File(LasertagMod.configFolderPath);
-
-                // Create directory if not exists
-                if (!dir.exists() && !dir.mkdir()) {
-                    throw new IOException("Make directory for team config failed!");
-                }
-
-                // Create file if not exists
-                if (!teamConfigFile.exists() && !teamConfigFile.createNewFile()) {
-                    throw new IOException("Creation of file for team config failed!");
-                }
-
                 // Write to file
-                FileIO.writeAllFile(teamConfigFile, configJson);
+                Files.createDirectories(teamConfigFilePath.getParent());
+                Files.writeString(teamConfigFilePath, configJson, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
             } catch (IOException e) {
                 LasertagMod.LOGGER.error("Writing to team config file failed: " + e.getMessage());
             }

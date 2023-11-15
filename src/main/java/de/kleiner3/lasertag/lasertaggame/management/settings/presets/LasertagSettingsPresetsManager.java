@@ -1,12 +1,13 @@
 package de.kleiner3.lasertag.lasertaggame.management.settings.presets;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.common.util.FileIO;
 import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.MinecraftServer;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 /**
  * Manages the lasertag settings presets
@@ -18,35 +19,29 @@ public class LasertagSettingsPresetsManager {
     private LasertagSettingsPresetsMap presets;
 
     // Get path to lasertag settings file
-    private static final String lasertagSettingsPresetsFilePath = LasertagMod.configFolderPath + "\\lasertagSettingsPresets.json";
-
-    // Create file object
-    private static final File lasertagSettingsPresetsFile = new File(lasertagSettingsPresetsFilePath);
+    private static final Path lasertagSettingsPresetsFilePath = LasertagMod.configFolderPath.resolve("lasertagSettingsPresets.json");
 
     //endregion
 
     public LasertagSettingsPresetsManager() {
-        if (lasertagSettingsPresetsFile.exists()) {
+
+        if (Files.exists(lasertagSettingsPresetsFilePath)) {
+
             try {
-                var presetsFileContents = FileIO.readAllFile(lasertagSettingsPresetsFile);
+                var presetsFileContents = Files.readString(lasertagSettingsPresetsFilePath);
 
                 presets = LasertagSettingsPresetsMap.fromJson(presetsFileContents);
             } catch (IOException e) {
                 LasertagMod.LOGGER.warn("Reading of lasertag settings presets file failed: " + e.getMessage());
             }
         } else {
-            try {
-                presets = LasertagSettingsPresetsMap.createNewPresetsMap();
-
-                var ignored = FileIO.createNewFile(lasertagSettingsPresetsFilePath);
-
-                persistUnsafe();
-            } catch (IOException e) {
-                LasertagMod.LOGGER.warn("Creation of new lasertag settings presets file in '" + lasertagSettingsPresetsFilePath + "' failed: " + e.getMessage());
-            }
+            presets = LasertagSettingsPresetsMap.createNewPresetsMap();
+            persist();
         }
 
-        presets.keySet().stream().forEach(s -> LasertagGameManager.getInstance().getPresetsNameManager().addPresetName(null, s));
+        if (presets != null) {
+            presets.keySet().forEach(s -> LasertagGameManager.getInstance().getPresetsNameManager().addPresetName(null, s));
+        }
     }
 
     public LasertagSettingsPresetsMap getPresets() {
@@ -82,15 +77,10 @@ public class LasertagSettingsPresetsManager {
 
     private void persist() {
         try {
-            this.persistUnsafe();
+            Files.createDirectories(lasertagSettingsPresetsFilePath.getParent());
+            Files.writeString(lasertagSettingsPresetsFilePath, presets.toJson(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         } catch (IOException ex) {
             LasertagMod.LOGGER.error("Could not persist preset: " + ex.getMessage());
         }
-    }
-
-    private void persistUnsafe() throws IOException {
-        var json = presets.toJson();
-
-        FileIO.writeAllFile(lasertagSettingsPresetsFile, json);
     }
 }

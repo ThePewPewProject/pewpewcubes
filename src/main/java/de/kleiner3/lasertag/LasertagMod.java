@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.bernie.geckolib3.GeckoLib;
 
+import java.nio.file.Path;
+
 /**
  * This class initializes the mod.
  *
@@ -34,7 +36,7 @@ public class LasertagMod implements ModInitializer {
     /**
      * The file path to the config folder of this mod
      */
-    public static final String configFolderPath = FabricLoader.getInstance().getConfigDir() + "\\lasertag";
+    public static final Path configFolderPath = FabricLoader.getInstance().getConfigDir().resolve("lasertag");
 
     @Override
     public void onInitialize() {

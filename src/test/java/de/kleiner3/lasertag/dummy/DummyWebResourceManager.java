@@ -22,21 +22,14 @@ public class DummyWebResourceManager extends WebResourceManager {
 
         var baseDir = Path.of(System.getProperty("user.dir"),"src", "main", "resources", "assets", "lasertag", "web");
 
+        try (var stream = Files.walk(baseDir)) {
 
-        try {
-            var stream = Files.walk(baseDir);
-
-            var paths = stream.filter(Files::isRegularFile).collect(Collectors.toList());
+            var paths = stream.filter(Files::isRegularFile).toList();
 
             for (var path : paths) {
                 var idPath = path.toString().replace('\\', '/').split("lasertag/web/")[1];
 
-                list.add(new Tuple<>(new Identifier(idPath), new Resource("lasertag", new Resource.InputSupplier<InputStream>() {
-                    @Override
-                    public InputStream get() throws IOException {
-                        return new FileInputStream(path.toString());
-                    }
-                })));
+                list.add(new Tuple<>(new Identifier(idPath), new Resource("lasertag", () -> new FileInputStream(path.toString()))));
             }
 
             return list;

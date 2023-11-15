@@ -3,7 +3,6 @@ package de.kleiner3.lasertag.lasertaggame.management.settings.presets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.ToNumberPolicy;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.lasertaggame.management.settings.LasertagSettingsMap;
 
 import java.util.HashMap;
