@@ -21,9 +21,21 @@ import java.util.Optional;
  */
 public class TeamConfigManager {
 
+    /**
+     * The path to the team config file
+     */
     private static final Path teamConfigFilePath = LasertagMod.configFolderPath.resolve("teamConfig.json");
 
+    /**
+     * The static instance of the dummy team "Spectators"
+     */
     public static final TeamDto SPECTATORS = new TeamDto(0, "Spectators", 128, 128, 128, null);
+
+    /**
+     * The team config
+     *     key: The name of the team
+     *     value: The TeamDto
+     */
     public HashMap<String, TeamDto> teamConfig = null;
 
     public TeamConfigManager() {
@@ -34,62 +46,32 @@ public class TeamConfigManager {
                 // Read config file
                 var configFileContents = Files.readString(teamConfigFilePath);
 
-                // get gson builder
-                var gsonBuilder = new GsonBuilder();
-
-                // Get deserializer
-                var deserializer = TeamConfigManagerDeserializer.getDeserializer();
-
-                // Register type
-                gsonBuilder.registerTypeAdapter(HashMap.class, deserializer);
-
-                // Parse
-                teamConfig = gsonBuilder.create().fromJson(configFileContents, new TypeToken<HashMap<String, TeamDto>>() {
-                }.getType());
+                teamConfig = deserializeTeamConfig(configFileContents);
             } catch (IOException ex) {
                 LasertagMod.LOGGER.warn("Reading of team config file failed: " + ex.getMessage());
-            } catch (Exception ex) {
-                LasertagMod.LOGGER.error("Unknown exception during loading of team config file: " + ex.getMessage());
             }
-        }
+        } else {
 
-        // If config couldn't be loaded from file
-        if (teamConfig == null) {
-
+            // Log
             LasertagMod.LOGGER.info("Using default team config...");
 
-            // Create map
-            teamConfig = new HashMap<>();
-
-            // Fill map with default values
-            teamConfig.put("Red", new TeamDto(1, "Red", 255, 0, 0, Blocks.RED_CONCRETE));
-            teamConfig.put("Green", new TeamDto(2, "Green", 0, 255, 0, Blocks.LIME_CONCRETE));
-            teamConfig.put("Blue", new TeamDto(3, "Blue", 0, 0, 255, Blocks.BLUE_CONCRETE));
-            teamConfig.put("Orange", new TeamDto(4,"Orange", 255, 128, 0, Blocks.ORANGE_CONCRETE));
-            teamConfig.put("Teal", new TeamDto(5, "Teal", 0, 128, 255, Blocks.LIGHT_BLUE_CONCRETE));
-            teamConfig.put("Pink", new TeamDto(6, "Pink", 255, 0, 255, Blocks.PINK_CONCRETE));
-
-            // Get gson builder
-            var gsonBuilder = new GsonBuilder();
-
-            // Register type adapter
-            gsonBuilder.registerTypeAdapter(TeamDto.class, TeamDtoSerializer.getSerializer());
-
-            // Serialize
-            var configJson = gsonBuilder.setPrettyPrinting().create().toJson(teamConfig);
+            // Load default config
+            teamConfig = createDefaultConfig();
 
             // Persist
-            try {
-                // Write to file
-                Files.createDirectories(teamConfigFilePath.getParent());
-                Files.writeString(teamConfigFilePath, configJson, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
-            } catch (IOException e) {
-                LasertagMod.LOGGER.error("Writing to team config file failed: " + e.getMessage());
-            }
+            this.persist();
         }
+    }
 
-        // Add dummy team spectators
-        teamConfig.put(SPECTATORS.name(), SPECTATORS);
+    //region Public methods
+
+    /**
+     * Resets the team config manager to its default state
+     */
+    public void reset() {
+
+        teamConfig = createDefaultConfig();
+        this.persist();
     }
 
     /**
@@ -117,4 +99,81 @@ public class TeamConfigManager {
                 .filter(team -> team.name().equals(name))
                 .findFirst();
     }
+
+    //endregion
+
+    //region Private methods
+
+    private String serializeTeamConfig() {
+
+        // Copy team config
+        var teamConfigCopy = new HashMap<String, TeamDto>(teamConfig);
+
+        // Remove spectators (Do not persist spectators)
+        teamConfigCopy.remove(SPECTATORS.name());
+
+        // Get gson builder
+        var gsonBuilder = new GsonBuilder();
+
+        // Register type adapter
+        gsonBuilder.registerTypeAdapter(TeamDto.class, TeamDtoSerializer.getSerializer());
+
+        // Serialize
+        return gsonBuilder.setPrettyPrinting().create().toJson(teamConfigCopy);
+    }
+
+    private static HashMap<String, TeamDto> deserializeTeamConfig(String json) {
+
+        // get gson builder
+        var gsonBuilder = new GsonBuilder();
+
+        // Get deserializer
+        var deserializer = TeamConfigManagerDeserializer.getDeserializer();
+
+        // Register type
+        gsonBuilder.registerTypeAdapter(HashMap.class, deserializer);
+
+        // Parse
+        HashMap<String, TeamDto> teamConfig = gsonBuilder.create().fromJson(json, new TypeToken<HashMap<String, TeamDto>>() {}.getType());
+
+        // Add dummy team spectators
+        teamConfig.put(SPECTATORS.name(), SPECTATORS);
+
+        return teamConfig;
+    }
+
+    private static HashMap<String, TeamDto> createDefaultConfig() {
+
+        // Create map
+        var teamConfig = new HashMap<String, TeamDto>();
+
+        // Fill map with default values
+        teamConfig.put("Red", new TeamDto(1, "Red", 255, 0, 0, Blocks.RED_CONCRETE));
+        teamConfig.put("Green", new TeamDto(2, "Green", 0, 255, 0, Blocks.LIME_CONCRETE));
+        teamConfig.put("Blue", new TeamDto(3, "Blue", 0, 0, 255, Blocks.BLUE_CONCRETE));
+        teamConfig.put("Orange", new TeamDto(4,"Orange", 255, 128, 0, Blocks.ORANGE_CONCRETE));
+        teamConfig.put("Teal", new TeamDto(5, "Teal", 0, 128, 255, Blocks.LIGHT_BLUE_CONCRETE));
+        teamConfig.put("Pink", new TeamDto(6, "Pink", 255, 0, 255, Blocks.PINK_CONCRETE));
+
+        // Add dummy team spectators
+        teamConfig.put(SPECTATORS.name(), SPECTATORS);
+
+        return teamConfig;
+    }
+
+    private void persist() {
+
+        // Serialize
+        var configJson = this.serializeTeamConfig();
+
+        try {
+            // Write to file
+            Files.createDirectories(teamConfigFilePath.getParent());
+            Files.writeString(teamConfigFilePath, configJson, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        } catch (IOException e) {
+            LasertagMod.LOGGER.error("Writing to team config file failed: " + e.getMessage());
+        }
+    }
+
+    //endregion
 }

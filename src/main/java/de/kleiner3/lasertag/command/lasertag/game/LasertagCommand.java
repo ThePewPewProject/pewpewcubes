@@ -25,6 +25,7 @@ public class LasertagCommand {
         ResetSettingsCommand.register(cmd);
         KickPlayerCommand.register(cmd);
         ReloadTeamConfigCommand.register(cmd);
+        ResetTeamConfigCommand.register(cmd);
         LasertagSettingsPresetCommand.register(cmd);
         LoadMapCommand.register(cmd);
         LasertagGameModeCommand.register(cmd);

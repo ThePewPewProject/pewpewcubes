@@ -126,6 +126,7 @@
 	"gui.game_manager.settings.sendTeamOutMessage": "Send team out info message",
 	"gui.game_manager.map_button": "Arena...",
 	"gui.game_manager.teams_button": "Teams...",
+	"gui.game_manager.reset_team_config_button": "Reset team config",
 	"gui.game_manager.reload_team_config_button": "Reload team config",
 	"gui.game_manager.settings_screen_title": "Lasertag Settings",
 	"gui.game_manager.map_screen_title": "Lasertag Arena",

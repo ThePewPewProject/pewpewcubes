@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.networking.server;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.callbacks.*;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import org.apache.logging.log4j.core.jmx.Server;
 
 /**
  * Class to handle all networking on the server
@@ -13,6 +14,7 @@ public class ServerNetworkingHandler {
     public void register() {
         ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_HIT_LASERTARGET, new PlayerHitLasertargetCallback());
         ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_HIT_PLAYER, new PlayerHitPlayerCallback());
+        ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.CLIENT_TRIGGER_RESET_TEAM_CONFIG, new ClientTriggerResetTeamConfigCallback());
         ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.CLIENT_TRIGGER_RELOAD_TEAM_CONFIG, new ClientTriggerReloadTeamConfigCallback());
         ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.CLIENT_TRIGGER_SETTINGS_RESET, new ClientTriggerSettingsResetCallback());
         ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.CLIENT_TRIGGER_SETTING_RESET, new ClientTriggerSettingResetCallback());

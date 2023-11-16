@@ -57,6 +57,9 @@ public class LasertagGameManagerScreen extends GameManagerScreen {
         }
 
         if (this.player.hasPermissionLevel(4)) {
+            this.addListedButton("gui.game_manager.reset_team_config_button", this::onResetTeamConfigClick);
+        }
+        if (this.player.hasPermissionLevel(4)) {
             this.addListedButton("gui.game_manager.reload_team_config_button", this::onReloadTeamConfigClick);
         }
     }
@@ -71,6 +74,10 @@ public class LasertagGameManagerScreen extends GameManagerScreen {
 
     private void onTeamsClick(ButtonWidget button) {
         this.client.setScreen(new LasertagGameManagerTeamsScreen(this, player));
+    }
+
+    private void onResetTeamConfigClick(ButtonWidget button) {
+        ClientPlayNetworking.send(NetworkingConstants.CLIENT_TRIGGER_RESET_TEAM_CONFIG, PacketByteBufs.empty());
     }
 
     private void onReloadTeamConfigClick(ButtonWidget button) {
