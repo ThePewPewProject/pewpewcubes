@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.common.util;
 
+import de.kleiner3.lasertag.LasertagMod;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
@@ -19,68 +20,74 @@ public class NbtUtil {
      */
     public static NbtCompound convertLitematicToNbt(NbtCompound litematic, String mainRegionName) {
 
-        // Create new nbt compound
-        var nbt = new NbtCompound();
+        try {
+            // Create new nbt compound
+            var nbt = new NbtCompound();
 
-        // Get the regions element
-        var regionsElement = litematic.get("Regions");
+            // Get the regions element
+            var regionsElement = litematic.get("Regions");
 
-        // If the regions element is not a nbt compound
-        if (!(regionsElement instanceof NbtCompound regionsCompound)) {
+            // If the regions element is not a nbt compound
+            if (!(regionsElement instanceof NbtCompound regionsCompound)) {
+                return null;
+            }
+
+            // Get the main region element
+            var mainRegionElement = regionsCompound.get(mainRegionName);
+
+            // If the main region element is not a nbt compound
+            if (!(mainRegionElement instanceof NbtCompound mainRegionCompound)) {
+                return null;
+            }
+
+            // Add size nbt list
+            if (!addSize(nbt, mainRegionCompound)) {
+                return null;
+            }
+
+            // Add entities list
+            if (!addEntities(nbt, mainRegionCompound)) {
+                return null;
+            }
+
+            // Get size element
+            var sizeElement = mainRegionCompound.get("Size");
+
+            // Check
+            if (!(sizeElement instanceof NbtCompound sizeCompound)) {
+                return null;
+            }
+
+            // Get the palette
+            var paletteElement = mainRegionCompound.get("BlockStatePalette");
+
+            // Check
+            if (!(paletteElement instanceof NbtList paletteList)) {
+                return null;
+            }
+
+            // Add blocks list
+            if (!addBlockList(nbt, mainRegionCompound, sizeCompound, paletteList)) {
+                return null;
+            }
+
+            // Add tile entities
+            if (!addTileEntities(nbt, mainRegionCompound, sizeCompound)) {
+                return null;
+            }
+
+            // Add palette list
+            nbt.put("palette", paletteElement);
+
+            // Add data version int
+            nbt.put("DataVersion", litematic.get("MinecraftDataVersion"));
+
+            return nbt;
+        } catch (Exception ex) {
+
+            LasertagMod.LOGGER.error("Could not convert litematic to nbt:", ex);
             return null;
         }
-
-        // Get the main region element
-        var mainRegionElement = regionsCompound.get(mainRegionName);
-
-        // If the main region element is not a nbt compound
-        if (!(mainRegionElement instanceof NbtCompound mainRegionCompound)) {
-            return null;
-        }
-
-        // Add size nbt list
-        if (!addSize(nbt, mainRegionCompound)) {
-            return null;
-        }
-
-        // Add entities list
-        if (!addEntities(nbt, mainRegionCompound)) {
-            return null;
-        }
-
-        // Get size element
-        var sizeElement = mainRegionCompound.get("Size");
-
-        // Check
-        if (!(sizeElement instanceof NbtCompound sizeCompound)) {
-            return null;
-        }
-
-        // Get the palette
-        var paletteElement = mainRegionCompound.get("BlockStatePalette");
-
-        // Check
-        if (!(paletteElement instanceof NbtList paletteList)) {
-            return null;
-        }
-
-        // Add blocks list
-        if (!addBlockList(nbt, mainRegionCompound, sizeCompound, paletteList)) {
-            return null;
-        }
-
-        // Add tile entities
-        if (!addTileEntities(nbt, mainRegionCompound, sizeCompound)) {
-            return null;
-        }
-
-        // Add palette list
-        nbt.put("palette", paletteElement);
-
-        // Add data version int
-        nbt.put("DataVersion", litematic.get("MinecraftDataVersion"));
-
-        return nbt;
     }
 
     //region convertLitematicToNbt helper
@@ -96,6 +103,14 @@ public class NbtUtil {
 
         // Convert to list
         var sizeList = xyzCompoundToList(sizeCompound);
+
+        // Check that size must be positive
+        if (((NbtInt)sizeList.get(0)).intValue() <= 0 ||
+             ((NbtInt)sizeList.get(1)).intValue() <= 0 ||
+             ((NbtInt)sizeList.get(2)).intValue() <= 0) {
+
+            throw new IllegalArgumentException("All dimensions of arena must be positive. Size: " + sizeList);
+        }
 
         // Put
         nbt.put("size", sizeList);
