@@ -60,6 +60,8 @@ public class LasertagMapManager implements IManager {
 
     public void loadMap(ArenaType newArenaType, ProceduralArenaType newProceduralArenaType) {
 
+        LasertagMod.LOGGER.info("Starting to load new arena '" + newArenaType.translatableName + "(" + newProceduralArenaType.translatableName + ")'");
+
         this.isLoading = true;
 
         // Step 0: Check if this is an arena world
@@ -107,7 +109,7 @@ public class LasertagMapManager implements IManager {
             LasertagMod.LOGGER.info(String.format(Locale.ROOT, "Arena loaded. This took %d ms for %d chunks, or %02f ms per chunk", blockPlaceDuration, updateBounds.numChunks(), (float) blockPlaceDuration / (float) updateBounds.numChunks()));
         } catch (Exception ex) {
 
-            LasertagMod.LOGGER.error("Could not load map '" + newArenaType.translatableName + "(" + newProceduralArenaType.translatableName + "):", ex);
+            LasertagMod.LOGGER.error("Could not load map '" + newArenaType.translatableName + "(" + newProceduralArenaType.translatableName + ")':", ex);
         } finally {
             // In case of unexpected exception: Close all loading screens on the clients
             this.sendMapLoadProgressEvent("", -1.0);
