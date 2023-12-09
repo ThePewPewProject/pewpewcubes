@@ -10,8 +10,10 @@ import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaChunkGenerator;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaChunkGeneratorConfig;
-import de.kleiner3.lasertag.worldgen.chunkgen.ArenaType;
-import de.kleiner3.lasertag.worldgen.chunkgen.ProceduralArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.type.ArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.type.ProceduralArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.template.ArenaTemplate;
+import de.kleiner3.lasertag.worldgen.chunkgen.template.TemplateRegistry;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -58,18 +60,26 @@ public class LasertagMapManager implements IManager {
 
     //region Public methods
 
-    public void loadMap(ArenaType newArenaType, ProceduralArenaType newProceduralArenaType) {
+    public boolean loadMap(ArenaType newArenaType, ProceduralArenaType newProceduralArenaType) {
 
+        // Start the generation
         LasertagMod.LOGGER.info("Starting to load new arena '" + newArenaType.translatableName + "(" + newProceduralArenaType.translatableName + ")'");
-
         this.isLoading = true;
 
         // Step 0: Check if this is an arena world
         var chunkGenerator = Objects.requireNonNull(server.getSaveProperties().getGeneratorOptions().getDimensions().get(DimensionOptions.OVERWORLD)).chunkGenerator;
         if (!(chunkGenerator instanceof ArenaChunkGenerator arenaChunkGenerator)) {
             LasertagMod.LOGGER.warn("Cannot reload map in non-arena world");
-            return;
+            return false;
         }
+
+        // Show loading screen
+        this.sendMapLoadProgressEvent("Starting the generation of the arena", 0.01);
+
+        // Create old arena template
+        var oldArenaType = arenaChunkGenerator.getConfig().getType();
+        var oldArenaProceduralType = arenaChunkGenerator.getConfig().getProceduralType();
+        var oldArenaTemplate = TemplateRegistry.getTemplate(oldArenaType, oldArenaProceduralType, arenaChunkGenerator.getConfig().getSeed());
 
         // Start time measurement
         var blockPlaceStartTime = System.currentTimeMillis();
@@ -79,25 +89,24 @@ public class LasertagMapManager implements IManager {
 
         try {
             // Step 2: Remove all blocks of the old arena
-            var oldArenaType = arenaChunkGenerator.getConfig().getType();
-            var oldArenaProceduralType = arenaChunkGenerator.getConfig().getProceduralType();
-            var oldArenaBounds = this.calculateBounds(oldArenaType, oldArenaProceduralType);
+            var oldArenaBounds = this.calculateBounds(oldArenaTemplate);
             this.removeOldBlocks(oldArenaBounds);
 
             // Step 3: Clear spawn-point cache if necessary and reset arena structure placer
             if (!oldArenaType.equals(newArenaType)) {
                 server.getLasertagServerManager().getSpawnpointManager().clearSpawnpointCache();
             }
-            newArenaType.arenaPlacer.reset();
 
             // Step 3: Remove all entities except the players
             this.removeEntities();
 
             // Step 4: Set new arena chunk generator config
-            arenaChunkGenerator.setConfig(new ArenaChunkGeneratorConfig(newArenaType.ordinal(), newProceduralArenaType.ordinal(), (new Random()).nextLong()));
+            var newSeed = new Random().nextLong();
+            arenaChunkGenerator.setConfig(new ArenaChunkGeneratorConfig(newArenaType.ordinal(), newProceduralArenaType.ordinal(), newSeed));
+            var newArenaTemplate = TemplateRegistry.getTemplate(newArenaType, newProceduralArenaType, newSeed);
 
             // Step 5: Generate new arena
-            var newArenaBounds = this.calculateBounds(newArenaType, newProceduralArenaType);
+            var newArenaBounds = this.calculateBounds(newArenaTemplate);
             this.generateArena(newArenaBounds);
 
             // Step 6: Mark all changed chunks for update
@@ -110,12 +119,15 @@ public class LasertagMapManager implements IManager {
         } catch (Exception ex) {
 
             LasertagMod.LOGGER.error("Could not load map '" + newArenaType.translatableName + "(" + newProceduralArenaType.translatableName + ")':", ex);
+            throw ex;
         } finally {
             // In case of unexpected exception: Close all loading screens on the clients
             this.sendMapLoadProgressEvent("", -1.0);
 
             this.isLoading = false;
         }
+
+        return true;
     }
 
     @Override
@@ -136,6 +148,7 @@ public class LasertagMapManager implements IManager {
      * Ignores offline players.
      */
     private void teleportPlayersToOrigin() {
+
         LasertagGameManager.getInstance().getPlayerManager().forEachPlayer(playerUuid -> {
             var player = server.getPlayerManager().getPlayer(playerUuid);
 
@@ -224,6 +237,7 @@ public class LasertagMapManager implements IManager {
      * @param newArenaBounds The bounds of the new arena
      */
     private void generateArena(ArenaBoundsDto newArenaBounds) {
+
         // Create task executor
         TaskExecutor<Runnable> taskExecutor = TaskExecutor.create(Util.getMainWorkerExecutor(), "lasertag-loadarena");
 
@@ -265,10 +279,14 @@ public class LasertagMapManager implements IManager {
                             for (var u = chunkPos.z - taskMargin; u <= chunkPos.z + taskMargin; ++u) {
                                 for (var v = chunkPos.x - taskMargin; v <= chunkPos.x + taskMargin; ++v) {
                                     var chunk = serverChunkManager.getChunk(v, u, chunkStatus.getPrevious(), true);
-                                    if (chunk instanceof ReadOnlyChunk) {
-                                        chunkList.add(new ReadOnlyChunk(((ReadOnlyChunk) chunk).getWrappedChunk(), true));
-                                    } else if (chunk instanceof WorldChunk) {
-                                        chunkList.add(new ReadOnlyChunk((WorldChunk) chunk, true));
+                                    if (chunk instanceof ReadOnlyChunk roChunk) {
+                                        // Mutate private final field as a performance optimization.
+                                        // The constructor of ReadOnlyChunk uses a lot of memory. Work around this
+                                        // issue by mutating the private field instead of re-wrapping the wrapped chunk
+                                        roChunk.field_34554 = true;
+                                        chunkList.add(roChunk);
+                                    } else if (chunk instanceof WorldChunk wChunk) {
+                                        chunkList.add(new ReadOnlyChunk(wChunk, true));
                                     } else {
                                         chunkList.add(chunk);
                                     }
@@ -314,6 +332,7 @@ public class LasertagMapManager implements IManager {
      * @param bounds The bounds
      */
     private void markChunksForUpdate(ArenaBoundsDto bounds) {
+
         // Init progress variables
         var currentStepString = "Marking chunks for update";
         this.sendMapLoadProgressEvent(currentStepString, 0.0);
@@ -359,13 +378,13 @@ public class LasertagMapManager implements IManager {
      * Calculates the chunk bounds (startX, startZ, endX, endZ and number of chunks)
      * for the given arena type
      *
-     * @param arenaType The arena type to calculate the bounds for
+     * @param template The arena template to calculate the bounds for
      * @return The calculated arena bounds dto
      */
-    private ArenaBoundsDto calculateBounds(ArenaType arenaType, ProceduralArenaType proceduralArenaType) {
+    private ArenaBoundsDto calculateBounds(ArenaTemplate template) {
 
-        var arenaSize = arenaType.getArenaSize(proceduralArenaType);
-        Vec3i arenaOffset = arenaType.getCompleteOffset(proceduralArenaType);
+        var arenaSize = template.getArenaSize();
+        Vec3i arenaOffset = template.getPlacementOffset();
         var startZ = -arenaOffset.getZ();
         var startX = -arenaOffset.getX();
         var endZ = startZ + arenaSize.getZ();
@@ -387,6 +406,7 @@ public class LasertagMapManager implements IManager {
      * @return The union of both bounds
      */
     private ArenaBoundsDto calculateUnion(ArenaBoundsDto first, ArenaBoundsDto second) {
+
         var unionStartChunkZ = Math.min(first.startZ(), second.startZ());
         var unionStartChunkX = Math.min(first.startX(), second.startX());
         var unionEndChunkZ = Math.max(first.endZ(), second.endZ());
@@ -403,6 +423,7 @@ public class LasertagMapManager implements IManager {
      * @param progress The progress in percent of the current step
      */
     private void sendMapLoadProgressEvent(String stepString, double progress) {
+
         // Create packet buffer
         var buf = new PacketByteBuf(Unpooled.buffer());
 

@@ -6,8 +6,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import de.kleiner3.lasertag.worldgen.chunkgen.ArenaType;
-import de.kleiner3.lasertag.worldgen.chunkgen.ProceduralArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.type.ArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.type.ProceduralArenaType;
 import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.concurrent.CompletableFuture;

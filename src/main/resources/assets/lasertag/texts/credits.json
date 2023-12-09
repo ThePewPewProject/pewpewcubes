@@ -57,7 +57,8 @@
         "title": "Powered by",
         "names": [
           "GeckoLib     MIT license",
-          "Fabric API   Apache-2.0 license"
+          "Fabric API   Apache-2.0 license",
+          "Litematica   LGPL-3.0 license"
         ]
       }
     ]

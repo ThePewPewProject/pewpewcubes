@@ -2,8 +2,8 @@ package de.kleiner3.lasertag.mixin.gui;
 
 import de.kleiner3.lasertag.worldgen.WorldPresets;
 import de.kleiner3.lasertag.worldgen.chunkgen.ArenaChunkGenerator;
-import de.kleiner3.lasertag.worldgen.chunkgen.ArenaType;
-import de.kleiner3.lasertag.worldgen.chunkgen.ProceduralArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.type.ArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.type.ProceduralArenaType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;

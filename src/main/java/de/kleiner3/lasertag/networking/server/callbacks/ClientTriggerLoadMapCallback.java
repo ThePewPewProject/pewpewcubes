@@ -1,8 +1,8 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.worldgen.chunkgen.ArenaType;
-import de.kleiner3.lasertag.worldgen.chunkgen.ProceduralArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.type.ArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.type.ProceduralArenaType;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;

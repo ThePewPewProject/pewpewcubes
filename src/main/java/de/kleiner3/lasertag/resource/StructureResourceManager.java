@@ -1,29 +1,37 @@
 package de.kleiner3.lasertag.resource;
 
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.common.util.StringUtil;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.*;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Manages all .nbt file resources
  *
  * @author Étienne Muser
  */
-public class StructureResourceManager implements SimpleSynchronousResourceReloadListener {
+public class StructureResourceManager {
     //region Private fields
 
     private final Map<Identifier, Resource> structureResources = new HashMap<>();
 
     public static final String LITEMATIC_FILE_ENDING = ".litematic";
     public static final String NBT_FILE_ENDING = ".nbt";
-    public static final String[] FILE_ENDINGS = new String[] { NBT_FILE_ENDING, LITEMATIC_FILE_ENDING };
+    public static final String[] FILE_ENDINGS = new String[]{NBT_FILE_ENDING, LITEMATIC_FILE_ENDING};
 
     //endregion
 
@@ -37,20 +45,27 @@ public class StructureResourceManager implements SimpleSynchronousResourceReload
                 .toList();
     }
 
-    @Override
-    public Identifier getFabricId() {
-        return new Identifier(LasertagMod.ID, "lasertag_structure_resource_manager");
-    }
+    public void reload() throws IOException, URISyntaxException {
 
-    @Override
-    public void reload(ResourceManager manager) {
-        var resources = manager.findResources("structures", path -> StringUtil.stringEndsWithList(path.getPath(), FILE_ENDINGS));
-        for(var entry : resources.entrySet()) {
-            if (!entry.getKey().getNamespace().equals(LasertagMod.ID)) {
-                continue;
-            }
+        var uri = getClass().getClassLoader().getResource("data/lasertag/structures").toURI();
 
-            structureResources.put(entry.getKey(), entry.getValue());
+        structureResources.clear();
+        try (var stream = Files.walk(Path.of(uri))) {
+
+            stream.filter(Files::isRegularFile)
+                    .filter(path -> StringUtil.stringEndsWithList(path.toString(), FILE_ENDINGS))
+                    .forEach(path -> {
+
+                        // Split the path by "structures"
+                        var splitPath = path.toString().split("structures");
+
+                        // Get the resource identifier id path
+                        var resourceIdPath = ("structures" + splitPath[splitPath.length - 1]).replace(File.separatorChar, '/');
+
+                        structureResources.put(
+                                new Identifier(LasertagMod.ID, resourceIdPath),
+                                new Resource(LasertagMod.ID, () -> Files.newInputStream(path)));
+                    });
         }
     }
 }

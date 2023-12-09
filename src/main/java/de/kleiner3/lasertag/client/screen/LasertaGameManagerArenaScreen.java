@@ -2,8 +2,8 @@ package de.kleiner3.lasertag.client.screen;
 
 import de.kleiner3.lasertag.client.screen.widget.*;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
-import de.kleiner3.lasertag.worldgen.chunkgen.ArenaType;
-import de.kleiner3.lasertag.worldgen.chunkgen.ProceduralArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.type.ArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.type.ProceduralArenaType;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.Drawable;

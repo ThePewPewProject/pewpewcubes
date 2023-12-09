@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.lasertaggame.management.music;
 
 import de.kleiner3.lasertag.lasertaggame.management.IManager;
-import de.kleiner3.lasertag.worldgen.chunkgen.ArenaType;
+import de.kleiner3.lasertag.worldgen.chunkgen.type.ArenaType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.BlockPos;

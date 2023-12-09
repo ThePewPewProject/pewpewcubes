@@ -1,6 +1,9 @@
-package de.kleiner3.lasertag.worldgen.chunkgen;
+package de.kleiner3.lasertag.worldgen.chunkgen.placer;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.mixin.IStructureTemplateAccessor;
+import de.kleiner3.lasertag.worldgen.chunkgen.template.ArenaTemplate;
+import de.kleiner3.lasertag.worldgen.chunkgen.template.PrebuildArenaTemplate;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
@@ -22,25 +25,33 @@ public class ArenaStructurePlacer {
 
     /**
      * Places all blocks of an arena in the specified chunk
-     * @param arenaType
-     * @param proceduralArenaType
+     * @param template
      * @param chunk
      * @param world
      */
-    public void placeArenaChunkSegment(ArenaType arenaType,
-                                       ProceduralArenaType proceduralArenaType,
+    public void placeArenaChunkSegment(ArenaTemplate template,
                                        Chunk chunk,
-                                       StructureWorldAccess world,
-                                       long seed) {
+                                       StructureWorldAccess world) {
+
+        // Sanity check
+        if (template == null) {
+            LasertagMod.LOGGER.warn("Arena generation: Skipping chunk '" + chunk + "'");
+            return;
+        }
+
+        // Try to cast
+        if (!(template instanceof PrebuildArenaTemplate prebuildArenaTemplate)) {
+            throw new UnsupportedOperationException("Unsupported arena template type '" + template.getClass().getName() + "'");
+        }
 
         // Get the current chunks block box
         var chunkBox = getBlockBoxForChunk(chunk);
 
         // Get the arena size
-        var size = arenaType.getArenaSize(proceduralArenaType);
+        var size = prebuildArenaTemplate.getArenaSize();
 
         // Get the startPos
-        var startPos = BlockPos.ORIGIN.subtract(arenaType.placementOffset);
+        var startPos = prebuildArenaTemplate.getStartPos();
 
         // If chunk does not intersect with arena bounding box, do nothing
         if (chunkBox.getMaxX() < startPos.getX() || chunkBox.getMinX() > (startPos.getX() + size.getX()) ||
@@ -48,66 +59,45 @@ public class ArenaStructurePlacer {
             return;
         }
 
-        var arenaTemplate = arenaType.getArenaTemplate();
+        var structureTemplate = prebuildArenaTemplate.getArenaTemplate();
 
-        this.placeArenaChunkSegment(arenaTemplate, chunkBox, startPos, world);
+        this.placeArenaChunkSegment(structureTemplate, chunkBox, world);
     }
 
     /**
      * Spawns all entites of an arena
-     * @param type
+     * @param template
      * @param chunkRegion
      */
-    public void spawnEntitiesOfArena(ArenaType type, ChunkRegion chunkRegion) {
+    public void spawnEntitiesOfArena(ArenaTemplate template, ChunkRegion chunkRegion) {
 
-        var arenaTemplate = type.getArenaTemplate();
-        var startPos = BlockPos.ORIGIN.subtract(type.placementOffset);
+        // Sanity check
+        if (template == null) {
+            LasertagMod.LOGGER.warn("Arena generation: Skipping chunk region '" + chunkRegion + "'");
+            return;
+        }
+
+        // Try to cast
+        if (!(template instanceof PrebuildArenaTemplate prebuildArenaTemplate)) {
+            throw new UnsupportedOperationException("Unsupported arena template type '" + template.getClass().getName() + "'");
+        }
+
+        var arenaTemplate = prebuildArenaTemplate.getArenaTemplate();
 
         // Get the entity infos
         var entityInfos = ((IStructureTemplateAccessor)arenaTemplate).getEntities();
 
         // For every entity
         entityInfos.forEach((entityInfo) -> {
-                    // Get the position
-                    var pos = entityInfo.pos;
-
-                    var x = startPos.getX() + pos.x;
-                    var y = startPos.getY() + pos.y;
-                    var z = startPos.getZ() + pos.z;
 
                     // Get the chunk coords
-                    var chunkX = ChunkSectionPos.getSectionCoord(x);
-                    var chunkZ = ChunkSectionPos.getSectionCoord(z);
+                    var chunkX = ChunkSectionPos.getSectionCoord(entityInfo.pos.x);
+                    var chunkZ = ChunkSectionPos.getSectionCoord(entityInfo.pos.z);
 
                     // If chunk of entity is not loaded
                     if (!chunkRegion.isChunkLoaded(chunkX, chunkZ)) {
                         // Do nothing
                         return;
-                    }
-
-                    var isAlreadyAdapted = entityInfo.nbt.contains("lasertag:tileAdapted");
-
-                    if (!isAlreadyAdapted) {
-
-                        // Overwrite position
-                        var posList = new NbtList();
-                        posList.add(0, NbtDouble.of(x));
-                        posList.add(1, NbtDouble.of(y));
-                        posList.add(2, NbtDouble.of(z));
-                        entityInfo.nbt.put("Pos", posList);
-
-                        var hasTileXYZ = entityInfo.nbt.contains("TileX");
-                        if (hasTileXYZ) {
-                            // Overwrite tile position
-                            var tileX = startPos.getX() + entityInfo.nbt.getInt("TileX");
-                            var tileY = startPos.getY() + entityInfo.nbt.getInt("TileY");
-                            var tileZ = startPos.getZ() + entityInfo.nbt.getInt("TileZ");
-                            entityInfo.nbt.putInt("TileX", tileX);
-                            entityInfo.nbt.putInt("TileY", tileY);
-                            entityInfo.nbt.putInt("TileZ", tileZ);
-                        }
-
-                        entityInfo.nbt.putBoolean("lasertag:tileAdapted", true);
                     }
 
                     // Create the entity
@@ -118,23 +108,19 @@ public class ArenaStructurePlacer {
                 });
     }
 
-    public void reset() {
-        // Nothing to reset
-    }
-
     protected void placeArenaChunkSegment(StructureTemplate template,
                                           BlockBox chunkBox,
-                                          Vec3i startPos,
                                           StructureWorldAccess world) {
         // Get block infos
         var blockInfos = ((IStructureTemplateAccessor)template).getBlockInfoLists().get(0).getAll();
 
         // For every block in the chunkbox
-        blockInfos.stream()
-                .filter((blockInfo) -> chunkBox.contains(startPos.add(blockInfo.pos)))
-                .forEach((blockInfo) -> {
-                    // Get the actual block pos
-                    var actualBlockPos = new BlockPos(startPos.add(blockInfo.pos));
+        blockInfos.forEach((blockInfo) -> {
+
+                    // If the block is not inside the chunk
+                    if (!chunkBox.contains(blockInfo.pos)) {
+                        return;
+                    }
 
                     // Get the block state
                     var blockState = blockInfo.state;
@@ -145,12 +131,12 @@ public class ArenaStructurePlacer {
                     }
 
                     // Place the block in the world
-                    if (!world.setBlockState(actualBlockPos, blockState, Block.NOTIFY_LISTENERS)) {
+                    if (!world.setBlockState(blockInfo.pos, blockState, Block.NOTIFY_LISTENERS)) {
                         return;
                     }
 
                     if (blockInfo.nbt != null) {
-                        var blockEntity = world.getBlockEntity(actualBlockPos);
+                        var blockEntity = world.getBlockEntity(blockInfo.pos);
 
                         if (blockEntity != null) {
                             blockEntity.readNbt(blockInfo.nbt);
@@ -160,6 +146,7 @@ public class ArenaStructurePlacer {
     }
 
     protected static BlockBox getBlockBoxForChunk(Chunk chunk) {
+
         ChunkPos chunkPos = chunk.getPos();
         int startX = chunkPos.getStartX();
         int startZ = chunkPos.getStartZ();

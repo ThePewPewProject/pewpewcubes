@@ -2,6 +2,8 @@ package de.kleiner3.lasertag.worldgen.chunkgen;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import de.kleiner3.lasertag.worldgen.chunkgen.template.ArenaTemplate;
+import de.kleiner3.lasertag.worldgen.chunkgen.template.TemplateRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.structure.StructureSet;
@@ -47,16 +49,17 @@ public class ArenaChunkGenerator extends ChunkGenerator {
 
     private ArenaChunkGeneratorConfig config;
     private final Registry<Biome> biomeRegistry;
+    private ArenaTemplate template;
 
     /**
      * The constructor to use to generate an arena
      * @param config The arena chunk generator config
      */
     public ArenaChunkGenerator(Registry<StructureSet> structureSetRegistry, Registry<Biome> biomeRegistry,  ArenaChunkGeneratorConfig config) {
-        super(structureSetRegistry, Optional.empty(), new FixedBiomeSource(biomeRegistry.getOrCreateEntry(config.getType().biome)));
 
-        this.config = config;
+        super(structureSetRegistry, Optional.empty(), new FixedBiomeSource(biomeRegistry.getOrCreateEntry(config.getType().biome)));
         this.biomeRegistry = biomeRegistry;
+        this.setConfig(config);
     }
 
     @Override
@@ -66,7 +69,7 @@ public class ArenaChunkGenerator extends ChunkGenerator {
         var type = config.getType();
 
         // Place the arena
-        type.arenaPlacer.placeArenaChunkSegment(type, config.getProceduralType(), chunk, world, config.getSeed());
+        type.arenaPlacer.placeArenaChunkSegment(template, chunk, world);
     }
 
     public ArenaChunkGeneratorConfig getConfig() {
@@ -118,7 +121,7 @@ public class ArenaChunkGenerator extends ChunkGenerator {
     public void populateEntities(ChunkRegion region) {
 
         // Place the arena entities
-        config.getType().arenaPlacer.spawnEntitiesOfArena(config.getType(), region);
+        config.getType().arenaPlacer.spawnEntitiesOfArena(template, region);
     }
 
     @Override
@@ -144,5 +147,6 @@ public class ArenaChunkGenerator extends ChunkGenerator {
     public void setConfig(ArenaChunkGeneratorConfig newConfig) {
         this.config = newConfig;
         this.biomeSource = new FixedBiomeSource(biomeRegistry.getOrCreateEntry(config.getType().biome));
+        this.template = TemplateRegistry.getTemplate(config.getType(), config.getProceduralType(), config.getSeed());
     }
 }

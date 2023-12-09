@@ -1,21 +1,18 @@
-package de.kleiner3.lasertag.worldgen.chunkgen;
+package de.kleiner3.lasertag.worldgen.chunkgen.type;
 
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.SoundEvents;
-import de.kleiner3.lasertag.common.util.NbtUtil;
-import de.kleiner3.lasertag.resource.ResourceManagers;
-import de.kleiner3.lasertag.resource.StructureResourceManager;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtIo;
+import de.kleiner3.lasertag.worldgen.chunkgen.placer.ArenaStructurePlacer;
+import de.kleiner3.lasertag.worldgen.chunkgen.placer.ProceduralArenaStructurePlacer;
+import de.kleiner3.lasertag.worldgen.chunkgen.template.ArenaTemplate;
+import de.kleiner3.lasertag.worldgen.chunkgen.template.PrebuildArenaTemplate;
+import de.kleiner3.lasertag.worldgen.chunkgen.template.ProceduralArenaTemplate;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
-
-import java.io.IOException;
 
 /**
  * Enum to represent all possible arena types
@@ -26,6 +23,7 @@ public enum ArenaType {
     PROCEDURAL(BiomeKeys.THE_VOID,
             new Identifier(LasertagMod.ID, "structures/procedural_arenas"),
             null,
+            null,
             "arenaType.procedural",
             new ProceduralArenaStructurePlacer(),
             SoundEvents.PROCEDURAL_ARENA_INTRO_MUSIC_SOUND_EVENT,
@@ -34,6 +32,7 @@ public enum ArenaType {
     JUNGLE(BiomeKeys.JUNGLE,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/jungle_arena.litematic"),
             new Vec3i(21, 3, 61),
+            new Vec3i(144, 65, 138),
             "arenaType.jungle",
             SoundEvents.JUNGLE_ARENA_INTRO_MUSIC_SOUND_EVENT,
             SoundEvents.JUNGLE_ARENA_MUSIC_SOUND_EVENT,
@@ -41,6 +40,7 @@ public enum ArenaType {
     DESERT(BiomeKeys.DESERT,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/desert_arena.litematic"),
             new Vec3i(55, 26, 99),
+            new Vec3i(117, 75, 179),
             "arenaType.desert",
             SoundEvents.DESERT_ARENA_INTRO_MUSIC_SOUND_EVENT,
             SoundEvents.DESERT_ARENA_MUSIC_SOUND_EVENT,
@@ -48,6 +48,7 @@ public enum ArenaType {
     FLOWER_FOREST(BiomeKeys.FLOWER_FOREST,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/flower_forest_arena.litematic"),
             new Vec3i(49, 1, 70),
+            new Vec3i(153, 43, 153),
             "arenaType.flower_forest",
             SoundEvents.FLOWER_FOREST_ARENA_INTRO_MUSIC_SOUND_EVENT,
             SoundEvents.FLOWER_FOREST_ARENA_MUSIC_SOUND_EVENT,
@@ -55,6 +56,7 @@ public enum ArenaType {
     MEDIEVAL_CITY(BiomeKeys.PLAINS,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/medieval_city_arena.litematic"),
             new Vec3i(116, 13, 73),
+            new Vec3i(290, 85, 357),
             "arenaType.medieval_city",
             SoundEvents.MEDIEVAL_CITY_ARENA_INTRO_MUSIC_SOUND_EVENT,
             SoundEvents.MEDIEVAL_CITY_ARENA_MUSIC_SOUND_EVENT,
@@ -72,16 +74,18 @@ public enum ArenaType {
     ArenaType(RegistryKey<Biome> biome,
               Identifier nbtFileId,
               Vec3i placementOffset,
+              Vec3i arenaSize,
               String translatableName,
               SoundEvent introMusic,
               SoundEvent music,
               SoundEvent outroMusic) {
-        this(biome, nbtFileId, placementOffset, translatableName, new ArenaStructurePlacer(), introMusic, music, outroMusic);
+        this(biome, nbtFileId, placementOffset, arenaSize, translatableName, new ArenaStructurePlacer(), introMusic, music, outroMusic);
     }
 
     ArenaType(RegistryKey<Biome> biome,
               Identifier nbtFileId,
               Vec3i placementOffset,
+              Vec3i arenaSize,
               String translatableName,
               ArenaStructurePlacer arenaPlacer,
               SoundEvent introMusic,
@@ -90,6 +94,7 @@ public enum ArenaType {
         this.biome = biome;
         this.nbtFileId = nbtFileId;
         this.placementOffset = placementOffset;
+        this.arenaSize = arenaSize;
         this.translatableName = translatableName;
         this.arenaPlacer = arenaPlacer;
         this.introMusic = introMusic;
@@ -98,8 +103,9 @@ public enum ArenaType {
     }
 
     public final RegistryKey<Biome> biome;
-    public final  Identifier nbtFileId;
-    public final  Vec3i placementOffset;
+    public final Identifier nbtFileId;
+    public final Vec3i placementOffset;
+    public final Vec3i arenaSize;
     public final String translatableName;
 
     public final ArenaStructurePlacer arenaPlacer;
@@ -107,80 +113,4 @@ public enum ArenaType {
     public final SoundEvent introMusic;
     public final SoundEvent music;
     public final SoundEvent outroMusic;
-
-    private StructureTemplate arenaTemplate = null;
-    private Vec3i arenaSize = null;
-
-    public StructureTemplate getArenaTemplate() {
-        // If is procedural arena
-        if (placementOffset == null) {
-            throw new UnsupportedOperationException("Cannot get template of procedural arena");
-        }
-
-        if (arenaTemplate == null) {
-            initArenaTemplate();
-        }
-
-        return arenaTemplate;
-    }
-
-    public Vec3i getArenaSize(ProceduralArenaType proceduralArenaType) {
-        // If is procedural arena
-        if (placementOffset == null) {
-            return ((ProceduralArenaStructurePlacer)this.arenaPlacer).getCompleteSize(proceduralArenaType);
-        }
-
-        if (arenaSize == null) {
-            initArenaTemplate();
-        }
-
-        return arenaSize;
-    }
-
-    public Vec3i getCompleteOffset(ProceduralArenaType proceduralArenaType) {
-        // If is procedural arena
-        if (placementOffset == null) {
-            return ((ProceduralArenaStructurePlacer)this.arenaPlacer).getCompleteOffset(proceduralArenaType);
-        }
-
-        return this.placementOffset;
-    }
-
-    /**
-     * Initializes the arena template with the information of the arena nbt file.
-     */
-    private void initArenaTemplate() {
-        // Get nbt file
-        var resource = ResourceManagers.STRUCTURE_RESOURCE_MANAGER.get(nbtFileId);
-
-        // Sanity check
-        if (resource == null) {
-            LasertagMod.LOGGER.warn("Arena nbt file not in resource manager.");
-            return;
-        }
-
-        // Read nbt file
-        NbtCompound nbt;
-        try {
-            nbt = NbtIo.readCompressed(resource.getInputStream());
-        } catch (IOException e) {
-            LasertagMod.LOGGER.error("Unable to load nbt file.", e);
-            return;
-        }
-
-        // If is litematic file
-        if (nbtFileId.getPath().endsWith(StructureResourceManager.LITEMATIC_FILE_ENDING)) {
-            // Convert litematic nbt compound to nbt nbt compound
-            nbt = NbtUtil.convertLitematicToNbt(nbt, "main");
-
-            // Sanity check
-            if (nbt == null) {
-                LasertagMod.LOGGER.error("Litematica file could not be converted to nbt.");
-            }
-        }
-
-        this.arenaTemplate = new StructureTemplate();
-        this.arenaTemplate.readNbt(nbt);
-        this.arenaSize = arenaTemplate.getSize();
-    }
 }
