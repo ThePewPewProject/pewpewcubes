@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.StoneButtonBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
@@ -36,8 +37,15 @@ public class LasertagStartGameButton extends StoneButtonBlock implements BlockEn
         }
 
         if (!world.isClient) {
+
+            // Cast to server world
+            var serverWorld = (ServerWorld) world;
+
+            // Get the game managers
+            var gameManager = serverWorld.getServerLasertagManager();
+
             var server = world.getServer();
-            var abortReasons = server.getLasertagServerManager().startGame(false);
+            var abortReasons = gameManager.startGame(false);
 
             abortReasons.ifPresent(feedback -> server.getPlayerManager().broadcast(Text.literal("Start game aborted. Reasons:\n" + feedback).formatted(Formatting.RED), false));
         }

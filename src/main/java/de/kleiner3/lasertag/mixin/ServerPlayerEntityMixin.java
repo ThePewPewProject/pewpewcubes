@@ -1,6 +1,5 @@
 package de.kleiner3.lasertag.mixin;
 
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -19,12 +18,17 @@ public class ServerPlayerEntityMixin {
 
     @Inject(method = "onDeath", at = @At("TAIL"))
     private void onPlayerDeath(DamageSource damageSource, CallbackInfo ci) {
+
         ServerPlayerEntity player = ((ServerPlayerEntity)(Object)this);
+
+        // Get the game managers
+        var gameManager = player.getWorld().getServerLasertagManager();
+        var gameModeManager = gameManager.getGameModeManager();
 
         // Get the server
         MinecraftServer server = player.getServer();
         if (server != null) {
-            server.execute(() -> LasertagGameManager.getInstance().getGameModeManager().getGameMode().onPlayerDeath(server, player, damageSource));
+            server.execute(() -> gameModeManager.getGameMode().onPlayerDeath(server, player, damageSource));
         }
     }
 }

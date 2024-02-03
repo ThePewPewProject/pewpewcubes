@@ -2,8 +2,8 @@ package de.kleiner3.lasertag.block.entity.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.kleiner3.lasertag.block.entity.LasertagFlagBlockEntity;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.block.enums.DoubleBlockHalf;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -37,6 +37,11 @@ public class LasertagFlagRenderer extends GeoBlockRenderer<LasertagFlagBlockEnti
             return;
         }
 
+        // Get the game managers
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var syncedState = gameManager.getSyncedState();
+        var teamsConfigState = syncedState.getTeamsConfigState();
+
         // Render base
         GeoModel model = modelProvider.getModel(modelProvider.getModelResource(blockEntity));
         this.dispatchedMat = poseStack.peek().getPositionMatrix().copy();
@@ -59,7 +64,7 @@ public class LasertagFlagRenderer extends GeoBlockRenderer<LasertagFlagBlockEnti
         var cameo = RenderLayer.getEntityTranslucentEmissive(LIGHTS_MODEL.getTextureResource(null));
 
         // Get the team of the flag
-        var teamOptional = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfName(blockEntity.getTeamName());
+        var teamOptional = teamsConfigState.getTeamOfName(blockEntity.getTeamName());
 
         var r = 1.0f;
         var g = 1.0f;

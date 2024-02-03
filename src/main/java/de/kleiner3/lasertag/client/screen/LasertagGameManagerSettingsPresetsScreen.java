@@ -1,10 +1,10 @@
 package de.kleiner3.lasertag.client.screen;
 
 import de.kleiner3.lasertag.client.screen.widget.*;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -151,6 +151,11 @@ public class LasertagGameManagerSettingsPresetsScreen extends GameManagerScreen 
      * @return The preset names
      */
     private List<String> getPresetNames() {
-        return new ArrayList<>(LasertagGameManager.getInstance().getPresetsNameManager().getSettingsPresetNames());
+
+        // Get the game managers
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var settingsPresetsNamesManager = gameManager.getSettingsPresetsNameManager();
+
+        return new ArrayList<>(settingsPresetsNamesManager.getSettingsPresetNames());
     }
 }

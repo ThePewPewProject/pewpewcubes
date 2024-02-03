@@ -18,7 +18,12 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onPlayerMove(Lnet/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket;)V", at = @At("HEAD"), cancellable = true)
     private void onPlayerMove(PlayerMoveC2SPacket packet, CallbackInfo ci) {
-        if (((ServerPlayNetworkHandler)(Object)this).server.getLasertagServerManager().getMapManager().isLoading()) {
+
+        // Get the game managers
+        var gameManager = ((ServerPlayNetworkHandler)(Object)this).server.getOverworld().getServerLasertagManager();
+        var arenaManager = gameManager.getArenaManager();
+
+        if (arenaManager.isLoading()) {
             ci.cancel();
         }
     }

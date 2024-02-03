@@ -2,8 +2,7 @@ package de.kleiner3.lasertag.block.entity;
 
 import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.entity.Entities;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -45,8 +44,14 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements
 
     public void serverTick(ServerWorld world) {
 
+        // Get the game managers
+        var gameManager = world.getServerLasertagManager();
+        var teamsManager = gameManager.getTeamsManager();
+        var syncedState = gameManager.getSyncedState();
+        var teamsConfigState = syncedState.getTeamsConfigState();
+
         // Do nothing if a game is running
-        if (world.getServer().getLasertagServerManager().isGameRunning()) {
+        if (gameManager.isGameRunning()) {
             return;
         }
 
@@ -73,7 +78,7 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements
                 if (playerBoundingBox.intersects(blockBoundingBox)) {
 
                     // Get the team
-                    var teamOptional = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfName(this.teamName);
+                    var teamOptional = teamsConfigState.getTeamOfName(this.teamName);
 
                     // Join the team
                     teamOptional.ifPresent(team -> playerJoinTeamIfNecessary(world, player, team));
@@ -99,11 +104,11 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements
                 if (playerBoundingBox.intersects(blockBoundingBox)) {
 
                     // Get the team
-                    var teamOptional = LasertagGameManager.getInstance().getTeamManager().getTeamOfPlayer(player.getUuid());
+                    var teamOptional = teamsManager.getTeamOfPlayer(player.getUuid());
 
                     // Leave the team
                     teamOptional.ifPresent(team -> {
-                        LasertagGameManager.getInstance().getTeamManager().playerLeaveHisTeam(world, player.getUuid());
+                        teamsManager.playerLeaveHisTeam(player.getUuid());
                         player.getInventory().clear();
                         player.sendMessage(Text.literal("You left your team"), true);
                     });
@@ -117,11 +122,12 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements
 
     private static void playerJoinTeamIfNecessary(ServerWorld world, PlayerEntity player, TeamDto team) {
 
-        // Get the team manager
-        var teamManager = LasertagGameManager.getInstance().getTeamManager();
+        // Get the game managers
+        var gameManager = world.getServerLasertagManager();
+        var teamsManager = gameManager.getTeamsManager();
 
         // Get the players team
-        var playersTeamOptional = teamManager.getTeamOfPlayer(player.getUuid());
+        var playersTeamOptional = teamsManager.getTeamOfPlayer(player.getUuid());
 
         // If player is in a team
         if (playersTeamOptional.isPresent()) {
@@ -132,7 +138,7 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements
         }
 
         // Join team
-        var joinSucceeded = teamManager.playerJoinTeam(world, team, player);
+        var joinSucceeded = teamsManager.playerJoinTeam(player, team);
 
         // If join did not succeed
         if (!joinSucceeded) {
@@ -173,8 +179,14 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements
             return;
         }
 
+        // Cast to server world
+        var serverWorld = (ServerWorld) world;
+
+        // Get the block tick manager
+        var blockTickManager = serverWorld.getServerLasertagManager().getBlockTickManager();
+
         // Register this as a ticker
-        world.getServer().getLasertagServerManager().getBlockTickManager().registerTicker(this);
+        blockTickManager.registerTicker(this);
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.command.CommandFeedback;
 import de.kleiner3.lasertag.command.ServerFeedbackCommand;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -24,11 +23,15 @@ public class SavePresetCommand extends ServerFeedbackCommand {
     @Override
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
 
+        // Get the game managers
+        var gameManager = context.getSource().getWorld().getServerLasertagManager();
+        var settingsPresetsManager = gameManager.getSettingsPresetsManager();
+        var settingsPresetsNameManager = gameManager.getSettingsPresetsNameManager();
+
         var presetName = getString(context, "name");
 
-        var server = context.getSource().getServer();
-        server.getLasertagServerManager().getSettingsPresetsManager().savePreset(presetName);
-        LasertagGameManager.getInstance().getPresetsNameManager().addPresetName(server, presetName);
+        settingsPresetsManager.savePreset(presetName);
+        settingsPresetsNameManager.addPresetName(presetName);
 
         return Optional.of(new CommandFeedback(Text.literal("Saved settings preset '" + presetName + "'"), true, false));
     }

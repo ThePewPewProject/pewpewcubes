@@ -4,7 +4,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.command.CommandFeedback;
 import de.kleiner3.lasertag.command.ServerFeedbackCommand;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -25,11 +24,15 @@ public class DeletePresetCommand extends ServerFeedbackCommand {
     @Override
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
 
+        // Get the game managers
+        var gameManager = context.getSource().getWorld().getServerLasertagManager();
+        var settingsPresetsManager = gameManager.getSettingsPresetsManager();
+        var settingsPresetsNameManager = gameManager.getSettingsPresetsNameManager();
+
         var presetName = getString(context, "name");
 
-        var server = context.getSource().getServer();
-        var successful = server.getLasertagServerManager().getSettingsPresetsManager().deletePreset(presetName);
-        LasertagGameManager.getInstance().getPresetsNameManager().removePresetName(server, presetName);
+        var successful = settingsPresetsManager.deletePreset(presetName);
+        settingsPresetsNameManager.removePresetName(presetName);
 
         if (successful) {
             return Optional.of(new CommandFeedback(Text.literal("Deleted settings preset '" + presetName + "'"), true, false));

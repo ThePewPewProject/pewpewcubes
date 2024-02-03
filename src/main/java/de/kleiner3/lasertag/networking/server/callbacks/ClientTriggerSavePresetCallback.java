@@ -1,7 +1,6 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
@@ -20,11 +19,16 @@ public class ClientTriggerSavePresetCallback implements ServerPlayNetworking.Pla
 
         try {
 
+            // Get the game managers
+            var gameManager = server.getOverworld().getServerLasertagManager();
+            var settingsPresetsManager = gameManager.getSettingsPresetsManager();
+            var settingsPresetsNamesManger = gameManager.getSettingsPresetsNameManager();
+
             // Read name from buffer
             var presetName = buf.readString();
 
-            server.getLasertagServerManager().getSettingsPresetsManager().savePreset(presetName);
-            LasertagGameManager.getInstance().getPresetsNameManager().addPresetName(server, presetName);
+            settingsPresetsManager.savePreset(presetName);
+            settingsPresetsNamesManger.addPresetName(presetName);
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in ClientTriggerSavePresetCallback", ex);
             throw ex;

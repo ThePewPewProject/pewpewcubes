@@ -4,7 +4,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.command.CommandFeedback;
 import de.kleiner3.lasertag.command.ServerFeedbackCommand;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.Optional;
@@ -20,18 +19,22 @@ public class ReloadTeamConfigCommand extends ServerFeedbackCommand {
     @Override
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
 
+        // Get the game managers
+        var gameManager = context.getSource().getWorld().getServerLasertagManager();
+        var playerNamesState = gameManager.getSyncedState().getPlayerNamesState();
+        var teamsManager = gameManager.getTeamsManager();
+
         var world = context.getSource().getWorld();
-        var teamManager = LasertagGameManager.getInstance().getTeamManager();
 
         // Throw every player out of his team
-        teamManager.forEachPlayer((team, playerUuid) -> {
-            teamManager.playerLeaveHisTeam(world, playerUuid);
+        playerNamesState.forEachPlayer((playerUuid) -> {
+            teamsManager.playerLeaveHisTeam(playerUuid);
 
             var playerOptional = Optional.ofNullable(world.getPlayerByUuid(playerUuid));
             playerOptional.ifPresent(playerEntity -> playerEntity.getInventory().clear());
         });
 
-        LasertagGameManager.getInstance().reloadTeamConfig(world);
+        teamsManager.reloadTeamsConfig();
 
         return Optional.empty();
     }

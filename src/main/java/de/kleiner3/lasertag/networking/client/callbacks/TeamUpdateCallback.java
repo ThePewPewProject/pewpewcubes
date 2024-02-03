@@ -3,8 +3,7 @@ package de.kleiner3.lasertag.networking.client.callbacks;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.screen.LasertagGameManagerTeamsScreen;
 import de.kleiner3.lasertag.client.screen.LasertagTeamSelectorScreen;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -22,23 +21,27 @@ public class TeamUpdateCallback implements ClientPlayNetworking.PlayChannelHandl
 
         try {
 
+            // Get the game managers
+            var gameManager = client.world.getClientLasertagManager();
+            var teamsManager = gameManager.getTeamsManager();
+            var syncedState = gameManager.getSyncedState();
+            var teamsConfigState = syncedState.getTeamsConfigState();
+
             var playerUuid = buf.readUuid();
 
-            var oldValueString = buf.readString();
-            TeamDto oldValue = null;
-            if (!oldValueString.equals("null")) {
-
-                oldValue = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfId(Integer.parseInt(oldValueString)).get();
-            }
 
             var newValueString = buf.readString();
             TeamDto newValue = null;
             if (!newValueString.equals("null")) {
 
-                newValue = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfId(Integer.parseInt(newValueString)).get();
+                newValue = teamsConfigState.getTeamOfId(Integer.parseInt(newValueString)).orElseThrow();
             }
 
-            LasertagGameManager.getInstance().getTeamManager().updateTeam(playerUuid, oldValue, newValue);
+            if (newValue == null) {
+                teamsManager.removePlayerFromTeam(playerUuid);
+            } else {
+                teamsManager.updateTeamOfPlayer(playerUuid, newValue);
+            }
 
             if (client.currentScreen instanceof LasertagGameManagerTeamsScreen lasertagGameManagerTeamsScreen) {
                 lasertagGameManagerTeamsScreen.resetList();

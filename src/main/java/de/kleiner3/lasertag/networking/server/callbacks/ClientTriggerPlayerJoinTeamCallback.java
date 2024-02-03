@@ -1,7 +1,6 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
@@ -20,17 +19,20 @@ public class ClientTriggerPlayerJoinTeamCallback implements ServerPlayNetworking
 
         try {
 
-            // Get the lasertag team manager
-            var teamManager = LasertagGameManager.getInstance().getTeamManager();
+            // Get the game managers
+            var gameManager = server.getOverworld().getServerLasertagManager();
+            var teamsManager = gameManager.getTeamsManager();
+            var syncedState = gameManager.getSyncedState();
+            var teamsConfigState = syncedState.getTeamsConfigState();
 
             // Read team id
             var teamId = buf.readInt();
 
             // Get the team
-            var teamOptional = teamManager.getTeamConfigManager().getTeamOfId(teamId);
+            var teamOptional = teamsConfigState.getTeamOfId(teamId);
 
             // Join team
-            teamOptional.ifPresent(teamDto -> teamManager.playerJoinTeam(server.getOverworld(), teamDto, player));
+            teamOptional.ifPresent(teamDto -> teamsManager.playerJoinTeam(player, teamDto));
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in ClientTriggerPlayerJoinTeamCallback", ex);
             throw ex;

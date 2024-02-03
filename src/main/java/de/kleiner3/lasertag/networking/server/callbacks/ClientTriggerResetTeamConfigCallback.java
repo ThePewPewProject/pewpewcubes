@@ -1,7 +1,6 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
@@ -23,21 +22,26 @@ public class ClientTriggerResetTeamConfigCallback implements ServerPlayNetworkin
 
         try {
 
+            // Get the game managers
+            var gameManager = server.getOverworld().getServerLasertagManager();
+            var teamsManager = gameManager.getTeamsManager();
+            var syncedState = gameManager.getSyncedState();
+            var teamsConfigState = syncedState.getTeamsConfigState();
+            var playerNamesState = gameManager.getSyncedState().getPlayerNamesState();
+
             server.execute(() -> {
 
                 var world = server.getOverworld();
-                var teamManager = LasertagGameManager.getInstance().getTeamManager();
-                var teamConfigManager = teamManager.getTeamConfigManager();
 
                 // Throw every player out of his team
-                teamManager.forEachPlayer((team, playerUuid) -> {
-                    teamManager.playerLeaveHisTeam(world, playerUuid);
+                playerNamesState.forEachPlayer((playerUuid) -> {
+                    teamsManager.playerLeaveHisTeam(playerUuid);
 
                     var playerOptional = Optional.ofNullable(world.getPlayerByUuid(playerUuid));
                     playerOptional.ifPresent(playerEntity -> playerEntity.getInventory().clear());
                 });
 
-                teamConfigManager.reset();
+                teamsConfigState.reset();
             });
         } catch (Exception ex) {
 

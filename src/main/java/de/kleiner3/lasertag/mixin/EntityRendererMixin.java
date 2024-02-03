@@ -1,8 +1,8 @@
 package de.kleiner3.lasertag.mixin;
 
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
-import de.kleiner3.lasertag.lasertaggame.management.settings.valuetypes.CTFFlagHoldingPlayerVisibility;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.settings.valuetypes.CTFFlagHoldingPlayerVisibility;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -33,16 +33,17 @@ public class EntityRendererMixin {
         }
 
         // Get the managers
-        var gameManager = LasertagGameManager.getInstance();
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
         var settingsManager = gameManager.getSettingsManager();
-        var teamManager = gameManager.getTeamManager();
-        var flagManager = gameManager.getFlagManager();
+        var teamManager = gameManager.getTeamsManager();
+        var teamsConfigState = gameManager.getSyncedState().getTeamsConfigState();
+        var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
 
         // If capture the flag setting "flagHoldingPlayerVisibility" is set to NAMETAG
         if (settingsManager.getEnum(SettingDescription.CTF_FLAG_HOLDING_PLAYER_VISIBILITY) == CTFFlagHoldingPlayerVisibility.NAMETAG) {
 
             // Get the team of the flag the rendered player is holding
-            var teamOptional = flagManager.getPlayerHoldingFlagTeam(player.getUuid());
+            var teamOptional = captureTheFlagManager.getPlayerHoldingFlagTeam(player.getUuid());
 
             // If player is holding a flag
             if (teamOptional.isPresent()) {
@@ -59,7 +60,10 @@ public class EntityRendererMixin {
         }
 
         teamManager.getTeamOfPlayer(player.getUuid())
-                .ifPresent(playerTeam -> {
+                .ifPresent(playerTeamId -> {
+
+                    var playerTeam = teamsConfigState.getTeamOfId(playerTeamId).orElseThrow();
+
                     var playerColor = playerTeam.color().getValue();
 
                     var mutableText = (MutableText)text;

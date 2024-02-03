@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import de.kleiner3.lasertag.item.LasertagFlagItem;
 import de.kleiner3.lasertag.item.model.LasertagFlagItemModel;
 import de.kleiner3.lasertag.item.model.LasertagFlagLightsItemModel;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -53,8 +53,12 @@ public class LasertagFlagItemRenderer extends GeoItemRenderer<LasertagFlagItem> 
 
         if (entity instanceof PlayerEntity) {
 
+            // Get the game managers
+            var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+            var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
+
             // Get the team of the flag the player is holding
-            var teamOptional = LasertagGameManager.getInstance().getFlagManager().getPlayerHoldingFlagTeam(entity.getUuid());
+            var teamOptional = captureTheFlagManager.getPlayerHoldingFlagTeam(entity.getUuid());
 
             teamOptional.ifPresent(team -> {
                 var color = team.color();

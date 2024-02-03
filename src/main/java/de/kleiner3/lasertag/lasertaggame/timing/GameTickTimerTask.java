@@ -1,8 +1,9 @@
 package de.kleiner3.lasertag.lasertaggame.timing;
 
 import de.kleiner3.lasertag.lasertaggame.ITickable;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.IGameModeManager;
+import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.ISettingsManager;
 
 import java.util.TimerTask;
 
@@ -12,23 +13,25 @@ import java.util.TimerTask;
  * @author Étienne Muser
  */
 public class GameTickTimerTask extends TimerTask {
+
     private final ITickable game;
+    private final IGameModeManager gameModeManager;
+    private final ISettingsManager settingsManager;
 
     private int seconds = -1;
 
-    public GameTickTimerTask(ITickable game) {
+    public GameTickTimerTask(ITickable game, IGameModeManager gameModeManager, ISettingsManager settingsManager) {
         this.game = game;
+        this.gameModeManager = gameModeManager;
+        this. settingsManager = settingsManager;
     }
 
     @Override
     public void run() {
         ++seconds;
 
-        // Get the managers
-        var gameManager = LasertagGameManager.getInstance();
-
         // Get the game mode
-        var gameMode = gameManager.getGameModeManager().getGameMode();
+        var gameMode = gameModeManager.getGameMode();
 
         // If game mode has infinite time
         if (gameMode.hasInfiniteTime()) {
@@ -40,7 +43,7 @@ public class GameTickTimerTask extends TimerTask {
         } else {
 
             // Get the total duration of the game
-            var gameDurationSeconds = gameManager.getSettingsManager().<Long>get(SettingDescription.PLAY_TIME) * 60;
+            var gameDurationSeconds = settingsManager.<Long>get(SettingDescription.PLAY_TIME) * 60;
 
             // If is 30 seconds before end
             if (gameDurationSeconds - seconds == 30) {

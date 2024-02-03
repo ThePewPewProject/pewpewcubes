@@ -1,7 +1,6 @@
 package de.kleiner3.lasertag.events.callback;
 
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
@@ -24,26 +23,37 @@ import java.util.UUID;
  */
 public class PlayerJoinEventHandler {
     public static void onPlayerJoin(ServerPlayNetworkHandler handler, PacketSender ignoredSender, MinecraftServer server) {
+
         // Get the player
         ServerPlayerEntity player = handler.getPlayer();
 
+        // Get the game managers
+        var gameManager = server.getOverworld().getServerLasertagManager();
+        var playerNamesState = gameManager.getSyncedState().getPlayerNamesState();
+        var settingsManager = gameManager.getSettingsManager();
+        var teamsManager = gameManager.getTeamsManager();
+
         // Add player to player manager
-        LasertagGameManager.getInstance().getPlayerManager().putPlayer(player.getUuid(), player.getLasertagUsername());
+        playerNamesState.savePlayerUsername(player.getUuid(), player.getLasertagUsername());
 
-        // Sync managers
-        LasertagGameManager.getInstance().syncToClient(player, server);
+        // Set to adventure game mode
+        player.changeGameMode(GameMode.ADVENTURE);
 
+        // Sync state to the client
+        gameManager.syncStateToClient(player);
+
+        // Send player joined event
         sendPlayerJoinedNetworkEvent(server.getOverworld(), player.getUuid(), player.getLasertagUsername());
 
         // If origin spawn setting is disabled
-        if (!LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.DO_ORIGIN_SPAWN)) {
+        if (!settingsManager.<Boolean>get(SettingDescription.DO_ORIGIN_SPAWN)) {
             // Dont teleport him to origin
             return;
         }
 
         // If player is already in a team and game is running (i.e. he got disconnected)
-        if (LasertagGameManager.getInstance().getTeamManager().isPlayerInTeam(player.getUuid()) &&
-            server.getLasertagServerManager().isGameRunning()) {
+        if (teamsManager.isPlayerInTeam(player.getUuid()) &&
+            gameManager.isGameRunning()) {
             // Dont teleport him to origin
             return;
         }
@@ -53,12 +63,10 @@ public class PlayerJoinEventHandler {
 
         // Set players spawnpoint
         player.setSpawnPoint(World.OVERWORLD, new BlockPos(0, 1, 0), 0.0F, true, false);
-
-        // Set to adventure game mode
-        player.changeGameMode(GameMode.ADVENTURE);
     }
 
     private static void sendPlayerJoinedNetworkEvent(ServerWorld world, UUID playerUuid, String playerName) {
+
         // Create packet byte buffer
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 

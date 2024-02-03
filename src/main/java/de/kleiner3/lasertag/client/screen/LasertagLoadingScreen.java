@@ -2,8 +2,8 @@ package de.kleiner3.lasertag.client.screen;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.gui.LasertagHudRenderManager;
+import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.UIState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.*;
@@ -28,6 +28,10 @@ public class LasertagLoadingScreen extends Screen {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 
+        // Get the game managers
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var uiState = gameManager.getSyncedState().getUIState();
+
         var hMid = this.height / 2.0F;
         var wMid = this.width / 2.0F;
 
@@ -35,18 +39,17 @@ public class LasertagLoadingScreen extends Screen {
         this.renderVignette();
 
         var textColor = 0xFFFFFFFF;
-        var renderData = LasertagGameManager.getInstance().getHudRenderManager();
-        var stepString = renderData.mapLoadingStepString + "...";
+        var stepString = uiState.mapLoadingStepString + "...";
         var textWidth = this.textRenderer.getWidth(stepString);
         this.textRenderer.drawWithShadow(matrices, Text.literal(stepString), wMid - (textWidth / 2.0F), hMid - 15, textColor);
 
-        int barStart = renderData.wMid - (LasertagHudRenderManager.progressBarWidth / 2);
-        int progressWidth = (int) (LasertagHudRenderManager.progressBarWidth * renderData.mapLoadingProgress);
-        int barUpperHeight = renderData.hMid + 10;
-        int barLowerHeight = renderData.hMid + 15;
+        int barStart = (int)(wMid - (UIState.progressBarWidth / 2.0));
+        int progressWidth = (int) (UIState.progressBarWidth * uiState.mapLoadingProgress);
+        int barUpperHeight = (int)hMid + 10;
+        int barLowerHeight = (int)hMid + 15;
 
         // Draw background
-        DrawableHelper.fill(matrices, barStart, barUpperHeight, barStart + LasertagHudRenderManager.progressBarWidth, barLowerHeight, LasertagHudRenderManager.boxColor);
+        DrawableHelper.fill(matrices, barStart, barUpperHeight, barStart + UIState.progressBarWidth, barLowerHeight, UIState.boxColor);
 
         // Draw progress
         DrawableHelper.fill(matrices, barStart, barUpperHeight, barStart + progressWidth, barLowerHeight, 0xFFFFFFFF);

@@ -23,10 +23,15 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class LoadPresetCommand extends ServerFeedbackCommand {
     @Override
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+
+        // Get the game managers
+        var gameManager = context.getSource().getWorld().getServerLasertagManager();
+        var settingsPresetsManager = gameManager.getSettingsPresetsManager();
+
         var presetName = getString(context, "name");
         var server = context.getSource().getServer();
 
-        var successful = context.getSource().getServer().getLasertagServerManager().getSettingsPresetsManager().loadPreset(presetName, server);
+        var successful = settingsPresetsManager.loadPreset(presetName);
 
         if (successful) {
             return Optional.of(new CommandFeedback(Text.literal("Loaded settings preset '" + presetName + "'"), true, true));

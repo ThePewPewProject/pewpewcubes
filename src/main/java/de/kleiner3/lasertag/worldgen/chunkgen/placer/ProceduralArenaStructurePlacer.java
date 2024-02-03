@@ -1,9 +1,9 @@
 package de.kleiner3.lasertag.worldgen.chunkgen.placer;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.worldgen.chunkgen.type.ProceduralArenaType;
 import de.kleiner3.lasertag.worldgen.chunkgen.template.ArenaTemplate;
 import de.kleiner3.lasertag.worldgen.chunkgen.template.ProceduralArenaTemplate;
+import de.kleiner3.lasertag.worldgen.chunkgen.type.ProceduralArenaType;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.StructureWorldAccess;

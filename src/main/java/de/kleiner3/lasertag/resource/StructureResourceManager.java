@@ -1,23 +1,18 @@
 package de.kleiner3.lasertag.resource;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.common.util.StringUtil;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.*;
-import java.util.Collections;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Manages all .nbt file resources

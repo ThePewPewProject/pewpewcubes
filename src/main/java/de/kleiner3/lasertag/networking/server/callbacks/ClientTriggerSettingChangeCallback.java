@@ -1,8 +1,7 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
@@ -10,8 +9,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import static de.kleiner3.lasertag.lasertaggame.management.settings.SettingDataType.BOOL;
-import static de.kleiner3.lasertag.lasertaggame.management.settings.SettingDataType.LONG;
+import static de.kleiner3.lasertag.lasertaggame.settings.SettingDataType.BOOL;
+import static de.kleiner3.lasertag.lasertaggame.settings.SettingDataType.LONG;
 
 /**
  * Callback for the client trigger setting change network event
@@ -23,6 +22,10 @@ public class ClientTriggerSettingChangeCallback implements ServerPlayNetworking.
     public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 
         try {
+
+            // Get the game managers
+            var gameManager = server.getOverworld().getServerLasertagManager();
+            var settingsManager = gameManager.getSettingsManager();
 
             // Get the setting name
             var settingEnumName = buf.readString();
@@ -42,7 +45,7 @@ public class ClientTriggerSettingChangeCallback implements ServerPlayNetworking.
             }
 
             if (settingValue != null) {
-                LasertagGameManager.getInstance().getSettingsManager().set(server, settingDescription.getName(), settingValue);
+                settingsManager.set(settingDescription.getName(), settingValue);
             }
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in ClientTriggerSettingChangeCallback", ex);

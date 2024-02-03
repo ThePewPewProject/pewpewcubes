@@ -3,8 +3,7 @@ package de.kleiner3.lasertag.networking.client.callbacks;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.screen.LasertagGameManagerScreen;
 import de.kleiner3.lasertag.client.screen.LasertagGameManagerSettingsScreen;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.gamemode.GameModes;
+import de.kleiner3.lasertag.lasertaggame.gamemode.GameModes;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -22,6 +21,10 @@ public class GameModeSyncCallback implements ClientPlayNetworking.PlayChannelHan
 
         try {
 
+            // Get the game managers
+            var gameManager = client.world.getClientLasertagManager();
+            var gameModeManager = gameManager.getGameModeManager();
+
             // Get the game mode translatable name
             var gameModeTranslatableName = buf.readString();
 
@@ -29,7 +32,7 @@ public class GameModeSyncCallback implements ClientPlayNetworking.PlayChannelHan
             var newGameMode = GameModes.GAME_MODES.get(gameModeTranslatableName);
 
             // Set the new game mode
-            LasertagGameManager.getInstance().getGameModeManager().setGameMode(null, newGameMode);
+            gameModeManager.setGameMode(newGameMode);
 
             // If client has game manager screen open
             if (client.currentScreen instanceof LasertagGameManagerScreen lasertagGameManagerScreen) {

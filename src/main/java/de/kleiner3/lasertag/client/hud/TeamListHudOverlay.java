@@ -2,10 +2,9 @@ package de.kleiner3.lasertag.client.hud;
 
 import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.common.util.AdvancedDrawableHelper;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
-import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
-import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
+import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -47,22 +46,25 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         drawPlayersWithoutTeam(matrices, scaledWindowWidth, scaledWindowHeight);
         drawSpectators(matrices, scaledWindowHeight);
 
-        var lasertagGameManager = LasertagGameManager.getInstance();
+        // Get the game managers
+        var gameManager = CLIENT.world.getClientLasertagManager();
+        var settingsManager = gameManager.getSettingsManager();
+        var teamsManager = gameManager.getTeamsManager();
+        var syncedState = gameManager.getSyncedState();
+        var teamsConfigState = syncedState.getTeamsConfigState();
 
         // If render team list setting is disabled
-        if (!lasertagGameManager.getSettingsManager().<Boolean>get(SettingDescription.RENDER_TEAM_LIST)) {
+        if (!settingsManager.<Boolean>get(SettingDescription.RENDER_TEAM_LIST)) {
             var text = Text.literal("Render team list setting is disabled").asOrderedText();
             drawCenteredTextWithShadow(matrices, TEXT_RENDERER, text, scaledWindowWidth / 2, NOTE_TOP_PADDING, 0xFFFFFF);
             return;
         }
 
-        var teamManager = lasertagGameManager.getTeamManager();
-
         // Get a list of Tuple<TeamDto, List<UUID>> (One entry is a team which is not empty)
-        var teams = teamManager.getTeamMap().entrySet().stream()
-                .filter(entry -> !entry.getValue().isEmpty())
-                .filter(entry -> !entry.getKey().equals(TeamConfigManager.SPECTATORS))
-                .map(entry -> new Tuple<>(entry.getKey(), entry.getValue()))
+        var teams = teamsConfigState.getTeams().stream()
+                .filter(team -> !teamsManager.getPlayersOfTeam(team).isEmpty())
+                .filter(team -> !team.equals(TeamsConfigState.SPECTATORS))
+                .map(team -> new Tuple<>(team, teamsManager.getPlayersOfTeam(team)))
                 .toList();
         var numberOfTeams = teams.size();
 
@@ -124,9 +126,9 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         var textHeight = TEXT_RENDERER.fontHeight;
 
         // Get the managers
-        var gameManager = LasertagGameManager.getInstance();
+        var gameManager = CLIENT.world.getClientLasertagManager();
         var gameMode = gameManager.getGameModeManager().getGameMode();
-        var playerManager = gameManager.getPlayerManager();
+        var playerNamesManager = gameManager.getSyncedState().getPlayerNamesState();
 
         // Draw rectangle of team
         drawRectangle(matrices, rectangleStartX, rectangleStartY, rectangleStartX + TEAM_WIDTH, rectangleStartY + teamHeight, 0xAAFFFFFF);
@@ -155,7 +157,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
             }
 
             // Draw player name
-            TEXT_RENDERER.draw(matrices, playerManager.getPlayerUsername(playerUuid), rectangleStartX + TEXT_PADDING + 1, playerY, playerNamecolor);
+            TEXT_RENDERER.draw(matrices, playerNamesManager.getPlayerUsername(playerUuid), rectangleStartX + TEXT_PADDING + 1, playerY, playerNamecolor);
 
             // Draw player score
             var playerScoreText = gameMode.getPlayerScoreText(playerUuid);
@@ -168,13 +170,17 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
 
     private void drawPlayersWithoutTeam(MatrixStack matrices, int scaledWindowWidth, int scaledWindowHeight) {
 
+        // Get the game managers
+        var gameManager = CLIENT.world.getClientLasertagManager();
+        var teamsManager = gameManager.getTeamsManager();
+
         // Apply padding
         scaledWindowWidth -= TEAM_PADDING;
         scaledWindowHeight -= TEAM_PADDING;
 
         // Get the players without team
         var playersWithoutTeam = CLIENT.player.networkHandler.getPlayerList().stream()
-                .filter(playerListEntry -> !LasertagGameManager.getInstance().getTeamManager().isPlayerInTeam(playerListEntry.getProfile().getId()))
+                .filter(playerListEntry -> !teamsManager.isPlayerInTeam(playerListEntry.getProfile().getId()))
                 .limit(MAX_NUMBER_PLAYERS_IN_WITHOUT_TEAM_LIST)
                 .toList();
 
@@ -200,15 +206,20 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
 
     private void drawSpectators(MatrixStack matrices, int scaledWindowHeight) {
 
-        // Get the HUD render data
-        var teamManager = LasertagGameManager.getInstance().getTeamManager();
+        // Get the game managers
+        var gameManager = CLIENT.world.getClientLasertagManager();
+        var teamsManager = gameManager.getTeamsManager();
+        var syncedState = gameManager.getSyncedState();
+        var teamsConfigState = syncedState.getTeamsConfigState();
+        var playerNamesState = syncedState.getPlayerNamesState();
 
         // Get the team
-        var spectatorTeam = teamManager.getTeamMap().entrySet().stream()
-                .filter(entry -> entry.getKey().equals(TeamConfigManager.SPECTATORS))
+        var spectatorTeam = teamsConfigState.getTeams().stream()
+                .filter(team -> team.equals(TeamsConfigState.SPECTATORS))
                 .findFirst()
-                .get()
-                .getValue().stream()
+                .get();
+
+        var spectatorTeamPlayers = teamsManager.getPlayersOfTeam(spectatorTeam).stream()
                 .filter(playerUuid -> CLIENT.getNetworkHandler().getPlayerListEntry(playerUuid) != null)
                 .limit(MAX_NUMBER_PLAYERS_IN_WITHOUT_TEAM_LIST)
                 .toList();
@@ -217,7 +228,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         scaledWindowHeight -= TEAM_PADDING;
 
         var startX = TEAM_PADDING;
-        var height = TEXT_PADDING + TEXT_RENDERER.fontHeight + TEXT_PADDING + (spectatorTeam.size() * (INTRA_PLAYER_PADDING + TEXT_RENDERER.fontHeight));
+        var height = TEXT_PADDING + TEXT_RENDERER.fontHeight + TEXT_PADDING + (spectatorTeamPlayers.size() * (INTRA_PLAYER_PADDING + TEXT_RENDERER.fontHeight));
         var startY = scaledWindowHeight - height;
 
         // Draw background rect
@@ -226,12 +237,10 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         // Draw header
         TEXT_RENDERER.drawWithShadow(matrices, "Spectators:", startX + TEXT_PADDING, startY + TEXT_PADDING, 0xFFFFFFFF);
 
-        var playerManager = LasertagGameManager.getInstance().getPlayerManager();
-
         var yPos = startY + TEXT_PADDING + TEXT_RENDERER.fontHeight + TEXT_PADDING;
-        for (var playerUuid : spectatorTeam) {
+        for (var playerUuid : spectatorTeamPlayers) {
             // Draw players name
-            TEXT_RENDERER.draw(matrices, playerManager.getPlayerUsername(playerUuid), startX + TEXT_PADDING, yPos, 0xFFFFFFFF);
+            TEXT_RENDERER.draw(matrices, playerNamesState.getPlayerUsername(playerUuid), startX + TEXT_PADDING, yPos, 0xFFFFFFFF);
 
             yPos += (TEXT_RENDERER.fontHeight + INTRA_PLAYER_PADDING);
         }

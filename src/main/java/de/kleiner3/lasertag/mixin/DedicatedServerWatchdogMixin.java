@@ -35,10 +35,16 @@ public abstract class DedicatedServerWatchdogMixin {
     @Inject(method = "run()V", at = @At("HEAD"), cancellable = true)
     private void runOverride(CallbackInfo ci) {
 
-        while (((DedicatedServerWatchdog) (Object) this).server.isRunning()) {
+        var thisWD = ((DedicatedServerWatchdog) (Object) this);
+
+        while (thisWD.server.isRunning()) {
+
+            // Get the game managers
+            var gameManager = thisWD.server.getOverworld().getServerLasertagManager();
+            var arenaManager = gameManager.getArenaManager();
 
             // If map is loading, ignore
-            if (((DedicatedServerWatchdog) (Object) this).server.getLasertagServerManager().getMapManager().isLoading()) {
+            if (arenaManager.isLoading()) {
                 this.isIgnoring = true;
             }
 

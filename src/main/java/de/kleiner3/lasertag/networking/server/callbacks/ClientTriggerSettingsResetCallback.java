@@ -1,7 +1,6 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
@@ -20,7 +19,11 @@ public class ClientTriggerSettingsResetCallback implements ServerPlayNetworking.
 
         try {
 
-            LasertagGameManager.getInstance().getSettingsManager().reset(server);
+            // Get the game mangers
+            var gameManager = server.getOverworld().getServerLasertagManager();
+            var settingsManager = gameManager.getSettingsManager();
+
+            settingsManager.reset();
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in ClientTriggerSettingsResetCallback", ex);
             throw ex;

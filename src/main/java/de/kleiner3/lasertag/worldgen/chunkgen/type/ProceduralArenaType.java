@@ -1,21 +1,9 @@
 package de.kleiner3.lasertag.worldgen.chunkgen.type;
 
-import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.common.util.NbtUtil;
-import de.kleiner3.lasertag.resource.ResourceManagers;
-import de.kleiner3.lasertag.resource.StructureResourceManager;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.resource.Resource;
 import net.minecraft.structure.StructureTemplate;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
 
 /**
  * Enum to represent all possible procedural arenas

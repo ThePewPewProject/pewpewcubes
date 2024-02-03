@@ -1,7 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -19,11 +18,15 @@ public class ScoreUpdateCallback implements ClientPlayNetworking.PlayChannelHand
 
         try {
 
+            // Get the game managers
+            var gameManager = client.world.getClientLasertagManager();
+            var scoreManager = gameManager.getScoreManager();
+
             // Get parameters
             var playerUuid = buf.readUuid();
             var newValue = buf.readLong();
 
-            LasertagGameManager.getInstance().getScoreManager().updateScore(playerUuid, newValue);
+            scoreManager.updateScore(playerUuid, newValue);
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in ScoreUpdateCallback", ex);
             throw ex;

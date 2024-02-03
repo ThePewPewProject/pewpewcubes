@@ -1,6 +1,6 @@
 package de.kleiner3.lasertag.mixin;
 
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,11 +18,12 @@ public abstract class WorldRendererMixin {
               at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getTeamColorValue()I"))
     private int onGetTeamColorValueInRender(Entity instance) {
 
-        // Get the manager
-        var flagManager = LasertagGameManager.getInstance().getFlagManager();
+        // Get the managers
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
 
         // Get the team of the flag the player is holding
-        var teamOptional = flagManager.getPlayerHoldingFlagTeam(instance.getUuid());
+        var teamOptional = captureTheFlagManager.getPlayerHoldingFlagTeam(instance.getUuid());
 
         // Return the color of the flags team or players default minecraft team color
         return teamOptional

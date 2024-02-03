@@ -1,7 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -20,18 +19,19 @@ public class CTFNumberOfFlagsUpdateCallback implements ClientPlayNetworking.Play
         try {
 
             // Get the managers
-            var gameManager = LasertagGameManager.getInstance();
-            var flagManager = gameManager.getFlagManager();
-            var teamManger = gameManager.getTeamManager().getTeamConfigManager();
+            var gameManager = client.world.getClientLasertagManager();
+            var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
+            var syncedState = gameManager.getSyncedState();
+            var teamsManger = syncedState.getTeamsConfigState();
 
             // Get the team
-            var teamOptional = teamManger.getTeamOfId(buf.readInt());
+            var teamOptional = teamsManger.getTeamOfId(buf.readInt());
 
             // Get the new number of flags
             var newNumberOfFlags = buf.readLong();
 
             // Update flag count
-            teamOptional.ifPresent(team -> flagManager.updateTeamFlagCount(team, newNumberOfFlags));
+            teamOptional.ifPresent(team -> captureTheFlagManager.updateTeamFlagCount(team, newNumberOfFlags));
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in CTFNumberOfFlagsUpdateCallback", ex);
             throw ex;

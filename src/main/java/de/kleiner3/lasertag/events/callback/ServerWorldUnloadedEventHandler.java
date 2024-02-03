@@ -1,6 +1,5 @@
 package de.kleiner3.lasertag.events.callback;
 
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 
@@ -11,10 +10,11 @@ import net.minecraft.server.world.ServerWorld;
  */
 public class ServerWorldUnloadedEventHandler {
     public static void onServerWorldUnloaded(MinecraftServer minecraftServer, ServerWorld serverWorld) {
-        // Reset game manager
-        LasertagGameManager.reset();
+
+        // Get the game managers
+        var gameManager = serverWorld.getServerLasertagManager();
 
         // Dispose server
-        minecraftServer.getLasertagServerManager().dispose();
+        gameManager.dispose();
     }
 }

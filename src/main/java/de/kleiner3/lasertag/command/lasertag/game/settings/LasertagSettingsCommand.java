@@ -4,7 +4,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.command.CommandFeedback;
 import de.kleiner3.lasertag.command.ServerFeedbackCommand;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -19,7 +18,12 @@ import static net.minecraft.server.command.CommandManager.literal;
  */
 public class LasertagSettingsCommand extends ServerFeedbackCommand {
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
-        return Optional.of(new CommandFeedback(Text.literal(LasertagGameManager.getInstance().getSettingsManager().toJson()), false, false));
+
+        // Get the game managers
+        var gameManager = context.getSource().getWorld().getServerLasertagManager();
+        var settingsManager = gameManager.getSettingsManager();
+
+        return Optional.of(new CommandFeedback(Text.literal(settingsManager.toString()), false, false));
     }
 
     public static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {

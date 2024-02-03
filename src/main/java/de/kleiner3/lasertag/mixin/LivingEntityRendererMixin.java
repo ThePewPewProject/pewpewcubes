@@ -1,8 +1,7 @@
 package de.kleiner3.lasertag.mixin;
 
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
-import de.kleiner3.lasertag.lasertaggame.management.settings.valuetypes.CTFFlagHoldingPlayerVisibility;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.settings.valuetypes.CTFFlagHoldingPlayerVisibility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.entity.LivingEntity;
@@ -33,9 +32,10 @@ public abstract class LivingEntityRendererMixin {
         }
 
         // Get managers
-        var gameManager = LasertagGameManager.getInstance();
-        var teamManager = gameManager.getTeamManager();
-        var hudManager = gameManager.getHudRenderManager();
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var teamManager = gameManager.getTeamsManager();
+        var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
+        var uiState = gameManager.getSyncedState().getUIState();
         var settingsManager = gameManager.getSettingsManager();
 
         // Get team of this player
@@ -56,7 +56,7 @@ public abstract class LivingEntityRendererMixin {
         if (settingsManager.getEnum(SettingDescription.CTF_FLAG_HOLDING_PLAYER_VISIBILITY) == CTFFlagHoldingPlayerVisibility.NAMETAG) {
 
             // Get the team of the flag the player is holding
-            var teamOptional = gameManager.getFlagManager().getPlayerHoldingFlagTeam(renderedPlayer.getUuid());
+            var teamOptional = captureTheFlagManager.getPlayerHoldingFlagTeam(renderedPlayer.getUuid());
 
             // If player is holding a flag
             if (teamOptional.isPresent()) {
@@ -64,7 +64,7 @@ public abstract class LivingEntityRendererMixin {
             }
         }
 
-        if (hudManager.shouldRenderNameTags) {
+        if (!uiState.isGameRunning) {
             return;
         }
 

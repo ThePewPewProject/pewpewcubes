@@ -2,12 +2,12 @@ package de.kleiner3.lasertag.client.screen;
 
 import de.kleiner3.lasertag.client.screen.widget.*;
 import de.kleiner3.lasertag.common.types.Tuple;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -21,8 +21,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import static de.kleiner3.lasertag.lasertaggame.management.settings.SettingDataType.BOOL;
-import static de.kleiner3.lasertag.lasertaggame.management.settings.SettingDataType.LONG;
+import static de.kleiner3.lasertag.lasertaggame.settings.SettingDataType.BOOL;
+import static de.kleiner3.lasertag.lasertaggame.settings.SettingDataType.LONG;
 
 /**
  * The settings screen of the lasertag game manager
@@ -155,15 +155,21 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
      * @return The setting descriptions and values
      */
     private List<Tuple<SettingDescription, Object>> getSettingDescriptions() {
-        return LasertagGameManager.getInstance().getGameModeManager().getGameMode().getRelevantSettings().stream()
+
+        // Get the game managers
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var gameModeManager = gameManager.getGameModeManager();
+        var settingsManager = gameManager.getSettingsManager();
+
+        return gameModeManager.getGameMode().getRelevantSettings().stream()
                 .sorted(Comparator.comparing(SettingDescription::getName))
                 .map(s -> {
 
                     Object value;
                     if (s.getDataType().isEnum()) {
-                        value = LasertagGameManager.getInstance().getSettingsManager().getEnum(s);
+                        value = settingsManager.getEnum(s);
                     } else {
-                        value = LasertagGameManager.getInstance().getSettingsManager().get(s);
+                        value = settingsManager.get(s);
                     }
 
                     return new Tuple<>(s, value);

@@ -1,12 +1,12 @@
 package de.kleiner3.lasertag.client.screen;
 
 import de.kleiner3.lasertag.client.screen.widget.*;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
-import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
+import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
@@ -98,8 +98,12 @@ public class LasertagTeamSelectorScreen extends Screen {
      */
     private Drawable getTeamNameColumn(ListCell<TeamDto> desc) {
 
+        // Get the game managers
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var teamsManager = gameManager.getTeamsManager();
+
         // Get the team of the player
-        var playersTeam = LasertagGameManager.getInstance().getTeamManager().getTeamOfPlayer(this.player.getUuid());
+        var playersTeam = teamsManager.getTeamOfPlayer(this.player.getUuid());
 
         var teamDto = desc.value();
         var teamName = teamDto.name();
@@ -136,14 +140,21 @@ public class LasertagTeamSelectorScreen extends Screen {
      * @return The teams
      */
     private List<TeamDto> getTeams() {
-        return LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().teamConfig.values().stream()
+
+        // Get the game managers
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var teamsManager = gameManager.getTeamsManager();
+        var syncedState = gameManager.getSyncedState();
+        var teamsConfigState = syncedState.getTeamsConfigState();
+
+        return teamsConfigState.getTeams().stream()
                 // Sort spectators to the bottom
                 .sorted((teamA, teamB) -> {
-                    if (teamA.equals(TeamConfigManager.SPECTATORS)) {
+                    if (teamA.equals(TeamsConfigState.SPECTATORS)) {
                         return 1;
                     }
 
-                    if (teamB.equals(TeamConfigManager.SPECTATORS)) {
+                    if (teamB.equals(TeamsConfigState.SPECTATORS)) {
                         return -1;
                     }
 

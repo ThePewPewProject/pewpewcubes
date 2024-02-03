@@ -2,7 +2,7 @@ package de.kleiner3.lasertag.block.entity.render;
 
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.entity.LasertagTeamZoneGeneratorBlockEntity;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
@@ -30,8 +30,13 @@ public class LasertagTeamZoneGeneratorBlockEntityRenderer implements BlockEntity
         int g;
         int b;
 
+        // Get the game managers
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var syncedState = gameManager.getSyncedState();
+        var teamsConfigManager = syncedState.getTeamsConfigState();
+
         // Get the team
-        var teamDtoOptional = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfName(entity.getTeamName());
+        var teamDtoOptional = teamsConfigManager.getTeamOfName(entity.getTeamName());
 
         if (teamDtoOptional.isPresent()){
             var colorDto = teamDtoOptional.get().color();

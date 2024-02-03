@@ -5,7 +5,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.kleiner3.lasertag.command.CommandFeedback;
 import de.kleiner3.lasertag.command.ServerFeedbackCommand;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -29,6 +28,10 @@ public class KickPlayerCommand extends ServerFeedbackCommand {
     @Override
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
 
+        // Get the game managers
+        var gameManager = context.getSource().getWorld().getServerLasertagManager();
+        var teamsManager = gameManager.getTeamsManager();
+
         Collection<ServerPlayerEntity> players;
         try {
             players = EntityArgumentType.getPlayers(context, "players");
@@ -37,7 +40,7 @@ public class KickPlayerCommand extends ServerFeedbackCommand {
         }
 
         for (var player : players) {
-            LasertagGameManager.getInstance().getTeamManager().playerLeaveHisTeam(context.getSource().getWorld(), player);
+            teamsManager.playerLeaveHisTeam(player);
 
             player.getInventory().clear();
         }

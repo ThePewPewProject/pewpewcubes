@@ -3,8 +3,7 @@ package de.kleiner3.lasertag.networking.client.callbacks;
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.statistics.GameStats;
 import de.kleiner3.lasertag.lasertaggame.statistics.WebStatisticsVisualizer;
 import de.kleiner3.lasertag.resource.ResourceManagers;
@@ -32,8 +31,8 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
         try {
 
             // Get the managers
-            var gameManager = LasertagGameManager.getInstance();
-            var hudRenderManager = gameManager.getHudRenderManager();
+            var gameManager = client.world.getClientLasertagManager();
+            var uiState = gameManager.getSyncedState().getUIState();
             var settingManager = gameManager.getSettingsManager();
 
             // Read from buffer
@@ -53,11 +52,11 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
                 }
 
                 // Set the winner team id
-                hudRenderManager.lastGameWinnerId = winnerTeamId;
+                uiState.lastGameWinnerId = winnerTeamId;
 
-                var gameOverOverlayTimer = ThreadUtil.createScheduledExecutor("lasertag-client-game-over-timer-%d");
+                var gameOverOverlayTimer = ThreadUtil.createScheduledExecutor("client-lasertag-game-over-timer-%d");
                 gameOverOverlayTimer.schedule(() -> {
-                    hudRenderManager.lastGameWinnerId = -1;
+                    uiState.lastGameWinnerId = -1;
                     gameOverOverlayTimer.shutdownNow();
                 }, 5, TimeUnit.SECONDS);
             }

@@ -2,7 +2,6 @@ package de.kleiner3.lasertag.networking.client.callbacks;
 
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.screen.LasertagGameManagerSettingsScreen;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -20,9 +19,13 @@ public class LasertagSettingsChangedCallback implements ClientPlayNetworking.Pla
 
         try {
 
+            // Get the game managers
+            var gameManger = client.world.getClientLasertagManager();
+            var settingsManager = gameManger.getSettingsManager();
+
             var newSettingsJson = buf.readString();
 
-            LasertagGameManager.getInstance().getSettingsManager().set(newSettingsJson);
+            settingsManager.set(newSettingsJson);
 
             if (client.currentScreen instanceof LasertagGameManagerSettingsScreen lasertagGameManagerSettingsScreen) {
                 lasertagGameManagerSettingsScreen.resetList();

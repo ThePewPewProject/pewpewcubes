@@ -1,9 +1,11 @@
 package de.kleiner3.lasertag.client.hud;
 
 import de.kleiner3.lasertag.common.util.DurationUtils;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.gui.LasertagHudRenderManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.state.management.client.IGameModeManager;
+import de.kleiner3.lasertag.lasertaggame.state.management.client.ISettingsManager;
+import de.kleiner3.lasertag.lasertaggame.state.synced.ITeamsConfigState;
+import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.UIState;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -32,69 +34,72 @@ public class LasertagHudOverlay implements HudRenderCallback {
         // Get the client
         MinecraftClient client = MinecraftClient.getInstance();
 
-        // If we are on the server
-        if (client == null) {
-            return;
-        }
+        // Get the client managers
+        var clientManager = client.world.getClientLasertagManager();
+        var settingsManager = clientManager.getSettingsManager();
+        var gameModeManager = clientManager.getGameModeManager();
+        var syncedState = clientManager.getSyncedState();
+        var teamConfigState = syncedState.getTeamsConfigState();
 
         // Get the render data
-        var renderData = LasertagGameManager.getInstance().getHudRenderManager();
+        var uiState = clientManager.getSyncedState().getUIState();
 
         // Calculate window size
-        renderData.width = client.getWindow().getScaledWidth();
-        renderData.wMid = renderData.width / 2;
-        renderData.height = client.getWindow().getScaledHeight();
-        renderData.hMid = renderData.height / 2;
+        var width = client.getWindow().getScaledWidth();
+        var wMid = width / 2;
+        var height = client.getWindow().getScaledHeight();
+        var hMid = height / 2;
 
         // Get the clients text renderer
         TextRenderer renderer = client.textRenderer;
 
         // Render HUD
-        renderTimer(renderer, matrixStack, renderData);
-        renderProgressBar(renderer, matrixStack, renderData);
-        renderStartingIn(renderer, matrixStack, renderData);
-        renderGameOver(renderer, matrixStack, renderData);
+        renderTimer(renderer, matrixStack, uiState, settingsManager, gameModeManager, wMid);
+        renderProgressBar(renderer, matrixStack, uiState, wMid, hMid);
+        renderStartingIn(renderer, matrixStack, uiState, wMid, hMid);
+        renderGameOver(renderer, matrixStack, uiState, teamConfigState, wMid, hMid);
     }
 
-    private void renderStartingIn(TextRenderer renderer, MatrixStack matrices, LasertagHudRenderManager renderData) {
+    private void renderStartingIn(TextRenderer renderer, MatrixStack matrices, UIState uiState, int wMid, int hMid) {
         // If starting in is -1 (the halting value)
-        if (renderData.startingIn <= -1) {
+        if (uiState.startingIn <= -1) {
             // Abort
             return;
         }
 
-        if (renderData.startingIn == 0) {
-            DrawableHelper.drawCenteredText(matrices, renderer, "GO!", renderData.wMid, renderData.hMid, 0xFFFFFFFF);
+        if (uiState.startingIn == 0) {
+            DrawableHelper.drawCenteredText(matrices, renderer, "GO!", wMid, hMid, 0xFFFFFFFF);
         } else {
-            DrawableHelper.drawCenteredText(matrices, renderer, "Starting in " + renderData.startingIn, renderData.wMid, renderData.hMid, 0xFFFFFFFF);
+            DrawableHelper.drawCenteredText(matrices, renderer, "Starting in " + uiState.startingIn, wMid, hMid, 0xFFFFFFFF);
         }
     }
 
-    private void renderProgressBar(TextRenderer renderer, MatrixStack matrices, LasertagHudRenderManager renderData) {
+    private void renderProgressBar(TextRenderer renderer, MatrixStack matrices, UIState uiState, int wMid, int hMid) {
         // If progress is 0
-        if (renderData.progress == 0.0) {
+        if (uiState.progress == -1.0) {
             // Abort
             return;
         }
 
-        int barStart = renderData.wMid - (LasertagHudRenderManager.progressBarWidth / 2);
-        int progressWidth = (int) (LasertagHudRenderManager.progressBarWidth * renderData.progress);
+        int barStart = wMid - (UIState.progressBarWidth / 2);
+        int progressWidth = (int) (UIState.progressBarWidth * uiState.progress);
 
         // Draw background
-        DrawableHelper.fill(matrices, barStart, renderData.hMid + 10, barStart + LasertagHudRenderManager.progressBarWidth, renderData.hMid + 15, LasertagHudRenderManager.boxColor);
+        DrawableHelper.fill(matrices, barStart, hMid + 10, barStart + UIState.progressBarWidth, hMid + 15, UIState.boxColor);
 
         // Draw progress
-        DrawableHelper.fill(matrices, barStart, renderData.hMid + 10, barStart + progressWidth, renderData.hMid + 15, 0xFFFFFFFF);
+        DrawableHelper.fill(matrices, barStart, hMid + 10, barStart + progressWidth, hMid + 15, 0xFFFFFFFF);
 
         // Draw text
-        DrawableHelper.drawCenteredText(matrices, renderer, "Scanning for spawn points...", renderData.wMid, renderData.hMid - 15, 0xFFFFFFFF);
+        DrawableHelper.drawCenteredText(matrices, renderer, "Scanning for spawn points...", wMid, hMid - 15, 0xFFFFFFFF);
     }
 
-    private void renderTimer(TextRenderer renderer, MatrixStack matrices, LasertagHudRenderManager renderData) {
-
-        // Get the managers
-        var gameManager = LasertagGameManager.getInstance();
-        var settingsManager = gameManager.getSettingsManager();
+    private void renderTimer(TextRenderer renderer,
+                             MatrixStack matrices,
+                             UIState uiState,
+                             ISettingsManager settingsManager,
+                             IGameModeManager gameModeManager,
+                             int wMid) {
 
         // If game time should not be rendered
         if (!settingsManager.<Boolean>get(SettingDescription.RENDER_TIMER)) {
@@ -103,10 +108,10 @@ public class LasertagHudOverlay implements HudRenderCallback {
         }
 
         // Get the game mode
-        var gameMode = gameManager.getGameModeManager().getGameMode();
+        var gameMode = gameModeManager.getGameMode();
 
         // Init seconds to show with the time the game is already running
-        var secondsToShow = renderData.gameTime;
+        var secondsToShow = uiState.gameTime;
 
         // If game mode has no infinite time
         if (!gameMode.hasInfiniteTime()) {
@@ -115,18 +120,22 @@ public class LasertagHudOverlay implements HudRenderCallback {
 
         DrawableHelper.drawCenteredText(matrices, renderer,
                 DurationUtils.toString(Duration.ofSeconds(secondsToShow)),
-                renderData.wMid, LasertagHudRenderManager.textPadding, 0xFFFFFF);
+                wMid, 1, 0xFFFFFF);
     }
 
-    private void renderGameOver(TextRenderer renderer, MatrixStack matrices, LasertagHudRenderManager renderData) {
+    private void renderGameOver(TextRenderer renderer,
+                                MatrixStack matrices,
+                                UIState uiState,
+                                ITeamsConfigState teamsConfig,
+                                int wMid, int hMid) {
 
-        var winnerTeamId = renderData.lastGameWinnerId;
+        var winnerTeamId = uiState.lastGameWinnerId;
 
         if (winnerTeamId == -1) {
             return;
         }
 
-        var winnerTeamOptional = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().getTeamOfId(winnerTeamId);
+        var winnerTeamOptional = teamsConfig.getTeamOfId(winnerTeamId);
 
         winnerTeamOptional.ifPresent(winnerTeam -> {
 
@@ -135,7 +144,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
             var textColor = 0xFFFFFFFF;
 
             matrices.scale(2, 2, 2);
-            DrawableHelper.drawCenteredText(matrices, renderer, "GAME OVER", renderData.wMid / 2, renderData.hMid / 2 - 15, textColor);
+            DrawableHelper.drawCenteredText(matrices, renderer, "GAME OVER", wMid / 2, hMid / 2 - 15, textColor);
 
             matrices.scale(0.5F, 0.5F, 0.5F);
             var beginningString = "Team ";
@@ -145,8 +154,8 @@ public class LasertagHudOverlay implements HudRenderCallback {
             var widthOfBeginningString = renderer.getWidth(beginningString);
             var widthOfBeginningAndName = renderer.getWidth(beginningAndNameString);
             var widthOfWholeString = renderer.getWidth(wholeString);
-            var textStartX = renderData.wMid - (widthOfWholeString / 2);
-            var textY = renderData.hMid + 10;
+            var textStartX = wMid - (widthOfWholeString / 2);
+            var textY = hMid + 10;
 
             renderer.draw(matrices, beginningString, textStartX, textY, textColor);
             renderer.draw(matrices, winnerTeam.name(), textStartX + widthOfBeginningString, textY, winnerTeam.color().getValue());

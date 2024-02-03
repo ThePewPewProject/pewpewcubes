@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.command.CommandFeedback;
 import de.kleiner3.lasertag.command.ServerFeedbackCommand;
 import de.kleiner3.lasertag.command.suggestions.TeamSuggestionProvider;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -25,6 +24,13 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class JoinLasertagTeamCommand extends ServerFeedbackCommand {
     @Override
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+
+        // Get the game managers
+        var gameManager = context.getSource().getWorld().getServerLasertagManager();
+        var teamsManager = gameManager.getTeamsManager();
+        var syncedState = gameManager.getSyncedState();
+        var teamsConfigState = syncedState.getTeamsConfigState();
+
         // Get the team
         var teamName = StringArgumentType.getString(context, "team");
 
@@ -35,15 +41,15 @@ public class JoinLasertagTeamCommand extends ServerFeedbackCommand {
         var player = context.getSource().getPlayer();
 
         // Get team
-        var teamDto = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().teamConfig.get(teamName);
+        var teamDto = teamsConfigState.getTeamOfName(teamName);
 
         // If team was not found
-        if (teamDto == null) {
+        if (teamDto.isEmpty()) {
             return Optional.of(new CommandFeedback(Text.literal("That team does not exist.").formatted(Formatting.RED), false, false));
         }
 
         // Join team
-        var joinSucceeded = LasertagGameManager.getInstance().getTeamManager().playerJoinTeam(server.getOverworld(), teamDto, player);
+        var joinSucceeded = teamsManager.playerJoinTeam(player, teamDto.get());
 
         // If join did not succeed
         if (!joinSucceeded) {

@@ -3,10 +3,9 @@ package de.kleiner3.lasertag.block;
 import de.kleiner3.lasertag.block.entity.LasertagFlagBlockEntity;
 import de.kleiner3.lasertag.entity.Entities;
 import de.kleiner3.lasertag.item.Items;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.gamemode.implementation.CaptureTheFlagGameMode;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
-import de.kleiner3.lasertag.lasertaggame.management.settings.valuetypes.CTFFlagHoldingPlayerVisibility;
+import de.kleiner3.lasertag.lasertaggame.gamemode.implementation.CaptureTheFlagGameMode;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.settings.valuetypes.CTFFlagHoldingPlayerVisibility;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import net.minecraft.block.Blocks;
@@ -62,10 +61,12 @@ public class LasertagFlagBlock extends Block implements BlockEntityProvider {
         }
 
         // Get the managers
-        var gameManager = LasertagGameManager.getInstance();
-        var flagManager = gameManager.getFlagManager();
-        var teamManager = gameManager.getTeamManager();
+        var gameManager = serverWorld.getServerLasertagManager();
+        var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
+        var teamsManager = gameManager.getTeamsManager();
         var settingsManager = gameManager.getSettingsManager();
+        var syncedState = gameManager.getSyncedState();
+        var teamsConfigState = syncedState.getTeamsConfigState();
 
         // Get the stack the player is holding
         var handStack = player.getStackInHand(hand);
@@ -76,7 +77,7 @@ public class LasertagFlagBlock extends Block implements BlockEntityProvider {
         }
 
         // Get the team of the flag the player is currently holding
-        var teamOptional = flagManager.getPlayerHoldingFlagTeam(player.getUuid());
+        var teamOptional = captureTheFlagManager.getPlayerHoldingFlagTeam(player.getUuid());
 
         // If player is currently not holding a flag
         if (teamOptional.isEmpty()) {
@@ -91,7 +92,7 @@ public class LasertagFlagBlock extends Block implements BlockEntityProvider {
         }
 
         // Get the team of the flag
-        var flagTeamOptional = teamManager.getTeamConfigManager().getTeamOfName(flagBlockEntity.getTeamName());
+        var flagTeamOptional = teamsConfigState.getTeamOfName(flagBlockEntity.getTeamName());
 
         // If flag has no team
         if (flagTeamOptional.isEmpty()) {
@@ -99,7 +100,7 @@ public class LasertagFlagBlock extends Block implements BlockEntityProvider {
         }
 
         // Get the team of the player
-        var playersTeam = teamManager.getTeamOfPlayer(player.getUuid());
+        var playersTeam = teamsManager.getTeamOfPlayer(player.getUuid());
 
         // If player has no team
         if (playersTeam.isEmpty()) {
@@ -112,7 +113,7 @@ public class LasertagFlagBlock extends Block implements BlockEntityProvider {
         }
 
         // Capture flag of team
-        flagManager.flagCaptured(serverWorld, teamOptional.get(), player.getUuid());
+        captureTheFlagManager.flagCaptured(player.getUuid(), teamOptional.get());
 
         // Take flag away from player
         handStack.decrement(1);
@@ -135,6 +136,16 @@ public class LasertagFlagBlock extends Block implements BlockEntityProvider {
         // If is on server
         if (!world.isClient) {
 
+            // Cast world to server world
+            var serverWorld = (ServerWorld) world;
+
+            // Get the game managers
+            var gameManager = serverWorld.getServerLasertagManager();
+            var teamsManager = gameManager.getTeamsManager();
+            var syncedState = gameManager.getSyncedState();
+            var teamsConfigState = syncedState.getTeamsConfigState();
+            var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
+
             // Get the block entity
             var blockEntity = world.getBlockEntity(pos);
 
@@ -149,11 +160,8 @@ public class LasertagFlagBlock extends Block implements BlockEntityProvider {
             // Give the player the flag
             this.givePlayerTheFlag(teamName, player);
 
-            // Get the manager
-            var gameManager = LasertagGameManager.getInstance();
-
             // Get the team
-            var teamOptional = gameManager.getTeamManager().getTeamConfigManager().getTeamOfName(teamName);
+            var teamOptional = teamsConfigState.getTeamOfName(teamName);
 
             teamOptional.ifPresent(team -> {
 
@@ -166,7 +174,7 @@ public class LasertagFlagBlock extends Block implements BlockEntityProvider {
                 }
 
                 // Set player picked up flag
-                gameManager.getFlagManager().playerPickedUpFlag((ServerWorld)world, (ServerPlayerEntity) player, team);
+                captureTheFlagManager.playerPickupFlag((ServerPlayerEntity) player, team);
 
                 // Remove all other flags of that team
                 ctfGameMode.removeFlags((ServerWorld) world, team);

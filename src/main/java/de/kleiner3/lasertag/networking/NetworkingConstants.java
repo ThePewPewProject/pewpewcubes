@@ -19,7 +19,7 @@ public class NetworkingConstants {
     public static final Identifier TEAM_UPDATE = new Identifier(LasertagMod.ID, "team_update");
     public static final Identifier SETTING_CHANGED = new Identifier(LasertagMod.ID, "setting_changed");
     public static final Identifier SETTINGS_CHANGED = new Identifier(LasertagMod.ID, "settings_changed");
-    public static final Identifier GAME_MANAGER_SYNC = new Identifier(LasertagMod.ID, "game_manager_sync");
+    public static final Identifier STATE_SYNC = new Identifier(LasertagMod.ID, "state_sync");
     public static final Identifier PLAYER_DEACTIVATED_STATUS_CHANGED = new Identifier(LasertagMod.ID, "player_deactivated_status_changed");
     public static final Identifier GAME_STATISTICS = new Identifier(LasertagMod.ID, "game_statistics");
     public static final Identifier MAP_LOADING_EVENT = new Identifier(LasertagMod.ID, "map_loading");
@@ -33,7 +33,6 @@ public class NetworkingConstants {
     public static final Identifier PLAY_PLAYER_DEACTIVATED_SOUND = new Identifier(LasertagMod.ID, "play_player_deactivated_sound");
     public static final Identifier PLAY_PLAYER_ACTIVATED_SOUND = new Identifier(LasertagMod.ID, "play_player_activated_sound");
     public static final Identifier GAME_STARTED = new Identifier(LasertagMod.ID, "game_started");
-    public static final Identifier GAME_START_ABORTED = new Identifier(LasertagMod.ID, "game_start_aborted");
     public static final Identifier GAME_OVER = new Identifier(LasertagMod.ID, "game_over");
     public static final Identifier PROGRESS = new Identifier(LasertagMod.ID, "progress");
     public static final Identifier SCORE_RESET = new Identifier(LasertagMod.ID, "score_reset");

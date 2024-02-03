@@ -20,6 +20,6 @@ public abstract class WorldMixin {
             return;
         }
 
-        ((World)(Object)this).getServer().getLasertagServerManager().getBlockTickManager().tick();
+        ((World)(Object)this).getServer().getOverworld().getServerLasertagManager().getBlockTickManager().tick();
     }
 }

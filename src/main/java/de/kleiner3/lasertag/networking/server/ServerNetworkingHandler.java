@@ -3,7 +3,6 @@ package de.kleiner3.lasertag.networking.server;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.callbacks.*;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import org.apache.logging.log4j.core.jmx.Server;
 
 /**
  * Class to handle all networking on the server

@@ -6,8 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.command.CommandFeedback;
 import de.kleiner3.lasertag.command.ServerFeedbackCommand;
 import de.kleiner3.lasertag.command.suggestions.LasertagGameModeSuggestionProvider;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.gamemode.GameModes;
+import de.kleiner3.lasertag.lasertaggame.gamemode.GameModes;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -27,6 +26,10 @@ public class LasertagGameModeCommand extends ServerFeedbackCommand {
     @Override
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
 
+        // Get the game managers
+        var gameManager = context.getSource().getWorld().getServerLasertagManager();
+        var gameModeManager = gameManager.getGameModeManager();
+
         // Get the game mode translatable name
         var gameModeTranslatableName = StringArgumentType.getString(context, "gamemode");
 
@@ -42,7 +45,7 @@ public class LasertagGameModeCommand extends ServerFeedbackCommand {
         }
 
         // Set the game mode
-        LasertagGameManager.getInstance().getGameModeManager().setGameMode(server, newGameMode);
+        gameModeManager.setGameMode(newGameMode);
 
         // Translate the game mode name
         var translatedGameModeName = Text.translatable(gameModeTranslatableName).getString();

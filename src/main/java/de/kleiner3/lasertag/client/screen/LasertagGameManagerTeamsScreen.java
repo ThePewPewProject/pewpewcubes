@@ -2,11 +2,11 @@ package de.kleiner3.lasertag.client.screen;
 
 import de.kleiner3.lasertag.client.screen.widget.*;
 import de.kleiner3.lasertag.common.types.Tuple;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.team.TeamDto;
+import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -92,7 +92,12 @@ public class LasertagGameManagerTeamsScreen extends GameManagerScreen {
      * @return The cell template
      */
     private Drawable getPlayerNameColumn(ListCell<Tuple<TeamDto, UUID>> desc) {
-        var playerName = LasertagGameManager.getInstance().getPlayerManager().getPlayerUsername(desc.value().y());
+
+        // Get the game managers
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var playerUsernamesState = gameManager.getSyncedState().getPlayerNamesState();
+
+        var playerName = playerUsernamesState.getPlayerUsername(desc.value().y());
         var startY = desc.y() + (desc.height() / 2) - (this.textRenderer.fontHeight / 2);
         var networkPlayer = this.client.getNetworkHandler().getPlayerListEntry(desc.value().y());
         var playerColor = networkPlayer != null ? 0xFFFFFFFF : 0xFF808080;
@@ -126,14 +131,22 @@ public class LasertagGameManagerTeamsScreen extends GameManagerScreen {
      * @return The teams and players
      */
     private List<Tuple<TeamDto, UUID>> getPlayers() {
+
+        // Get the game managers
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var playerNamesState = gameManager.getSyncedState().getPlayerNamesState();
+        var teamsManager = gameManager.getTeamsManager();
+        var teamsConfigState = gameManager.getSyncedState().getTeamsConfigState();
+
         var players = new ArrayList<Tuple<TeamDto, UUID>>();
 
-        LasertagGameManager.getInstance().getPlayerManager().forEachPlayer(playerUuid -> {
+        playerNamesState.forEachPlayer(playerUuid -> {
 
-            var teamOptional = LasertagGameManager.getInstance().getTeamManager().getTeamOfPlayer(playerUuid);
+            var teamIdOptional = teamsManager.getTeamOfPlayer(playerUuid);
             TeamDto team = null;
-            if (teamOptional.isPresent()) {
-                team = teamOptional.get();
+            if (teamIdOptional.isPresent()) {
+                var teamId = teamIdOptional.get();
+                team = teamsConfigState.getTeamOfId(teamId).orElseThrow();
             }
             players.add(new Tuple<>(team, playerUuid));
         });

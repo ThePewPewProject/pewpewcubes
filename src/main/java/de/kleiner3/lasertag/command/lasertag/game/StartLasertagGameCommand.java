@@ -26,7 +26,11 @@ public class StartLasertagGameCommand extends ServerFeedbackCommand {
 
     @Override
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
-        var abortReasons = context.getSource().getServer().getLasertagServerManager().startGame(scanSpawnpoints);
+
+        // Get the game managers
+        var gameManager = context.getSource().getWorld().getServerLasertagManager();
+
+        var abortReasons = gameManager.startGame(scanSpawnpoints);
 
         // If start game got aborted
         return abortReasons.map(s -> new CommandFeedback(Text.literal("Start game aborted. Reasons:\n" + s).formatted(Formatting.RED), false, true));

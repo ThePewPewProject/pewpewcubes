@@ -1,7 +1,6 @@
 package de.kleiner3.lasertag.networking.server.callbacks;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
@@ -20,9 +19,13 @@ public class ClientTriggerPlayerKickCallback implements ServerPlayNetworking.Pla
 
         try {
 
+            // Get the game managers
+            var gameManager = server.getOverworld().getServerLasertagManager();
+            var teamsManager = gameManager.getTeamsManager();
+
             var playerUuid = buf.readUuid();
 
-            LasertagGameManager.getInstance().getTeamManager().playerLeaveHisTeam(server.getOverworld(), playerUuid);
+            teamsManager.playerLeaveHisTeam(playerUuid);
 
             // Try to get the player from the player manager
             var player = server.getPlayerManager().getPlayer(playerUuid);

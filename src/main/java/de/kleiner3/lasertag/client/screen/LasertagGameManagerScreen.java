@@ -1,7 +1,6 @@
 package de.kleiner3.lasertag.client.screen;
 
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.gamemode.GameModes;
+import de.kleiner3.lasertag.lasertaggame.gamemode.GameModes;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -26,17 +25,26 @@ public class LasertagGameManagerScreen extends GameManagerScreen {
     }
 
     public void reloadGameMode() {
-        this.gameModeButton.setValue(LasertagGameManager.getInstance().getGameModeManager().getGameMode().getTranslatableName());
+
+        // Get the game managers
+        var gameManager = client.world.getClientLasertagManager();
+        var gameModeManager = gameManager.getGameModeManager();
+
+        this.gameModeButton.setValue(gameModeManager.getGameMode().getTranslatableName());
     }
 
     @Override
     protected void init() {
         super.init();
 
+        // Get the game managers
+        var gameManager = client.world.getClientLasertagManager();
+        var gameModeManager = gameManager.getGameModeManager();
+
         this.gameModeButton = this.addListedWidget((x, y, width, height) -> CyclingButtonWidget
                 .builder(this::getGameModeText)
                 .values(GameModes.GAME_MODES.keySet())
-                .initially(LasertagGameManager.getInstance().getGameModeManager().getGameMode().getTranslatableName())
+                .initially(gameModeManager.getGameMode().getTranslatableName())
                 .build(x, y, width, height, Text.translatable("gui.game_manager.game_mode_button"),
                 (button, gameModeTranslatableName) -> {
 

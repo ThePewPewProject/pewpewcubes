@@ -4,7 +4,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.kleiner3.lasertag.command.CommandFeedback;
 import de.kleiner3.lasertag.command.ServerFeedbackCommand;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -19,6 +18,11 @@ import static net.minecraft.server.command.CommandManager.literal;
  */
 public class LeaveLasertagTeamCommand extends ServerFeedbackCommand {
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+
+        // Get the game managers
+        var gameManager = context.getSource().getWorld().getServerLasertagManager();
+        var teamsManager = gameManager.getTeamsManager();
+
         // Get the server
         var server = context.getSource().getServer();
 
@@ -26,7 +30,7 @@ public class LeaveLasertagTeamCommand extends ServerFeedbackCommand {
         var player = context.getSource().getPlayer();
 
         // Leave team
-        LasertagGameManager.getInstance().getTeamManager().playerLeaveHisTeam(server.getOverworld(), player);
+        teamsManager.playerLeaveHisTeam(player);
 
         // Clear inventory
         player.getInventory().clear();

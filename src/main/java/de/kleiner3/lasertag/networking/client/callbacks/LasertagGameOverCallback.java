@@ -1,7 +1,6 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -19,10 +18,13 @@ public class LasertagGameOverCallback implements ClientPlayNetworking.PlayChanne
 
         try {
 
-            var hudRenderManager = LasertagGameManager.getInstance().getHudRenderManager();
-            hudRenderManager.stopGameTimer();
-            hudRenderManager.shouldRenderNameTags = true;
-            hudRenderManager.isGameRunning = false;
+            // Get the game managers
+            var gameManager = client.world.getClientLasertagManager();
+            var uiManager = gameManager.getUIStateManager();
+            var uiState = gameManager.getSyncedState().getUIState();
+
+            uiManager.stopGameTimer();
+            uiState.isGameRunning = false;
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in LasertagGameOverCallback", ex);
             throw ex;

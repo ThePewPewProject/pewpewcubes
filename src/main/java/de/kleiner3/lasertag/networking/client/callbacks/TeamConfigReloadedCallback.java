@@ -2,8 +2,6 @@ package de.kleiner3.lasertag.networking.client.callbacks;
 
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.client.screen.LasertagTeamSelectorScreen;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.team.LasertagTeamManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -21,12 +19,14 @@ public class TeamConfigReloadedCallback implements ClientPlayNetworking.PlayChan
 
         try {
 
+            // Get the game managers
+            var gameManager = client.world.getClientLasertagManager();
+            var teamConfigState = gameManager.getSyncedState().getTeamsConfigState();
+
             var jsonString = buf.readString();
 
-            // Deserialize team config
-            var teamConfig = LasertagTeamManager.fromJson(jsonString);
-
-            LasertagGameManager.getInstance().setTeamConfig(teamConfig);
+            // Deserialize and set team config
+            teamConfigState.setTeamConfig(jsonString);
 
             if (client.currentScreen instanceof LasertagTeamSelectorScreen lasertagTeamSelectorScreen) {
                 lasertagTeamSelectorScreen.resetList();

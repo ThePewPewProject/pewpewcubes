@@ -1,21 +1,26 @@
 package de.kleiner3.lasertag.item;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.LaserTargetBlock;
 import de.kleiner3.lasertag.client.SoundEvents;
 import de.kleiner3.lasertag.common.util.RaycastUtil;
 import de.kleiner3.lasertag.common.util.ThreadUtil;
 import de.kleiner3.lasertag.entity.LaserRayEntity;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.RangedWeaponItem;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -56,100 +61,166 @@ public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable 
 
     @Override
     public int getRange() {
-        return Math.toIntExact(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.WEAPON_REACH));
+        return 0;
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
+
+        LasertagMod.LOGGER.info("Player '" + playerEntity.getDisplayName().getString() + "' is using the weapon.");
+
+        if (world.isClient) {
+            return useClient(world, playerEntity, hand);
+        } else {
+            return useServer((ServerWorld)world, (ServerPlayerEntity)playerEntity, hand);
+        }
+    }
+
+
+    private TypedActionResult<ItemStack> useServer(ServerWorld world, ServerPlayerEntity playerEntity, Hand hand) {
+
+        // Get the game managers
+        var gameManager = world.getServerLasertagManager();
+        var settingsManager = gameManager.getSettingsManager();
+        var activationManager = gameManager.getActivationManager();
+        var teamsManager = gameManager.getTeamsManager();
+
         // Apply cooldown
-        playerEntity.getItemCooldownManager().set(this, Math.toIntExact(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.WEAPON_COOLDOWN)));
+        playerEntity.getItemCooldownManager().set(this, Math.toIntExact(settingsManager.<Long>get(SettingDescription.WEAPON_COOLDOWN)));
 
         // Get the item stack
         var laserweaponStack = playerEntity.getStackInHand(hand);
 
         // Check that player is active
-        if (LasertagGameManager.getInstance().getDeactivatedManager().isDeactivated(playerEntity.getUuid())) {
-            if (!world.isClient) {
-                world.playSound(null, playerEntity.getBlockPos(), net.minecraft.sound.SoundEvents.BLOCK_BAMBOO_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-            }
+        if (activationManager.isDeactivated(playerEntity.getUuid())) {
+            LasertagMod.LOGGER.info("[Server, " + playerEntity.getDisplayName().getString() + "] Weapon fail. Deactivated.");
+            world.playSound(null, playerEntity.getBlockPos(), net.minecraft.sound.SoundEvents.BLOCK_BAMBOO_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
             return TypedActionResult.fail(laserweaponStack);
         }
 
         // Get the players team
-        var team = LasertagGameManager.getInstance().getTeamManager().getTeamOfPlayer(playerEntity.getUuid());
+        var team = teamsManager.getTeamOfPlayer(playerEntity.getUuid());
 
         if (team.isEmpty()) {
-            if (!world.isClient) {
-                world.playSound(null, playerEntity.getBlockPos(), net.minecraft.sound.SoundEvents.BLOCK_BAMBOO_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-            }
+            LasertagMod.LOGGER.info("[Server, " + playerEntity.getDisplayName().getString() + "] Weapon fail. Not in team.");
+            world.playSound(null, playerEntity.getBlockPos(), net.minecraft.sound.SoundEvents.BLOCK_BAMBOO_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
             return TypedActionResult.fail(laserweaponStack);
         }
 
-        fireWeapon(world, playerEntity, team.get().color().getValue());
+        fireWeaponServer(world, playerEntity, team.get().color().getValue());
         return TypedActionResult.pass(laserweaponStack);
     }
 
-    private void fireWeapon(World world, PlayerEntity playerEntity, int color) {
-        if (!world.isClient) {
-            world.playSound(null, playerEntity.getBlockPos(), SoundEvents.LASERWEAPON_FIRE_SOUND_EVENT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+    @Environment(EnvType.CLIENT)
+    private TypedActionResult<ItemStack> useClient(World world, PlayerEntity playerEntity, Hand hand) {
+
+        // Cast
+        var clientWorld = (ClientWorld)world;
+
+        // Get the game managers
+        var gameManager = clientWorld.getClientLasertagManager();
+        var settingsManager = gameManager.getSettingsManager();
+        var activationManager = gameManager.getActivationManager();
+        var teamsManager = gameManager.getTeamsManager();
+        var teamsConfigState = gameManager.getSyncedState().getTeamsConfigState();
+
+        // Apply cooldown
+        playerEntity.getItemCooldownManager().set(this, Math.toIntExact(settingsManager.<Long>get(SettingDescription.WEAPON_COOLDOWN)));
+
+        // Get the item stack
+        var laserweaponStack = playerEntity.getStackInHand(hand);
+
+        // Check that player is active
+        if (activationManager.isDeactivated(playerEntity.getUuid())) {
+            LasertagMod.LOGGER.info("[Client, " + playerEntity.getDisplayName().getString() + "] Weapon fail. Deactivated.");
+            return TypedActionResult.fail(laserweaponStack);
         }
+
+        // Get the players team
+        var team = teamsManager.getTeamOfPlayer(playerEntity.getUuid());
+
+        if (team.isEmpty()) {
+            LasertagMod.LOGGER.info("[Client, " + playerEntity.getDisplayName().getString() + "] Weapon fail. Not in team.");
+            return TypedActionResult.fail(laserweaponStack);
+        }
+
+        fireWeaponClient(clientWorld, playerEntity);
+        return TypedActionResult.pass(laserweaponStack);
+    }
+
+    private void fireWeaponServer(ServerWorld world, ServerPlayerEntity player, int color) {
+
+        // Get the game managers
+        var gameManager = world.getServerLasertagManager();
+        var settingsManager = gameManager.getSettingsManager();
+
+        world.playSound(null, player.getBlockPos(), SoundEvents.LASERWEAPON_FIRE_SOUND_EVENT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
         // Raycast the crosshair
-        HitResult hit = RaycastUtil.raycastCrosshair(playerEntity, getRange());
-
-        if (world.isClient) {
-            switch (hit.getType()) {
-                // If a block was hit
-                case BLOCK -> {
-                    // Cast to BlockHitResult
-                    BlockHitResult blockHit = (BlockHitResult) hit;
-
-                    // Get the block pos of the hit block
-                    BlockPos blockPos = blockHit.getBlockPos();
-
-                    // Get the hit block
-                    BlockState blockState = world.getBlockState(blockPos);
-                    net.minecraft.block.Block block = blockState.getBlock();
-
-                    // If hit block is not a lasertarget block
-                    if (!(block instanceof LaserTargetBlock laserTarget)) {
-                        break;
-                    }
-                    sendHitLasertarget(playerEntity, blockPos);
-                }
-                case ENTITY -> {
-                    // Cast to EntityHitResult
-                    EntityHitResult entityHit = (EntityHitResult) hit;
-
-                    // Get hit entity
-                    Entity hitEntity = entityHit.getEntity();
-
-                    // Check that hit entity is a player
-                    if (!(hitEntity instanceof PlayerEntity hitPlayer)) {
-                        break;
-                    }
-
-                    // Cast to player and trigger onHit
-                    sendHitPlayer(playerEntity, hitPlayer);
-                }
-                default -> {
-                }
-            }
-            return;
-        }
+        HitResult hit = RaycastUtil.raycastCrosshair(player, Math.toIntExact(settingsManager.<Long>get(SettingDescription.WEAPON_REACH)));
 
         // Spawn laser ray entity
-        if (LasertagGameManager.getInstance().getSettingsManager().<Boolean>get(SettingDescription.SHOW_LASER_RAYS)) {
-            LaserRayEntity ray = new LaserRayEntity(world, playerEntity, color, hit);
+        if (settingsManager.<Boolean>get(SettingDescription.SHOW_LASER_RAYS)) {
+            LaserRayEntity ray = new LaserRayEntity(world, player, color, hit);
             world.spawnEntity(ray);
 
             // Despawn ray after 50ms
-            var despawnThread = ThreadUtil.createScheduledExecutor("lasertag-laserray-despawn-thread-%d");
+            var despawnThread = ThreadUtil.createScheduledExecutor("server-lasertag-laserray-despawn-thread-%d");
             despawnThread.schedule(() -> {
                 world.getServer().execute(ray::discard);
 
                 despawnThread.shutdownNow();
             }, 50, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    @Environment(EnvType.CLIENT)
+    private void fireWeaponClient(ClientWorld world, PlayerEntity playerEntity) {
+
+        // Get the game managers
+        var gameManager = world.getClientLasertagManager();
+        var settingsManager = gameManager.getSettingsManager();
+
+        // Raycast the crosshair
+        HitResult hit = RaycastUtil.raycastCrosshair(playerEntity, Math.toIntExact(settingsManager.<Long>get(SettingDescription.WEAPON_REACH)));
+
+        switch (hit.getType()) {
+            // If a block was hit
+            case BLOCK -> {
+                // Cast to BlockHitResult
+                BlockHitResult blockHit = (BlockHitResult) hit;
+
+                // Get the block pos of the hit block
+                BlockPos blockPos = blockHit.getBlockPos();
+
+                // Get the hit block
+                BlockState blockState = world.getBlockState(blockPos);
+                net.minecraft.block.Block block = blockState.getBlock();
+
+                // If hit block is not a lasertarget block
+                if (!(block instanceof LaserTargetBlock laserTarget)) {
+                    break;
+                }
+                sendHitLasertarget(playerEntity, blockPos);
+            }
+            case ENTITY -> {
+                // Cast to EntityHitResult
+                EntityHitResult entityHit = (EntityHitResult) hit;
+
+                // Get hit entity
+                Entity hitEntity = entityHit.getEntity();
+
+                // Check that hit entity is a player
+                if (!(hitEntity instanceof PlayerEntity hitPlayer)) {
+                    break;
+                }
+
+                // Cast to player and trigger onHit
+                sendHitPlayer(playerEntity, hitPlayer);
+            }
+            default -> {
+                LasertagMod.LOGGER.info("[Client, " + playerEntity.getDisplayName().getString() + "] Nothing hit.");
+            }
         }
     }
 

@@ -5,7 +5,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.concurrent.CompletableFuture;
@@ -31,6 +30,13 @@ public class TeamSuggestionProvider implements SuggestionProvider<ServerCommandS
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) {
+
+        // Get the game managers
+        var gameManager = context.getSource().getWorld().getServerLasertagManager();
+        var teamsManager = gameManager.getTeamsManager();
+        var syncedState = gameManager.getSyncedState();
+        var teamsConfigState = syncedState.getTeamsConfigState();
+
         boolean inputEmpty = false;
         // Try to get current input
         String input = null;
@@ -40,9 +46,9 @@ public class TeamSuggestionProvider implements SuggestionProvider<ServerCommandS
             inputEmpty = true;
         }
 
-        for (String color :  LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager().teamConfig.keySet()) {
-            if (inputEmpty || color.toLowerCase().startsWith(input.toLowerCase())) {
-                builder.suggest(color);
+        for (var team :  teamsConfigState.getTeams()) {
+            if (inputEmpty || team.name().toLowerCase().startsWith(input.toLowerCase())) {
+                builder.suggest(team.name());
             }
         }
 

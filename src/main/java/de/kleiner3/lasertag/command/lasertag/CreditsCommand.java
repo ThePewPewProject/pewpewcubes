@@ -25,7 +25,7 @@ public class CreditsCommand {
         }
 
         // Workaround: setScreen(null) in ChatScreen gets triggered after command execution
-        var delayThread = ThreadUtil.createScheduledExecutor("lasertag-creditsscreen-delay-thread-%d");
+        var delayThread = ThreadUtil.createScheduledExecutor("client-lasertag-creditsscreen-delay-thread-%d");
         delayThread.schedule(() -> {
             client.execute(() -> client.setScreen(new LasertagCreditsScreen()));
 

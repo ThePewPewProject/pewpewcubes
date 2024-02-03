@@ -13,6 +13,7 @@
     "RespawnAnchorBlockMixin",
     "ServerPlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin",
+    "ServerWorldMixin",
     "SlotMixin",
     "WorldMixin",
     "WorldPresetsMixin",
@@ -21,6 +22,7 @@
   "client": [
     "ClientPlayerEntityMixin",
     "ClientPlayNetworkHandlerMixin",
+    "ClientWorldMixin",
     "DeathScreenMixin",
     "EntityRendererMixin",
     "GameRendererMixin",

@@ -19,10 +19,14 @@ public class ClientTriggerLoadPresetCallback implements ServerPlayNetworking.Pla
 
         try {
 
+            // Get the game managers
+            var gameManager = server.getOverworld().getServerLasertagManager();
+            var settingsPresetsManager = gameManager.getSettingsPresetsManager();
+
             // Get the preset name
             var presetName = buf.readString();
 
-            server.getLasertagServerManager().getSettingsPresetsManager().loadPreset(presetName, server);
+            settingsPresetsManager.loadPreset(presetName);
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in ClientTriggerLoadPresetCallback", ex);
             throw ex;

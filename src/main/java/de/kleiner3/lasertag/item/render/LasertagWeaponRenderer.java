@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import de.kleiner3.lasertag.item.LasertagWeaponItem;
 import de.kleiner3.lasertag.item.model.LasertagWeaponLightsModel;
 import de.kleiner3.lasertag.item.model.LasertagWeaponModel;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -52,10 +52,20 @@ public class LasertagWeaponRenderer extends GeoItemRenderer<LasertagWeaponItem> 
 
         // If player is activated
         if (entity instanceof PlayerEntity) {
-            boolean isDeactivated = LasertagGameManager.getInstance().getDeactivatedManager().isDeactivated(entity.getUuid());
+
+            // Get the game managers
+            var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+            var activationManager = gameManager.getActivationManager();
+            var teamsManager = gameManager.getTeamsManager();
+            var teamsConfigState = gameManager.getSyncedState().getTeamsConfigState();
+
+            boolean isDeactivated = activationManager.isDeactivated(entity.getUuid());
 
             if (!isDeactivated) {
-                LasertagGameManager.getInstance().getTeamManager().getTeamOfPlayer(entity.getUuid()).ifPresent(team -> {
+                teamsManager.getTeamOfPlayer(entity.getUuid()).ifPresent(teamId -> {
+
+                    var team = teamsConfigState.getTeamOfId(teamId).orElseThrow();
+
                     var color = team.color();
 
                     r.set(color.r() / 255.0F);

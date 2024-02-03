@@ -4,8 +4,8 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import de.kleiner3.lasertag.command.suggestions.EnumSettingSuggestionProvider;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDataType;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDataType;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import net.minecraft.server.command.ServerCommandSource;
 
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;

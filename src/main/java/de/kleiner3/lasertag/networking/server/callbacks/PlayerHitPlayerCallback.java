@@ -19,10 +19,13 @@ public class PlayerHitPlayerCallback implements ServerPlayNetworking.PlayChannel
 
         try {
 
+            // Get the game managers
+            var gameManager = server.getOverworld().getServerLasertagManager();
+
             var playerUuid = buf.readUuid();
             var targetUuid = buf.readUuid();
 
-            server.getLasertagServerManager().playerHitPlayer(playerUuid, targetUuid);
+            gameManager.playerHitPlayer(playerUuid, targetUuid);
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in PlayerHitPlayerCallback", ex);
             throw ex;

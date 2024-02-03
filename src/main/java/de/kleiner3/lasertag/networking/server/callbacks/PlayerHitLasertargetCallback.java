@@ -20,6 +20,9 @@ public class PlayerHitLasertargetCallback implements ServerPlayNetworking.PlayCh
 
         try {
 
+            // Get the game managers
+            var gameManager = server.getOverworld().getServerLasertagManager();
+
             var playerUuid = buf.readUuid();
 
             var targetX = buf.readDouble();
@@ -28,7 +31,7 @@ public class PlayerHitLasertargetCallback implements ServerPlayNetworking.PlayCh
 
             var targetPos = new BlockPos(targetX, targetY, targetZ);
 
-            server.getLasertagServerManager().playerHitLasertarget(playerUuid, targetPos);
+            gameManager.playerHitLasertarget(playerUuid, targetPos);
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in PlayerHitLasertargetCallback", ex);
             throw ex;

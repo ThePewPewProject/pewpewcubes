@@ -1,8 +1,7 @@
 package de.kleiner3.lasertag.networking.client.callbacks;
 
 import de.kleiner3.lasertag.LasertagMod;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -20,14 +19,16 @@ public class LasertagGameStartedCallback implements ClientPlayNetworking.PlayCha
 
         try {
 
-            var renderData = LasertagGameManager.getInstance().getHudRenderManager();
+            // Get the gameManagers
+            var gameManager = client.world.getClientLasertagManager();
+            var uiManager = gameManager.getUIStateManager();
+            var settingsManager = gameManager.getSettingsManager();
+            var uiState = gameManager.getSyncedState().getUIState();
 
-            renderData.progress = 0.0;
-            renderData.shouldRenderNameTags = false;
-            renderData.isGameRunning = true;
+            uiState.isGameRunning = true;
 
             // Start pregame count down timer
-            renderData.startPreGameCountdownTimer(LasertagGameManager.getInstance().getSettingsManager().<Long>get(SettingDescription.PREGAME_DURATION));
+            uiManager.startPreGameCountdownTimer(settingsManager.<Long>get(SettingDescription.PREGAME_DURATION));
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in LasertagGameStartedCallback", ex);
             throw ex;

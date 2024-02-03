@@ -28,6 +28,10 @@ public class LoadMapCommand extends ServerFeedbackCommand {
     @Override
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
 
+        // Get the game managers
+        var gameManager = context.getSource().getWorld().getServerLasertagManager();
+        var arenaManager = gameManager.getArenaManager();
+
         var mapTranslatableName = StringArgumentType.getString(context, "map");
         var server = context.getSource().getServer();
 
@@ -50,7 +54,7 @@ public class LoadMapCommand extends ServerFeedbackCommand {
         }
 
         try {
-            server.getLasertagServerManager().getMapManager().loadMap(arenaTypeOptional.get(), proceduralTypeOptional.orElse(ProceduralArenaType.SMALL_2V2));
+            arenaManager.loadArena(arenaTypeOptional.get(), proceduralTypeOptional.orElse(ProceduralArenaType.SMALL_2V2));
         } catch (Exception e) {
             return Optional.of(new CommandFeedback(Text.literal("Unexpected error while loading map: " + e.getMessage()).formatted(Formatting.RED), false, false));
         }

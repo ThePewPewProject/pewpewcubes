@@ -1,7 +1,7 @@
 package de.kleiner3.lasertag.mixin;
 
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import org.spongepowered.asm.mixin.Final;
@@ -32,15 +32,15 @@ public abstract class DeathScreenMixin {
     private void onTick(CallbackInfo ci) {
 
         // Get the game managers
-        var gameManager = LasertagGameManager.getInstance();
-        var hudManager = gameManager.getHudRenderManager();
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var uiState = gameManager.getSyncedState().getUIState();
         var settingsManager = gameManager.getSettingsManager();
 
         // Get the respawn cooldown
         long respawnCooldownSeconds = 1;
 
         // If a game is currently running
-        if (hudManager.isGameRunning) {
+        if (uiState.isGameRunning) {
 
             // Use the setting
             respawnCooldownSeconds = settingsManager.get(SettingDescription.RESPAWN_PENALTY);

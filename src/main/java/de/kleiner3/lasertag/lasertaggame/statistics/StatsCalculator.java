@@ -2,9 +2,8 @@ package de.kleiner3.lasertag.lasertaggame.statistics;
 
 import de.kleiner3.lasertag.common.types.ScoreHolding;
 import de.kleiner3.lasertag.common.types.Tuple;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.players.LasertagPlayerNameManager;
-import de.kleiner3.lasertag.lasertaggame.management.team.TeamConfigManager;
+import de.kleiner3.lasertag.lasertaggame.state.management.server.IServerLasertagManager;
+import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,42 +16,51 @@ import java.util.HashMap;
  */
 public class StatsCalculator {
 
-    public static GameStats calcStats(LasertagPlayerNameManager playerManager, long gameTime) {
+    public static GameStats calcStats(IServerLasertagManager gameManager, long gameTime) {
 
-        // Get the managers
-        var gameManager = LasertagGameManager.getInstance();
-        var gameMode = gameManager.getGameModeManager().getGameMode();
+        // Get the game mangers
+        var syncedState = gameManager.getSyncedState();
+        var teamsConfig = syncedState.getTeamsConfigState();
+        var teamsManager = gameManager.getTeamsManager();
+        var playerNamesState = syncedState.getPlayerNamesState();
+        var gameModeManager = gameManager.getGameModeManager();
+
+        var gameMode = gameModeManager.getGameMode();
 
         // Init lists for sorting
         var playerScores = new ArrayList<Tuple<String, ScoreHolding>>();
         var teamScores = new ArrayList<Tuple<String, ScoreHolding>>();
         var teamPlayerScores = new HashMap<String, ArrayList<Tuple<String, ScoreHolding>>>();
 
-        for (var team : gameManager.getTeamManager().getTeamMap().entrySet()) {
+        for (var team : teamsConfig.getTeams()) {
 
-            var teamDto = team.getKey();
+            // Get the players of the team
+            var playerUuids = teamsManager.getPlayersOfTeam(team);
 
             // Skip spectators
-            if (teamDto.equals(TeamConfigManager.SPECTATORS)) {
+            if (team.equals(TeamsConfigState.SPECTATORS)) {
+                continue;
+            }
+
+            // Skip empty teams
+            if (playerUuids.isEmpty()) {
                 continue;
             }
 
             var playersOfThisTeam = new ArrayList<Tuple<String, ScoreHolding>>();
-            for (var playerUuid : team.getValue()) {
+            for (var playerUuid : playerUuids) {
 
-                var score = gameMode.getPlayerFinalScore(playerUuid);
-                var playerScoreTuple = new Tuple<>(playerManager.getPlayerUsername(playerUuid), score);
+                var score = gameMode.getPlayerFinalScore(playerUuid, gameManager);
+                var playerScoreTuple = new Tuple<>(playerNamesState.getPlayerUsername(playerUuid), score);
 
                 playerScores.add(playerScoreTuple);
                 playersOfThisTeam.add(playerScoreTuple);
             }
 
-            var teamScore = gameMode.getTeamFinalScore(teamDto);
+            var teamScore = gameMode.getTeamFinalScore(team, gameManager);
 
-            if (!playersOfThisTeam.isEmpty()) {
-                teamPlayerScores.put(teamDto.name(), playersOfThisTeam);
-                teamScores.add(new Tuple<>(teamDto.name(), teamScore));
-            }
+            teamPlayerScores.put(team.name(), playersOfThisTeam);
+            teamScores.add(new Tuple<>(team.name(), teamScore));
         }
 
         // Sort stats

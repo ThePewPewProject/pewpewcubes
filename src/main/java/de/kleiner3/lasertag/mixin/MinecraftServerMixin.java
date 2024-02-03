@@ -1,8 +1,5 @@
 package de.kleiner3.lasertag.mixin;
 
-import de.kleiner3.lasertag.lasertaggame.ILasertagServerManagerAccessor;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagServerManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.world.ServerWorld;
@@ -18,26 +15,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @author Étienne Muser
  */
 @Mixin(MinecraftServer.class)
-public abstract class MinecraftServerMixin implements ILasertagServerManagerAccessor {
-
-    private LasertagServerManager lasertagServerManager;
+public abstract class MinecraftServerMixin {
 
     @Shadow
     public abstract PlayerManager getPlayerManager();
 
     @Shadow
     public abstract ServerWorld getOverworld();
-
-    /**
-     * Inject into constructor of MinecraftServer
-     *
-     * @param ci The CallbackInfo
-     */
-    @Inject(method = "<init>", at = @At("TAIL"))
-    private void init(CallbackInfo ci) {
-
-        lasertagServerManager = new LasertagServerManager((MinecraftServer) (Object) this);
-    }
 
     /**
      * Inject into the stop method of the minecraft server.
@@ -48,15 +32,13 @@ public abstract class MinecraftServerMixin implements ILasertagServerManagerAcce
     @Inject(method = "shutdown", at = @At("HEAD"))
     private void atShutdown(CallbackInfo ci) {
 
+        // Get the game managers
+        var gameManager = getOverworld().getServerLasertagManager();
+
         // Stop the lasertag game
-        lasertagServerManager.stopLasertagGame();
+        gameManager.stopLasertagGame();
 
         // Dispose the game managers
-        LasertagGameManager.getInstance().dispose();
-    }
-
-    @Override
-    public LasertagServerManager getLasertagServerManager() {
-        return lasertagServerManager;
+        gameManager.dispose();
     }
 }

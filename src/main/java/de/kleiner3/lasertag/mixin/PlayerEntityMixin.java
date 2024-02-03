@@ -8,11 +8,14 @@ import de.kleiner3.lasertag.client.screen.ILasertagGameManagerScreenOpener;
 import de.kleiner3.lasertag.client.screen.ILasertagTeamSelectorScreenOpener;
 import de.kleiner3.lasertag.client.screen.ILasertagTeamZoneGeneratorScreenOpener;
 import de.kleiner3.lasertag.lasertaggame.ILasertagPlayer;
-import de.kleiner3.lasertag.lasertaggame.management.LasertagGameManager;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
@@ -33,19 +36,19 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer, ILasertagGam
     public void onDeactivated() {
 
         // Play deactivation sound
-        ServerEventSending.sendPlayerSoundEvent((ServerPlayerEntity)(Object)this, NetworkingConstants.PLAY_PLAYER_DEACTIVATED_SOUND);
+        ServerEventSending.sendPlayerSoundEvent((ServerPlayerEntity) (Object) this, NetworkingConstants.PLAY_PLAYER_DEACTIVATED_SOUND);
     }
 
     @Override
     public void onActivated() {
 
         // Play activation sound
-        ServerEventSending.sendPlayerSoundEvent((ServerPlayerEntity)(Object)this, NetworkingConstants.PLAY_PLAYER_ACTIVATED_SOUND);
+        ServerEventSending.sendPlayerSoundEvent((ServerPlayerEntity) (Object) this, NetworkingConstants.PLAY_PLAYER_ACTIVATED_SOUND);
     }
 
     @Override
     public String getLasertagUsername() {
-        return ((PlayerEntity)(Object)this).getDisplayName().getString();
+        return ((PlayerEntity) (Object) this).getDisplayName().getString();
     }
 
     @Override
@@ -69,19 +72,21 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer, ILasertagGam
     }
 
     /**
-     * Inject to allow player to break flag block even tho he is in adventure game mode
+     * Inject to allow player to break flag block even tho he is in adventure game mode.
+     * Is basically a copy of isBlockBreakingRestrictedServer.
      *
      * @param world
      * @param pos
      * @param gameMode
      * @param cir
      */
+    @Environment(EnvType.CLIENT)
     @Inject(method = "isBlockBreakingRestricted(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/GameMode;)Z", at = @At("HEAD"), cancellable = true)
-    private void isBlockBreakingRestricted(World world, BlockPos pos, GameMode gameMode, CallbackInfoReturnable<Boolean> cir) {
+    private void isBlockBreakingRestrictedClient(World world, BlockPos pos, GameMode gameMode, CallbackInfoReturnable<Boolean> cir) {
 
         // Use default logic if player is in spectator or creative game mode
         if (gameMode == GameMode.SPECTATOR ||
-            gameMode == GameMode.CREATIVE) {
+                gameMode == GameMode.CREATIVE) {
             return;
         }
 
@@ -102,9 +107,139 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer, ILasertagGam
             return;
         }
 
+        boolean holdingFlag = false;
+
+        if (world instanceof ServerWorld serverWorld) {
+
+            // Get the game managers
+            var gameManager = serverWorld.getServerLasertagManager();
+            var teamsManager = gameManager.getTeamsManager();
+            var syncedState = gameManager.getSyncedState();
+            var teamsConfigState = syncedState.getTeamsConfigState();
+            var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
+
+            // Get the team of the flag
+            var flagTeam = teamsConfigState.getTeamOfName(flagEntity.getTeamName());
+
+            // If flag has no team
+            if (flagTeam.isEmpty()) {
+                return;
+            }
+
+            // Get the team of the player
+            var playerTeam = teamsManager.getTeamOfPlayer(((PlayerEntity) (Object) this).getUuid());
+
+            // If player has no team
+            if (playerTeam.isEmpty()) {
+                return;
+            }
+
+            // If player tries to break his own flag
+            if (playerTeam.get().equals(flagTeam.get())) {
+                // Player can not break his own flag
+                cir.setReturnValue(true);
+                return;
+            }
+
+            // Get if player is already holding a flag
+            holdingFlag = captureTheFlagManager
+                    .getPlayerHoldingFlagTeam(((PlayerEntity) (Object) this).getUuid())
+                    .isPresent();
+        } else if (world instanceof ClientWorld clientWorld) {
+
+            // Get the game managers
+            var gameManager = clientWorld.getClientLasertagManager();
+            var teamsManager = gameManager.getTeamsManager();
+            var syncedState = gameManager.getSyncedState();
+            var teamsConfigState = syncedState.getTeamsConfigState();
+            var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
+
+            // Get the team of the flag
+            var flagTeam = teamsConfigState.getTeamOfName(flagEntity.getTeamName());
+
+            // If flag has no team
+            if (flagTeam.isEmpty()) {
+                return;
+            }
+
+            // Get the team of the player
+            var playerTeam = teamsManager.getTeamOfPlayer(((PlayerEntity) (Object) this).getUuid())
+                    .map(teamId -> teamsConfigState.getTeamOfId(teamId).orElseThrow());
+
+            // If player has no team
+            if (playerTeam.isEmpty()) {
+                return;
+            }
+
+            // If player tries to break his own flag
+            if (playerTeam.get().equals(flagTeam.get())) {
+                // Player can not break his own flag
+                cir.setReturnValue(true);
+                return;
+            }
+
+            // Get if player is already holding a flag
+            holdingFlag = captureTheFlagManager
+                    .getPlayerHoldingFlagTeam(((PlayerEntity) (Object) this).getUuid())
+                    .isPresent();
+        }
+
+        // Player is not restricted if he is not holding a flag
+        cir.setReturnValue(holdingFlag);
+    }
+
+    /**
+     * Inject to allow player to break flag block even tho he is in adventure game mode.
+     * Is basically a duplicate of isBlockBreakingRestrictedClient because on the server
+     * the class MinecraftClient does not exist.
+     *
+     * @param world
+     * @param pos
+     * @param gameMode
+     * @param cir
+     */
+    @Environment(EnvType.SERVER)
+    @Inject(method = "isBlockBreakingRestricted(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/GameMode;)Z", at = @At("HEAD"), cancellable = true)
+    private void isBlockBreakingRestrictedServer(World world, BlockPos pos, GameMode gameMode, CallbackInfoReturnable<Boolean> cir) {
+
+        // Use default logic if player is in spectator or creative game mode
+        if (gameMode == GameMode.SPECTATOR ||
+                gameMode == GameMode.CREATIVE) {
+            return;
+        }
+
+        // Get the block state
+        var blockState = world.getBlockState(pos);
+
+        // If the block is not a lasertag flag
+        if (!blockState.isOf(Blocks.LASERTAG_FLAG_BLOCK)) {
+
+            return;
+        }
+
+        // Get the block entity
+        var blockEntity = world.getBlockEntity(pos);
+
+        // If is not flag entity
+        if (!(blockEntity instanceof LasertagFlagBlockEntity flagEntity)) {
+            return;
+        }
+
+        boolean holdingFlag = false;
+
+        if (!(world instanceof ServerWorld serverWorld)) {
+            return;
+        }
+
+        // Get the game managers
+        var gameManager = serverWorld.getServerLasertagManager();
+        var teamsManager = gameManager.getTeamsManager();
+        var syncedState = gameManager.getSyncedState();
+        var teamsConfigState = syncedState.getTeamsConfigState();
+        var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
+
         // Get the team of the flag
-        var flagTeam = LasertagGameManager.getInstance().getTeamManager().getTeamConfigManager()
-                .getTeamOfName(flagEntity.getTeamName());
+        var flagTeam = teamsConfigState.getTeamOfName(flagEntity.getTeamName());
 
         // If flag has no team
         if (flagTeam.isEmpty()) {
@@ -112,7 +247,7 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer, ILasertagGam
         }
 
         // Get the team of the player
-        var playerTeam = LasertagGameManager.getInstance().getTeamManager().getTeamOfPlayer(((PlayerEntity)(Object)this).getUuid());
+        var playerTeam = teamsManager.getTeamOfPlayer(((PlayerEntity) (Object) this).getUuid());
 
         // If player has no team
         if (playerTeam.isEmpty()) {
@@ -127,8 +262,8 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer, ILasertagGam
         }
 
         // Get if player is already holding a flag
-        var holdingFlag = LasertagGameManager.getInstance().getFlagManager()
-                .getPlayerHoldingFlagTeam(((PlayerEntity)(Object)this).getUuid())
+        holdingFlag = captureTheFlagManager
+                .getPlayerHoldingFlagTeam(((PlayerEntity) (Object) this).getUuid())
                 .isPresent();
 
         // Player is not restricted if he is not holding a flag
