@@ -15,8 +15,8 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,17 +29,17 @@ import java.util.UUID;
  */
 public class TeamsManager implements ITeamsManager {
 
-    private final ServerWorld world;
+    private final MinecraftServer server;
 
     private final ITeamsState teamsState;
     private final ITeamsConfigState teamsConfigState;
 
     private final ISettingsManager settingsManager;
 
-    public TeamsManager(ITeamsState teamsState, ITeamsConfigState teamsConfigState, ServerWorld world, ISettingsManager settingsManager) {
+    public TeamsManager(ITeamsState teamsState, ITeamsConfigState teamsConfigState, MinecraftServer server, ISettingsManager settingsManager) {
         this.teamsState = teamsState;
         this.teamsConfigState = teamsConfigState;
-        this.world = world;
+        this.server = server;
         this.settingsManager = settingsManager;
     }
 
@@ -124,7 +124,7 @@ public class TeamsManager implements ITeamsManager {
 
         buf.writeString(teamConfigJson);
 
-        ServerEventSending.sendToEveryone(world, NetworkingConstants.TEAM_CONFIG_RELOADED, buf);
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.TEAM_CONFIG_RELOADED, buf);
     }
 
     /**
@@ -144,6 +144,6 @@ public class TeamsManager implements ITeamsManager {
         }
         buffer.writeString(newValueJsonString);
 
-        ServerEventSending.sendToEveryone(world, NetworkingConstants.TEAM_UPDATE, buffer);
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.TEAM_UPDATE, buffer);
     }
 }

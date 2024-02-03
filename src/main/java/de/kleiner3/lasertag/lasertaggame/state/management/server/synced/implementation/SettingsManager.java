@@ -187,7 +187,7 @@ public class SettingsManager implements ISettingsManager {
         buf.writeString(value);
 
         // Send update to clients
-        ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.SETTING_CHANGED, buf);
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.SETTING_CHANGED, buf);
 
         // Persist in file
         persist();
@@ -206,7 +206,7 @@ public class SettingsManager implements ISettingsManager {
         buf.writeString(settingsState.toJson());
 
         // Send update to clients
-        ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.SETTINGS_CHANGED, buf);
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.SETTINGS_CHANGED, buf);
 
         // Persist in file
         persist();

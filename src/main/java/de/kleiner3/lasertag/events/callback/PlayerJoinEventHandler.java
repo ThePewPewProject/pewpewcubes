@@ -9,7 +9,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
@@ -43,7 +42,7 @@ public class PlayerJoinEventHandler {
         gameManager.syncStateToClient(player);
 
         // Send player joined event
-        sendPlayerJoinedNetworkEvent(server.getOverworld(), player.getUuid(), player.getLasertagUsername());
+        sendPlayerJoinedNetworkEvent(server, player.getUuid(), player.getLasertagUsername());
 
         // If origin spawn setting is disabled
         if (!settingsManager.<Boolean>get(SettingDescription.DO_ORIGIN_SPAWN)) {
@@ -65,7 +64,7 @@ public class PlayerJoinEventHandler {
         player.setSpawnPoint(World.OVERWORLD, new BlockPos(0, 1, 0), 0.0F, true, false);
     }
 
-    private static void sendPlayerJoinedNetworkEvent(ServerWorld world, UUID playerUuid, String playerName) {
+    private static void sendPlayerJoinedNetworkEvent(MinecraftServer server, UUID playerUuid, String playerName) {
 
         // Create packet byte buffer
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
@@ -73,6 +72,6 @@ public class PlayerJoinEventHandler {
         buf.writeUuid(playerUuid);
         buf.writeString(playerName);
 
-        ServerEventSending.sendToEveryone(world, NetworkingConstants.PLAYER_JOINED, buf);
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.PLAYER_JOINED, buf);
     }
 }

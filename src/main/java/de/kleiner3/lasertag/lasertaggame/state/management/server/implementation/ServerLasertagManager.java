@@ -158,7 +158,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
         var preGameDelayTimer = ThreadUtil.createScheduledExecutor("server-lasertag-server-pregame-delay-timer-thread-%d");
         var preGameDelay = settingsManager.<Long>get(SettingDescription.PREGAME_DURATION);
 
-        if (server.getOverworld().getChunkManager().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator) {
+        if (world.getChunkManager().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator) {
             musicManager.playIntro(arenaChunkGenerator.getConfig().getType());
         }
 
@@ -180,7 +180,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
         gameMode.onPreGameStart(this.server);
 
         // Notify players
-        ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_STARTED, PacketByteBufs.empty());
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.GAME_STARTED, PacketByteBufs.empty());
 
         // If is on dedicated server
         if (server.isDedicated()) {
@@ -283,8 +283,11 @@ public class ServerLasertagManager implements IServerLasertagManager {
         // Register on server
         lasertargetManager.registerLasertarget(target);
 
+        // Get the world
+        var world = server.getOverworld();
+
         // Get the old block state
-        var oldBlockState = server.getOverworld().getBlockState(target.getPos());
+        var oldBlockState = world.getBlockState(target.getPos());
 
         // Delegate to game mode
         gameMode.onPlayerHitLasertarget(this.server, shooter, target);
@@ -297,15 +300,15 @@ public class ServerLasertagManager implements IServerLasertagManager {
         deactivationThread.schedule(() -> {
 
             // Get the old block state
-            var oldBlockStateReset = server.getOverworld().getBlockState(target.getPos());
+            var oldBlockStateReset = world.getBlockState(target.getPos());
 
             target.setDeactivated(false);
 
             // Get the new block state
-            var newBlockState = server.getOverworld().getBlockState(target.getPos());
+            var newBlockState = world.getBlockState(target.getPos());
 
             // Send lasertag updated to clients
-            server.getOverworld().updateListeners(target.getPos(), oldBlockStateReset, newBlockState, Block.NOTIFY_LISTENERS);
+            world.updateListeners(target.getPos(), oldBlockStateReset, newBlockState, Block.NOTIFY_LISTENERS);
 
             deactivationThread.shutdownNow();
         }, settingsManager.<Long>get(SettingDescription.LASERTARGET_DEACTIVATE_TIME), TimeUnit.SECONDS);
@@ -314,10 +317,10 @@ public class ServerLasertagManager implements IServerLasertagManager {
         target.addHitBy(shooter);
 
         // Get the new block state
-        var newBlockState = server.getOverworld().getBlockState(target.getPos());
+        var newBlockState = world.getBlockState(target.getPos());
 
         // Send lasertag updated to clients
-        server.getOverworld().updateListeners(target.getPos(), oldBlockState, newBlockState, Block.NOTIFY_LISTENERS);
+        world.updateListeners(target.getPos(), oldBlockState, newBlockState, Block.NOTIFY_LISTENERS);
     }
 
     /**
@@ -486,7 +489,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
         isRunning = false;
         syncedState.getUIState().isGameRunning = false;
 
-        ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.GAME_OVER, PacketByteBufs.empty());
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.GAME_OVER, PacketByteBufs.empty());
 
         // Reset server internal hud render manager
         uiStateManager.stopGameTimer();
@@ -506,8 +509,6 @@ public class ServerLasertagManager implements IServerLasertagManager {
 
     private void generateStats() {
         try {
-            var world = server.getOverworld();
-
             // Calculate stats
             var stats = StatsCalculator.calcStats(this,
                     syncedState.getUIState().gameTime);
@@ -531,7 +532,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
             buf.writeString(jsonString);
 
             // Send statistics to clients
-            ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_STATISTICS, buf);
+            ServerEventSending.sendToEveryone(server, NetworkingConstants.GAME_STATISTICS, buf);
         } catch (Exception e) {
             LasertagMod.LOGGER.error("ERROR:", e);
         }

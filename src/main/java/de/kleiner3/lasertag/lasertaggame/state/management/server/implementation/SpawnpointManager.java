@@ -121,7 +121,7 @@ public class SpawnpointManager implements ISpawnpointManager {
                 // Write progress to buffer
                 buf.writeDouble((double) currChunk / (double) maxChunk);
 
-                ServerEventSending.sendToEveryone(world, NetworkingConstants.PROGRESS, buf);
+                ServerEventSending.sendToEveryone(world.getServer(), NetworkingConstants.PROGRESS, buf);
             });
 
             // Stop time measurement
@@ -140,7 +140,7 @@ public class SpawnpointManager implements ISpawnpointManager {
             // Write progress to buffer
             buf.writeDouble(-1.0F);
 
-            ServerEventSending.sendToEveryone(world, NetworkingConstants.PROGRESS, buf);
+            ServerEventSending.sendToEveryone(world.getServer(), NetworkingConstants.PROGRESS, buf);
         }
     }
 }

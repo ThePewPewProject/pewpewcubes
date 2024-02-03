@@ -7,7 +7,7 @@ import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.MinecraftServer;
 
 import java.util.UUID;
 
@@ -18,11 +18,11 @@ import java.util.UUID;
  */
 public class ScoreManager implements IScoreManager {
 
-    private final ServerWorld world;
+    private final MinecraftServer server;
     private final IScoreState scoreState;
 
-    public ScoreManager(IScoreState scoreState, ServerWorld world) {
-        this.world = world;
+    public ScoreManager(IScoreState scoreState, MinecraftServer server) {
+        this.server = server;
         this.scoreState = scoreState;
     }
 
@@ -34,7 +34,7 @@ public class ScoreManager implements IScoreManager {
     @Override
     public void resetScores() {
         scoreState.resetScores();
-        ServerEventSending.sendToEveryone(world, NetworkingConstants.SCORE_RESET, PacketByteBufs.empty());
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.SCORE_RESET, PacketByteBufs.empty());
     }
 
     @Override
@@ -60,6 +60,6 @@ public class ScoreManager implements IScoreManager {
         buffer.writeUuid(key);
         buffer.writeLong(newValue);
 
-        ServerEventSending.sendToEveryone(world, NetworkingConstants.SCORE_UPDATE, buffer);
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.SCORE_UPDATE, buffer);
     }
 }

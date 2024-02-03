@@ -74,7 +74,7 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
                     captureTheFlagState.updateTeamFlagCount(team, settingsManager.<Long>get(SettingDescription.FLAG_COUNT));
                 });
 
-        ServerEventSending.sendToEveryone(world, NetworkingConstants.FLAG_RESET, PacketByteBufs.empty());
+        ServerEventSending.sendToEveryone(world.getServer(), NetworkingConstants.FLAG_RESET, PacketByteBufs.empty());
     }
 
     @Override
@@ -226,7 +226,7 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
         }
         buffer.writeString(teamIdString);
 
-        ServerEventSending.sendToEveryone(world, NetworkingConstants.CTF_FLAG_HOLDING_UPDATE, buffer);
+        ServerEventSending.sendToEveryone(world.getServer(), NetworkingConstants.CTF_FLAG_HOLDING_UPDATE, buffer);
     }
 
     private void sendTeamFlagStolenMessage(TeamDto team) {
@@ -249,7 +249,7 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
         buffer.writeInt(team.id());
         buffer.writeLong(newNumberOfFlags);
 
-        ServerEventSending.sendToEveryone(world, NetworkingConstants.CTF_NUMBER_OF_FLAGS_UPDATE, buffer);
+        ServerEventSending.sendToEveryone(world.getServer(), NetworkingConstants.CTF_NUMBER_OF_FLAGS_UPDATE, buffer);
     }
 
     private void sendTeamIsOutMessage(TeamDto team) {

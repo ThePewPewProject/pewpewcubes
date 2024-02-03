@@ -5,8 +5,8 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
@@ -38,15 +38,15 @@ public class ServerEventSending {
     /**
      * Sends a PacketByteBuf to every player in the given world
      *
-     * @param world The world where the players are in
+     * @param server The server this game is running on
      * @param id The identifier of the event to send
      * @param buf The data to send
      */
-    public static void sendToEveryone(ServerWorld world, Identifier id, PacketByteBuf buf) {
+    public static void sendToEveryone(MinecraftServer server, Identifier id, PacketByteBuf buf) {
 
-        world.getServer().execute(() -> {
+        server.execute(() -> {
             // Get all players
-            List<ServerPlayerEntity> players = world.getPlayers();
+            List<ServerPlayerEntity> players = server.getPlayerManager().getPlayerList();
 
             // For each player
             for (ServerPlayerEntity player : players) {

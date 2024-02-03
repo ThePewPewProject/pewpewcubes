@@ -45,17 +45,10 @@ public class SettingsPresetsNameManager implements ISettingsPresetsNameManager {
 
     private void sendNetworkEvent(Identifier networkEventId, String presetName) {
 
-        var world = server.getOverworld();
-
-        // Omit the event if the world has not loaded
-        if (world == null) {
-            return;
-        }
-
         var buf = new PacketByteBuf(Unpooled.buffer());
 
         buf.writeString(presetName);
 
-        ServerEventSending.sendToEveryone(world, networkEventId, buf);
+        ServerEventSending.sendToEveryone(server, networkEventId, buf);
     }
 }

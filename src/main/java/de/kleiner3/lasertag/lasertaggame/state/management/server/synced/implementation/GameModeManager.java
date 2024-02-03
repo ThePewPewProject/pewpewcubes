@@ -10,7 +10,7 @@ import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.MinecraftServer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,16 +28,16 @@ public class GameModeManager implements IGameModeManager {
 
     private final ISettingsManager settingsManager;
 
-    private final ServerWorld world;
+    private final MinecraftServer server;
 
     // Get path to lasertag game mode file
     private static final Path lasertagGameModeFilePath = LasertagMod.configFolderPath.resolve("lasertagGameMode.ltg");
 
-    public GameModeManager(GameModeState gameModeState, ServerWorld world, ISettingsManager settingsManager) {
+    public GameModeManager(GameModeState gameModeState, MinecraftServer server, ISettingsManager settingsManager) {
 
         this.gameModeState = gameModeState;
         this.settingsManager = settingsManager;
-        this.world = world;
+        this.server = server;
 
         if (Files.exists(lasertagGameModeFilePath)) {
 
@@ -90,6 +90,6 @@ public class GameModeManager implements IGameModeManager {
 
         buf.writeString(newGameMode.getTranslatableName());
 
-        ServerEventSending.sendToEveryone(world, NetworkingConstants.GAME_MODE_SYNC, buf);
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.GAME_MODE_SYNC, buf);
     }
 }

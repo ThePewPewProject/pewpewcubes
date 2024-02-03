@@ -116,6 +116,6 @@ public class ActivationManager implements IActivationManager {
         buf.writeUuid(uuid);
         buf.writeBoolean(deactivated);
 
-        ServerEventSending.sendToEveryone(server.getOverworld(), NetworkingConstants.PLAYER_DEACTIVATED_STATUS_CHANGED, buf);
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.PLAYER_DEACTIVATED_STATUS_CHANGED, buf);
     }
 }

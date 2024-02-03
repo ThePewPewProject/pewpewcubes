@@ -438,7 +438,7 @@ public class ArenaManager implements IArenaManager {
         buf.writeString(stepString);
         buf.writeDouble(progress);
 
-        ServerEventSending.sendToEveryone(this.server.getOverworld(), NetworkingConstants.MAP_LOADING_EVENT, buf);
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.MAP_LOADING_EVENT, buf);
     }
 
     //endregion
