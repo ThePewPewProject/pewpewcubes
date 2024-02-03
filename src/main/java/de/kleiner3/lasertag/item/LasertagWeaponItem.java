@@ -154,7 +154,7 @@ public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable 
         var gameManager = world.getServerLasertagManager();
         var settingsManager = gameManager.getSettingsManager();
 
-        world.playSound(null, player.getBlockPos(), SoundEvents.LASERWEAPON_FIRE_SOUND_EVENT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+        world.playSound(null, player.getBlockPos(), SoundEvents.LASERWEAPON_FIRE_SOUND_EVENT, SoundCategory.PLAYERS, 0.8f, 1.0f);
 
         // Raycast the crosshair
         HitResult hit = RaycastUtil.raycastCrosshair(player, Math.toIntExact(settingsManager.<Long>get(SettingDescription.WEAPON_REACH)));

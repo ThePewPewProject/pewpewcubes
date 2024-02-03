@@ -12,6 +12,9 @@ import net.minecraft.util.math.BlockPos;
  * @author Étienne Muser
  */
 public class MusicManager implements IMusicManager {
+
+    private static final float SOUND_VOLUME = 0.5f;
+
     private final MinecraftServer server;
 
     private boolean playingThisMinute = false;
@@ -21,7 +24,7 @@ public class MusicManager implements IMusicManager {
     }
 
     public void playIntro(ArenaType arenaType) {
-        server.getOverworld().playSound(null, new BlockPos(0, 0, 0), arenaType.introMusic, SoundCategory.MUSIC, 1.0f, 1.0f);
+        server.getOverworld().playSound(null, new BlockPos(0, 0, 0), arenaType.introMusic, SoundCategory.MUSIC, SOUND_VOLUME, 1.0f);
     }
 
     public void tick(ArenaType arenaType, boolean isLastMinute) {
@@ -32,14 +35,14 @@ public class MusicManager implements IMusicManager {
         }
 
         if (this.playingThisMinute) {
-            server.getOverworld().playSound(null, new BlockPos(0, 0, 0), arenaType.music, SoundCategory.MUSIC, 1.0f, 1.0f);
+            server.getOverworld().playSound(null, new BlockPos(0, 0, 0), arenaType.music, SoundCategory.MUSIC, SOUND_VOLUME, 1.0f);
         }
 
         this.playingThisMinute = !this.playingThisMinute;
     }
 
     public void playOutro(ArenaType arenaType) {
-        server.getOverworld().playSound(null, new BlockPos(0, 0, 0), arenaType.outroMusic, SoundCategory.MUSIC, 1.0f, 1.0f);
+        server.getOverworld().playSound(null, new BlockPos(0, 0, 0), arenaType.outroMusic, SoundCategory.MUSIC, SOUND_VOLUME, 1.0f);
     }
 
     public void reset() {
