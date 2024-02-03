@@ -11,6 +11,7 @@ import de.kleiner3.lasertag.lasertaggame.gamemode.GameMode;
 import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.IServerLasertagManager;
 import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.SettingsState;
+import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
 import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import net.minecraft.block.Block;
 import net.minecraft.block.enums.DoubleBlockHalf;
@@ -327,6 +328,13 @@ public class CaptureTheFlagGameMode extends GameMode {
     }
 
     public void placeFlags(ServerWorld world, TeamDto team) {
+
+        // If the team is the spectators
+        if (team.equals(TeamsConfigState.SPECTATORS)) {
+
+            // Do nothing - The spectators have no flags
+            return;
+        }
 
         // Get the game managers
         var gameManager = world.getServerLasertagManager();
