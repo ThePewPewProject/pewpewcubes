@@ -30,6 +30,8 @@ public class ClientLasertagManager implements IClientLasertagManager {
 
     private final IUIStateManager uiStateManager;
 
+    private final IRemainingTeamsManager remainingTeamsManager;
+
     //endregion
 
     public ClientLasertagManager(ISyncedState syncedState,
@@ -40,7 +42,8 @@ public class ClientLasertagManager implements IClientLasertagManager {
                                  ISettingsManager settingsManager,
                                  ISettingsPresetsNameManager settingsPresetsNameManager,
                                  ITeamsManager teamsManager,
-                                 IUIStateManager uiStateManager) {
+                                 IUIStateManager uiStateManager,
+                                 IRemainingTeamsManager remainingTeamsManager) {
         this.syncedState = syncedState;
         this.activationManager = activationManager;
         this.captureTheFlagManager = captureTheFlagManager;
@@ -50,6 +53,7 @@ public class ClientLasertagManager implements IClientLasertagManager {
         this.settingsPresetsNameManager = settingsPresetsNameManager;
         this.teamsManager = teamsManager;
         this.uiStateManager = uiStateManager;
+        this.remainingTeamsManager = remainingTeamsManager;
     }
 
     @Override
@@ -95,6 +99,11 @@ public class ClientLasertagManager implements IClientLasertagManager {
     @Override
     public ISyncedState getSyncedState() {
         return syncedState;
+    }
+
+    @Override
+    public IRemainingTeamsManager getRemainingTeamsManager() {
+        return remainingTeamsManager;
     }
 
     @Override

@@ -73,6 +73,7 @@
 
 	"gameMode.point_hunter": "Point Hunter",
 	"gameMode.capture_the_flag": "Capture The Flag",
+	"gameMode.musical_chairs": "Musical Chairs",
 
 	"subtitles.lasertag.music": "Thrilling music",
 	"subtitles.lasertag.weapon_fire_sound": "Laserweapon firing",
@@ -124,6 +125,8 @@
 	"gui.game_manager.settings.sendFlagStolenMessage": "Send flag stolen info message",
 	"gui.game_manager.settings.sendFlagCapturedMessage": "Send flag captured info message",
 	"gui.game_manager.settings.sendTeamOutMessage": "Send team out info message",
+	"gui.game_manager.settings.phaseDuration": "Phase duration",
+	"gui.game_manager.settings.resetScoresAtPhaseEnd": "Reset scores at phase end",
 	"gui.game_manager.map_button": "Arena...",
 	"gui.game_manager.teams_button": "Teams...",
 	"gui.game_manager.reset_team_config_button": "Reset team config",

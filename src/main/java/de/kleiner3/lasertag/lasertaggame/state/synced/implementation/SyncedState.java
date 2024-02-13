@@ -30,6 +30,7 @@ public class SyncedState implements ISyncedState {
     private final ITeamsState teamsState;
     private final ITeamsConfigState teamsConfigState;
     private final UIState uiState;
+    private final IRemainingTeamsState remainingTeamsState;
 
     //endregion
 
@@ -45,6 +46,7 @@ public class SyncedState implements ISyncedState {
         teamsConfigState = new TeamsConfigState();
         teamsState = new TeamsState(teamsConfigState);
         uiState = new UIState();
+        remainingTeamsState = new RemainingTeamsState();
     }
 
     //region Public methods
@@ -99,6 +101,11 @@ public class SyncedState implements ISyncedState {
         return uiState;
     }
 
+    @Override
+    public IRemainingTeamsState getRemainingTeamsState() {
+        return remainingTeamsState;
+    }
+
     //endregion
 
 
@@ -137,5 +144,6 @@ public class SyncedState implements ISyncedState {
         builder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ISettingsPresetsNamesState.class).registerSubtype(SettingsPresetsNamesState.class));
         builder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ITeamsState.class).registerSubtype(TeamsState.class));
         builder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ITeamsConfigState.class).registerSubtype(TeamsConfigState.class));
+        builder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IRemainingTeamsState.class).registerSubtype(RemainingTeamsState.class));
     }
 }

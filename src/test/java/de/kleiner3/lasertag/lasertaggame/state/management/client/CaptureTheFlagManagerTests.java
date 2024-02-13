@@ -195,6 +195,11 @@ public class CaptureTheFlagManagerTests {
             }
 
             @Override
+            public IRemainingTeamsState getRemainingTeamsState() {
+                return null;
+            }
+
+            @Override
             public String toJson() {
                 return null;
             }
@@ -237,6 +242,11 @@ public class CaptureTheFlagManagerTests {
 
         @Override
         public IUIStateManager getUIStateManager() {
+            return null;
+        }
+
+        @Override
+        public IRemainingTeamsManager getRemainingTeamsManager() {
             return null;
         }
 

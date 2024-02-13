@@ -144,6 +144,11 @@ public class ActivationManagerTests {
             }
 
             @Override
+            public IRemainingTeamsState getRemainingTeamsState() {
+                return null;
+            }
+
+            @Override
             public String toJson() {
                 return null;
             }
@@ -186,6 +191,11 @@ public class ActivationManagerTests {
 
         @Override
         public IUIStateManager getUIStateManager() {
+            return null;
+        }
+
+        @Override
+        public IRemainingTeamsManager getRemainingTeamsManager() {
             return null;
         }
 

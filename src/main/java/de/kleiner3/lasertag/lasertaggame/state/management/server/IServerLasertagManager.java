@@ -106,4 +106,8 @@ public interface IServerLasertagManager extends ITickable {
     ISettingsPresetsNameManager getSettingsPresetsNameManager();
 
     ITeamsManager getTeamsManager();
+
+    IMusicalChairsManager getMusicalChairsManager();
+
+    IRemainingTeamsManager getRemainingTeamsManager();
 }

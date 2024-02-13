@@ -45,6 +45,8 @@ public abstract class ServerWorldMixin implements IServerLasertagManagerAccessor
         var activationManager = new ActivationManager(syncedState.getActivationState(), server, settingsManager, syncedState.getPlayerNamesState());
         var settingsPresetsNameManager = new SettingsPresetsNameManager(syncedState.getSettingsPresetsNamesState(), server);
         var settingsPresetsManager = new SettingsPresetsManager(new SettingsPresetsState(), settingsPresetsNameManager, settingsManager);
+        var remainingTeamsManager = new RemainingTeamsManager(syncedState.getRemainingTeamsState(), syncedState.getTeamsConfigState(), teamsManager, server);
+        var musicalChairsManager = new MusicalChairsManager(settingsManager, teamsManager, scoreManager, gameModeManager, syncedState.getTeamsConfigState(), syncedState.getUIState(), remainingTeamsManager, world);
 
         serverLasertagManager = new ServerLasertagManager(server,
                 syncedState,
@@ -61,7 +63,9 @@ public abstract class ServerWorldMixin implements IServerLasertagManagerAccessor
                 settingsManager,
                 settingsPresetsNameManager,
                 teamsManager,
-                uiStateManager);
+                uiStateManager,
+                musicalChairsManager,
+                remainingTeamsManager);
     }
 
     @Override

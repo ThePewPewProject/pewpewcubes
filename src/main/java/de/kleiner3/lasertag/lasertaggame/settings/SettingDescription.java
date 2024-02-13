@@ -47,7 +47,11 @@ public enum SettingDescription {
     CTF_FLAG_HOLDING_PLAYER_VISIBILITY("flagHoldingPlayerVisibility", CTFFlagHoldingPlayerVisibility.GLOW, SettingDataType.ofEnum(CTFFlagHoldingPlayerVisibility.class), "visibility", null, null),
     SEND_FLAG_STOLEN_MESSAGE("sendFlagStolenMessage", true, SettingDataType.BOOL, "value", null, null),
     SEND_FLAG_CAPTURED_MESSAGE("sendFlagCapturedMessage", true, SettingDataType.BOOL, "value", null, null),
-    SEND_TEAM_OUT_MESSAGE("sendTeamOutMessage", true, SettingDataType.BOOL, "value", null, null);
+    SEND_TEAM_OUT_MESSAGE("sendTeamOutMessage", true, SettingDataType.BOOL, "value", null, null),
+
+    // Musical chairs specific
+    PHASE_DURATION("phaseDuration", 2L, SettingDataType.LONG, "minutes", 1L, null),
+    RESET_SCORES_AT_PHASE_END("resetScoresAtPhaseEnd", false, SettingDataType.BOOL, "value", null, null);
 
     /**
      * Get a SettingDescription given its name.

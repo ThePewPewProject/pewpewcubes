@@ -69,6 +69,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
     private final IMusicManager musicManager;
     private final ISettingsPresetsManager settingsPresetsManager;
     private final ISpawnpointManager spawnpointManager;
+    private final IMusicalChairsManager musicalChairsManager;
 
     //endregion
 
@@ -82,6 +83,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
     private final ISettingsPresetsNameManager settingsPresetsNameManager;
     private final ITeamsManager teamsManager;
     private final IUIStateManager uiStateManager;
+    private final IRemainingTeamsManager remainingTeamsManager;
 
     //endregion
 
@@ -100,7 +102,9 @@ public class ServerLasertagManager implements IServerLasertagManager {
                                  ISettingsManager settingsManager,
                                  ISettingsPresetsNameManager settingsPresetsNameManager,
                                  ITeamsManager teamsManager,
-                                 IUIStateManager uiStateManager) {
+                                 IUIStateManager uiStateManager,
+                                 IMusicalChairsManager musicalChairsManager,
+                                 IRemainingTeamsManager remainingTeamsManager) {
 
         this.server = server;
         this.syncedState = syncedState;
@@ -120,6 +124,8 @@ public class ServerLasertagManager implements IServerLasertagManager {
         this.settingsPresetsNameManager = settingsPresetsNameManager;
         this.teamsManager = teamsManager;
         this.uiStateManager = uiStateManager;
+        this.musicalChairsManager = musicalChairsManager;
+        this.remainingTeamsManager = remainingTeamsManager;
     }
 
     //region Public methods
@@ -168,7 +174,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
             gameMode.onGameStart(this.server);
 
             // Start game tick timer
-            gameTickTimer = ThreadUtil.createScheduledExecutor("server-lasertag-server-game-tick-timer-thread-%d");
+            gameTickTimer = ThreadUtil.createScheduledExecutor("server-lasertag-game-tick-timer-thread-%d");
             gameTickTimer.scheduleAtFixedRate(new GameTickTimerTask(this, gameModeManager, settingsManager), 0, 1, TimeUnit.SECONDS);
 
             // Stop the pre game delay timer
@@ -469,6 +475,16 @@ public class ServerLasertagManager implements IServerLasertagManager {
     @Override
     public ITeamsManager getTeamsManager() {
         return teamsManager;
+    }
+
+    @Override
+    public IMusicalChairsManager getMusicalChairsManager() {
+        return musicalChairsManager;
+    }
+
+    @Override
+    public IRemainingTeamsManager getRemainingTeamsManager() {
+        return remainingTeamsManager;
     }
 
     //endregion
