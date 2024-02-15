@@ -25,3 +25,5 @@ accessible field net/minecraft/client/gui/screen/world/CreateWorldScreen levelNa
 accessible field net/minecraft/client/gui/screen/world/CreateWorldScreen currentDifficulty Lnet/minecraft/world/Difficulty;
 accessible field net/minecraft/world/chunk/ReadOnlyChunk field_34554 Z
 mutable field net/minecraft/world/chunk/ReadOnlyChunk field_34554 Z
+accessible field net/minecraft/server/dedicated/ServerPropertiesHandler$WorldGenProperties levelType Ljava/lang/String;
+mutable field net/minecraft/server/dedicated/ServerPropertiesHandler$WorldGenProperties levelType Ljava/lang/String;
