@@ -74,6 +74,7 @@
 	"gameMode.point_hunter": "Point Hunter",
 	"gameMode.capture_the_flag": "Capture The Flag",
 	"gameMode.musical_chairs": "Musical Chairs",
+	"gameMode.elimination": "Elimination",
 
 	"subtitles.lasertag.music": "Thrilling music",
 	"subtitles.lasertag.weapon_fire_sound": "Laserweapon firing",
@@ -127,6 +128,9 @@
 	"gui.game_manager.settings.sendTeamOutMessage": "Send team out info message",
 	"gui.game_manager.settings.phaseDuration": "Phase duration",
 	"gui.game_manager.settings.resetScoresAtPhaseEnd": "Reset scores at phase end",
+	"gui.game_manager.settings.initialBorderSize": "Initial border size",
+	"gui.game_manager.settings.borderShrinkDistance": "Border shrink distance",
+	"gui.game_manager.settings.borderShrinkTime": "Border shrink time",
 	"gui.game_manager.map_button": "Arena...",
 	"gui.game_manager.teams_button": "Teams...",
 	"gui.game_manager.reset_team_config_button": "Reset team config",

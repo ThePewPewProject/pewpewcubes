@@ -84,6 +84,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
     private final ITeamsManager teamsManager;
     private final IUIStateManager uiStateManager;
     private final IRemainingTeamsManager remainingTeamsManager;
+    private final IEliminationManager eliminationManager;
 
     //endregion
 
@@ -104,10 +105,11 @@ public class ServerLasertagManager implements IServerLasertagManager {
                                  ITeamsManager teamsManager,
                                  IUIStateManager uiStateManager,
                                  IMusicalChairsManager musicalChairsManager,
-                                 IRemainingTeamsManager remainingTeamsManager) {
+                                 IRemainingTeamsManager remainingTeamsManager, IEliminationManager eliminationManager) {
 
         this.server = server;
         this.syncedState = syncedState;
+        this.eliminationManager = eliminationManager;
         isRunning = false;
 
         this.arenaManager = arenaManager;
@@ -485,6 +487,11 @@ public class ServerLasertagManager implements IServerLasertagManager {
     @Override
     public IRemainingTeamsManager getRemainingTeamsManager() {
         return remainingTeamsManager;
+    }
+
+    @Override
+    public IEliminationManager getEliminationManager() {
+        return eliminationManager;
     }
 
     //endregion

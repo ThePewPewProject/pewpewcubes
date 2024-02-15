@@ -34,6 +34,7 @@ public abstract class ClientWorldMixin implements IClientLasertagManagerAccessor
         var teamsManager = new TeamsManager();
         var uiManager = new UIStateManager(gameModeManager, settingsManager);
         var remainingTeamsManager = new RemainingTeamsManager();
+        var eliminationManager = new EliminationManager();
 
         clientLasertagManager = new ClientLasertagManager(syncedState,
                 activationManager,
@@ -44,7 +45,8 @@ public abstract class ClientWorldMixin implements IClientLasertagManagerAccessor
                 settingsPresetsNameManager,
                 teamsManager,
                 uiManager,
-                remainingTeamsManager);
+                remainingTeamsManager,
+                eliminationManager);
 
         // Set the client manager in the sub managers
         activationManager.setClientManager(clientLasertagManager);
@@ -56,6 +58,7 @@ public abstract class ClientWorldMixin implements IClientLasertagManagerAccessor
         teamsManager.setClientManager(clientLasertagManager);
         uiManager.setClientManager(clientLasertagManager);
         remainingTeamsManager.setClientManager(clientLasertagManager);
+        eliminationManager.setClientManager(clientLasertagManager);
     }
 
     @Override

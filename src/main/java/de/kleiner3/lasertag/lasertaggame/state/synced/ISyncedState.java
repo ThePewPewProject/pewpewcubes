@@ -34,6 +34,8 @@ public interface ISyncedState {
 
     IRemainingTeamsState getRemainingTeamsState();
 
+    IEliminationState getEliminationState();
+
     /**
      * Serialize the entire synced state to JSON
      *

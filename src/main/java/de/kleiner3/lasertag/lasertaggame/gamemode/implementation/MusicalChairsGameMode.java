@@ -110,7 +110,6 @@ public class MusicalChairsGameMode extends PointBasedGameMode {
         // Get the game managers
         var gameManager = server.getOverworld().getServerLasertagManager();
         var remainingTeamsManager = gameManager.getRemainingTeamsManager();
-        var musicalChairsManager = gameManager.getMusicalChairsManager();
 
         // Get all the teams that are left
         var numberAliveTeams = remainingTeamsManager.getRemainingTeams().size();

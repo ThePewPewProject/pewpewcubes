@@ -149,6 +149,11 @@ public class ActivationManagerTests {
             }
 
             @Override
+            public IEliminationState getEliminationState() {
+                return null;
+            }
+
+            @Override
             public String toJson() {
                 return null;
             }
@@ -196,6 +201,11 @@ public class ActivationManagerTests {
 
         @Override
         public IRemainingTeamsManager getRemainingTeamsManager() {
+            return null;
+        }
+
+        @Override
+        public IEliminationManager getEliminationManager() {
             return null;
         }
 

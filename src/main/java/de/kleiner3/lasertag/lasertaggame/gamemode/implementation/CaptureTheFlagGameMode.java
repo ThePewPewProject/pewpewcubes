@@ -7,6 +7,7 @@ import de.kleiner3.lasertag.block.entity.LasertagFlagBlockEntity;
 import de.kleiner3.lasertag.common.types.ScoreHolding;
 import de.kleiner3.lasertag.common.util.DurationUtils;
 import de.kleiner3.lasertag.damage.DamageSources;
+import de.kleiner3.lasertag.lasertaggame.gamemode.DamageBasedGameMode;
 import de.kleiner3.lasertag.lasertaggame.gamemode.GameMode;
 import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.IServerLasertagManager;
@@ -60,10 +61,10 @@ import java.util.UUID;
  *
  * @author Étienne Muser
  */
-public class CaptureTheFlagGameMode extends GameMode {
+public class CaptureTheFlagGameMode extends DamageBasedGameMode {
 
     public CaptureTheFlagGameMode() {
-        super("gameMode.capture_the_flag", true, true, true);
+        super("gameMode.capture_the_flag", true, true);
     }
 
     @Override
@@ -82,11 +83,6 @@ public class CaptureTheFlagGameMode extends GameMode {
     public List<SettingDescription> getRelevantSettings() {
         var list = super.getRelevantSettings();
 
-        // From damage based
-        list.add(SettingDescription.LASER_RAY_DAMAGE);
-        list.add(SettingDescription.LASERTARGET_HEAL);
-        list.add(SettingDescription.PLAYER_RESET_HEAL);
-
         // From CTF specific
         list.add(SettingDescription.FLAG_COUNT);
         list.add(SettingDescription.CTF_FLAG_HOLDING_PLAYER_VISIBILITY);
@@ -103,79 +99,21 @@ public class CaptureTheFlagGameMode extends GameMode {
     }
 
     @Override
-    public void onPlayerHitLasertarget(MinecraftServer server,
-                                       ServerPlayerEntity shooter,
-                                       LaserTargetBlockEntity target) {
-
-        // Get the managers
-        var gameManager = server.getOverworld().getServerLasertagManager();
-        var settingsManager = gameManager.getSettingsManager();
-
-        long healAmount = settingsManager.get(SettingDescription.LASERTARGET_HEAL);
-
-        // Regenerate health
-        shooter.heal(healAmount);
-
-        super.onPlayerHitLasertarget(server, shooter, target);
-    }
-
-    @Override
-    public void onPlayerHitPlayer(MinecraftServer server, ServerPlayerEntity shooter, ServerPlayerEntity target) {
-
-        // Get the managers
-        var gameManager = server.getOverworld().getServerLasertagManager();
-        var teamsManager = gameManager.getTeamsManager();
-        var activationManager = gameManager.getActivationManager();
-
-        // Get the teams of shooter and target
-        var shooterTeam = teamsManager.getTeamOfPlayer(shooter.getUuid());
-        var targetTeam = teamsManager.getTeamOfPlayer(target.getUuid());
-
-        // Check that hit player is not in same team as firing player
-        if (shooterTeam.equals(targetTeam)) {
-            return;
-        }
-
-        // Check if player is deactivated
-        if (activationManager.isDeactivated(target.getUuid())) {
-            return;
-        }
-
-        // Get the damage amount
-        long damageAmount = gameManager.getSettingsManager().get(SettingDescription.LASER_RAY_DAMAGE);
-
-        // Damage the target
-        target.damage(DamageSources.laser(shooter), damageAmount);
-
-        super.onPlayerHitPlayer(server, shooter, target);
-    }
-
-    @Override
     public void onPlayerDeath(MinecraftServer server, ServerPlayerEntity player, DamageSource source) {
 
+        super.onPlayerDeath(server, player, source);
+
         // Get the managers
         var gameManager = server.getOverworld().getServerLasertagManager();
+        var activationManager = gameManager.getActivationManager();
+        var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
 
         // If no game is running
         if (!gameManager.isGameRunning()) {
             return;
         }
 
-        // Get the managers
-        var activationManager = gameManager.getActivationManager();
-        var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
-
-        // If the player got damaged by laser
-        if (source.name.equals("laser")) {
-
-            // Get the shooter
-            var shooter = (ServerPlayerEntity)source.getAttacker();
-
-            // Heal the shooter
-            long healAmount = gameManager.getSettingsManager().get(SettingDescription.PLAYER_RESET_HEAL);
-            shooter.heal(healAmount);
-        }
-
+        // Deactivate the player who died
         activationManager.deactivate(player.getUuid());
 
         // Get the team of the flag the player is currently holding
@@ -203,10 +141,6 @@ public class CaptureTheFlagGameMode extends GameMode {
 
         // Reset the flag manager
         captureTheFlagManager.reset();
-
-        // Set players dont regen health
-        var gameRules = server.getGameRules();
-        gameRules.get(GameRules.NATURAL_REGENERATION).set(false, server);
 
         // Get a list of the teams with players in them
         var teams = teamsConfigState.getTeams().stream()
@@ -242,10 +176,6 @@ public class CaptureTheFlagGameMode extends GameMode {
     @Override
     public void onGameEnd(MinecraftServer server) {
         super.onGameEnd(server);
-
-        // Set players regen health
-        var gameRules = server.getGameRules();
-        gameRules.get(GameRules.NATURAL_REGENERATION).set(true, server);
 
         // Get the game managers
         var gameManager = server.getOverworld().getServerLasertagManager();

@@ -200,6 +200,11 @@ public class CaptureTheFlagManagerTests {
             }
 
             @Override
+            public IEliminationState getEliminationState() {
+                return null;
+            }
+
+            @Override
             public String toJson() {
                 return null;
             }
@@ -247,6 +252,11 @@ public class CaptureTheFlagManagerTests {
 
         @Override
         public IRemainingTeamsManager getRemainingTeamsManager() {
+            return null;
+        }
+
+        @Override
+        public IEliminationManager getEliminationManager() {
             return null;
         }
 

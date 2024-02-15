@@ -51,7 +51,12 @@ public enum SettingDescription {
 
     // Musical chairs specific
     PHASE_DURATION("phaseDuration", 2L, SettingDataType.LONG, "minutes", 1L, null),
-    RESET_SCORES_AT_PHASE_END("resetScoresAtPhaseEnd", false, SettingDataType.BOOL, "value", null, null);
+    RESET_SCORES_AT_PHASE_END("resetScoresAtPhaseEnd", false, SettingDataType.BOOL, "value", null, null),
+
+    // Elimination specific
+    INITIAL_BORDER_SIZE("initialBorderSize", 200L, SettingDataType.LONG, "blocks", 1L, null),
+    BORDER_SHRINK_DISTANCE("borderShrinkDistance", 10L, SettingDataType.LONG, "blocks", 0L, null),
+    BORDER_SHRINK_TIME("borderShrinkTime", 10L, SettingDataType.LONG, "seconds", 0L, 59L);
 
     /**
      * Get a SettingDescription given its name.
