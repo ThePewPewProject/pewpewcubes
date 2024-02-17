@@ -14,6 +14,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -191,6 +192,9 @@ public class EliminationGameMode extends DamageBasedGameMode {
             sendTeamIsOutMessage(eliminatedPlayersTeam, server.getOverworld());
             remainingTeamsManager.removeTeam(eliminatedPlayersTeam);
         }
+
+        // Set player to spectator
+        player.changeGameMode(GameMode.SPECTATOR);
 
         checkGameOver(server);
     }
