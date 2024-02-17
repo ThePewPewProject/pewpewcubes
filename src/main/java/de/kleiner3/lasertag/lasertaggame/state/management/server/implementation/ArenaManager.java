@@ -105,7 +105,7 @@ public class ArenaManager implements IArenaManager {
             this.removeOldBlocks(oldArenaBounds);
 
             // Step 3: Clear spawn-point cache if necessary and reset arena structure placer
-            if (!oldArenaType.equals(newArenaType)) {
+            if (!oldArenaType.equals(newArenaType) || oldArenaType.equals(ArenaType.PROCEDURAL)) {
                 spawnpointManager.clearSpawnpointCache();
             }
 
