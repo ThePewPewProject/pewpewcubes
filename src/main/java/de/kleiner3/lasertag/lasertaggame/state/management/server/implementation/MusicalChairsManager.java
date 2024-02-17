@@ -3,6 +3,7 @@ package de.kleiner3.lasertag.lasertaggame.state.management.server.implementation
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
+import de.kleiner3.lasertag.lasertaggame.state.management.server.ILasertargetManager;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.IMusicalChairsManager;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.*;
 import de.kleiner3.lasertag.lasertaggame.state.server.IMusicalChairsState;
@@ -48,6 +49,8 @@ public class MusicalChairsManager implements IMusicalChairsManager {
 
     private final IRemainingTeamsManager remainingTeamsManager;
 
+    private final ILasertargetManager lasertargetManager;
+
     private final ServerWorld world;
 
     private final IMusicalChairsState musicalChairsState;
@@ -58,7 +61,7 @@ public class MusicalChairsManager implements IMusicalChairsManager {
                                 IGameModeManager gameModeManager,
                                 ITeamsConfigState teamsConfigState,
                                 UIState uiState,
-                                IRemainingTeamsManager remainingTeamsManager,
+                                IRemainingTeamsManager remainingTeamsManager, ILasertargetManager lasertargetManager,
                                 ServerWorld world
     ) {
         this.settingsManager = settingsManager;
@@ -68,6 +71,7 @@ public class MusicalChairsManager implements IMusicalChairsManager {
         this.teamsConfigState = teamsConfigState;
         this.uiState = uiState;
         this.remainingTeamsManager = remainingTeamsManager;
+        this.lasertargetManager = lasertargetManager;
         this.world = world;
         this.musicalChairsState = new MusicalChairsState();
     }
@@ -123,6 +127,9 @@ public class MusicalChairsManager implements IMusicalChairsManager {
     }
 
     private void handlePhaseChange() {
+
+        // Reset the lasertargets
+        lasertargetManager.resetLasertargets();
 
         // If the scores should be reset at the end of the phase
         if (settingsManager.<Boolean>get(SettingDescription.RESET_SCORES_AT_PHASE_END)) {
