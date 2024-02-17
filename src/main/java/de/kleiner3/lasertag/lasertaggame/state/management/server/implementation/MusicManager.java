@@ -13,7 +13,7 @@ import net.minecraft.util.math.BlockPos;
  */
 public class MusicManager implements IMusicManager {
 
-    private static final float SOUND_VOLUME = 0.5f;
+    private static final float SOUND_VOLUME = 0.3f;
 
     private final MinecraftServer server;
 
