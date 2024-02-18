@@ -5,6 +5,7 @@ import de.kleiner3.lasertag.common.util.DurationUtils;
 import de.kleiner3.lasertag.lasertaggame.gamemode.DamageBasedGameMode;
 import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.IServerLasertagManager;
+import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.SettingsState;
 import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
 import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import net.minecraft.client.MinecraftClient;
@@ -40,6 +41,17 @@ public class EliminationGameMode extends DamageBasedGameMode {
 
     public EliminationGameMode() {
         super("gameMode.elimination", true, true);
+    }
+
+    @Override
+    public SettingsState createDefaultSettings() {
+
+        var map = super.createDefaultSettings();
+
+        map.put(SettingDescription.WEAPON_COOLDOWN.getName(), 10L);
+        map.put(SettingDescription.LASERTARGET_DEACTIVATE_TIME.getName(), 4L);
+
+        return map;
     }
 
     @Override
