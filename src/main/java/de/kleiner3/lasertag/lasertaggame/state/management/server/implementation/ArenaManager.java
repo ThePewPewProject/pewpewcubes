@@ -96,49 +96,51 @@ public class ArenaManager implements IArenaManager {
         // Start time measurement
         var blockPlaceStartTime = System.currentTimeMillis();
 
-        // Step 1: Teleport all players back to origin for their own safety
-        this.teleportPlayersToOrigin();
+        // Step 1: Clear spawn-point cache if necessary and reset arena structure placer
+        if (!oldArenaType.equals(newArenaType) || oldArenaType.equals(ArenaType.PROCEDURAL)) {
+            spawnpointManager.clearSpawnpointCache();
+        }
 
-        try {
-            // Step 2: Remove all blocks of the old arena
-            var oldArenaBounds = this.calculateBounds(oldArenaTemplate);
-            this.removeOldBlocks(oldArenaBounds);
+        // Step 2: Teleport all players back to origin for their own safety
+        var teleportPlayersToOriginFuture = this.teleportPlayersToOrigin();
 
-            // Step 3: Clear spawn-point cache if necessary and reset arena structure placer
-            if (!oldArenaType.equals(newArenaType) || oldArenaType.equals(ArenaType.PROCEDURAL)) {
-                spawnpointManager.clearSpawnpointCache();
+        // Step 3: Remove all blocks of the old arena
+        var oldArenaBounds = this.calculateBounds(oldArenaTemplate);
+        var removeOldBlocksFuture = this.removeOldBlocks(oldArenaBounds, teleportPlayersToOriginFuture);
+
+        // Step 3: Remove all entities except the players
+        var removeEntitiesFuture = this.removeEntities(removeOldBlocksFuture);
+
+        // Step 4: Set new arena chunk generator config
+        var newSeed = new Random().nextLong();
+        arenaChunkGenerator.setConfig(new ArenaChunkGeneratorConfig(newArenaType.ordinal(), newProceduralArenaType.ordinal(), newSeed));
+        var newArenaTemplate = TemplateRegistry.getTemplate(newArenaType, newProceduralArenaType, newSeed);
+
+        // Step 5: Generate new arena
+        var newArenaBounds = this.calculateBounds(newArenaTemplate);
+        var generateArenaFuture = this.generateArena(newArenaBounds, removeEntitiesFuture);
+
+        // Step 6: Mark all changed chunks for update
+        var updateBounds = this.calculateUnion(oldArenaBounds, newArenaBounds);
+        var markChunksForUpdateFuture = this.markChunksForUpdate(updateBounds, generateArenaFuture);
+
+        // When the futures completed
+        markChunksForUpdateFuture.whenComplete((result, ex) -> {
+
+            // If this completed exceptionally
+            if (ex != null) {
+                LasertagMod.LOGGER.error("Could not load map '" + newArenaType.translatableName + "(" + newProceduralArenaType.translatableName + ")':", ex);
             }
-
-            // Step 3: Remove all entities except the players
-            this.removeEntities();
-
-            // Step 4: Set new arena chunk generator config
-            var newSeed = new Random().nextLong();
-            arenaChunkGenerator.setConfig(new ArenaChunkGeneratorConfig(newArenaType.ordinal(), newProceduralArenaType.ordinal(), newSeed));
-            var newArenaTemplate = TemplateRegistry.getTemplate(newArenaType, newProceduralArenaType, newSeed);
-
-            // Step 5: Generate new arena
-            var newArenaBounds = this.calculateBounds(newArenaTemplate);
-            this.generateArena(newArenaBounds);
-
-            // Step 6: Mark all changed chunks for update
-            var updateBounds = this.calculateUnion(oldArenaBounds, newArenaBounds);
-            this.markChunksForUpdate(updateBounds);
 
             // Final logging
             var blockPlaceDuration = System.currentTimeMillis() - blockPlaceStartTime;
             LasertagMod.LOGGER.info(String.format(Locale.ROOT, "Arena loaded. This took %d ms for %d chunks, or %02f ms per chunk", blockPlaceDuration, updateBounds.numChunks(), (float) blockPlaceDuration / (float) updateBounds.numChunks()));
-        } catch (Exception ex) {
 
-            LasertagMod.LOGGER.error("Could not load map '" + newArenaType.translatableName + "(" + newProceduralArenaType.translatableName + ")':", ex);
-            throw ex;
-        } finally {
             // In case of unexpected exception: Close all loading screens on the clients
             this.sendMapLoadProgressEvent("", -1.0);
 
             this.isLoading = false;
-        }
-
+        });
         return true;
     }
 
@@ -155,9 +157,10 @@ public class ArenaManager implements IArenaManager {
      * Teleports all players in the world to the origin.
      * Ignores offline players.
      */
-    private void teleportPlayersToOrigin() {
+    private CompletableFuture<Void> teleportPlayersToOrigin() {
 
-        playerNamesState.forEachPlayer(playerUuid -> {
+        return CompletableFuture.runAsync(() -> playerNamesState.forEachPlayer(playerUuid -> {
+
             var player = server.getPlayerManager().getPlayer(playerUuid);
 
             // Sanity check
@@ -167,7 +170,7 @@ public class ArenaManager implements IArenaManager {
             }
 
             player.requestTeleport(0.5F, 1, 0.5F);
-        });
+        }), server);
     }
 
     /**
@@ -175,64 +178,67 @@ public class ArenaManager implements IArenaManager {
      *
      * @param oldArenaBounds The bounds in which to remove all blocks
      */
-    private void removeOldBlocks(ArenaBoundsDto oldArenaBounds) {
+    private CompletableFuture<Void> removeOldBlocks(ArenaBoundsDto oldArenaBounds, CompletableFuture<?> previousFuture) {
 
-        // Reset custom block tickers
-        blockTickManager.clear();
+        return previousFuture.thenRunAsync(() -> {
 
-        // Get chunk manager
-        var serverWorld = server.getOverworld();
-        var serverChunkManager = serverWorld.getChunkManager();
+            // Reset custom block tickers
+            blockTickManager.clear();
 
-        // Init progress variables
-        var currentStepString = "Removing blocks from old arena";
-        this.sendMapLoadProgressEvent(currentStepString, 0.0);
-        var removeBlocksChunkIndex = 0;
+            // Get chunk manager
+            var serverWorld = server.getOverworld();
+            var serverChunkManager = serverWorld.getChunkManager();
 
-        // Remove all blocks of the old arena
-        for(var chunkZ = oldArenaBounds.startZ(); chunkZ <= oldArenaBounds.endZ(); ++chunkZ) {
-            for(var chunkX = oldArenaBounds.startX(); chunkX <= oldArenaBounds.endX(); ++chunkX) {
-                var chunkPos = new ChunkPos(chunkX, chunkZ);
-                var worldChunk = serverChunkManager.getWorldChunk(chunkX, chunkZ, true);
-                if (worldChunk != null) {
+            // Init progress variables
+            var currentStepString = "Removing blocks from old arena";
+            this.sendMapLoadProgressEvent(currentStepString, 0.0);
+            var removeBlocksChunkIndex = 0;
 
-                    for (BlockPos blockPos : BlockPos.iterate(chunkPos.getStartX(), serverWorld.getBottomY(), chunkPos.getStartZ(), chunkPos.getEndX(), serverWorld.getTopY() - 1, chunkPos.getEndZ())) {
+            // Remove all blocks of the old arena
+            for (var chunkZ = oldArenaBounds.startZ(); chunkZ <= oldArenaBounds.endZ(); ++chunkZ) {
+                for (var chunkX = oldArenaBounds.startX(); chunkX <= oldArenaBounds.endX(); ++chunkX) {
+                    var chunkPos = new ChunkPos(chunkX, chunkZ);
+                    var worldChunk = serverChunkManager.getWorldChunk(chunkX, chunkZ, true);
+                    if (worldChunk != null) {
 
-                        // get the current block state
-                        var currentBlockState = serverWorld.getBlockState(blockPos);
+                        for (BlockPos blockPos : BlockPos.iterate(chunkPos.getStartX(), serverWorld.getBottomY(), chunkPos.getStartZ(), chunkPos.getEndX(), serverWorld.getTopY() - 1, chunkPos.getEndZ())) {
 
-                        // If is already air
-                        if (currentBlockState.equals(Blocks.AIR.getDefaultState())) {
-                            // Continue with the next block
-                            continue;
+                            // get the current block state
+                            var currentBlockState = serverWorld.getBlockState(blockPos);
+
+                            // If is already air
+                            if (currentBlockState.equals(Blocks.AIR.getDefaultState())) {
+                                // Continue with the next block
+                                continue;
+                            }
+
+                            // Clear block entity
+                            var blockEntity = serverWorld.getBlockEntity(blockPos);
+                            Clearable.clear(blockEntity);
+
+                            // Set block to air. Block.FORCE_STATE so that no items drop (Flowers, seeds, etc)
+                            serverWorld.setBlockState(blockPos, Blocks.AIR.getDefaultState(), Block.FORCE_STATE);
                         }
 
-                        // Clear block entity
-                        var blockEntity = serverWorld.getBlockEntity(blockPos);
-                        Clearable.clear(blockEntity);
-
-                        // Set block to air. Block.FORCE_STATE so that no items drop (Flowers, seeds, etc)
-                        serverWorld.setBlockState(blockPos, Blocks.AIR.getDefaultState(), Block.FORCE_STATE);
+                        worldChunk.clear();
+                    } else {
+                        LasertagMod.LOGGER.warn("Load arena, remove old arena - Could not get chunk (" + chunkX + ", " + chunkZ + ")");
                     }
 
-                    worldChunk.clear();
-                } else {
-                    LasertagMod.LOGGER.warn("Load arena, remove old arena - Could not get chunk (" + chunkX + ", " + chunkZ + ")");
+                    this.sendMapLoadProgressEvent(currentStepString, (double) (++removeBlocksChunkIndex) / (double) oldArenaBounds.numChunks());
                 }
-
-                this.sendMapLoadProgressEvent(currentStepString, (double)(++removeBlocksChunkIndex) / (double)oldArenaBounds.numChunks());
             }
-        }
+        }, server);
     }
 
     /**
      * Removes all entities except players from the world
      */
-    private void removeEntities() {
+    private CompletableFuture<Void> removeEntities(CompletableFuture<?> previousFuture) {
 
-        server.getOverworld()
+        return previousFuture.thenRunAsync(() -> server.getOverworld()
                 .getEntitiesByType(TypeFilter.instanceOf(Entity.class), e -> !(e instanceof PlayerEntity))
-                .forEach(Entity::discard);
+                .forEach(Entity::discard), server);
     }
 
     /**
@@ -244,10 +250,9 @@ public class ArenaManager implements IArenaManager {
      *
      * @param newArenaBounds The bounds of the new arena
      */
-    private void generateArena(ArenaBoundsDto newArenaBounds) {
+    private CompletableFuture<?> generateArena(ArenaBoundsDto newArenaBounds, CompletableFuture<?> previousFuture) {
 
-        // Create task executor
-        TaskExecutor<Runnable> taskExecutor = TaskExecutor.create(Util.getMainWorkerExecutor(), "lasertag-loadarena");
+        var generateArenaFuture = previousFuture;
 
         // Get chunk manager
         var serverWorld = server.getOverworld();
@@ -255,7 +260,7 @@ public class ArenaManager implements IArenaManager {
         serverChunkManager.threadedAnvilChunkStorage.verifyChunkGenerator();
 
         // For every chunk generation step necessary
-        for(var chunkStatus : ImmutableList.of(ChunkStatus.BIOMES, ChunkStatus.FEATURES, ChunkStatus.LIGHT, ChunkStatus.SPAWN)) {
+        for (var chunkStatus : ImmutableList.of(ChunkStatus.BIOMES, ChunkStatus.FEATURES, ChunkStatus.LIGHT, ChunkStatus.SPAWN)) {
 
             // Init progress variables
             var currentStepChunkIndex = new AtomicInteger(0);
@@ -265,10 +270,8 @@ public class ArenaManager implements IArenaManager {
             // Start time measurement for this step
             var stepStartTime = System.currentTimeMillis();
 
-            CompletableFuture<Unit> completableFuture = CompletableFuture.supplyAsync(() -> Unit.INSTANCE, taskExecutor::send);
-
-            for(var chunkZ = newArenaBounds.startZ(); chunkZ <= newArenaBounds.endZ(); ++chunkZ) {
-                for(var chunkX = newArenaBounds.startX(); chunkX <= newArenaBounds.endX(); ++chunkX) {
+            for (var chunkZ = newArenaBounds.startZ(); chunkZ <= newArenaBounds.endZ(); ++chunkZ) {
+                for (var chunkX = newArenaBounds.startX(); chunkX <= newArenaBounds.endX(); ++chunkX) {
                     var chunkPos = new ChunkPos(chunkX, chunkZ);
                     var worldChunk = serverChunkManager.getWorldChunk(chunkX, chunkZ, true);
                     if (worldChunk != null) {
@@ -302,10 +305,10 @@ public class ArenaManager implements IArenaManager {
                             }
                         }
 
-                        completableFuture = completableFuture.thenComposeAsync((unit) -> {
+                        generateArenaFuture = generateArenaFuture.thenComposeAsync((unit) -> {
                             // Execute the generation step
                             var generationTask = chunkStatus.runGenerationTask(
-                                            taskExecutor::send,
+                                            server,
                                             serverWorld,
                                             serverChunkManager.getChunkGenerator(),
                                             serverWorld.getStructureTemplateManager(),
@@ -318,19 +321,22 @@ public class ArenaManager implements IArenaManager {
                                     .thenApply((either) -> Unit.INSTANCE);
 
                             // Generation step for this chunk finished -> Send progress event
-                            this.sendMapLoadProgressEvent(currentStepString, (double)currentStepChunkIndex.incrementAndGet() / (double)newArenaBounds.numChunks());
+                            this.sendMapLoadProgressEvent(currentStepString, (double) currentStepChunkIndex.incrementAndGet() / (double) newArenaBounds.numChunks());
 
                             return generationTask;
-                        }, taskExecutor::send);
+                        }, server);
                     } else {
                         LasertagMod.LOGGER.warn("Load arena, " + chunkStatus.getId() + " - Could not get chunk (" + chunkX + ", " + chunkZ + ")");
                     }
                 }
             }
 
-            server.runTasks(completableFuture::isDone);
-            LasertagMod.LOGGER.info("Loading map - " + chunkStatus.getId() + " took " + (System.currentTimeMillis() - stepStartTime) + " ms");
+            generateArenaFuture = generateArenaFuture.thenRunAsync(() -> {
+                LasertagMod.LOGGER.info("Loading map - " + chunkStatus.getId() + " took " + (System.currentTimeMillis() - stepStartTime) + " ms");
+            });
         }
+
+        return generateArenaFuture;
     }
 
     /**
@@ -339,47 +345,49 @@ public class ArenaManager implements IArenaManager {
      *
      * @param bounds The bounds
      */
-    private void markChunksForUpdate(ArenaBoundsDto bounds) {
+    private CompletableFuture<Void> markChunksForUpdate(ArenaBoundsDto bounds, CompletableFuture<?> previousFuture) {
 
-        // Init progress variables
-        var currentStepString = "Marking chunks for update";
-        this.sendMapLoadProgressEvent(currentStepString, 0.0);
-        var markUpdateChunkIndex = 0;
+        return previousFuture.thenRunAsync(() -> {
 
-        // Get chunk manager
-        var serverWorld = server.getOverworld();
-        var serverChunkManager = serverWorld.getChunkManager();
+            // Init progress variables
+            var currentStepString = "Marking chunks for update";
+            this.sendMapLoadProgressEvent(currentStepString, 0.0);
+            var markUpdateChunkIndex = 0;
 
-        // For every chunk
-        for(var chunkZ = bounds.startZ(); chunkZ <= bounds.endZ(); ++chunkZ) {
-            for(var chunkX = bounds.startX(); chunkX <= bounds.endX(); ++chunkX) {
-                var chunkPos = new ChunkPos(chunkX, chunkZ);
-                var worldChunk = serverChunkManager.getWorldChunk(chunkX, chunkZ, false);
+            // Get chunk manager
+            var serverWorld = server.getOverworld();
+            var serverChunkManager = serverWorld.getChunkManager();
 
-                if (worldChunk != null) {
+            // For every chunk
+            for (var chunkZ = bounds.startZ(); chunkZ <= bounds.endZ(); ++chunkZ) {
+                for (var chunkX = bounds.startX(); chunkX <= bounds.endX(); ++chunkX) {
+                    var chunkPos = new ChunkPos(chunkX, chunkZ);
+                    var worldChunk = serverChunkManager.getWorldChunk(chunkX, chunkZ, false);
 
-                    // Reload chunks on the clients to update biome
-                    for (var player : serverWorld.getPlayers()) {
-                        player.sendUnloadChunkPacket(chunkPos);
-                        serverChunkManager.threadedAnvilChunkStorage.sendChunkDataPackets(player, new MutableObject<>(), worldChunk);
+                    if (worldChunk != null) {
+
+                        // Reload chunks on the clients to update biome
+                        for (var player : serverWorld.getPlayers()) {
+                            player.sendUnloadChunkPacket(chunkPos);
+                            serverChunkManager.threadedAnvilChunkStorage.sendChunkDataPackets(player, new MutableObject<>(), worldChunk);
+                        }
+
+                        // Mark every block for update
+                        for (var blockPos : BlockPos.iterate(chunkPos.getStartX(), serverWorld.getBottomY(), chunkPos.getStartZ(), chunkPos.getEndX(), serverWorld.getTopY() - 1, chunkPos.getEndZ())) {
+                            serverChunkManager.markForUpdate(blockPos);
+                        }
+                    } else {
+                        LasertagMod.LOGGER.warn("Load arena, mark for update - Could not get chunk (" + chunkX + ", " + chunkZ + ")");
                     }
 
-                    // Mark every block for update
-                    for (var blockPos : BlockPos.iterate(chunkPos.getStartX(), serverWorld.getBottomY(), chunkPos.getStartZ(), chunkPos.getEndX(), serverWorld.getTopY() - 1, chunkPos.getEndZ())) {
-                        serverChunkManager.markForUpdate(blockPos);
-                    }
+                    this.sendMapLoadProgressEvent(currentStepString, (double) (++markUpdateChunkIndex) / (double) bounds.numChunks());
                 }
-                else {
-                    LasertagMod.LOGGER.warn("Load arena, mark for update - Could not get chunk (" + chunkX + ", " + chunkZ + ")");
-                }
-
-                this.sendMapLoadProgressEvent(currentStepString, (double)(++markUpdateChunkIndex) / (double)bounds.numChunks());
             }
-        }
 
-        // Send final progress event with progress=-1 to close the loading screens
-        currentStepString = "";
-        this.sendMapLoadProgressEvent(currentStepString, -1.0);
+            // Send final progress event with progress=-1 to close the loading screens
+            currentStepString = "";
+            this.sendMapLoadProgressEvent(currentStepString, -1.0);
+        }, server);
     }
 
     /**
@@ -409,7 +417,7 @@ public class ArenaManager implements IArenaManager {
     /**
      * Calculates the union bounds of two arena bounds
      *
-     * @param first The first arena bounds
+     * @param first  The first arena bounds
      * @param second The second arena bounds
      * @return The union of both bounds
      */
@@ -428,7 +436,7 @@ public class ArenaManager implements IArenaManager {
      * Sends the progress event to all clients in the world
      *
      * @param stepString String describing what the current step is
-     * @param progress The progress in percent of the current step
+     * @param progress   The progress in percent of the current step
      */
     private void sendMapLoadProgressEvent(String stepString, double progress) {
 

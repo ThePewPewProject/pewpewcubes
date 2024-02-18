@@ -49,10 +49,8 @@ public class ClientTriggerLoadMapCallback implements ServerPlayNetworking.PlayCh
                 return;
             }
 
-            var finalArenaTypeOptional = arenaTypeOptional;
-            server.execute(() -> {
-                arenaManager.loadArena(finalArenaTypeOptional.get(), proceduralTypeOptional.orElse(ProceduralArenaType.SMALL_2V2));
-            });
+            // Load the arena
+            arenaManager.loadArena(arenaTypeOptional.get(), proceduralTypeOptional.orElse(ProceduralArenaType.SMALL_2V2));
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in ClientTriggerLoadMapCallback", ex);
             throw ex;
