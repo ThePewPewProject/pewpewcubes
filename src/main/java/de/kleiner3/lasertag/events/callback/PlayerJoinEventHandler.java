@@ -35,24 +35,26 @@ public class PlayerJoinEventHandler {
         // Add player to player manager
         playerNamesState.savePlayerUsername(player.getUuid(), player.getLasertagUsername());
 
-        // Set to adventure game mode
-        player.changeGameMode(GameMode.ADVENTURE);
-
         // Sync state to the client
         gameManager.syncStateToClient(player);
 
         // Send player joined event
         sendPlayerJoinedNetworkEvent(server, player.getUuid(), player.getLasertagUsername());
 
-        // If origin spawn setting is disabled
-        if (!settingsManager.<Boolean>get(SettingDescription.DO_ORIGIN_SPAWN)) {
-            // Dont teleport him to origin
+        // If player is already in a team and game is running (he got disconnected)
+        if (teamsManager.isPlayerInTeam(player.getUuid()) &&
+            gameManager.isGameRunning()) {
+
+            // Dont teleport him to origin and dont set him to adventure game mode
             return;
         }
 
-        // If player is already in a team and game is running (i.e. he got disconnected)
-        if (teamsManager.isPlayerInTeam(player.getUuid()) &&
-            gameManager.isGameRunning()) {
+        // Set to adventure game mode
+        player.changeGameMode(GameMode.ADVENTURE);
+
+        // If origin spawn setting is disabled
+        if (!settingsManager.<Boolean>get(SettingDescription.DO_ORIGIN_SPAWN)) {
+
             // Dont teleport him to origin
             return;
         }
