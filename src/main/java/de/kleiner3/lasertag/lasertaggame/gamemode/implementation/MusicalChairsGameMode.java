@@ -48,11 +48,11 @@ public class MusicalChairsGameMode extends PointBasedGameMode {
 
         // Get the game managers
         var gameManager = server.getOverworld().getServerLasertagManager();
-        var remainingTeamsManager = gameManager.getRemainingTeamsManager();
+        var eliminationManager = gameManager.getEliminationManager();
         var musicalChairsManager = gameManager.getMusicalChairsManager();
 
         // Reset game managers
-        remainingTeamsManager.reset();
+        eliminationManager.reset();
         musicalChairsManager.resetTicksSinceLastPhase();
     }
 
@@ -109,10 +109,10 @@ public class MusicalChairsGameMode extends PointBasedGameMode {
 
         // Get the game managers
         var gameManager = server.getOverworld().getServerLasertagManager();
-        var remainingTeamsManager = gameManager.getRemainingTeamsManager();
+        var eliminationManager = gameManager.getEliminationManager();
 
         // Get all the teams that are left
-        var numberAliveTeams = remainingTeamsManager.getRemainingTeams().size();
+        var numberAliveTeams = eliminationManager.getRemainingTeamIds().size();
 
         LasertagMod.LOGGER.info("[MusicalChairsGameMode] Remaining teams: " + numberAliveTeams);
 
@@ -127,18 +127,18 @@ public class MusicalChairsGameMode extends PointBasedGameMode {
 
         // Get the game managers
         var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
-        var remainingTeamsManager = gameManager.getRemainingTeamsManager();
+        var eliminationManager = gameManager.getEliminationManager();
 
-        return remainingTeamsManager.getRemainingTeamIds().get(0);
+        return eliminationManager.getRemainingTeamIds().get(0);
     }
 
     @Override
     public ScoreHolding getTeamFinalScore(TeamDto team, IServerLasertagManager gameManager) {
 
         // Get the game managers
-        var musicalChairsManager = gameManager.getMusicalChairsManager();
+        var eliminationManager = gameManager.getEliminationManager();
 
-        return new MusicalChairsTeamScore(musicalChairsManager.getTeamSurvivedTime(team));
+        return new MusicalChairsTeamScore(eliminationManager.getTeamSurviveTime(team));
     }
 
     @Override

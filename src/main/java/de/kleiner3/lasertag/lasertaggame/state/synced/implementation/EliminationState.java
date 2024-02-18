@@ -17,12 +17,31 @@ public class EliminationState implements IEliminationState {
      *     key: The players uuid
      *     value: The number of players he eliminated
      */
-    private static final Map<UUID, Long> playerEliminationCountMap = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> playerEliminationCountMap = new ConcurrentHashMap<>();
 
     /**
      * Set of all players that have been eliminated
      */
-    private static final Set<UUID> eliminatedPlayersSet = new HashSet<>();
+    private final Set<UUID> eliminatedPlayersSet = new HashSet<>();
+
+    /**
+     * Set of all teams that have been eliminated. Teams are saved by their ids.
+     */
+    private final Set<Integer> eliminatedTeamsSet = new HashSet<>();
+
+    /**
+     * Map mapping every eliminated team to their survive time
+     *     key: The teams id
+     *     value: The time in seconds the team got eliminated
+     */
+    private final Map<Integer, Long> teamSurviveTimeMap = new ConcurrentHashMap<>();
+
+    /**
+     * Map mapping every players uuid to their survive time in seconds
+     *     key: The players uuid
+     *     value: The players survive time in seconds
+     */
+    private final Map<UUID, Long> playerSurviveTimeMap = new ConcurrentHashMap<>();
 
     @Override
     public void setEliminationCount(UUID playerUuid, long newCount) {
@@ -35,18 +54,51 @@ public class EliminationState implements IEliminationState {
     }
 
     @Override
-    public synchronized void eliminatePlayer(UUID playerUuid) {
+    public void eliminatePlayer(UUID playerUuid) {
         eliminatedPlayersSet.add(playerUuid);
     }
 
     @Override
-    public synchronized boolean isEliminated(UUID playerUuid) {
+    public boolean isEliminated(UUID playerUuid) {
         return eliminatedPlayersSet.contains(playerUuid);
+    }
+
+    @Override
+    public void eliminateTeam(int teamId) {
+        eliminatedTeamsSet.add(teamId);
+    }
+
+    @Override
+    public boolean isEliminated(int teamId) {
+        return eliminatedTeamsSet.contains(teamId);
+    }
+
+    @Override
+    public void setTeamSurviveTime(int teamId, long surviveTime) {
+        teamSurviveTimeMap.put(teamId, surviveTime);
+    }
+
+    @Override
+    public Long getTeamSurviveTime(int teamId) {
+        return teamSurviveTimeMap.get(teamId);
+    }
+
+    @Override
+    public void setPlayerSurviveTime(UUID playerUuid, long surviveTime) {
+        playerSurviveTimeMap.put(playerUuid, surviveTime);
+    }
+
+    @Override
+    public Long getPlayerSuriviveTime(UUID playerUuid) {
+        return playerSurviveTimeMap.get(playerUuid);
     }
 
     @Override
     public synchronized void reset() {
         playerEliminationCountMap.clear();
+        eliminatedTeamsSet.clear();
         eliminatedPlayersSet.clear();
+        teamSurviveTimeMap.clear();
+        playerSurviveTimeMap.clear();
     }
 }

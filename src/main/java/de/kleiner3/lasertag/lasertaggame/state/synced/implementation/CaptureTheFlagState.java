@@ -20,11 +20,6 @@ public class CaptureTheFlagState implements ICaptureTheFlagState {
     private final HashMap<Integer, Long> teamFlagMap = new HashMap<>();
 
     /**
-     * Maps every team's id to the time in seconds they survived
-     */
-    private final HashMap<Integer, Long> teamSurviveTimeMap = new HashMap<>();
-
-    /**
      * Maps every player to the number of flags he has captured. Only necessary on the server. Does not get
      * synced to the clients.
      */
@@ -39,7 +34,6 @@ public class CaptureTheFlagState implements ICaptureTheFlagState {
     @Override
     public synchronized void reset() {
         this.teamFlagMap.clear();
-        this.teamSurviveTimeMap.clear();
         this.playerFlagCapturedMap.clear();
         this.playerHoldingFlagMap.clear();
     }
@@ -78,16 +72,6 @@ public class CaptureTheFlagState implements ICaptureTheFlagState {
     @Override
     public synchronized void setNumberOfCapturedFlags(UUID playerUuid, long newFlagCapturedCount) {
         playerFlagCapturedMap.put(playerUuid, newFlagCapturedCount);
-    }
-
-    @Override
-    public synchronized Optional<Long> getSurviveTime(TeamDto team) {
-        return Optional.ofNullable(teamSurviveTimeMap.get(team.id()));
-    }
-
-    @Override
-    public synchronized void setSurviveTime(TeamDto team, long surviveTime) {
-        teamSurviveTimeMap.put(team.id(), surviveTime);
     }
 
     @Override

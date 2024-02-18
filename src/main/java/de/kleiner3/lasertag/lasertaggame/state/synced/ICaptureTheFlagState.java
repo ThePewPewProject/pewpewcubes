@@ -59,22 +59,6 @@ public interface ICaptureTheFlagState {
     void setNumberOfCapturedFlags(UUID playerUuid, long newFlagCapturedCount);
 
     /**
-     * Get how long a team survived in seconds
-     *
-     * @param team The team to get the survival duration from
-     * @return Optional containing the survival duration. Or Optional.empty if the team survived till the end
-     */
-    Optional<Long> getSurviveTime(TeamDto team);
-
-    /**
-     * Set how long a team survived in seconds
-     *
-     * @param team        The team to update the survival duration of
-     * @param surviveTime The new survival duration
-     */
-    void setSurviveTime(TeamDto team, long surviveTime);
-
-    /**
      * Update the flag count of a team
      *
      * @param team         The team to update the flag count of

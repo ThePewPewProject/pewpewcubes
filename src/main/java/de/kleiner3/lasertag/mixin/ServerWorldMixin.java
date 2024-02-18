@@ -41,13 +41,12 @@ public abstract class ServerWorldMixin implements IServerLasertagManagerAccessor
         var teamsManager = new TeamsManager(syncedState.getTeamsState(), syncedState.getTeamsConfigState(), server, settingsManager);
         var scoreManager = new ScoreManager(syncedState.getScoreState(), server);
         var uiStateManager = new UIStateManager(syncedState.getUIState(), gameModeManager, settingsManager);
-        var captureTheFlagManager = new CaptureTheFlagManager(world, syncedState.getCaptureTheFlagState(), settingsManager, gameModeManager, syncedState.getUIState(), teamsManager, syncedState.getTeamsConfigState());
+        var eliminationManager = new EliminationManager(server, syncedState.getEliminationState(), settingsManager, teamsManager, syncedState.getUIState(), syncedState.getTeamsConfigState());
+        var captureTheFlagManager = new CaptureTheFlagManager(world, syncedState.getCaptureTheFlagState(), settingsManager, gameModeManager, syncedState.getUIState(), teamsManager, eliminationManager, syncedState.getTeamsConfigState());
         var activationManager = new ActivationManager(syncedState.getActivationState(), server, settingsManager, syncedState.getPlayerNamesState());
         var settingsPresetsNameManager = new SettingsPresetsNameManager(syncedState.getSettingsPresetsNamesState(), server);
         var settingsPresetsManager = new SettingsPresetsManager(new SettingsPresetsState(), settingsPresetsNameManager, settingsManager);
-        var remainingTeamsManager = new RemainingTeamsManager(syncedState.getRemainingTeamsState(), syncedState.getTeamsConfigState(), teamsManager, server);
-        var musicalChairsManager = new MusicalChairsManager(settingsManager, teamsManager, scoreManager, gameModeManager, syncedState.getTeamsConfigState(), syncedState.getUIState(), remainingTeamsManager, lasertargetManager, world);
-        var eliminationManager = new EliminationManager(server, syncedState.getEliminationState(), settingsManager, syncedState.getUIState());
+        var musicalChairsManager = new MusicalChairsManager(settingsManager, teamsManager, scoreManager, gameModeManager, syncedState.getTeamsConfigState(), lasertargetManager, eliminationManager, world);
 
         serverLasertagManager = new ServerLasertagManager(server,
                 syncedState,
@@ -66,7 +65,6 @@ public abstract class ServerWorldMixin implements IServerLasertagManagerAccessor
                 teamsManager,
                 uiStateManager,
                 musicalChairsManager,
-                remainingTeamsManager,
                 eliminationManager);
     }
 

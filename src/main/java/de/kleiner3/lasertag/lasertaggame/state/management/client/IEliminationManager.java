@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame.state.management.client;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -26,11 +27,39 @@ public interface IEliminationManager {
     void setEliminationCount(UUID playerUuid, long eliminationCount);
 
     /**
+     * Get the ids of the remaining teams
+     *
+     * @return A list containing all team ids of the remaining teams
+     */
+    List<Integer> getRemainingTeamIds();
+
+    /**
+     * Set a team to be eliminated
+     *
+     * @param teamId The teams id
+     */
+    void setTeamEliminated(int teamId);
+
+    /**
+     * Set a teams survive time in seconds
+     *
+     * @param surviveTime The teams survive time
+     */
+    void setTeamSurviveTime(int teamId, long surviveTime);
+
+    /**
      * Set a player to be eliminated
      *
-     * @param playerUuid The uuid of the player
+     * @param playerUuid The players uuid
      */
-    void eliminatePlayer(UUID playerUuid);
+    void setPlayerEliminated(UUID playerUuid);
+
+    /**
+     * Set a players survive time in seconds
+     *
+     * @param surviveTime The players survive time
+     */
+    void setPlayerSurviveTime(UUID playerUuid, long surviveTime);
 
     /**
      * Reset the elimination manager

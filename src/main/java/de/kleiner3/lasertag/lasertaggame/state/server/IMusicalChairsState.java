@@ -1,7 +1,5 @@
 package de.kleiner3.lasertag.lasertaggame.state.server;
 
-import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
-
 import java.util.UUID;
 
 /**
@@ -11,22 +9,6 @@ import java.util.UUID;
  * @author Étienne Muser
  */
 public interface IMusicalChairsState {
-
-    /**
-     * Set the survive time of a team
-     *
-     * @param team        The team
-     * @param surviveTime The new survive time in seconds
-     */
-    void setTeamSurviveTime(TeamDto team, long surviveTime);
-
-    /**
-     * Get the survive time of a team
-     *
-     * @param teamDto The team
-     * @return The survive time in seconds of the team
-     */
-    Long getTeamSurviveTime(TeamDto teamDto);
 
     /**
      * Set a players overall score

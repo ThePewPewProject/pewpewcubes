@@ -25,8 +25,6 @@ public interface IClientLasertagManager {
 
     IUIStateManager getUIStateManager();
 
-    IRemainingTeamsManager getRemainingTeamsManager();
-
     IEliminationManager getEliminationManager();
 
     ISyncedState getSyncedState();

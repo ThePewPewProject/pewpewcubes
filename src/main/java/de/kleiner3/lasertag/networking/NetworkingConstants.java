@@ -24,7 +24,6 @@ public class NetworkingConstants {
     public static final Identifier GAME_STATISTICS = new Identifier(LasertagMod.ID, "game_statistics");
     public static final Identifier MAP_LOADING_EVENT = new Identifier(LasertagMod.ID, "map_loading");
     public static final Identifier TEAM_ELIMINATED = new Identifier(LasertagMod.ID, "team_eliminated");
-    public static final Identifier REMAINING_TEAMS_RESET = new Identifier(LasertagMod.ID, "remaining_teams_changed");
     public static final Identifier PLAYER_ELIMINATED = new Identifier(LasertagMod.ID, "player_eliminated");
     public static final Identifier ELIMINATION_STATE_RESET = new Identifier(LasertagMod.ID, "elimination_state_reset");
 

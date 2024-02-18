@@ -195,11 +195,6 @@ public class CaptureTheFlagManagerTests {
             }
 
             @Override
-            public IRemainingTeamsState getRemainingTeamsState() {
-                return null;
-            }
-
-            @Override
             public IEliminationState getEliminationState() {
                 return null;
             }
@@ -247,11 +242,6 @@ public class CaptureTheFlagManagerTests {
 
         @Override
         public IUIStateManager getUIStateManager() {
-            return null;
-        }
-
-        @Override
-        public IRemainingTeamsManager getRemainingTeamsManager() {
             return null;
         }
 

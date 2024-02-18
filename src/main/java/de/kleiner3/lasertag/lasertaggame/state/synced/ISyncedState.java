@@ -32,8 +32,6 @@ public interface ISyncedState {
 
     UIState getUIState();
 
-    IRemainingTeamsState getRemainingTeamsState();
-
     IEliminationState getEliminationState();
 
     /**

@@ -1,7 +1,5 @@
 package de.kleiner3.lasertag.lasertaggame.state.management.server;
 
-import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
-
 import java.util.UUID;
 
 /**
@@ -15,14 +13,6 @@ public interface IMusicalChairsManager {
      * Tick the manager.
      */
     void tick();
-
-    /**
-     * Get a teams survive time
-     *
-     * @param team The team
-     * @return The teams survive time in seconds
-     */
-    Long getTeamSurvivedTime(TeamDto team);
 
     /**
      * Get a players total score

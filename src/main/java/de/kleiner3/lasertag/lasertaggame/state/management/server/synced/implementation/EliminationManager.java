@@ -1,10 +1,12 @@
 package de.kleiner3.lasertag.lasertaggame.state.management.server.synced.implementation;
 
-import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.IEliminationManager;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.ISettingsManager;
+import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.ITeamsManager;
 import de.kleiner3.lasertag.lasertaggame.state.synced.IEliminationState;
+import de.kleiner3.lasertag.lasertaggame.state.synced.ITeamsConfigState;
+import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
 import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.UIState;
 import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
@@ -13,10 +15,13 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.world.GameMode;
 
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Implementation of the IElimination manager for the lasertag game
@@ -32,43 +37,50 @@ public class EliminationManager implements IEliminationManager {
      */
     private long ticksSinceLastPhaseChange = -1L;
 
-    /**
-     * Map mapping every team to their survive time in seconds
-     *     key: The team
-     *     value: The teams survive time in seconds
-     */
-    private final Map<TeamDto, Long> teamSurviveTimeMap = new ConcurrentHashMap<>();
-
-    /**
-     * Map mapping every players uuid to their survive time in seconds
-     *     key: The players uuid
-     *     value: The players survive time in seconds
-     */
-    private final Map<UUID, Long> playerSurviveTimeMap = new ConcurrentHashMap<>();
-
     private final MinecraftServer server;
 
     private final IEliminationState eliminationState;
 
     private final ISettingsManager settingsManager;
 
+    private final ITeamsManager teamsManager;
+
     private final UIState uiState;
 
-    public EliminationManager(MinecraftServer server, IEliminationState eliminationState, ISettingsManager settingsManager, UIState uiState) {
+    private final ITeamsConfigState teamsConfigState;
+
+    public EliminationManager(MinecraftServer server,
+                              IEliminationState eliminationState,
+                              ISettingsManager settingsManager,
+                              ITeamsManager teamsManager,
+                              UIState uiState,
+                              ITeamsConfigState teamsConfigState) {
         this.server = server;
         this.eliminationState = eliminationState;
         this.settingsManager = settingsManager;
+        this.teamsManager = teamsManager;
         this.uiState = uiState;
+        this.teamsConfigState = teamsConfigState;
     }
 
     @Override
     public synchronized void eliminatePlayer(UUID eliminatedPlayerUuid, UUID shooterUuid) {
 
+        // If the player is already eliminated
+        if (eliminationState.isEliminated(eliminatedPlayerUuid)) {
+
+            // Do nothing
+            return;
+        }
+
         // Eliminate the player
         eliminationState.eliminatePlayer(eliminatedPlayerUuid);
 
+        // Get the survive time
+        var surviveTime = uiState.gameTime;
+
         // Put the players survive time
-        playerSurviveTimeMap.put(eliminatedPlayerUuid, uiState.gameTime);
+        eliminationState.setPlayerSurviveTime(eliminatedPlayerUuid, surviveTime);
 
         var newEliminationCount = 0L;
 
@@ -83,37 +95,47 @@ public class EliminationManager implements IEliminationManager {
             eliminationState.setEliminationCount(shooterUuid, newEliminationCount);
         }
 
-        // Create packet buffer
-        var buf = new PacketByteBuf(Unpooled.buffer());
+        // Check if the players team got eliminated
+        checkTeamElimination(eliminatedPlayerUuid, surviveTime);
 
-        buf.writeUuid(eliminatedPlayerUuid);
-        buf.writeUuid(shooterUuid);
-        buf.writeLong(newEliminationCount);
+        // Put the player into spectator game mode
+        putPlayerToSpectatorGameMode(eliminatedPlayerUuid);
 
-        ServerEventSending.sendToEveryone(server, NetworkingConstants.PLAYER_ELIMINATED, buf);
+        // Send the network event
+        sendPlayerEliminatedNetworkEvent(eliminatedPlayerUuid, shooterUuid, newEliminationCount, surviveTime);
     }
 
     @Override
-    public boolean isPlayerEliminated(UUID playerUuid) {
-        return eliminationState.isEliminated(playerUuid);
+    public synchronized void eliminateTeam(TeamDto team) {
+
+        // Eliminate every player of that team
+        teamsManager.getPlayersOfTeam(team).forEach(playerUuid -> eliminatePlayer(playerUuid, null));
     }
 
     @Override
-    public long getPlayerEliminationCount(UUID playerUuid) {
+    public synchronized boolean isPlayerNotEliminated(UUID playerUuid) {
+        return !eliminationState.isEliminated(playerUuid);
+    }
+
+    @Override
+    public synchronized boolean isTeamNotEliminated(TeamDto team) {
+        return !eliminationState.isEliminated(team.id());
+    }
+
+    @Override
+    public synchronized long getPlayerEliminationCount(UUID playerUuid) {
         return eliminationState.getEliminationCount(playerUuid);
     }
 
     @Override
-    public void reset() {
+    public synchronized void reset() {
         eliminationState.reset();
-        teamSurviveTimeMap.clear();
-        playerSurviveTimeMap.clear();
 
         ServerEventSending.sendToEveryone(server, NetworkingConstants.ELIMINATION_STATE_RESET, PacketByteBufs.empty());
     }
 
     @Override
-    public void tick() {
+    public synchronized void tick() {
 
         // Increment time since last phase change
         ++ticksSinceLastPhaseChange;
@@ -130,18 +152,94 @@ public class EliminationManager implements IEliminationManager {
     }
 
     @Override
-    public void setTeamSurviveTime(TeamDto team, long surviveTime) {
-        teamSurviveTimeMap.put(team, surviveTime);
+    public synchronized Long getTeamSurviveTime(TeamDto team) {
+        return eliminationState.getTeamSurviveTime(team.id());
     }
 
     @Override
-    public Long getTeamSurviveTime(TeamDto team) {
-        return teamSurviveTimeMap.get(team);
+    public synchronized Long getPlayerSurviveTime(UUID playerUuid) {
+        return eliminationState.getPlayerSuriviveTime(playerUuid);
     }
 
     @Override
-    public Long getPlayerSurviveTime(UUID playerUuid) {
-        return playerSurviveTimeMap.get(playerUuid);
+    public synchronized List<Integer> getRemainingTeamIds() {
+
+        return teamsConfigState.getTeams().stream()
+                .filter(team -> !teamsManager.getPlayersOfTeam(team).isEmpty())
+                .filter(team -> !team.equals(TeamsConfigState.SPECTATORS))
+                .map(TeamDto::id)
+                .filter(id -> !eliminationState.isEliminated(id))
+                .toList();
+    }
+
+    private void checkTeamElimination(UUID playerUuid, long surviveTime) {
+
+        // Get the players team
+        var eliminatedPlayersTeam = teamsManager.getTeamOfPlayer(playerUuid).orElseThrow();
+
+        // Check if the team has still players left
+        var teamHasPlayersLeft = teamsManager.getPlayersOfTeam(eliminatedPlayersTeam).stream()
+                .anyMatch(this::isPlayerNotEliminated);
+
+        // If team is now eliminated
+        if (!teamHasPlayersLeft) {
+
+            setTeamEliminated(eliminatedPlayersTeam, surviveTime);
+        }
+    }
+
+    private void setTeamEliminated(TeamDto team, long surviveTime) {
+
+        eliminationState.setTeamSurviveTime(team.id(), surviveTime);
+        eliminationState.eliminateTeam(team.id());
+        sendTeamIsOutMessage(team);
+        sendTeamEliminatedNetworkEvent(team, surviveTime);
+    }
+
+    private void putPlayerToSpectatorGameMode(UUID playerUuid) {
+
+        // Get the eliminated player
+        var player = server.getOverworld().getPlayerByUuid(playerUuid);
+
+        // Sanity check
+        if (player == null) {
+            return;
+        }
+
+        // Cast to server player entity
+        if (!(player instanceof ServerPlayerEntity serverPlayer)) {
+            return;
+        }
+
+        // Set player to spectator game mode
+        serverPlayer.changeGameMode(GameMode.SPECTATOR);
+    }
+
+    private void sendPlayerEliminatedNetworkEvent(UUID eliminatedPlayerUuid,
+                                                  UUID shooterUuid,
+                                                  long newEliminationCount,
+                                                  long surviveTime) {
+
+        // Create packet buffer
+        var buf = new PacketByteBuf(Unpooled.buffer());
+
+        buf.writeUuid(eliminatedPlayerUuid);
+        buf.writeNullable(shooterUuid, PacketByteBuf::writeUuid);
+        buf.writeLong(newEliminationCount);
+        buf.writeLong(surviveTime);
+
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.PLAYER_ELIMINATED, buf);
+    }
+
+    private void sendTeamEliminatedNetworkEvent(TeamDto team,
+                                                long surviveTime) {
+        // Create packet buffer
+        var buf = new PacketByteBuf(Unpooled.buffer());
+
+        buf.writeInt(team.id());
+        buf.writeLong(surviveTime);
+
+        ServerEventSending.sendToEveryone(server, NetworkingConstants.TEAM_ELIMINATED, buf);
     }
 
     private void shrinkBorder() {
@@ -177,5 +275,20 @@ public class EliminationManager implements IEliminationManager {
 
             worldBorder.setSize(newBorderSize);
         }
+    }
+
+    private void sendTeamIsOutMessage(TeamDto team) {
+
+        boolean sendMessage = settingsManager.get(SettingDescription.SEND_TEAM_OUT_MESSAGE);
+
+        if (!sendMessage) {
+            return;
+        }
+
+        var msg = Text.literal("Team ");
+        var teamName = Text.literal(team.name()).setStyle(Style.EMPTY.withColor(team.color().getValue()));
+        msg.append(teamName);
+        msg.append(" got eliminated!");
+        server.getPlayerManager().broadcast(msg, false);
     }
 }

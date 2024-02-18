@@ -109,7 +109,5 @@ public interface IServerLasertagManager extends ITickable {
 
     IMusicalChairsManager getMusicalChairsManager();
 
-    IRemainingTeamsManager getRemainingTeamsManager();
-
     IEliminationManager getEliminationManager();
 }

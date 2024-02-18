@@ -43,6 +43,53 @@ public interface IEliminationState {
     boolean isEliminated(UUID playerUuid);
 
     /**
+     * Set a team to be eliminated
+     *
+     * @param teamId The teams id
+     */
+    void eliminateTeam(int teamId);
+
+    /**
+     * Check if a team is eliminated
+     *
+     * @param teamId The teams id
+     * @return True if the team is eliminated. Otherwise, false.
+     */
+    boolean isEliminated(int teamId);
+
+    /**
+     * Set a teams survive time in seconds
+     *
+     * @param teamId      The id of the team
+     * @param surviveTime The teams survive time in seconds
+     */
+    void setTeamSurviveTime(int teamId, long surviveTime);
+
+    /**
+     * Get a teams survive time in seconds
+     *
+     * @param teamId The id of the team
+     * @return The teams survive time in seconds or null if the team survived to the end
+     */
+    Long getTeamSurviveTime(int teamId);
+
+    /**
+     * Set a players survive time in seconds
+     *
+     * @param playerUuid The uuid of the player
+     * @param surviveTime The players survive time in seconds
+     */
+    void setPlayerSurviveTime(UUID playerUuid, long surviveTime);
+
+    /**
+     * Get a players survive time in seconds
+     *
+     * @param playerUuid The players uuid
+     * @return The players surivive time in seconds or null if he survived to the end
+     */
+    Long getPlayerSuriviveTime(UUID playerUuid);
+
+    /**
      * Reset the state to pre game conditions
      */
     void reset();

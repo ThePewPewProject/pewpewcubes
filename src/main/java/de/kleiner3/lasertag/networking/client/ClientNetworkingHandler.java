@@ -37,6 +37,7 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.TEAM_CONFIG_RELOADED, new TeamConfigReloadedCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.GAME_MODE_SYNC, new GameModeSyncCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.TEAM_ELIMINATED, new TeamEliminatedCallback());
-        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.REMAINING_TEAMS_RESET, new RemainingTeamsResetCallback());
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_ELIMINATED, new PlayerEliminatedCallback());
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.ELIMINATION_STATE_RESET, new EliminationStateResetCallback());
     }
 }

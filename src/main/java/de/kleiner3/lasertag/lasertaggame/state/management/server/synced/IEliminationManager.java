@@ -2,6 +2,7 @@ package de.kleiner3.lasertag.lasertaggame.state.management.server.synced;
 
 import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -20,12 +21,27 @@ public interface IEliminationManager {
     void eliminatePlayer(UUID eliminatedPlayerUuid, UUID shooterUuid);
 
     /**
+     * Eliminate a team
+     *
+     * @param team The team to eliminate
+     */
+    void eliminateTeam(TeamDto team);
+
+    /**
      * Check if a player is eliminated
      *
      * @param playerUuid The uuid of the player
      * @return True if the player is eliminated. Otherwise, false.
      */
-    boolean isPlayerEliminated(UUID playerUuid);
+    boolean isPlayerNotEliminated(UUID playerUuid);
+
+    /**
+     * Check if a team is not eliminated
+     *
+     * @param team The team to check
+     * @return True if the team is still in the game. Otherwise, false.
+     */
+    boolean isTeamNotEliminated(TeamDto team);
 
     /**
      * Get the elimination count of a player
@@ -36,6 +52,13 @@ public interface IEliminationManager {
     long getPlayerEliminationCount(UUID playerUuid);
 
     /**
+     * Get a list of all remaining team ids
+     *
+     * @return A list containing the team ids of all remaining teams
+     */
+    List<Integer> getRemainingTeamIds();
+
+    /**
      * Reset the elimination manager
      */
     void reset();
@@ -44,14 +67,6 @@ public interface IEliminationManager {
      * Tick the elimination manager
      */
     void tick();
-
-    /**
-     * Set the survive time of a team
-     *
-     * @param team        The team to set the survive time of
-     * @param surviveTime The survive time in seconds
-     */
-    void setTeamSurviveTime(TeamDto team, long surviveTime);
 
     /**
      * Get the survive time of a team

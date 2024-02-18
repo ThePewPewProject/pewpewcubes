@@ -11,10 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -135,12 +132,10 @@ public class EliminationGameMode extends DamageBasedGameMode {
         // Get the game managers
         var gameManager = server.getOverworld().getServerLasertagManager();
         var eliminationManager = gameManager.getEliminationManager();
-        var remainingTeamsManager = gameManager.getRemainingTeamsManager();
         var settingsManager = gameManager.getSettingsManager();
 
         // Reset game managers
         eliminationManager.reset();
-        remainingTeamsManager.reset();
 
         // Set the world border
         var worldBorder = server.getOverworld().getWorldBorder();
@@ -168,33 +163,9 @@ public class EliminationGameMode extends DamageBasedGameMode {
         // Get the game managers
         var gameManager = server.getOverworld().getServerLasertagManager();
         var eliminationManager = gameManager.getEliminationManager();
-        var teamsManager = gameManager.getTeamsManager();
-        var remainingTeamsManager = gameManager.getRemainingTeamsManager();
-        var uiState = gameManager.getSyncedState().getUIState();
 
         // Eliminate the player
         eliminationManager.eliminatePlayer(player.getUuid(), shooterUuid);
-
-        // Get the players team
-        var eliminatedPlayersTeam = teamsManager.getTeamOfPlayer(player.getUuid()).orElseThrow();
-
-        // Check if the team has still players left
-        var teamHasPlayersLeft = teamsManager.getPlayersOfTeam(eliminatedPlayersTeam).stream()
-                        .anyMatch(p -> !eliminationManager.isPlayerEliminated(p));
-
-        // If team is now eliminated
-        if (!teamHasPlayersLeft) {
-
-            // Set the teams survive time
-            eliminationManager.setTeamSurviveTime(eliminatedPlayersTeam, uiState.gameTime);
-
-            // Eliminate team
-            sendTeamIsOutMessage(eliminatedPlayersTeam, server.getOverworld());
-            remainingTeamsManager.removeTeam(eliminatedPlayersTeam);
-        }
-
-        // Set player to spectator
-        player.changeGameMode(GameMode.SPECTATOR);
 
         checkGameOver(server);
     }
@@ -211,7 +182,7 @@ public class EliminationGameMode extends DamageBasedGameMode {
         // Get the not eliminated players
         var notEliminatedTeams = teamsConfigState.getTeams().stream()
                 .filter(t -> t != TeamsConfigState.SPECTATORS)
-                .filter(t -> teamsManager.getPlayersOfTeam(t).stream().anyMatch(p -> !eliminationManager.isPlayerEliminated(p)))
+                .filter(t -> teamsManager.getPlayersOfTeam(t).stream().anyMatch(eliminationManager::isPlayerNotEliminated))
                 .count();
 
         // If the game is not over
@@ -242,9 +213,9 @@ public class EliminationGameMode extends DamageBasedGameMode {
 
         // Get the game managers
         var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
-        var remainingTeamsManager = gameManager.getRemainingTeamsManager();
+        var eliminationManager = gameManager.getEliminationManager();
 
-        return remainingTeamsManager.getRemainingTeamIds().get(0);
+        return eliminationManager.getRemainingTeamIds().get(0);
     }
 
     @Override
@@ -292,23 +263,6 @@ public class EliminationGameMode extends DamageBasedGameMode {
         var eliminationManager = gameManager.getEliminationManager();
 
         return new EliminationPlayerScore(eliminationManager.getPlayerSurviveTime(playerUuid), eliminationManager.getPlayerEliminationCount(playerUuid));
-    }
-
-    private void sendTeamIsOutMessage(TeamDto team, ServerWorld world) {
-
-        var settingsManager = world.getServerLasertagManager().getSettingsManager();
-
-        boolean sendMessage = settingsManager.get(SettingDescription.SEND_TEAM_OUT_MESSAGE);
-
-        if (!sendMessage) {
-            return;
-        }
-
-        var msg = Text.literal("Team ");
-        var teamName = Text.literal(team.name()).setStyle(Style.EMPTY.withColor(team.color().getValue()));
-        msg.append(teamName);
-        msg.append(" got eliminated!");
-        world.getServer().getPlayerManager().broadcast(msg, false);
     }
 
     private static class EliminationTeamScore implements ScoreHolding {

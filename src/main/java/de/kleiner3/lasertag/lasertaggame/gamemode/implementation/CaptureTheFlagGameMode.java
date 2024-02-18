@@ -2,13 +2,10 @@ package de.kleiner3.lasertag.lasertaggame.gamemode.implementation;
 
 import de.kleiner3.lasertag.block.Blocks;
 import de.kleiner3.lasertag.block.LasertagFlagBlock;
-import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import de.kleiner3.lasertag.block.entity.LasertagFlagBlockEntity;
 import de.kleiner3.lasertag.common.types.ScoreHolding;
 import de.kleiner3.lasertag.common.util.DurationUtils;
-import de.kleiner3.lasertag.damage.DamageSources;
 import de.kleiner3.lasertag.lasertaggame.gamemode.DamageBasedGameMode;
-import de.kleiner3.lasertag.lasertaggame.gamemode.GameMode;
 import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.IServerLasertagManager;
 import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.SettingsState;
@@ -22,7 +19,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.world.GameRules;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -242,10 +238,9 @@ public class CaptureTheFlagGameMode extends DamageBasedGameMode {
     public ScoreHolding getTeamFinalScore(TeamDto team, IServerLasertagManager gameManager) {
 
         // Get the survive time
-        var surviveTimeOptional = gameManager.getCaptureTheFlagManager()
-                .getSurviveTime(team);
+        var surviveTime = gameManager.getEliminationManager().getTeamSurviveTime(team);
 
-        return surviveTimeOptional.map(CTFTeamScore::new).orElseGet(() -> new CTFTeamScore(null));
+        return new CTFTeamScore(surviveTime);
     }
 
     @Override

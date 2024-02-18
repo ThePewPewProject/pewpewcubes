@@ -1,7 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame.state.server.implementation;
 
 import de.kleiner3.lasertag.lasertaggame.state.server.IMusicalChairsState;
-import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 
 import java.util.Map;
 import java.util.Optional;
@@ -16,28 +15,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MusicalChairsState implements IMusicalChairsState {
 
     /**
-     * Map mapping every eliminated team to their survive time
-     *     key: The team
-     *     value: The time in seconds the team got eliminated
-     */
-    private final Map<TeamDto, Long> teamSurviveTimeMap = new ConcurrentHashMap<>();
-
-    /**
      * Map mapping every player's uuid to the overall score they achieved
      *     key: The players uuid
      *     value: The overall score the player achieved
      */
     private final Map<UUID, Long> playerOverallScoreMap = new ConcurrentHashMap<>();
-
-    @Override
-    public void setTeamSurviveTime(TeamDto team, long surviveTime) {
-        teamSurviveTimeMap.put(team, surviveTime);
-    }
-
-    @Override
-    public Long getTeamSurviveTime(TeamDto teamDto) {
-        return teamSurviveTimeMap.get(teamDto);
-    }
 
     @Override
     public void setPlayerOverallScore(UUID playerUuid, long newScore) {
@@ -52,7 +34,6 @@ public class MusicalChairsState implements IMusicalChairsState {
     @Override
     public void reset() {
 
-        teamSurviveTimeMap.clear();
         playerOverallScoreMap.clear();
     }
 }

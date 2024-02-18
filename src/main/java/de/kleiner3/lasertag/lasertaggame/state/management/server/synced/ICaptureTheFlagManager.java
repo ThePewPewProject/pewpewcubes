@@ -49,13 +49,6 @@ public interface ICaptureTheFlagManager {
      */
     long getNumberOfCapturedFlags(UUID playerUuid);
 
-    /**
-     * Get the duration a team survived
-     *
-     * @param team The team
-     * @return Optional containing the survival time of the team if the team didn't survive to the end. Otherwise, Optional.empty.
-     */
-    Optional<Long> getSurviveTime(TeamDto team);
 
     /**
      * Get the number of flags a team has left

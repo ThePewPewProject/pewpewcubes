@@ -24,14 +24,14 @@ public class PlayerEliminatedCallback implements ClientPlayNetworking.PlayChanne
 
             // Get the data from the buffer
             var eliminatedPlayerUuid = buf.readUuid();
-            var shooterUuid = buf.readUuid();
+            var shooterUuid = buf.readNullable(PacketByteBuf::readUuid);
             var newEliminationCount = buf.readLong();
+            var playerSurviveTime = buf.readLong();
 
-            // Eliminate the player
-            eliminationManager.eliminatePlayer(eliminatedPlayerUuid);
-
-            // Set the eliminated count of the shooting player
+            // Set the data on the elimination manager
+            eliminationManager.setPlayerEliminated(eliminatedPlayerUuid);
             eliminationManager.setEliminationCount(shooterUuid, newEliminationCount);
+            eliminationManager.setPlayerSurviveTime(eliminatedPlayerUuid, playerSurviveTime);
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in PlayerEliminatedCallback", ex);
             throw ex;

@@ -9,13 +9,8 @@ import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.*;
 import de.kleiner3.lasertag.lasertaggame.state.server.IMusicalChairsState;
 import de.kleiner3.lasertag.lasertaggame.state.server.implementation.MusicalChairsState;
 import de.kleiner3.lasertag.lasertaggame.state.synced.ITeamsConfigState;
-import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.UIState;
 import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.world.GameMode;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -45,11 +40,9 @@ public class MusicalChairsManager implements IMusicalChairsManager {
 
     private final ITeamsConfigState teamsConfigState;
 
-    private final UIState uiState;
-
-    private final IRemainingTeamsManager remainingTeamsManager;
-
     private final ILasertargetManager lasertargetManager;
+
+    private final IEliminationManager eliminationManager;
 
     private final ServerWorld world;
 
@@ -60,8 +53,8 @@ public class MusicalChairsManager implements IMusicalChairsManager {
                                 IScoreManager scoreManager,
                                 IGameModeManager gameModeManager,
                                 ITeamsConfigState teamsConfigState,
-                                UIState uiState,
-                                IRemainingTeamsManager remainingTeamsManager, ILasertargetManager lasertargetManager,
+                                ILasertargetManager lasertargetManager,
+                                IEliminationManager eliminationManager,
                                 ServerWorld world
     ) {
         this.settingsManager = settingsManager;
@@ -69,9 +62,8 @@ public class MusicalChairsManager implements IMusicalChairsManager {
         this.scoreManager = scoreManager;
         this.gameModeManager = gameModeManager;
         this.teamsConfigState = teamsConfigState;
-        this.uiState = uiState;
-        this.remainingTeamsManager = remainingTeamsManager;
         this.lasertargetManager = lasertargetManager;
+        this.eliminationManager = eliminationManager;
         this.world = world;
         this.musicalChairsState = new MusicalChairsState();
     }
@@ -96,11 +88,6 @@ public class MusicalChairsManager implements IMusicalChairsManager {
             // Handle phase change
             handlePhaseChange();
         }
-    }
-
-    @Override
-    public Long getTeamSurvivedTime(TeamDto team) {
-        return musicalChairsState.getTeamSurviveTime(team);
     }
 
     @Override
@@ -139,7 +126,7 @@ public class MusicalChairsManager implements IMusicalChairsManager {
 
         // Get the non-eliminated teams
         var nonEliminatedTeams = teamsConfigState.getTeams().stream()
-                .filter(remainingTeamsManager::remains)
+                .filter(eliminationManager::isTeamNotEliminated)
                 .toList();
 
         var sb = new StringBuilder("[MusicalChairsManager] Remaining teams: [");
@@ -192,51 +179,12 @@ public class MusicalChairsManager implements IMusicalChairsManager {
         toBeEliminatedTeams.forEach(team -> {
 
             LasertagMod.LOGGER.info("[MusicalChairsManager] Eliminating team '" + team.name() + "'.");
-
-            musicalChairsState.setTeamSurviveTime(team, uiState.gameTime);
-            sendTeamIsOutMessage(team);
-            putTeamToSpectators(team);
-            remainingTeamsManager.removeTeam(team);
+            eliminationManager.eliminateTeam(team);
         });
 
         // Check if game ended
         gameModeManager.getGameMode().checkGameOver(world.getServer());
     }
 
-    private void sendTeamIsOutMessage(TeamDto team) {
 
-        boolean sendMessage = settingsManager.get(SettingDescription.SEND_TEAM_OUT_MESSAGE);
-
-        if (!sendMessage) {
-            return;
-        }
-
-        var msg = Text.literal("Team ");
-        var teamName = Text.literal(team.name()).setStyle(Style.EMPTY.withColor(team.color().getValue()));
-        msg.append(teamName);
-        msg.append(" got eliminated!");
-        world.getServer().getPlayerManager().broadcast(msg, false);
-    }
-
-    private void putTeamToSpectators(TeamDto team) {
-
-        teamsManager.getPlayersOfTeam(team).forEach(playerUuid -> {
-
-            // Get the player
-            var player = world.getPlayerByUuid(playerUuid);
-
-            // Sanity check
-            if (player == null) {
-                return;
-            }
-
-            // Cast to server player entity
-            if (!(player instanceof ServerPlayerEntity serverPlayer)) {
-                return;
-            }
-
-            // Set player to spectator game mode
-            serverPlayer.changeGameMode(GameMode.SPECTATOR);
-        });
-    }
 }
