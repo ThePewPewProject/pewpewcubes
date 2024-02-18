@@ -10,6 +10,7 @@ import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.ISetting
 import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.ITeamsManager;
 import de.kleiner3.lasertag.lasertaggame.state.synced.ICaptureTheFlagState;
 import de.kleiner3.lasertag.lasertaggame.state.synced.ITeamsConfigState;
+import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
 import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.UIState;
 import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
@@ -64,11 +65,12 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
     public void reset() {
         captureTheFlagState.reset();
 
-        // For every team that is not empty
+        // For every team that is not empty and not spectators
         teamsConfigState
                 .getTeams()
                 .stream()
                 .filter(team -> !teamsManager.getPlayersOfTeam(team).isEmpty())
+                .filter(team -> !team.equals(TeamsConfigState.SPECTATORS))
                 .forEach(team -> {
                     // Put the teams initial flag count
                     captureTheFlagState.updateTeamFlagCount(team, settingsManager.<Long>get(SettingDescription.FLAG_COUNT));

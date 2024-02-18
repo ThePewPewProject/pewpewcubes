@@ -164,6 +164,7 @@ public class CaptureTheFlagGameMode extends DamageBasedGameMode {
 
         // Get the number of teams with flags left
         var numberOfTeamsLeft = teamConfigState.getTeams().stream()
+                .filter(team -> !team.equals(TeamsConfigState.SPECTATORS))
                 .filter(team -> captureTheFlagManager.getNumberOfFlags(team) > 0)
                 .count();
 
