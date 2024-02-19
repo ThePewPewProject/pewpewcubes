@@ -33,6 +33,7 @@ public class LoadMapCommand extends ServerFeedbackCommand {
         var arenaManager = gameManager.getArenaManager();
 
         var mapTranslatableName = StringArgumentType.getString(context, "map");
+        var server = context.getSource().getServer();
 
         var arenaTypeOptional = Arrays.stream(ArenaType.values())
                 .filter(m -> m.translatableName.equals(mapTranslatableName))
