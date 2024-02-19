@@ -1,6 +1,5 @@
 package de.kleiner3.lasertag.item;
 
-import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.block.LaserTargetBlock;
 import de.kleiner3.lasertag.client.SoundEvents;
 import de.kleiner3.lasertag.common.util.RaycastUtil;
@@ -67,8 +66,6 @@ public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity playerEntity, Hand hand) {
 
-        LasertagMod.LOGGER.info("Player '" + playerEntity.getDisplayName().getString() + "' is using the weapon.");
-
         if (world.isClient) {
             return useClient(world, playerEntity, hand);
         } else {
@@ -93,7 +90,6 @@ public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable 
 
         // Check that player is active
         if (activationManager.isDeactivated(playerEntity.getUuid())) {
-            LasertagMod.LOGGER.info("[Server, " + playerEntity.getDisplayName().getString() + "] Weapon fail. Deactivated.");
             world.playSound(null, playerEntity.getBlockPos(), net.minecraft.sound.SoundEvents.BLOCK_BAMBOO_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
             return TypedActionResult.fail(laserweaponStack);
         }
@@ -102,7 +98,6 @@ public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable 
         var team = teamsManager.getTeamOfPlayer(playerEntity.getUuid());
 
         if (team.isEmpty()) {
-            LasertagMod.LOGGER.info("[Server, " + playerEntity.getDisplayName().getString() + "] Weapon fail. Not in team.");
             world.playSound(null, playerEntity.getBlockPos(), net.minecraft.sound.SoundEvents.BLOCK_BAMBOO_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
             return TypedActionResult.fail(laserweaponStack);
         }
@@ -132,7 +127,6 @@ public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable 
 
         // Check that player is active
         if (activationManager.isDeactivated(playerEntity.getUuid())) {
-            LasertagMod.LOGGER.info("[Client, " + playerEntity.getDisplayName().getString() + "] Weapon fail. Deactivated.");
             return TypedActionResult.fail(laserweaponStack);
         }
 
@@ -140,7 +134,6 @@ public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable 
         var team = teamsManager.getTeamOfPlayer(playerEntity.getUuid());
 
         if (team.isEmpty()) {
-            LasertagMod.LOGGER.info("[Client, " + playerEntity.getDisplayName().getString() + "] Weapon fail. Not in team.");
             return TypedActionResult.fail(laserweaponStack);
         }
 
@@ -217,9 +210,6 @@ public class LasertagWeaponItem extends RangedWeaponItem implements IAnimatable 
 
                 // Cast to player and trigger onHit
                 sendHitPlayer(playerEntity, hitPlayer);
-            }
-            default -> {
-                LasertagMod.LOGGER.info("[Client, " + playerEntity.getDisplayName().getString() + "] Nothing hit.");
             }
         }
     }

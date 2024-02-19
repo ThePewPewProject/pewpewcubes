@@ -18,8 +18,6 @@ public class PlayerDeactivatedStatusChangedCallback implements ClientPlayNetwork
 
         try {
 
-            LasertagMod.LOGGER.info("[Client] Received activation changed.");
-
             // Get the game managers
             var gameManager = client.world.getClientLasertagManager();
             var activationManager = gameManager.getActivationManager();
@@ -27,8 +25,6 @@ public class PlayerDeactivatedStatusChangedCallback implements ClientPlayNetwork
             // Read from buffer
             var uuid = buf.readUuid();
             var deactivated = buf.readBoolean();
-
-            LasertagMod.LOGGER.info("[Client] Activated: (" + uuid.toString() + ", " + deactivated + ")");
 
             // Set deactivated status
             activationManager.setDeactivated(uuid, deactivated);
