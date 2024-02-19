@@ -40,7 +40,7 @@ public interface IEliminationState {
      * @param playerUuid The players uuid
      * @return True if the player is eliminated. Otherwise, false.
      */
-    boolean isEliminated(UUID playerUuid);
+    boolean isPlayerEliminated(UUID playerUuid);
 
     /**
      * Set a team to be eliminated
@@ -55,7 +55,7 @@ public interface IEliminationState {
      * @param teamId The teams id
      * @return True if the team is eliminated. Otherwise, false.
      */
-    boolean isEliminated(int teamId);
+    boolean isTeamEliminated(int teamId);
 
     /**
      * Set a teams survive time in seconds

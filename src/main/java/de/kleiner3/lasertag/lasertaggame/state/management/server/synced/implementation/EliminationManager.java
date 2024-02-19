@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame.state.management.server.synced.implementation;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.IEliminationManager;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.ISettingsManager;
@@ -67,11 +68,13 @@ public class EliminationManager implements IEliminationManager {
     public synchronized void eliminatePlayer(UUID eliminatedPlayerUuid, UUID shooterUuid) {
 
         // If the player is already eliminated
-        if (eliminationState.isEliminated(eliminatedPlayerUuid)) {
+        if (eliminationState.isPlayerEliminated(eliminatedPlayerUuid)) {
 
             // Do nothing
             return;
         }
+
+        LasertagMod.LOGGER.info("Eliminating player '" + server.getOverworld().getPlayerByUuid(eliminatedPlayerUuid).getDisplayName().getString() + "'");
 
         // Eliminate the player
         eliminationState.eliminatePlayer(eliminatedPlayerUuid);
@@ -108,18 +111,20 @@ public class EliminationManager implements IEliminationManager {
     @Override
     public synchronized void eliminateTeam(TeamDto team) {
 
+        LasertagMod.LOGGER.info("Eliminating entire team '" + team.name() + "'.");
+
         // Eliminate every player of that team
         teamsManager.getPlayersOfTeam(team).forEach(playerUuid -> eliminatePlayer(playerUuid, null));
     }
 
     @Override
     public synchronized boolean isPlayerNotEliminated(UUID playerUuid) {
-        return !eliminationState.isEliminated(playerUuid);
+        return !eliminationState.isPlayerEliminated(playerUuid);
     }
 
     @Override
     public synchronized boolean isTeamNotEliminated(TeamDto team) {
-        return !eliminationState.isEliminated(team.id());
+        return !eliminationState.isTeamEliminated(team.id());
     }
 
     @Override
@@ -168,7 +173,7 @@ public class EliminationManager implements IEliminationManager {
                 .filter(team -> !teamsManager.getPlayersOfTeam(team).isEmpty())
                 .filter(team -> !team.equals(TeamsConfigState.SPECTATORS))
                 .map(TeamDto::id)
-                .filter(id -> !eliminationState.isEliminated(id))
+                .filter(id -> !eliminationState.isTeamEliminated(id))
                 .toList();
     }
 
@@ -183,6 +188,8 @@ public class EliminationManager implements IEliminationManager {
 
         // If team is now eliminated
         if (!teamHasPlayersLeft) {
+
+            LasertagMod.LOGGER.info("Team '" + eliminatedPlayersTeam.name() + "' has no players left... Team eliminated.");
 
             setTeamEliminated(eliminatedPlayersTeam, surviveTime);
         }

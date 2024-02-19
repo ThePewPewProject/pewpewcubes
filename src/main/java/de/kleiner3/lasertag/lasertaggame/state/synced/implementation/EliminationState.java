@@ -59,7 +59,7 @@ public class EliminationState implements IEliminationState {
     }
 
     @Override
-    public boolean isEliminated(UUID playerUuid) {
+    public boolean isPlayerEliminated(UUID playerUuid) {
         return eliminatedPlayersSet.contains(playerUuid);
     }
 
@@ -69,7 +69,7 @@ public class EliminationState implements IEliminationState {
     }
 
     @Override
-    public boolean isEliminated(int teamId) {
+    public boolean isTeamEliminated(int teamId) {
         return eliminatedTeamsSet.contains(teamId);
     }
 

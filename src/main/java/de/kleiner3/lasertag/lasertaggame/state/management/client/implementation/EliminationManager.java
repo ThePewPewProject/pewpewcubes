@@ -43,7 +43,7 @@ public class EliminationManager implements IEliminationManager {
                 .filter(team -> !teamsManager.getPlayersOfTeam(team).isEmpty())
                 .filter(team -> !team.equals(TeamsConfigState.SPECTATORS))
                 .map(TeamDto::id)
-                .filter(id -> !eliminationState.isEliminated(id))
+                .filter(id -> !eliminationState.isTeamEliminated(id))
                 .toList();
     }
 
