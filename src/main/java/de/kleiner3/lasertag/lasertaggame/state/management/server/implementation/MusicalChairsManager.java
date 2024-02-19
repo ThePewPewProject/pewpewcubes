@@ -9,6 +9,7 @@ import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.*;
 import de.kleiner3.lasertag.lasertaggame.state.server.IMusicalChairsState;
 import de.kleiner3.lasertag.lasertaggame.state.server.implementation.MusicalChairsState;
 import de.kleiner3.lasertag.lasertaggame.state.synced.ITeamsConfigState;
+import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
 import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import net.minecraft.server.world.ServerWorld;
 
@@ -126,7 +127,9 @@ public class MusicalChairsManager implements IMusicalChairsManager {
 
         // Get the non-eliminated teams
         var nonEliminatedTeams = teamsConfigState.getTeams().stream()
+                .filter(team -> !teamsManager.getPlayersOfTeam(team).isEmpty())
                 .filter(eliminationManager::isTeamNotEliminated)
+                .filter(team -> !team.equals(TeamsConfigState.SPECTATORS))
                 .toList();
 
         var sb = new StringBuilder("[MusicalChairsManager] Remaining teams: [");
