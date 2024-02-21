@@ -26,16 +26,17 @@ public class SettingsManager implements ISettingsManager {
 
     private final SettingsState settingsState;
 
-    private IGameModeManager gameModeManager;
+    private final IGameModeManager gameModeManager;
     private final MinecraftServer server;
 
     // Get path to lasertag settings file
     private static final Path lasertagSettingsFilePath = LasertagMod.configFolderPath.resolve("lasertagSettings.json");
 
-    public SettingsManager(MinecraftServer server, SettingsState settingsState) {
+    public SettingsManager(MinecraftServer server, SettingsState settingsState, IGameModeManager gameModeManager) {
 
         this.server = server;
         this.settingsState = settingsState;
+        this.gameModeManager = gameModeManager;
 
         if (Files.exists(lasertagSettingsFilePath)) {
 
@@ -64,10 +65,6 @@ public class SettingsManager implements ISettingsManager {
             // Write to settings file
             persist();
         }
-    }
-
-    public void setGameModeManager(IGameModeManager gameModeManager) {
-        this.gameModeManager = gameModeManager;
     }
 
     @Override

@@ -26,17 +26,16 @@ public class GameModeManager implements IGameModeManager {
 
     private final GameModeState gameModeState;
 
-    private final ISettingsManager settingsManager;
+    private ISettingsManager settingsManager;
 
     private final MinecraftServer server;
 
     // Get path to lasertag game mode file
     private static final Path lasertagGameModeFilePath = LasertagMod.configFolderPath.resolve("lasertagGameMode.ltg");
 
-    public GameModeManager(GameModeState gameModeState, MinecraftServer server, ISettingsManager settingsManager) {
+    public GameModeManager(GameModeState gameModeState, MinecraftServer server) {
 
         this.gameModeState = gameModeState;
-        this.settingsManager = settingsManager;
         this.server = server;
 
         if (Files.exists(lasertagGameModeFilePath)) {
@@ -56,6 +55,10 @@ public class GameModeManager implements IGameModeManager {
                 LasertagMod.LOGGER.warn("Creation of new lasertag game mode file in '" + lasertagGameModeFilePath + "' failed: " + ex.getMessage());
             }
         }
+    }
+
+    public void setSettingsManager(ISettingsManager settingsManager) {
+        this.settingsManager = settingsManager;
     }
 
     @Override
