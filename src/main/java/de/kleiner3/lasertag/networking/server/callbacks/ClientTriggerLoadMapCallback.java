@@ -26,7 +26,7 @@ public class ClientTriggerLoadMapCallback implements ServerPlayNetworking.PlayCh
 
             // Get the game managers
             var gameManager = server.getOverworld().getServerLasertagManager();
-            var arenaManager  =gameManager.getArenaManager();
+            var arenaManager = gameManager.getArenaManager();
 
             // Get the arena name
             var mapTranslatableName = buf.readString();
@@ -49,10 +49,7 @@ public class ClientTriggerLoadMapCallback implements ServerPlayNetworking.PlayCh
                 return;
             }
 
-            var finalArenaTypeOptional = arenaTypeOptional;
-            server.execute(() -> {
-                arenaManager.loadArena(finalArenaTypeOptional.get(), proceduralTypeOptional.orElse(ProceduralArenaType.SMALL_2V2));
-            });
+            arenaManager.loadArena(arenaTypeOptional.get(), proceduralTypeOptional.orElse(ProceduralArenaType.SMALL_2V2));
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in ClientTriggerLoadMapCallback", ex);
             throw ex;
