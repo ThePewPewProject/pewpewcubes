@@ -8,7 +8,6 @@ import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.*;
 import de.kleiner3.lasertag.lasertaggame.state.synced.ICaptureTheFlagState;
 import de.kleiner3.lasertag.lasertaggame.state.synced.ITeamsConfigState;
 import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
-import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.UIState;
 import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import de.kleiner3.lasertag.networking.NetworkingConstants;
 import de.kleiner3.lasertag.networking.server.ServerEventSending;
@@ -32,7 +31,6 @@ import java.util.UUID;
 public class CaptureTheFlagManager implements ICaptureTheFlagManager {
 
     private final ICaptureTheFlagState captureTheFlagState;
-    private final UIState uiState;
 
     private final ISettingsManager settingsManager;
     private final IGameModeManager gameModeManager;
@@ -46,14 +44,12 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
                                  ICaptureTheFlagState captureTheFlagState,
                                  ISettingsManager settingsManager,
                                  IGameModeManager gameModeManager,
-                                 UIState uiState,
                                  ITeamsManager teamsManager,
                                  IEliminationManager eliminationManager,
                                  ITeamsConfigState teamsConfigState) {
         this.captureTheFlagState = captureTheFlagState;
         this.settingsManager = settingsManager;
         this.gameModeManager = gameModeManager;
-        this.uiState = uiState;
         this.teamsManager = teamsManager;
         this.world = world;
         this.eliminationManager = eliminationManager;
@@ -61,7 +57,7 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
     }
 
     @Override
-    public void reset() {
+    public synchronized void reset() {
         captureTheFlagState.reset();
 
         // For every team that is not empty and not spectators
@@ -79,7 +75,7 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
     }
 
     @Override
-    public void playerDropFlag(UUID playerUuid) {
+    public synchronized void playerDropFlag(UUID playerUuid) {
 
         // Get the team of the flag the player is holding
         var flagTeamOptional = captureTheFlagState.getPlayerHoldingFlagTeam(playerUuid);
@@ -128,7 +124,7 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
     }
 
     @Override
-    public void playerPickupFlag(ServerPlayerEntity player, TeamDto team) {
+    public synchronized void playerPickupFlag(ServerPlayerEntity player, TeamDto team) {
 
         // Send flag stolen message
         sendTeamFlagStolenMessage(team);
@@ -147,23 +143,23 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
     }
 
     @Override
-    public Optional<TeamDto> getPlayerHoldingFlagTeam(UUID playerUuid) {
+    public synchronized Optional<TeamDto> getPlayerHoldingFlagTeam(UUID playerUuid) {
 
         return captureTheFlagState.getPlayerHoldingFlagTeam(playerUuid).map(t -> teamsConfigState.getTeamOfId(t).orElseThrow());
     }
 
     @Override
-    public long getNumberOfCapturedFlags(UUID playerUuid) {
+    public synchronized long getNumberOfCapturedFlags(UUID playerUuid) {
         return captureTheFlagState.getNumberOfCapturedFlags(playerUuid);
     }
 
     @Override
-    public long getNumberOfFlags(TeamDto teamDto) {
+    public synchronized long getNumberOfFlags(TeamDto teamDto) {
         return captureTheFlagState.getNumberOfFlags(teamDto);
     }
 
     @Override
-    public void flagCaptured(UUID playerUuid, TeamDto team) {
+    public synchronized void flagCaptured(UUID playerUuid, TeamDto team) {
 
         // Get the teams number of flags
         var numberOfFlags = captureTheFlagState.getNumberOfFlags(team);
@@ -194,7 +190,13 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
 
         if (numberOfFlags == 0) {
 
+            // Eliminate team
             eliminationManager.eliminateTeam(team);
+
+            // Drop the flags every player is holding
+            teamsManager.getPlayersOfTeam(team).forEach(this::playerDropFlag);
+
+            // Check game over
             gameMode.checkGameOver(world.getServer());
         } else {
 

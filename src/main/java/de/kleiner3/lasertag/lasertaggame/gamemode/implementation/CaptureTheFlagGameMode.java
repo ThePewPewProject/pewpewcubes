@@ -112,14 +112,6 @@ public class CaptureTheFlagGameMode extends DamageBasedGameMode {
         // Deactivate the player who died
         activationManager.deactivate(player.getUuid());
 
-        // Get the team of the flag the player is currently holding
-        var teamOptional = captureTheFlagManager.getPlayerHoldingFlagTeam(player.getUuid());
-
-        // check if player is not holding a flag
-        if (teamOptional.isEmpty()) {
-            return;
-        }
-
         // Drop flag
         captureTheFlagManager.playerDropFlag(player.getUuid());
     }

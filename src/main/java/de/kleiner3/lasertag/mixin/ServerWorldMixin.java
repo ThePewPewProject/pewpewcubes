@@ -42,7 +42,7 @@ public abstract class ServerWorldMixin implements IServerLasertagManagerAccessor
         var scoreManager = new ScoreManager(syncedState.getScoreState(), server);
         var uiStateManager = new UIStateManager(syncedState.getUIState(), gameModeManager, settingsManager);
         var eliminationManager = new EliminationManager(server, syncedState.getEliminationState(), settingsManager, teamsManager, syncedState.getUIState(), syncedState.getTeamsConfigState());
-        var captureTheFlagManager = new CaptureTheFlagManager(world, syncedState.getCaptureTheFlagState(), settingsManager, gameModeManager, syncedState.getUIState(), teamsManager, eliminationManager, syncedState.getTeamsConfigState());
+        var captureTheFlagManager = new CaptureTheFlagManager(world, syncedState.getCaptureTheFlagState(), settingsManager, gameModeManager, teamsManager, eliminationManager, syncedState.getTeamsConfigState());
         var activationManager = new ActivationManager(syncedState.getActivationState(), server, settingsManager, syncedState.getPlayerNamesState());
         var settingsPresetsNameManager = new SettingsPresetsNameManager(syncedState.getSettingsPresetsNamesState(), server);
         var settingsPresetsManager = new SettingsPresetsManager(new SettingsPresetsState(), settingsPresetsNameManager, settingsManager);
