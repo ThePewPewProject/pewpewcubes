@@ -202,10 +202,6 @@ public class EliminationGameMode extends DamageBasedGameMode {
             return;
         }
 
-        // Reset border
-        var worldBorder = server.getOverworld().getWorldBorder();
-        worldBorder.setSize(Integer.MAX_VALUE - 1);
-
         // Stop the game
         gameManager.stopLasertagGame();
     }
@@ -218,6 +214,16 @@ public class EliminationGameMode extends DamageBasedGameMode {
         var eliminationManager = gameManager.getEliminationManager();
 
         eliminationManager.tick();
+    }
+
+    @Override
+    public void onGameEnd(MinecraftServer server) {
+
+        // Reset border
+        var worldBorder = server.getOverworld().getWorldBorder();
+        worldBorder.setSize(Integer.MAX_VALUE - 1);
+
+        super.onGameEnd(server);
     }
 
     @Override
