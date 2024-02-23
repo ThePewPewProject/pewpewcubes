@@ -123,12 +123,14 @@ public class CaptureTheFlagGameMode extends DamageBasedGameMode {
         // Get the managers
         var gameManager = server.getOverworld().getServerLasertagManager();
         var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
+        var eliminationManager = gameManager.getEliminationManager();
         var teamsManager = gameManager.getTeamsManager();
         var syncedState = gameManager.getSyncedState();
         var teamsConfigState = syncedState.getTeamsConfigState();
 
-        // Reset the flag manager
+        // Reset the game managers
         captureTheFlagManager.reset();
+        eliminationManager.reset();
 
         // Get a list of the teams with players in them
         var teams = teamsConfigState.getTeams().stream()

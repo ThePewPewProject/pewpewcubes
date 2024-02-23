@@ -1,5 +1,6 @@
 package de.kleiner3.lasertag.lasertaggame.state.management.server.synced.implementation;
 
+import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.item.Items;
 import de.kleiner3.lasertag.lasertaggame.gamemode.implementation.CaptureTheFlagGameMode;
 import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
@@ -190,6 +191,8 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
 
         if (numberOfFlags == 0) {
 
+            LasertagMod.LOGGER.info("[CTF] Team " + team.name() + " got eliminated...");
+
             // Eliminate team
             eliminationManager.eliminateTeam(team);
 
@@ -199,6 +202,8 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
             // Check game over
             gameMode.checkGameOver(world.getServer());
         } else {
+
+            LasertagMod.LOGGER.info("[CTF] Team " + team.name() + " lost a flag...");
 
             // If is capture the flag game mode
             if (gameMode instanceof CaptureTheFlagGameMode ctfGameMode) {

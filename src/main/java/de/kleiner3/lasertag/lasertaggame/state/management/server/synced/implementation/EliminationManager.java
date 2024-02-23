@@ -23,6 +23,7 @@ import net.minecraft.world.GameMode;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the IElimination manager for the lasertag game
@@ -67,8 +68,12 @@ public class EliminationManager implements IEliminationManager {
     @Override
     public synchronized void eliminatePlayer(UUID eliminatedPlayerUuid, UUID shooterUuid) {
 
+        LasertagMod.LOGGER.info("Trying to eliminate player '" + server.getOverworld().getPlayerByUuid(eliminatedPlayerUuid).getDisplayName().getString() + "'");
+
         // If the player is already eliminated
         if (eliminationState.isPlayerEliminated(eliminatedPlayerUuid)) {
+
+            LasertagMod.LOGGER.info("Player is already eliminated.");
 
             // Do nothing
             return;
@@ -113,8 +118,15 @@ public class EliminationManager implements IEliminationManager {
 
         LasertagMod.LOGGER.info("Eliminating entire team '" + team.name() + "'.");
 
+        // Get the players of the team
+        var playersOfTeam = teamsManager.getPlayersOfTeam(team);
+
+        var uuidsString = playersOfTeam.stream().map(UUID::toString).collect(Collectors.joining(", "));
+
+        LasertagMod.LOGGER.info("Current players of team: [" + uuidsString + "]");
+
         // Eliminate every player of that team
-        teamsManager.getPlayersOfTeam(team).forEach(playerUuid -> eliminatePlayer(playerUuid, null));
+        playersOfTeam.forEach(playerUuid -> eliminatePlayer(playerUuid, null));
     }
 
     @Override
