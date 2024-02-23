@@ -127,8 +127,11 @@ public class MusicalChairsManager implements IMusicalChairsManager {
 
         // Get the non-eliminated teams
         var nonEliminatedTeams = teamsConfigState.getTeams().stream()
+                // Filter out empty teams
                 .filter(team -> !teamsManager.getPlayersOfTeam(team).isEmpty())
+                // Filter out eliminated teams
                 .filter(eliminationManager::isTeamNotEliminated)
+                // Filter out the spectators
                 .filter(team -> !team.equals(TeamsConfigState.SPECTATORS))
                 .toList();
 

@@ -186,7 +186,7 @@ public class EliminationManager implements IEliminationManager {
         var teamHasPlayersLeft = teamsManager.getPlayersOfTeam(eliminatedPlayersTeam).stream()
                 .anyMatch(this::isPlayerNotEliminated);
 
-        // If team is now eliminated
+        // If team is now eliminated (has no players left)
         if (!teamHasPlayersLeft) {
 
             LasertagMod.LOGGER.info("Team '" + eliminatedPlayersTeam.name() + "' has no players left... Team eliminated.");
