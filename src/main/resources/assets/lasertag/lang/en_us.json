@@ -68,8 +68,8 @@
 	"selectWorld.proceduralType": "Size",
 	"arenaType.procedural.small_two_team": "Small 2 Teams",
 	"arenaType.procedural.small_two_team_extended": "Procedural: Small 2 Teams",
-	"arenaType.procedural.medium_four_team": "Medium 4 Teams",
-	"arenaType.procedural.medium_four_team_extended": "Procedural: Medium 4 Teams",
+	"arenaType.procedural.large_four_team": "Large 4 Teams",
+	"arenaType.procedural.large_four_team_extended": "Procedural: Large 4 Teams",
 
 	"gameMode.point_hunter": "Point Hunter",
 	"gameMode.capture_the_flag": "Capture The Flag",

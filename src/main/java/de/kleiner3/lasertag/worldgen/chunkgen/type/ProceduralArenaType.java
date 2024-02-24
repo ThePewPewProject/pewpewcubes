@@ -31,7 +31,35 @@ public enum ProceduralArenaType {
                             "orange_segments",
                             "orange_spawns",
                     },
-            new Vec3i(7, 0, 23));
+            new Vec3i(7, 0, 23)),
+
+    LARGE_4V4("large_four_team",
+            "arenaType.procedural.large_four_team",
+            new int[][]
+                    {
+                            {0,  4,  4,  4,  4, 1},
+                            {5,  8,  8,  9,  9, 6},
+                            {5,  8,  8,  9,  9, 6},
+                            {5, 10, 10, 11, 11, 6},
+                            {5, 10, 10, 11, 11, 6},
+                            {2,  7,  7,  7,  7, 3},
+                    },
+            new String[]
+                    {
+                            "green_spawns",
+                            "blue_spawns",
+                            "pink_spawns",
+                            "red_spawns",
+                            "east_segments",
+                            "north_segments",
+                            "south_segments",
+                            "west_segments",
+                            "first_quadrants",
+                            "fourth_quadrants",
+                            "second_quadrants",
+                            "third_quadrants"
+                    },
+            new Vec3i(17, 0, 17));
 
     /**
      * Enum constructor
