@@ -105,6 +105,35 @@ java {
 	withSourcesJar()
 }
 
+// The auto-increment build number task
+tasks.register('incrBuildNumber') {
+	doLast {
+		// Get the properties file
+		Properties props = new Properties()
+		File propsFile = new File('gradle.properties')
+		props.load(propsFile.newDataInputStream())
+
+		// Get the old version
+		String oldVersion = props.getProperty('mod_version')
+
+		// Split the old version at the '+'
+		def (oldVersionNumber, oldBuildNumber) = oldVersion.tokenize('+')
+
+		// Increment build number
+		Integer nextBuildNumber = ((oldBuildNumber as Integer) + 1)
+
+		// Build new version number
+		String nextVersionNumber = oldVersionNumber + '+' + nextBuildNumber.toString()
+
+		// Save new version number to properties file
+		props.setProperty('mod_version', nextVersionNumber)
+		props.store(propsFile.newWriter(), null)
+		props.load(propsFile.newDataInputStream())
+	}
+}
+
+build.dependsOn tasks.incrBuildNumber
+
 jar {
 	from("COPYING") {
 		rename { "${it}_${base.archivesName.get()}"}
