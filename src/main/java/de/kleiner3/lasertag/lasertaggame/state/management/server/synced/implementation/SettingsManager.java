@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Comparator;
+import java.util.Map;
 
 /**
  * Implementation of the ISettingsManager for the lasertag game
@@ -207,5 +209,24 @@ public class SettingsManager implements ISettingsManager {
 
         // Persist in file
         persist();
+    }
+
+    @Override
+    public String toString() {
+
+        var builder = new StringBuilder("--------------------\n");
+
+        settingsState.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(e -> {
+                    builder.append(e.getKey());
+                    builder.append(": ");
+                    builder.append(e.getValue().toString());
+                    builder.append("\n");
+                });
+
+        builder.append("--------------------");
+
+        return builder.toString();
     }
 }
