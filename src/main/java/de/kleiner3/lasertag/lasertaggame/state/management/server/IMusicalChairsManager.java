@@ -31,7 +31,7 @@ public interface IMusicalChairsManager {
     void onPlayerScored(UUID playerUuid, long score);
 
     /**
-     * Reset the ticks since last phase
+     * Resets the musical chairs manager
      */
-    void resetTicksSinceLastPhase();
+    void reset();
 }

@@ -110,8 +110,9 @@ public class MusicalChairsManager implements IMusicalChairsManager {
     }
 
     @Override
-    public void resetTicksSinceLastPhase() {
+    public void reset() {
         ticksSinceLastPhaseChange = -1L;
+        musicalChairsState.reset();
     }
 
     private void handlePhaseChange() {
@@ -191,6 +192,4 @@ public class MusicalChairsManager implements IMusicalChairsManager {
         // Check if game ended
         gameModeManager.getGameMode().checkGameOver(world.getServer());
     }
-
-
 }

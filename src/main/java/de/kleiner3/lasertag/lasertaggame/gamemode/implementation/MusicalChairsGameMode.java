@@ -53,7 +53,7 @@ public class MusicalChairsGameMode extends PointBasedGameMode {
 
         // Reset game managers
         eliminationManager.reset();
-        musicalChairsManager.resetTicksSinceLastPhase();
+        musicalChairsManager.reset();
     }
 
     @Override
