@@ -502,6 +502,9 @@ public class ServerLasertagManager implements IServerLasertagManager {
         // Delegate to game mode
         gameMode.onGameEnd(this.server);
 
+        // Stop all music from playing
+        musicManager.stopMusic();
+
         isRunning = false;
         syncedState.getUIState().isGameRunning = false;
 

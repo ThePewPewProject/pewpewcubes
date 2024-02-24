@@ -32,6 +32,11 @@ public interface IMusicManager {
     void playOutro(ArenaType arenaType);
 
     /**
+     * Stop all currently playing music
+     */
+    void stopMusic();
+
+    /**
      * Reset the state
      */
     void reset();
