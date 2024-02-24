@@ -25,6 +25,13 @@ public class ServerPlayerEntityMixin {
         var gameManager = player.getWorld().getServerLasertagManager();
         var gameModeManager = gameManager.getGameModeManager();
 
+        // If no game is running
+        if (!gameManager.isGameRunning()) {
+
+            // Do nothing
+            return;
+        }
+
         // Get the server
         MinecraftServer server = player.getServer();
         if (server != null) {

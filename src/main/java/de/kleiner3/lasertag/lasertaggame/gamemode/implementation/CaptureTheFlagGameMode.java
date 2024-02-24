@@ -104,11 +104,6 @@ public class CaptureTheFlagGameMode extends DamageBasedGameMode {
         var activationManager = gameManager.getActivationManager();
         var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
 
-        // If no game is running
-        if (!gameManager.isGameRunning()) {
-            return;
-        }
-
         // Deactivate the player who died
         activationManager.deactivate(player.getUuid());
 

@@ -100,11 +100,6 @@ public abstract class DamageBasedGameMode extends GameMode {
         var gameManager = server.getOverworld().getServerLasertagManager();
         var settingsManager = gameManager.getSettingsManager();
 
-        // If no game is running
-        if (!gameManager.isGameRunning()) {
-            return;
-        }
-
         // If the player got damaged by laser
         if (source.name.equals("laser")) {
 
