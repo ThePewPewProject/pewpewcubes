@@ -188,12 +188,8 @@ public class ServerLasertagManager implements IServerLasertagManager {
         // Notify players
         ServerEventSending.sendToEveryone(server, NetworkingConstants.GAME_STARTED, PacketByteBufs.empty());
 
-        // If is on dedicated server
-        if (server.isDedicated()) {
-
-            // Start pregame count down timer
-            uiStateManager.startPreGameCountdownTimer(settingsManager.<Long>get(SettingDescription.PREGAME_DURATION));
-        }
+        // Start pregame count down timer
+        uiStateManager.startPreGameCountdownTimer(settingsManager.<Long>get(SettingDescription.PREGAME_DURATION));
 
         return Optional.empty();
     }
@@ -510,6 +506,9 @@ public class ServerLasertagManager implements IServerLasertagManager {
 
         ServerEventSending.sendToEveryone(server, NetworkingConstants.GAME_OVER, PacketByteBufs.empty());
 
+        // Get the game time before resetting it to 0
+        var gameTime = syncedState.getUIState().gameTime;
+
         // Reset server internal hud render manager
         uiStateManager.stopGameTimer();
 
@@ -520,17 +519,16 @@ public class ServerLasertagManager implements IServerLasertagManager {
         musicManager.reset();
 
         // Generate statistics
-        this.generateStats();
+        this.generateStats(gameTime);
 
         // Clean up (stop game tick timer)
         dispose();
     }
 
-    private void generateStats() {
+    private void generateStats(long gameTime) {
         try {
             // Calculate stats
-            var stats = StatsCalculator.calcStats(this,
-                    syncedState.getUIState().gameTime);
+            var stats = StatsCalculator.calcStats(this, gameTime);
 
             // Create packet
             var buf = new PacketByteBuf(Unpooled.buffer());
