@@ -164,5 +164,7 @@
 	"chat.message.no_game_stats": "There are no last game stats.",
 	"chat.message.game_stats_saved": "Game statistics saved. Open them with /stats.",
 	"chat.message.game_mode_print": "Current game mode: %s",
-	"chat.message.winner_announcement": "Game Over! %s won!"
+	"chat.message.winner_announcement": "Game Over! %s won!",
+	"chat.message.flag_stolen": "Flag of Team %s got stolen!",
+	"chat.message.flag_captured": "Flag of Team %s got captured by Team %s!"
 }

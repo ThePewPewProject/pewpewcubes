@@ -211,7 +211,10 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
                 // Place the flags
                 ctfGameMode.placeFlags(world, team);
 
-                sendTeamFlagCapturedMessage(team);
+                // Get the capturing teams name
+                var capturingTeam = teamsManager.getTeamOfPlayer(playerUuid).orElseThrow();
+
+                sendTeamFlagCapturedMessage(team, capturingTeam);
             }
         }
     }
@@ -237,10 +240,12 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
             return;
         }
 
-        var msg = Text.literal("Flag of Team ");
+        // Get the team name as text
         var teamName = Text.literal(team.name()).setStyle(Style.EMPTY.withColor(team.color().getValue()));
-        msg.append(teamName);
-        msg.append(" got stolen!");
+
+        // Build the message
+        var msg = Text.translatable("chat.message.flag_stolen", teamName);
+
         world.getServer().getPlayerManager().broadcast(msg, false);
     }
 
@@ -253,17 +258,22 @@ public class CaptureTheFlagManager implements ICaptureTheFlagManager {
         ServerEventSending.sendToEveryone(world.getServer(), NetworkingConstants.CTF_NUMBER_OF_FLAGS_UPDATE, buffer);
     }
 
-    private void sendTeamFlagCapturedMessage(TeamDto team) {
+    private void sendTeamFlagCapturedMessage(TeamDto losingTeam, TeamDto capturingTeam) {
 
         boolean sendMessage = settingsManager.get(SettingDescription.SEND_FLAG_CAPTURED_MESSAGE);
         if (!sendMessage) {
             return;
         }
 
-        var msg = Text.literal("Flag of Team ");
-        var teamName = Text.literal(team.name()).setStyle(Style.EMPTY.withColor(team.color().getValue()));
-        msg.append(teamName);
-        msg.append(" got captured!");
+        // Get the losing teams name
+        var losingTeamName = Text.literal(losingTeam.name()).setStyle(Style.EMPTY.withColor(losingTeam.color().getValue()));
+
+        // Get the capturing teams name
+        var capturingTeamName = Text.literal(capturingTeam.name()).setStyle(Style.EMPTY.withColor(capturingTeam.color().getValue()));
+
+        // Build the message
+        var msg = Text.translatable("chat.message.flag_captured", losingTeamName, capturingTeamName);
+
         world.getServer().getPlayerManager().broadcast(msg, false);
     }
 }
