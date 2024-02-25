@@ -8,5 +8,5 @@ import de.kleiner3.lasertag.lasertaggame.gamemode.GameModes;
  * @author Étienne Muser
  */
 public class GameModeState {
-    public String currentGameModeTranslatableName = GameModes.POINT_HUNTER_GAME_MODE.getTranslatableName();
+    public String currentGameModeTranslatableName = GameModes.ELIMINATION.getTranslatableName();
 }

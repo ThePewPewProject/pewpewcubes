@@ -22,9 +22,9 @@ public class GameModes {
     public static final GameMode ELIMINATION = new EliminationGameMode();
 
     public static final Map<String, GameMode> GAME_MODES = Map.ofEntries(
-            entry(POINT_HUNTER_GAME_MODE.getTranslatableName(), POINT_HUNTER_GAME_MODE),
+            entry(ELIMINATION.getTranslatableName(), ELIMINATION),
             entry(CAPTURE_THE_FLAG_GAME_MODE.getTranslatableName(), CAPTURE_THE_FLAG_GAME_MODE),
             entry(MUSICAL_CHAIRS_GAME_MODE.getTranslatableName(), MUSICAL_CHAIRS_GAME_MODE),
-            entry(ELIMINATION.getTranslatableName(), ELIMINATION)
+            entry(POINT_HUNTER_GAME_MODE.getTranslatableName(), POINT_HUNTER_GAME_MODE)
     );
 }
