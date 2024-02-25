@@ -157,6 +157,8 @@
 	"death.attack.laser": "%s was reset",
 	"death.attack.laser.player": "%s was reset",
 
+	"chat.message.team_zone_generator_not_enough_permissions": "You do not have enough permissions to use the team zone generator.",
+	"chat.message.start_game_button_not_enough_permissions": "You do not have enough permissions to start a game.",
 	"chat.messae.game_stats_generate_failed": "Failed to generate statistics file.",
 	"chat.message.game_stats_open_failed": "Failed to open statistics from '%s'.",
 	"chat.message.no_game_stats": "There are no last game stats.",

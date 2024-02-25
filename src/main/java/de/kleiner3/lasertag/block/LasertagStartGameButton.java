@@ -32,7 +32,7 @@ public class LasertagStartGameButton extends StoneButtonBlock implements BlockEn
         // If player does not have permission to start the game
         if (!player.hasPermissionLevel(1)) {
             // Send feedback
-            player.sendMessage(Text.literal("You do not have enough permissions to start a game.").formatted(Formatting.RED), true);
+            player.sendMessage(Text.translatable("chat.message.start_game_button_not_enough_permissions").formatted(Formatting.RED), true);
             return ActionResult.FAIL;
         }
 

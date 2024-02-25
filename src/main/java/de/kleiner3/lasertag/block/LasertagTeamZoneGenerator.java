@@ -11,6 +11,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -31,6 +32,15 @@ public class LasertagTeamZoneGenerator extends BlockWithEntity {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+
+        // If player does not have permission to start the game
+        if (!player.hasPermissionLevel(1)) {
+
+            // Send feedback
+            player.sendMessage(Text.translatable("chat.message.team_zone_generator_not_enough_permissions").formatted(Formatting.RED), true);
+            return ActionResult.FAIL;
+        }
+
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof LasertagTeamZoneGeneratorBlockEntity lasertagTeamZoneGeneratorBlockEntity) {
             lasertagTeamZoneGeneratorBlockEntity.openScreen(player);
