@@ -162,5 +162,6 @@
 	"chat.messae.game_stats_generate_failed": "Failed to generate statistics file.",
 	"chat.message.game_stats_open_failed": "Failed to open statistics from '%s'.",
 	"chat.message.no_game_stats": "There are no last game stats.",
-	"chat.message.game_stats_saved": "Game statistics saved. Open them with /stats."
+	"chat.message.game_stats_saved": "Game statistics saved. Open them with /stats.",
+	"chat.message.game_mode_print": "Current game mode: %s"
 }

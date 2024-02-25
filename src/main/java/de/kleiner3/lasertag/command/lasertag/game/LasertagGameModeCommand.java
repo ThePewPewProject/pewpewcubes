@@ -23,6 +23,7 @@ import static net.minecraft.server.command.CommandManager.literal;
  * @author Étienne Muser
  */
 public class LasertagGameModeCommand extends ServerFeedbackCommand {
+
     @Override
     protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
 
@@ -32,9 +33,6 @@ public class LasertagGameModeCommand extends ServerFeedbackCommand {
 
         // Get the game mode translatable name
         var gameModeTranslatableName = StringArgumentType.getString(context, "gamemode");
-
-        // Get the server
-        var server = context.getSource().getServer();
 
         // Get the new game mode
         var newGameMode = GameModes.GAME_MODES.get(gameModeTranslatableName);
@@ -53,9 +51,35 @@ public class LasertagGameModeCommand extends ServerFeedbackCommand {
         return Optional.of(new CommandFeedback(Text.literal("Game mode changed to '" + translatedGameModeName + "'."), false, true));
     }
 
+    private static int executeWithoutArgs(CommandContext<ServerCommandSource> context) {
+
+        // Get the source
+        var source = context.getSource();
+
+        // Get the player
+        var player = source.getPlayer();
+
+        // Get the game managers
+        var gameManager = source.getWorld().getServerLasertagManager();
+        var gameModeManager = gameManager.getGameModeManager();
+
+        // Get the game mode name
+        var gameModeName = Text.translatable(gameModeManager.getGameMode().getTranslatableName());
+
+        // Build the message string
+        var message = Text.translatable("chat.message.game_mode_print", gameModeName);
+
+        // Send chat message to the player
+        player.sendMessage(message, false);
+
+        return SINGLE_SUCCESS;
+    }
+
     static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
         lab.then(literal("gamemode")
+                        .executes(LasertagGameModeCommand::executeWithoutArgs)
                         .then(argument("gamemode", word())
+                                .requires(s -> s.hasPermissionLevel(1))
                                 .suggests(LasertagGameModeSuggestionProvider.getInstance())
                                 .executes(new LasertagGameModeCommand())));
     }
