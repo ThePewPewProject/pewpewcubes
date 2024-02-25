@@ -3,12 +3,14 @@ package de.kleiner3.lasertag.lasertaggame.statistics;
 import com.google.gson.Gson;
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.common.util.DurationUtils;
+import de.kleiner3.lasertag.lasertaggame.gamemode.GameMode;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.PlayerInfoDto;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.ProfileTextureDto;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.SessionPlayerProfileDto;
 import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import de.kleiner3.lasertag.resource.WebResourceManager;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.Identifier;
 
 import java.io.IOException;
@@ -47,7 +49,7 @@ public class WebStatisticsVisualizer {
 
     private static final Identifier REPLACE_ID = new Identifier(LasertagMod.ID, "statistics_go_here");
 
-    public static Path build(GameStats stats, TeamDto winningTeam, WebResourceManager resourceManager) {
+    public static Path build(GameStats stats, TeamDto winningTeam, GameMode gameMode, WebResourceManager resourceManager) {
 
         // The path to the generated index.html file
         Path resultPath = null;
@@ -74,7 +76,7 @@ public class WebStatisticsVisualizer {
                     return null;
                 }
 
-                fileContents = buildHtml(fileContents, stats, winningTeam);
+                fileContents = buildHtml(fileContents, stats, winningTeam, gameMode);
 
                 // Write file
                 resultPath = TARGET_PATH.resolve(fileTuple.x().getPath());
@@ -104,11 +106,11 @@ public class WebStatisticsVisualizer {
         return resultPath;
     }
 
-    private static String buildHtml(String html, GameStats stats, TeamDto winningTeam) {
+    private static String buildHtml(String html, GameStats stats, TeamDto winningTeam, GameMode gameMode) {
         // build html to insert
         var builder = new StringBuilder();
 
-        buildWinnerTeam(builder, winningTeam);
+        buildOverTableHeader(builder, winningTeam, gameMode);
 
         buildTeamScores(builder, stats);
 
@@ -120,12 +122,14 @@ public class WebStatisticsVisualizer {
         return html.replaceAll("#" + REPLACE_ID + "#", builder.toString());
     }
 
-    private static void buildWinnerTeam(StringBuilder builder, TeamDto winningTeam) {
+    private static void buildOverTableHeader(StringBuilder builder, TeamDto winningTeam, GameMode gameMode) {
 
         // Get the winning teams color
         var winningTeamColor = winningTeam.color();
 
-        builder.append("<div class=\"container\"><h1><i>Winner: <span style=\"color:rgb(");
+        builder.append("<div class=\"container over-table-header\"><div><h1><i>Winner: <span style=\"color:rgb(");
+
+        // Winner team
         builder.append(winningTeamColor.r());
         builder.append(",");
         builder.append(winningTeamColor.g());
@@ -134,6 +138,13 @@ public class WebStatisticsVisualizer {
         builder.append(");\"><b>");
         builder.append(winningTeam.name());
         builder.append("</b></span></i></h1></div>");
+
+        // Game mode
+        builder.append("<div class=\"game-mode-container\"><h2 class=\"game-mode-text\"><i>");
+        builder.append(I18n.translate(gameMode.getTranslatableName()));
+        builder.append("</i></h2></div>");
+
+        builder.append("</div>");
     }
 
     private static void buildTeamScores(StringBuilder builder, GameStats stats) {

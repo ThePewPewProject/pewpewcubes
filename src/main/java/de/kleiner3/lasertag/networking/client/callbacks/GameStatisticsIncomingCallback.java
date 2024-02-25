@@ -35,6 +35,7 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
             var uiState = gameManager.getSyncedState().getUIState();
             var settingManager = gameManager.getSettingsManager();
             var teamsConfigState = gameManager.getSyncedState().getTeamsConfigState();
+            var gameModeManager = gameManager.getGameModeManager();
 
             // Read from buffer
             var json = buf.readString();
@@ -74,8 +75,11 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
             // If should generate file
             if (settingManager.<Boolean>get(SettingDescription.GEN_STATS_FILE)) {
 
+                // Get the current game mode
+                var gameMode = gameModeManager.getGameMode();
+
                 // Generate file
-                var generatedFilePath = WebStatisticsVisualizer.build(stats, winningTeam, ResourceManagers.WEB_RESOURCE_MANAGER);
+                var generatedFilePath = WebStatisticsVisualizer.build(stats, winningTeam, gameMode, ResourceManagers.WEB_RESOURCE_MANAGER);
 
                 // If generation failed
                 if (generatedFilePath == null) {

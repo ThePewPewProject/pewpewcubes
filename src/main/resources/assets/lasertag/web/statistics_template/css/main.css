@@ -33,3 +33,17 @@ table {
 .header-addition {
     float: right;
 }
+
+.over-table-header {
+    display: flex;
+    align-items: flex-end;
+}
+
+.game-mode-container {
+    flex-grow: 1;
+}
+
+.game-mode-text {
+    text-align: right;
+    font-weight: lighter;
+}
