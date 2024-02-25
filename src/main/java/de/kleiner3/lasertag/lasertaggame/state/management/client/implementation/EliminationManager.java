@@ -72,6 +72,16 @@ public class EliminationManager implements IEliminationManager {
     }
 
     @Override
+    public boolean isTeamEliminated(int teamId) {
+        return clientManager.getSyncedState().getEliminationState().isTeamEliminated(teamId);
+    }
+
+    @Override
+    public boolean isPlayerEliminated(UUID playerUuid) {
+        return clientManager.getSyncedState().getEliminationState().isPlayerEliminated(playerUuid);
+    }
+
+    @Override
     public synchronized void reset() {
         clientManager.getSyncedState().getEliminationState().reset();
     }

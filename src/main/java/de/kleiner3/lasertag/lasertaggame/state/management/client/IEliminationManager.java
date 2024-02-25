@@ -62,6 +62,20 @@ public interface IEliminationManager {
     void setPlayerSurviveTime(UUID playerUuid, long surviveTime);
 
     /**
+     * Get if a team is eliminated
+     *
+     * @param teamId The teams id
+     */
+    boolean isTeamEliminated(int teamId);
+
+    /**
+     * Get if a player is eliminated
+     *
+     * @param playerUuid The players uuid
+     */
+    boolean isPlayerEliminated(UUID playerUuid);
+
+    /**
      * Reset the elimination manager
      */
     void reset();

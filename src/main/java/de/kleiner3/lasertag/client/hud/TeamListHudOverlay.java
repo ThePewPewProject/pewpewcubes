@@ -28,10 +28,20 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
     private static final int INTRA_PLAYER_PADDING = 0;
     private static final int TEAM_LIST_TOP_PADDING = 15;
     private static final int NOTE_TOP_PADDING = 25;
-    private static final int BACKGROUND_COLOR = 0x66000000;
     private static final int MAX_NUMBER_PLAYERS_IN_WITHOUT_TEAM_LIST = 15;
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
     private static final TextRenderer TEXT_RENDERER = CLIENT.textRenderer;
+
+    //region Colors
+
+    private static final int BACKGROUND_COLOR = 0x66000000;
+    private static final int BOX_COLOR = 0xAAFFFFFF;
+    private static final int ELIMINATED_BOX_COLOR = 0x90FF2020;
+    private static final int ELIMINATED_PLAYER_COLOR = 0x90FF2020;
+    private static final int OFFLINE_PLAYER_COLOR = 0xFF808080;
+    private static final int WHITE = 0xFFFFFFFF;
+
+    //endregion
 
     /**
      * Renders the current team list into the matrix stack
@@ -52,11 +62,12 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         var teamsManager = gameManager.getTeamsManager();
         var syncedState = gameManager.getSyncedState();
         var teamsConfigState = syncedState.getTeamsConfigState();
+        var eliminationManager = gameManager.getEliminationManager();
 
         // If render team list setting is disabled
         if (!settingsManager.<Boolean>get(SettingDescription.RENDER_TEAM_LIST)) {
             var text = Text.literal("Render team list setting is disabled").asOrderedText();
-            drawCenteredTextWithShadow(matrices, TEXT_RENDERER, text, scaledWindowWidth / 2, NOTE_TOP_PADDING, 0xFFFFFF);
+            drawCenteredTextWithShadow(matrices, TEXT_RENDERER, text, scaledWindowWidth / 2, NOTE_TOP_PADDING, WHITE);
             return;
         }
 
@@ -71,7 +82,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         // If there is no team to show
         if (numberOfTeams == 0) {
             var text = Text.literal("No teams to show").asOrderedText();
-            drawCenteredTextWithShadow(matrices, TEXT_RENDERER, text, scaledWindowWidth / 2, NOTE_TOP_PADDING, 0xFFFFFF);
+            drawCenteredTextWithShadow(matrices, TEXT_RENDERER, text, scaledWindowWidth / 2, NOTE_TOP_PADDING, WHITE);
             return;
         }
 
@@ -90,7 +101,12 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         // Draw the background rectangle
         fill(matrices, startX, TEAM_LIST_TOP_PADDING, startX + teamListWidth, TEAM_LIST_TOP_PADDING + teamListHeight, BACKGROUND_COLOR);
 
-        var teamIterator = teams.iterator();
+        // Sort the teams by elimination
+        var sortedTeams = teams.stream()
+                .sorted((a,b) -> Boolean.compare(eliminationManager.isTeamEliminated(a.x().id()),
+                                                 eliminationManager.isTeamEliminated(b.x().id())));
+
+        var teamIterator = sortedTeams.iterator();
         for (int row = 0; row < numberOfRows; ++row) {
             for (int column = 0; column < MAX_NUMBER_TEAMS_PER_ROW; ++column) {
                 if (!teamIterator.hasNext()) {
@@ -129,9 +145,13 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         var gameManager = CLIENT.world.getClientLasertagManager();
         var gameMode = gameManager.getGameModeManager().getGameMode();
         var playerNamesManager = gameManager.getSyncedState().getPlayerNamesState();
+        var eliminationManager = gameManager.getEliminationManager();
+
+        // Get the teams box color
+        var boxColor = eliminationManager.isTeamEliminated(teamDto.id()) ? ELIMINATED_BOX_COLOR : BOX_COLOR;
 
         // Draw rectangle of team
-        drawRectangle(matrices, rectangleStartX, rectangleStartY, rectangleStartX + TEAM_WIDTH, rectangleStartY + teamHeight, 0xAAFFFFFF);
+        drawRectangle(matrices, rectangleStartX, rectangleStartY, rectangleStartX + TEAM_WIDTH, rectangleStartY + teamHeight, boxColor);
 
         // Draw team name
         drawWithShadow(matrices, TEXT_RENDERER, Text.literal(teamDto.name()).asOrderedText(), rectangleStartX + TEXT_PADDING + 1, rectangleStartY + TEXT_PADDING + 1, teamDto.color().getValue());
@@ -139,21 +159,27 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         // Draw team score
         var teamScoreText = gameMode.getTeamScoreText(teamDto);
         var scoreStartX = rectangleStartX + TEAM_WIDTH - TEXT_RENDERER.getWidth(teamScoreText) - TEXT_PADDING;
-        drawWithShadow(matrices, TEXT_RENDERER, teamScoreText.asOrderedText(), scoreStartX, rectangleStartY + TEXT_PADDING + 1, 0xFFFFFFFF);
+        drawWithShadow(matrices, TEXT_RENDERER, teamScoreText.asOrderedText(), scoreStartX, rectangleStartY + TEXT_PADDING + 1, WHITE);
+
+        // Sort players by eliminated
+        var sortedPlayers = team.y().stream()
+                .sorted((a,b) -> Boolean.compare(eliminationManager.isPlayerEliminated(a),
+                                                 eliminationManager.isPlayerEliminated(b)))
+                .toList();
 
         var playerY = rectangleStartY + TEXT_PADDING + textHeight + TEXT_PADDING;
-        for (var playerUuid : team.y()) {
+        for (var playerUuid : sortedPlayers) {
 
             // Try to get player from player list
             var networkPlayer = CLIENT.getNetworkHandler().getPlayerListEntry(playerUuid);
 
             // Set default text color to white
-            var playerNamecolor = 0xFFFFFFFF;
+            var playerNamecolor = eliminationManager.isPlayerEliminated(playerUuid) ? ELIMINATED_PLAYER_COLOR : WHITE;
 
             // If the player is not online
             if (networkPlayer == null) {
                 // Set text color to gray
-                playerNamecolor = 0xFF808080;
+                playerNamecolor = OFFLINE_PLAYER_COLOR;
             }
 
             // Draw player name
@@ -162,7 +188,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
             // Draw player score
             var playerScoreText = gameMode.getPlayerScoreText(playerUuid);
             var playerScoreStartX = rectangleStartX + TEAM_WIDTH - TEXT_RENDERER.getWidth(playerScoreText) - TEXT_PADDING;
-            TEXT_RENDERER.draw(matrices, playerScoreText, playerScoreStartX, playerY, 0xFFFFFFFF);
+            TEXT_RENDERER.draw(matrices, playerScoreText, playerScoreStartX, playerY, WHITE);
 
             playerY += (INTRA_PLAYER_PADDING + textHeight);
         }
@@ -192,13 +218,13 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         fill(matrices, startX, startY, startX + TEAM_WIDTH, startY + height, BACKGROUND_COLOR);
 
         // Draw header
-        TEXT_RENDERER.drawWithShadow(matrices, "Players without team:", startX + TEXT_PADDING, startY + TEXT_PADDING, 0xFFFFFFFF);
+        TEXT_RENDERER.drawWithShadow(matrices, "Players without team:", startX + TEXT_PADDING, startY + TEXT_PADDING, WHITE);
 
         var yPos = startY + TEXT_PADDING + TEXT_RENDERER.fontHeight + TEXT_PADDING;
         for (var player : playersWithoutTeam) {
 
             // Draw players name
-            TEXT_RENDERER.draw(matrices, player.getProfile().getName(), startX + TEXT_PADDING, yPos, 0xFFFFFFFF);
+            TEXT_RENDERER.draw(matrices, player.getProfile().getName(), startX + TEXT_PADDING, yPos, WHITE);
 
             yPos += (TEXT_RENDERER.fontHeight + INTRA_PLAYER_PADDING);
         }
@@ -235,12 +261,12 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         fill(matrices, startX, startY, startX + TEAM_WIDTH, startY + height, BACKGROUND_COLOR);
 
         // Draw header
-        TEXT_RENDERER.drawWithShadow(matrices, "Spectators:", startX + TEXT_PADDING, startY + TEXT_PADDING, 0xFFFFFFFF);
+        TEXT_RENDERER.drawWithShadow(matrices, "Spectators:", startX + TEXT_PADDING, startY + TEXT_PADDING, WHITE);
 
         var yPos = startY + TEXT_PADDING + TEXT_RENDERER.fontHeight + TEXT_PADDING;
         for (var playerUuid : spectatorTeamPlayers) {
             // Draw players name
-            TEXT_RENDERER.draw(matrices, playerNamesState.getPlayerUsername(playerUuid), startX + TEXT_PADDING, yPos, 0xFFFFFFFF);
+            TEXT_RENDERER.draw(matrices, playerNamesState.getPlayerUsername(playerUuid), startX + TEXT_PADDING, yPos, WHITE);
 
             yPos += (TEXT_RENDERER.fontHeight + INTRA_PLAYER_PADDING);
         }
