@@ -25,6 +25,10 @@ public abstract class WorldPresetsMixin {
 
     @Inject(method = "initAndGetDefault", at = @At("RETURN"))
     private void addPresets(CallbackInfoReturnable<RegistryEntry<WorldPreset>> cir) {
-        this.register(de.kleiner3.lasertag.worldgen.WorldPresets.ARENA, this.createOverworldOptions(new ArenaChunkGenerator(BuiltinRegistries.STRUCTURE_SET, BuiltinRegistries.BIOME, ArenaChunkGeneratorConfig.getDefaultConfig())));
+        this.register(de.kleiner3.lasertag.worldgen.WorldPresets.ARENA,
+                this.createOverworldOptions(
+                        new ArenaChunkGenerator(BuiltinRegistries.STRUCTURE_SET,
+                                BuiltinRegistries.BIOME,
+                                ArenaChunkGeneratorConfig.getDefaultConfig())));
     }
 }

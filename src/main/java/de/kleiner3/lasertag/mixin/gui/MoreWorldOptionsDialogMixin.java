@@ -135,6 +135,9 @@ public abstract class MoreWorldOptionsDialogMixin {
         }
     }
 
+    /**
+     * This method makes it so the map type lasertag arena is selected by default
+     */
     @Inject(method = "<init>(Lnet/minecraft/client/world/GeneratorOptionsHolder;Ljava/util/Optional;Ljava/util/OptionalLong;)V", at = @At("TAIL"))
     private void createArenaPresetEntryIfDefault(GeneratorOptionsHolder generatorOptionsHolder, Optional<RegistryKey<WorldPreset>> presetKey, OptionalLong seed, CallbackInfo ci) {
         presetKey.ifPresent(presetKeyValue -> {
