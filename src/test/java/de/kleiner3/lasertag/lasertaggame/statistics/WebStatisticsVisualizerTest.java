@@ -1,7 +1,9 @@
 package de.kleiner3.lasertag.lasertaggame.statistics;
 
+import de.kleiner3.lasertag.common.types.ColorDto;
 import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.dummy.DummyWebResourceManager;
+import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
@@ -40,7 +42,7 @@ class WebStatisticsVisualizerTest {
         stats.teamScores.add(new Tuple<>("Orange", "900"));
         stats.teamScores.add(new Tuple<>("Pink", "600"));
 
-        var result = WebStatisticsVisualizer.build(stats, new DummyWebResourceManager());
+        var result = WebStatisticsVisualizer.build(stats, new TeamDto(0, "Teal", new ColorDto(0, 128, 255), null), new DummyWebResourceManager());
 
         assertNotNull(result);
     }

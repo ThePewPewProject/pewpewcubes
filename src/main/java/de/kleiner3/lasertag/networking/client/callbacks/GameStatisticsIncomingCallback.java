@@ -34,6 +34,7 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
             var gameManager = client.world.getClientLasertagManager();
             var uiState = gameManager.getSyncedState().getUIState();
             var settingManager = gameManager.getSettingsManager();
+            var teamsConfigState = gameManager.getSyncedState().getTeamsConfigState();
 
             // Read from buffer
             var json = buf.readString();
@@ -41,37 +42,46 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
             // Unpack json
             var stats = new Gson().fromJson(json, GameStats.class);
 
-            if (!stats.teamScores.isEmpty()) {
+            // Get the winner team id
+            var winnerTeamId = gameManager.getGameModeManager().getGameMode().getWinnerTeamId();
 
-                // Get the winner team id
-                var winnerTeamId = gameManager.getGameModeManager().getGameMode().getWinnerTeamId();
-
-                // If something went wrong
-                if (winnerTeamId == -1) {
-                    LasertagMod.LOGGER.warn("Something went wrong while deciding what team won.");
-                }
-
-                // Set the winner team id
-                uiState.lastGameWinnerId = winnerTeamId;
-
-                var gameOverOverlayTimer = ThreadUtil.createScheduledExecutor("client-lasertag-game-over-timer-%d");
-                gameOverOverlayTimer.schedule(() -> {
-                    uiState.lastGameWinnerId = -1;
-                    gameOverOverlayTimer.shutdownNow();
-                }, 5, TimeUnit.SECONDS);
+            // If something went wrong
+            if (winnerTeamId == -1) {
+                LasertagMod.LOGGER.warn("Something went wrong while deciding what team won.");
             }
+
+            // Set the winner team id
+            uiState.lastGameWinnerId = winnerTeamId;
+
+            var gameOverOverlayTimer = ThreadUtil.createScheduledExecutor("client-lasertag-game-over-timer-%d");
+            gameOverOverlayTimer.schedule(() -> {
+                uiState.lastGameWinnerId = -1;
+                gameOverOverlayTimer.shutdownNow();
+            }, 5, TimeUnit.SECONDS);
+
+            // Get the winning team
+            var winningTeam = teamsConfigState.getTeamOfId(winnerTeamId).orElseThrow();
+
+            // Get the winning team text
+            var winningTeamText = Text.literal(winningTeam.name()).setStyle(Style.EMPTY.withColor(winningTeam.color().getValue()));
+
+            // Build the announcement message
+            var message = Text.translatable("chat.message.winner_announcement", winningTeamText);
+
+            // Send winning message in chat
+            client.player.sendMessage(message);
 
             // If should generate file
             if (settingManager.<Boolean>get(SettingDescription.GEN_STATS_FILE)) {
 
                 // Generate file
-                var generatedFilePath = WebStatisticsVisualizer.build(stats, ResourceManagers.WEB_RESOURCE_MANAGER);
+                var generatedFilePath = WebStatisticsVisualizer.build(stats, winningTeam, ResourceManagers.WEB_RESOURCE_MANAGER);
 
                 // If generation failed
                 if (generatedFilePath == null) {
 
                     LasertagMod.LOGGER.error("Failed to generate statistics file.");
-                    client.player.sendMessage(Text.translatable("chat.messae.game_stats_generate_failed")
+                    client.player.sendMessage(Text.translatable("chat.message.game_stats_generate_failed")
                             .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
 
                     return;
@@ -94,7 +104,7 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
                         client.player.sendMessage(
                                 Text.translatable("chat.message.game_stats_open_failed",
                                                 generatedFilePath.toString())
-                                .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
+                                        .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
                     }
 
                 } else {

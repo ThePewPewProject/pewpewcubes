@@ -159,9 +159,10 @@
 
 	"chat.message.team_zone_generator_not_enough_permissions": "You do not have enough permissions to use the team zone generator.",
 	"chat.message.start_game_button_not_enough_permissions": "You do not have enough permissions to start a game.",
-	"chat.messae.game_stats_generate_failed": "Failed to generate statistics file.",
+	"chat.message.game_stats_generate_failed": "Failed to generate statistics file.",
 	"chat.message.game_stats_open_failed": "Failed to open statistics from '%s'.",
 	"chat.message.no_game_stats": "There are no last game stats.",
 	"chat.message.game_stats_saved": "Game statistics saved. Open them with /stats.",
-	"chat.message.game_mode_print": "Current game mode: %s"
+	"chat.message.game_mode_print": "Current game mode: %s",
+	"chat.message.winner_announcement": "Game Over! %s won!"
 }

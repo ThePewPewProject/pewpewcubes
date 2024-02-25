@@ -6,6 +6,7 @@ import de.kleiner3.lasertag.common.util.DurationUtils;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.PlayerInfoDto;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.ProfileTextureDto;
 import de.kleiner3.lasertag.lasertaggame.statistics.mojangsessionaccess.SessionPlayerProfileDto;
+import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import de.kleiner3.lasertag.resource.WebResourceManager;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
@@ -46,7 +47,8 @@ public class WebStatisticsVisualizer {
 
     private static final Identifier REPLACE_ID = new Identifier(LasertagMod.ID, "statistics_go_here");
 
-    public static Path build(GameStats stats, WebResourceManager resourceManager) {
+    public static Path build(GameStats stats, TeamDto winningTeam, WebResourceManager resourceManager) {
+
         // The path to the generated index.html file
         Path resultPath = null;
 
@@ -72,7 +74,7 @@ public class WebStatisticsVisualizer {
                     return null;
                 }
 
-                fileContents = buildHtml(fileContents, stats);
+                fileContents = buildHtml(fileContents, stats, winningTeam);
 
                 // Write file
                 resultPath = TARGET_PATH.resolve(fileTuple.x().getPath());
@@ -102,9 +104,11 @@ public class WebStatisticsVisualizer {
         return resultPath;
     }
 
-    private static String buildHtml(String html, GameStats stats) {
+    private static String buildHtml(String html, GameStats stats, TeamDto winningTeam) {
         // build html to insert
         var builder = new StringBuilder();
+
+        buildWinnerTeam(builder, winningTeam);
 
         buildTeamScores(builder, stats);
 
@@ -114,6 +118,22 @@ public class WebStatisticsVisualizer {
 
         // Find and replace
         return html.replaceAll("#" + REPLACE_ID + "#", builder.toString());
+    }
+
+    private static void buildWinnerTeam(StringBuilder builder, TeamDto winningTeam) {
+
+        // Get the winning teams color
+        var winningTeamColor = winningTeam.color();
+
+        builder.append("<div class=\"container\"><h1><i>Winner: <span style=\"color:rgb(");
+        builder.append(winningTeamColor.r());
+        builder.append(",");
+        builder.append(winningTeamColor.g());
+        builder.append(",");
+        builder.append(winningTeamColor.b());
+        builder.append(");\"><b>");
+        builder.append(winningTeam.name());
+        builder.append("</b></span></i></h1></div>");
     }
 
     private static void buildTeamScores(StringBuilder builder, GameStats stats) {
