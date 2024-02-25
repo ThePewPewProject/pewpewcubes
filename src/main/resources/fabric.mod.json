@@ -43,7 +43,8 @@
 		"net/minecraft/client/network/ClientPlayerEntity": ["de/kleiner3/lasertag/client/screen/ILasertagGameManagerScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagTeamSelectorScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagCreditsScreenOpener", "de/kleiner3/lasertag/client/screen/ILasertagTeamZoneGeneratorScreenOpener"],
         "net/minecraft/world/World": ["de/kleiner3/lasertag/common/util/fastiter/IFastWorldIter"],
         "net/minecraft/client/world/ClientWorld": ["de/kleiner3/lasertag/lasertaggame/state/management/client/IClientLasertagManagerAccessor"],
-        "net/minecraft/server/world/ServerWorld": ["de/kleiner3/lasertag/lasertaggame/state/management/server/IServerLasertagManagerAccessor"]
+        "net/minecraft/server/world/ServerWorld": ["de/kleiner3/lasertag/lasertaggame/state/management/server/IServerLasertagManagerAccessor"],
+        "net/minecraft/client/MinecraftClient": ["de/kleiner3/lasertag/lasertaggame/IStatsFilePathHolding"]
     }
   },
 

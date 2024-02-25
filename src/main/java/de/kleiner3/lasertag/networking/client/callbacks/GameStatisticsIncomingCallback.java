@@ -69,14 +69,16 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
 
                 // If generation failed
                 if (generatedFilePath == null) {
-                    var msg = "Failed to generate statistics file.";
 
-                    LasertagMod.LOGGER.error(msg);
-                    client.player.sendMessage(Text.translatable(msg)
+                    LasertagMod.LOGGER.error("Failed to generate statistics file.");
+                    client.player.sendMessage(Text.translatable("chat.messae.game_stats_generate_failed")
                             .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
 
                     return;
                 }
+
+                // Set the stats file
+                client.setStatsFilePath(generatedFilePath.toString());
 
                 // If should automatically open file
                 if (settingManager.<Boolean>get(SettingDescription.AUTO_OPEN_STATS_FILE)) {
@@ -89,15 +91,16 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
                         LasertagMod.LOGGER.error("Failed to open statistics from '" + generatedFilePath + "': " + e.getMessage());
 
                         // Notify player
-                        client.player.sendMessage(Text.translatable("Failed to open statistics from " + generatedFilePath)
+                        client.player.sendMessage(
+                                Text.translatable("chat.message.game_stats_open_failed",
+                                                generatedFilePath.toString())
                                 .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
                     }
 
                 } else {
 
                     // Notify player about generation of file
-                    client.player.sendMessage(Text.translatable("Game statistics saved to " + generatedFilePath)
-                            .fillStyle(Style.EMPTY.withColor(Formatting.WHITE)), false);
+                    client.player.sendMessage(Text.translatable("chat.message.game_stats_saved"), false);
                 }
             }
         } catch (Exception ex) {

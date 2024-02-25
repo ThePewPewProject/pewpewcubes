@@ -155,5 +155,10 @@
 	"render.start_game_button_text": "Start Game",
 
 	"death.attack.laser": "%s was reset",
-	"death.attack.laser.player": "%s was reset"
+	"death.attack.laser.player": "%s was reset",
+
+	"chat.messae.game_stats_generate_failed": "Failed to generate statistics file.",
+	"chat.message.game_stats_open_failed": "Failed to open statistics from '%s'.",
+	"chat.message.no_game_stats": "There are no last game stats.",
+	"chat.message.game_stats_saved": "Game statistics saved. Open them with /stats."
 }

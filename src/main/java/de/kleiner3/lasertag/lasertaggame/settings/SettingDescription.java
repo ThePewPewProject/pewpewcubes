@@ -23,7 +23,7 @@ public enum SettingDescription {
     PLAYER_DEACTIVATE_TIME("playerDeactivationDuration", 5L, SettingDataType.LONG, "seconds", 0L, null),
     LASERTARGET_DEACTIVATE_TIME("lasertargetDeactivatedDuration", 7L, SettingDataType.LONG, "seconds", 0L, null),
     GEN_STATS_FILE("generateStatsFile", true, SettingDataType.BOOL, "value", null, null),
-    AUTO_OPEN_STATS_FILE("autoOpenStatsFile", true, SettingDataType.BOOL, "value", null, null),
+    AUTO_OPEN_STATS_FILE("autoOpenStatsFile", false, SettingDataType.BOOL, "value", null, null),
     DO_ORIGIN_SPAWN("doOriginSpawn", true, SettingDataType.BOOL, "value", null, null),
     RESPAWN_PENALTY("respawnPenalty", 0L, SettingDataType.LONG, "seconds", 0L, null),
     SHOW_NAMETAGS_OF_TEAMMATES("showNametagsOfTeammates", true, SettingDataType.BOOL, "value", null, null),
@@ -71,20 +71,20 @@ public enum SettingDescription {
     }
 
     private final String name;
-    private final Object baseValue;
+    private final Object defaultValue;
     private final SettingDataType dataType;
     private final String settingValueName;
     private final Object minValue;
     private final Object maxValue;
 
     SettingDescription(String name,
-                       Object baseValue,
+                       Object defaultValue,
                        SettingDataType dataType,
                        String settingValueName,
                        Object minValue,
                        Object maxValue) {
         this.name = name;
-        this.baseValue = baseValue;
+        this.defaultValue = defaultValue;
         this.dataType = dataType;
         this.settingValueName = settingValueName;
         this.minValue = minValue;
@@ -95,8 +95,8 @@ public enum SettingDescription {
         return name;
     }
 
-    public Object getBaseValue() {
-        return baseValue;
+    public Object getDefaultValue() {
+        return defaultValue;
     }
 
     public SettingDataType getDataType() {

@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.command;
 
 import de.kleiner3.lasertag.command.lasertag.CreditsCommand;
+import de.kleiner3.lasertag.command.lasertag.StatsCommand;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 
 /**
@@ -14,5 +15,6 @@ public class ClientCommands {
      */
     public static void register() {
         ClientCommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess) -> CreditsCommand.register(dispatcher)));
+        ClientCommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess) -> StatsCommand.register(dispatcher)));
     }
 }

@@ -19,9 +19,9 @@ public class SettingsState extends HashMap<String, Object> {
 
         for (var setting : SettingDescription.values()) {
             if (setting.getDataType().isEnum()) {
-                settings.put(setting.getName(), ((Enum<?>)setting.getBaseValue()).name());
+                settings.put(setting.getName(), ((Enum<?>)setting.getDefaultValue()).name());
             } else {
-                settings.put(setting.getName(), setting.getBaseValue());
+                settings.put(setting.getName(), setting.getDefaultValue());
             }
         }
 
