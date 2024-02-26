@@ -71,7 +71,7 @@ public class MusicalChairsManager implements IMusicalChairsManager {
 
 
     @Override
-    public void tick() {
+    public synchronized void tick() {
 
         LasertagMod.LOGGER.info("[MusicalChairsManager] Tick...");
 
@@ -92,12 +92,12 @@ public class MusicalChairsManager implements IMusicalChairsManager {
     }
 
     @Override
-    public long getPlayerTotalScore(UUID playerUuid) {
+    public synchronized long getPlayerTotalScore(UUID playerUuid) {
         return musicalChairsState.getPlayerOverallScore(playerUuid);
     }
 
     @Override
-    public void onPlayerScored(UUID playerUuid, long score) {
+    public synchronized void onPlayerScored(UUID playerUuid, long score) {
 
         // Get the old score
         var oldScore = musicalChairsState.getPlayerOverallScore(playerUuid);
@@ -110,7 +110,7 @@ public class MusicalChairsManager implements IMusicalChairsManager {
     }
 
     @Override
-    public void reset() {
+    public synchronized void reset() {
         ticksSinceLastPhaseChange = -1L;
         musicalChairsState.reset();
     }

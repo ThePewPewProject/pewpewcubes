@@ -27,18 +27,18 @@ public class ScoreManager implements IScoreManager {
     }
 
     @Override
-    public long getScore(UUID playerUuuid) {
+    public synchronized long getScore(UUID playerUuuid) {
         return scoreState.getScoreOfPlayer(playerUuuid);
     }
 
     @Override
-    public void resetScores() {
+    public synchronized void resetScores() {
         scoreState.resetScores();
         ServerEventSending.sendToEveryone(server, NetworkingConstants.SCORE_RESET, PacketByteBufs.empty());
     }
 
     @Override
-    public void onPlayerScored(UUID playerUuid, long score) {
+    public synchronized void onPlayerScored(UUID playerUuid, long score) {
 
         var oldScore = scoreState.getScoreOfPlayer(playerUuid);
         var newScore = oldScore + score;

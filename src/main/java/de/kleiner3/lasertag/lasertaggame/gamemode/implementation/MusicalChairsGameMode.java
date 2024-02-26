@@ -70,7 +70,6 @@ public class MusicalChairsGameMode extends PointBasedGameMode {
 
     @Override
     public void onPlayerHitLasertarget(MinecraftServer server, ServerPlayerEntity shooter, LaserTargetBlockEntity target) {
-        super.onPlayerHitLasertarget(server, shooter, target);
 
         // Get the game managers
         var gameManager = server.getOverworld().getServerLasertagManager();
@@ -79,19 +78,35 @@ public class MusicalChairsGameMode extends PointBasedGameMode {
 
         // Player scored
         musicalChairsManager.onPlayerScored(shooter.getUuid(), settingsManager.<Long>get(SettingDescription.LASERTARGET_HIT_SCORE));
+        super.onPlayerHitLasertarget(server, shooter, target);
     }
 
     @Override
     public void onPlayerHitPlayer(MinecraftServer server, ServerPlayerEntity shooter, ServerPlayerEntity target) {
-        super.onPlayerHitPlayer(server, shooter, target);
 
         // Get the game managers
         var gameManager = server.getOverworld().getServerLasertagManager();
         var musicalChairsManager = gameManager.getMusicalChairsManager();
         var settingsManager = gameManager.getSettingsManager();
+        var teamsManager = gameManager.getTeamsManager();
+        var activationManager = gameManager.getActivationManager();
+
+        var shooterTeam = teamsManager.getTeamOfPlayer(shooter.getUuid());
+        var targetTeam = teamsManager.getTeamOfPlayer(target.getUuid());
+
+        // Check that hit player is not in same team as firing player
+        if (shooterTeam.equals(targetTeam)) {
+            return;
+        }
+
+        // Check if player is deactivated
+        if (activationManager.isDeactivated(target.getUuid())) {
+            return;
+        }
 
         // Player scored
         musicalChairsManager.onPlayerScored(shooter.getUuid(), settingsManager.<Long>get(SettingDescription.PLAYER_HIT_SCORE));
+        super.onPlayerHitPlayer(server, shooter, target);
     }
 
     @Override
