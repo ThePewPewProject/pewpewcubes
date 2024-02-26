@@ -177,7 +177,7 @@ public class EliminationGameMode extends DamageBasedGameMode {
         var eliminationManager = gameManager.getEliminationManager();
 
         // Eliminate the player
-        eliminationManager.eliminatePlayer(player.getUuid(), shooterUuid);
+        eliminationManager.eliminatePlayer(player.getUuid(), shooterUuid, true);
 
         checkGameOver(server);
     }

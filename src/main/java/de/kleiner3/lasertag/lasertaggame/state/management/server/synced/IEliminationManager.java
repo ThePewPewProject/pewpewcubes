@@ -17,8 +17,9 @@ public interface IEliminationManager {
      *
      * @param eliminatedPlayerUuid The player who was eliminated
      * @param shooterUuid          The player who eliminated the player
+     * @param playEliminationSound Flag to indicate whether the elimination sound should be played
      */
-    void eliminatePlayer(UUID eliminatedPlayerUuid, UUID shooterUuid);
+    void eliminatePlayer(UUID eliminatedPlayerUuid, UUID shooterUuid, boolean playEliminationSound);
 
     /**
      * Eliminate a team

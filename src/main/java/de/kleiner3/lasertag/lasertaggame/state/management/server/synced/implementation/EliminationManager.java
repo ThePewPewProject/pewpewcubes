@@ -1,6 +1,7 @@
 package de.kleiner3.lasertag.lasertaggame.state.management.server.synced.implementation;
 
 import de.kleiner3.lasertag.LasertagMod;
+import de.kleiner3.lasertag.client.SoundEvents;
 import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.IEliminationManager;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.ISettingsManager;
@@ -17,8 +18,10 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 
 import java.util.List;
@@ -66,7 +69,7 @@ public class EliminationManager implements IEliminationManager {
     }
 
     @Override
-    public synchronized void eliminatePlayer(UUID eliminatedPlayerUuid, UUID shooterUuid) {
+    public synchronized void eliminatePlayer(UUID eliminatedPlayerUuid, UUID shooterUuid, boolean playEliminationSound) {
 
         LasertagMod.LOGGER.info("Trying to eliminate player '" + server.getOverworld().getPlayerByUuid(eliminatedPlayerUuid).getDisplayName().getString() + "'");
 
@@ -111,6 +114,12 @@ public class EliminationManager implements IEliminationManager {
 
         // Send the network event
         sendPlayerEliminatedNetworkEvent(eliminatedPlayerUuid, shooterUuid, newEliminationCount, surviveTime);
+
+        // If the elimination sound should be played
+        if (playEliminationSound) {
+
+            playEliminationSound();
+        }
     }
 
     @Override
@@ -126,7 +135,9 @@ public class EliminationManager implements IEliminationManager {
         LasertagMod.LOGGER.info("Current players of team: [" + uuidsString + "]");
 
         // Eliminate every player of that team
-        playersOfTeam.forEach(playerUuid -> eliminatePlayer(playerUuid, null));
+        playersOfTeam.forEach(playerUuid -> eliminatePlayer(playerUuid, null, false));
+
+        playEliminationSound();
     }
 
     @Override
@@ -309,5 +320,17 @@ public class EliminationManager implements IEliminationManager {
         msg.append(teamName);
         msg.append(" got eliminated!");
         server.getPlayerManager().broadcast(msg, false);
+    }
+
+    private void playEliminationSound() {
+
+        LasertagMod.LOGGER.info("Playing elimination sound...");
+
+        server.getOverworld().playSound(null,
+                BlockPos.ORIGIN,
+                SoundEvents.PLAYER_ELIMINATION_SOUND_EVENT,
+                SoundCategory.AMBIENT,
+                200.0f,
+                1.0f);
     }
 }

@@ -66,5 +66,14 @@
       "lasertag:fire_sound_9",
       "lasertag:fire_sound_10"
     ]
+  },
+
+  "player_elimination_sound": {
+    "subtitle": "subtitles.player_eliminated_sound",
+    "sounds": [
+      "lasertag:player_eliminated_1",
+      "lasertag:player_eliminated_2",
+      "lasertag:player_eliminated_3"
+    ]
   }
 }

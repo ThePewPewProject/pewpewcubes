@@ -78,6 +78,7 @@
 
 	"subtitles.lasertag.music": "Thrilling music",
 	"subtitles.lasertag.weapon_fire_sound": "Laserweapon firing",
+	"subtitles.player_eliminated_sound": "Player eliminated",
 
 	"gui.exit": "Exit",
 	"gui.back": "Back",

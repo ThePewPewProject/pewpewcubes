@@ -51,6 +51,8 @@ public class SoundEvents {
     // ===== Sound effects =====
     public static final Identifier LASERWEAPON_FIRE_SOUND_ID = new Identifier(LasertagMod.ID, "laserweapon_fire_sound");
     public static final SoundEvent LASERWEAPON_FIRE_SOUND_EVENT = new SoundEvent(LASERWEAPON_FIRE_SOUND_ID);
+    public static final Identifier PLAYER_ELIMINATION_SOUND_ID = new Identifier(LasertagMod.ID, "player_elimination_sound");
+    public static final SoundEvent PLAYER_ELIMINATION_SOUND_EVENT = new SoundEvent(PLAYER_ELIMINATION_SOUND_ID, Float.MAX_VALUE);
 
     public static void register() {
         // Music
@@ -76,5 +78,6 @@ public class SoundEvents {
 
         // Sound effects
         Registry.register(Registry.SOUND_EVENT, LASERWEAPON_FIRE_SOUND_ID, LASERWEAPON_FIRE_SOUND_EVENT);
+        Registry.register(Registry.SOUND_EVENT, PLAYER_ELIMINATION_SOUND_ID, PLAYER_ELIMINATION_SOUND_EVENT);
     }
 }

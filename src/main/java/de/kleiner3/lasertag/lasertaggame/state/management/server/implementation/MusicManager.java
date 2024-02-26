@@ -25,7 +25,7 @@ public class MusicManager implements IMusicManager {
     }
 
     public void playIntro(ArenaType arenaType) {
-        server.getOverworld().playSound(null, new BlockPos(0, 0, 0), arenaType.introMusic, SoundCategory.MUSIC, SOUND_VOLUME, 1.0f);
+        server.getOverworld().playSound(null, BlockPos.ORIGIN, arenaType.introMusic, SoundCategory.MUSIC, SOUND_VOLUME, 1.0f);
     }
 
     public void tick(ArenaType arenaType, boolean isLastMinute) {
@@ -36,14 +36,14 @@ public class MusicManager implements IMusicManager {
         }
 
         if (this.playingThisMinute) {
-            server.getOverworld().playSound(null, new BlockPos(0, 0, 0), arenaType.music, SoundCategory.MUSIC, SOUND_VOLUME, 1.0f);
+            server.getOverworld().playSound(null, BlockPos.ORIGIN, arenaType.music, SoundCategory.MUSIC, SOUND_VOLUME, 1.0f);
         }
 
         this.playingThisMinute = !this.playingThisMinute;
     }
 
     public void playOutro(ArenaType arenaType) {
-        server.getOverworld().playSound(null, new BlockPos(0, 0, 0), arenaType.outroMusic, SoundCategory.MUSIC, SOUND_VOLUME, 1.0f);
+        server.getOverworld().playSound(null, BlockPos.ORIGIN, arenaType.outroMusic, SoundCategory.MUSIC, SOUND_VOLUME, 1.0f);
     }
 
     @Override
