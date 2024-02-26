@@ -7,6 +7,7 @@ import de.kleiner3.lasertag.lasertaggame.state.synced.implementation.TeamsConfig
 import de.kleiner3.lasertag.lasertaggame.team.TeamDto;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
@@ -147,14 +148,40 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
         var playerNamesManager = gameManager.getSyncedState().getPlayerNamesState();
         var eliminationManager = gameManager.getEliminationManager();
 
+        // Get if team is eliminated
+        var teamEliminated = eliminationManager.isTeamEliminated(teamDto.id());
+
         // Get the teams box color
-        var boxColor = eliminationManager.isTeamEliminated(teamDto.id()) ? ELIMINATED_BOX_COLOR : BOX_COLOR;
+        var boxColor = teamEliminated ? ELIMINATED_BOX_COLOR : BOX_COLOR;
 
         // Draw rectangle of team
         drawRectangle(matrices, rectangleStartX, rectangleStartY, rectangleStartX + TEAM_WIDTH, rectangleStartY + teamHeight, boxColor);
 
+        // Build team name
+        var teamNameText = Text.literal(teamDto.name()).asOrderedText();
+
         // Draw team name
-        drawWithShadow(matrices, TEXT_RENDERER, Text.literal(teamDto.name()).asOrderedText(), rectangleStartX + TEXT_PADDING + 1, rectangleStartY + TEXT_PADDING + 1, teamDto.color().getValue());
+        drawWithShadow(matrices,
+                TEXT_RENDERER,
+                teamNameText,
+                rectangleStartX + TEXT_PADDING + 1,
+                rectangleStartY + TEXT_PADDING + 1,
+                teamDto.color().getValue());
+
+        // If the team is eliminated
+        if (teamEliminated) {
+
+            var teamNameAddition = Text.literal(" (" + I18n.translate("gui.hud.team_list.eliminated") + ")").asOrderedText();
+
+            // Also draw eliminated behind the teams name
+            drawWithShadow(matrices,
+                    TEXT_RENDERER,
+                    teamNameAddition,
+                    rectangleStartX + TEXT_PADDING + 1 + TEXT_RENDERER.getWidth(teamNameText),
+                    rectangleStartY + TEXT_PADDING + 1,
+                    ELIMINATED_PLAYER_COLOR
+            );
+        }
 
         // Draw team score
         var teamScoreText = gameMode.getTeamScoreText(teamDto);

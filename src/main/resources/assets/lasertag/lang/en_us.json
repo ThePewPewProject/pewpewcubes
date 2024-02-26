@@ -139,6 +139,8 @@
 	"gui.game_manager.map_screen_title": "Lasertag Arena",
 	"gui.game_manager.teams_screen_title": "Lasertag Teams",
 
+	"gui.hud.team_list.eliminated": "Eliminated",
+
 	"gui.team_selector.title": "Select your team!",
 	"gui.team_selector.join_team": "Join",
 
