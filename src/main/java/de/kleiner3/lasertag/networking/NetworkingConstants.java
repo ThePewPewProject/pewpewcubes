@@ -26,6 +26,11 @@ public class NetworkingConstants {
     public static final Identifier TEAM_ELIMINATED = new Identifier(LasertagMod.ID, "team_eliminated");
     public static final Identifier PLAYER_ELIMINATED = new Identifier(LasertagMod.ID, "player_eliminated");
     public static final Identifier ELIMINATION_STATE_RESET = new Identifier(LasertagMod.ID, "elimination_state_reset");
+    public static final Identifier SET_HIT_BY = new Identifier(LasertagMod.ID, "set_hit_by");
+    public static final Identifier SET_LAST_HIT_TIME = new Identifier(LasertagMod.ID, "set_last_hit_time");
+    public static final Identifier SET_LASERTARGET_DEACTIVATED = new Identifier(LasertagMod.ID, "set_lasertarget_deactivated");
+    public static final Identifier LASERTARGETS_RESET = new Identifier(LasertagMod.ID, "lasertargets_reset");
+    public static final Identifier LASERTARGETS_ALREADY_HIT_BY_RESET = new Identifier(LasertagMod.ID, "lasertargets_already_hit_by_reset");
 
 
     // ===== General ================

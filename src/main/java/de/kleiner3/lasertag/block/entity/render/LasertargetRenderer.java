@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import de.kleiner3.lasertag.block.entity.LaserTargetBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.WallMountedBlock;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -39,6 +40,10 @@ public class LasertargetRenderer extends GeoBlockRenderer<LaserTargetBlockEntity
     @Override
     public void render(LaserTargetBlockEntity blockEntity, float partialTick, MatrixStack poseStack, VertexConsumerProvider bufferSource, int packedLight) {
 
+        // Get the game managers
+        var clientManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var lasertargetsManager = clientManager.getLasertargetsManager();
+
         // Render base
         GeoModel model = modelProvider.getModel(modelProvider.getModelResource(blockEntity));
         this.dispatchedMat = poseStack.peek().getPositionMatrix().copy();
@@ -68,9 +73,10 @@ public class LasertargetRenderer extends GeoBlockRenderer<LaserTargetBlockEntity
         var g = 0.0f;
         var b = 0.0f;
 
+        var isDeactivated = lasertargetsManager.isDeactivated(blockEntity.getPos());
         var timeSinceLastHit = blockEntity.getTimeSinceLastHit();
         if (timeSinceLastHit <= FLASH_DURATION) {
-            if (blockEntity.isDeactivated()) {
+            if (isDeactivated) {
                 g = 1.0f;
                 b = 1.0f;
             } else {
@@ -79,7 +85,7 @@ public class LasertargetRenderer extends GeoBlockRenderer<LaserTargetBlockEntity
             }
 
             brightness = brightness + ((1 - brightness) * doFlash(timeSinceLastHit));
-        } else if (blockEntity.isDeactivated()) {
+        } else if (isDeactivated) {
             brightness = 0.0f;
         }
 

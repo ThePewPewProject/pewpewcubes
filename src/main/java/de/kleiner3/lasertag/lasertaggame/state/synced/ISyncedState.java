@@ -34,6 +34,8 @@ public interface ISyncedState {
 
     IEliminationState getEliminationState();
 
+    ILasertargetState getLasertargetState();
+
     /**
      * Serialize the entire synced state to JSON
      *

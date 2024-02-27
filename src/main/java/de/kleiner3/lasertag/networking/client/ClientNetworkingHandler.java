@@ -39,5 +39,10 @@ public class ClientNetworkingHandler {
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.TEAM_ELIMINATED, new TeamEliminatedCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.PLAYER_ELIMINATED, new PlayerEliminatedCallback());
         ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.ELIMINATION_STATE_RESET, new EliminationStateResetCallback());
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.SET_HIT_BY, new SetLasertargetHitByCallback());
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.SET_LAST_HIT_TIME, new SetLasertargetLastHitTimeCallback());
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.SET_LASERTARGET_DEACTIVATED, new SetLasertargetDeactivatedCallback());
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTARGETS_RESET, new LasertargetStateResetCallback());
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingConstants.LASERTARGETS_ALREADY_HIT_BY_RESET, new LasertargetsAlreadyHitByStateResetCallback());
     }
 }

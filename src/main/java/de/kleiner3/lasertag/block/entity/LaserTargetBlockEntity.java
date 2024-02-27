@@ -4,6 +4,7 @@ import de.kleiner3.lasertag.entity.Entities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
@@ -26,102 +27,22 @@ public class LaserTargetBlockEntity extends BlockEntity implements IAnimatable {
 
     private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
-    /**
-     * Represents the uuids of the players who hit the target already.
-     */
-    private List<UUID> hitBy = new ArrayList<>();
-    private boolean deactivated = false;
-    private long lastHitTime = 0;
-
     public LaserTargetBlockEntity(BlockPos pos, BlockState state) {
         super(Entities.LASER_TARGET_ENTITY, pos, state);
     }
 
     public long getTimeSinceLastHit() {
-        return Math.max(0, this.world.getTime() - lastHitTime);
-    }
 
-    @Override
-    protected void writeNbt(NbtCompound nbt) {
-        nbt.putBoolean("deactivated", deactivated);
-        nbt.putLong("lastHitTime", lastHitTime);
+        // Get the game managers
+        var clientManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var lasertargetsManager = clientManager.getLasertargetsManager();
 
-        var hitByFlattened = new ArrayList<Long>();
-        for (var uuid : hitBy) {
-            hitByFlattened.add(uuid.getMostSignificantBits());
-            hitByFlattened.add(uuid.getLeastSignificantBits());
-        }
-        nbt.putLongArray("hitBy", hitByFlattened);
-
-        super.writeNbt(nbt);
-    }
-
-    @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-
-        var hitByFlattened = nbt.getLongArray("hitBy");
-        hitBy = new ArrayList<>();
-        for(int i = 0; i < hitByFlattened.length; i += 2) {
-            hitBy.add(new UUID(hitByFlattened[i], hitByFlattened[i+1]));
-        }
-
-        deactivated = nbt.getBoolean("deactivated");
-        lastHitTime = nbt.getLong("lastHitTime");
+        return Math.max(0, this.world.getTime() - lasertargetsManager.getLastHitTime(this.pos));
     }
 
     @Override
     public Packet<ClientPlayPacketListener> toUpdatePacket() {
         return BlockEntityUpdateS2CPacket.create(this);
-    }
-
-    @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        return createNbt();
-    }
-
-    public void reset() {
-        deactivated = false;
-        hitBy = new ArrayList<>();
-    }
-
-    public boolean alreadyHitBy(PlayerEntity p) {
-        var uuid = p.getUuid();
-
-        for (var playerUuid : hitBy) {
-            if (playerUuid.equals(uuid)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public void addHitBy(PlayerEntity p) {
-        hitBy.add(p.getUuid());
-    }
-
-    /**
-     * Sets the last hit time of this lasertarget to now
-     */
-    public void setHit() {
-        lastHitTime = world.getTime();
-
-        if (world.isClient) {
-            return;
-        }
-
-        // Send lasertag updated to clients
-        var state = this.getCachedState();
-        world.getServer().getOverworld().updateListeners(this.pos, state, state, Block.NOTIFY_LISTENERS);
-    }
-
-    public void setDeactivated(boolean deactivated) {
-        this.deactivated = deactivated;
-    }
-
-    public boolean isDeactivated() {
-        return deactivated;
     }
 
     // Predicate runs every frame

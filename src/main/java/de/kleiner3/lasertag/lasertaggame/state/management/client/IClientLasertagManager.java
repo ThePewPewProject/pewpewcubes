@@ -27,6 +27,8 @@ public interface IClientLasertagManager {
 
     IEliminationManager getEliminationManager();
 
+    ILasertargetsManager getLasertargetsManager();
+
     ISyncedState getSyncedState();
 
     /**

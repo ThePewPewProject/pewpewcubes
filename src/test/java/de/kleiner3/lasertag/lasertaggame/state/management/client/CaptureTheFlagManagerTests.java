@@ -200,6 +200,11 @@ public class CaptureTheFlagManagerTests {
             }
 
             @Override
+            public ILasertargetState getLasertargetState() {
+                return null;
+            }
+
+            @Override
             public String toJson() {
                 return null;
             }
@@ -247,6 +252,11 @@ public class CaptureTheFlagManagerTests {
 
         @Override
         public IEliminationManager getEliminationManager() {
+            return null;
+        }
+
+        @Override
+        public ILasertargetsManager getLasertargetsManager() {
             return null;
         }
 

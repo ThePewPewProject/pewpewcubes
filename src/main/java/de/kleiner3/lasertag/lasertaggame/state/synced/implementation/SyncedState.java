@@ -31,6 +31,7 @@ public class SyncedState implements ISyncedState {
     private final ITeamsConfigState teamsConfigState;
     private final UIState uiState;
     private final IEliminationState eliminationState;
+    private final ILasertargetState lasertargetState;
 
     //endregion
 
@@ -47,6 +48,7 @@ public class SyncedState implements ISyncedState {
         teamsState = new TeamsState(teamsConfigState);
         uiState = new UIState();
         eliminationState = new EliminationState();
+        lasertargetState = new LasertargetState();
     }
 
     //region Public methods
@@ -106,6 +108,11 @@ public class SyncedState implements ISyncedState {
         return eliminationState;
     }
 
+    @Override
+    public ILasertargetState getLasertargetState() {
+        return lasertargetState;
+    }
+
     //endregion
 
 
@@ -145,5 +152,6 @@ public class SyncedState implements ISyncedState {
         builder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ITeamsState.class).registerSubtype(TeamsState.class));
         builder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ITeamsConfigState.class).registerSubtype(TeamsConfigState.class));
         builder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(IEliminationState.class).registerSubtype(EliminationState.class));
+        builder.registerTypeAdapterFactory(RuntimeTypeAdapterFactory.of(ILasertargetState.class).registerSubtype(LasertargetState.class));
     }
 }

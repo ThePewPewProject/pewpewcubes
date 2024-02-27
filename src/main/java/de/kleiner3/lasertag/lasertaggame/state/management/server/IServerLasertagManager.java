@@ -110,4 +110,6 @@ public interface IServerLasertagManager extends ITickable {
     IMusicalChairsManager getMusicalChairsManager();
 
     IEliminationManager getEliminationManager();
+
+    ILasertargetsManager getLasertargetsManager();
 }

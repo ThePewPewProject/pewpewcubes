@@ -33,11 +33,12 @@ public abstract class ServerWorldMixin implements IServerLasertagManagerAccessor
         var spawnpointManager = new SpawnpointManager(syncedState.getTeamsConfigState());
         var blockTickManager = new BlockTickManager(server);
         var arenaManager = new ArenaManager(server, spawnpointManager, syncedState.getPlayerNamesState(), blockTickManager);
-        var lasertargetManager = new LasertargetManager();
+
         var musicManager = new MusicManager(server);
         var gameModeManager = new GameModeManager(syncedState.getGameModeState(), server);
         var settingsManager = new SettingsManager(server, syncedState.getSettingsState(), gameModeManager);
         gameModeManager.setSettingsManager(settingsManager);
+        var lasertargetsManager = new LasertargetsManager(syncedState.getLasertargetState(), settingsManager, server);
         var teamsManager = new TeamsManager(syncedState.getTeamsState(), syncedState.getTeamsConfigState(), server, settingsManager);
         var scoreManager = new ScoreManager(syncedState.getScoreState(), server);
         var uiStateManager = new UIStateManager(syncedState.getUIState(), gameModeManager, settingsManager);
@@ -46,13 +47,12 @@ public abstract class ServerWorldMixin implements IServerLasertagManagerAccessor
         var activationManager = new ActivationManager(syncedState.getActivationState(), server, settingsManager, syncedState.getPlayerNamesState());
         var settingsPresetsNameManager = new SettingsPresetsNameManager(syncedState.getSettingsPresetsNamesState(), server);
         var settingsPresetsManager = new SettingsPresetsManager(new SettingsPresetsState(), settingsPresetsNameManager, settingsManager);
-        var musicalChairsManager = new MusicalChairsManager(settingsManager, teamsManager, scoreManager, gameModeManager, syncedState.getTeamsConfigState(), lasertargetManager, eliminationManager, world);
+        var musicalChairsManager = new MusicalChairsManager(settingsManager, teamsManager, scoreManager, gameModeManager, syncedState.getTeamsConfigState(), eliminationManager, lasertargetsManager, world);
 
         serverLasertagManager = new ServerLasertagManager(server,
                 syncedState,
                 arenaManager,
                 blockTickManager,
-                lasertargetManager,
                 musicManager,
                 settingsPresetsManager,
                 spawnpointManager,
@@ -65,7 +65,8 @@ public abstract class ServerWorldMixin implements IServerLasertagManagerAccessor
                 teamsManager,
                 uiStateManager,
                 musicalChairsManager,
-                eliminationManager);
+                eliminationManager,
+                lasertargetsManager);
     }
 
     @Override

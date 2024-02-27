@@ -65,7 +65,6 @@ public class ServerLasertagManager implements IServerLasertagManager {
 
     private final IArenaManager arenaManager;
     private final IBlockTickManager blockTickManager;
-    private final ILasertargetManager lasertargetManager;
     private final IMusicManager musicManager;
     private final ISettingsPresetsManager settingsPresetsManager;
     private final ISpawnpointManager spawnpointManager;
@@ -84,6 +83,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
     private final ITeamsManager teamsManager;
     private final IUIStateManager uiStateManager;
     private final IEliminationManager eliminationManager;
+    private final ILasertargetsManager lasertargetsManager;
 
     //endregion
 
@@ -91,7 +91,6 @@ public class ServerLasertagManager implements IServerLasertagManager {
                                  ISyncedState syncedState,
                                  IArenaManager arenaManager,
                                  IBlockTickManager blockTickManager,
-                                 ILasertargetManager lasertargetManager,
                                  IMusicManager musicManager,
                                  ISettingsPresetsManager settingsPresetsManager,
                                  ISpawnpointManager spawnpointManager,
@@ -104,16 +103,17 @@ public class ServerLasertagManager implements IServerLasertagManager {
                                  ITeamsManager teamsManager,
                                  IUIStateManager uiStateManager,
                                  IMusicalChairsManager musicalChairsManager,
-                                 IEliminationManager eliminationManager) {
+                                 IEliminationManager eliminationManager,
+                                 ILasertargetsManager lasertargetsManager) {
 
         this.server = server;
         this.syncedState = syncedState;
         this.eliminationManager = eliminationManager;
+        this.lasertargetsManager = lasertargetsManager;
         isRunning = false;
 
         this.arenaManager = arenaManager;
         this.blockTickManager = blockTickManager;
-        this.lasertargetManager = lasertargetManager;
         this.musicManager = musicManager;
         this.settingsPresetsManager = settingsPresetsManager;
         this.spawnpointManager = spawnpointManager;
@@ -267,10 +267,10 @@ public class ServerLasertagManager implements IServerLasertagManager {
     @Override
     public void playerHitLasertarget(ServerPlayerEntity shooter, LaserTargetBlockEntity target) {
 
-        target.setHit();
+        lasertargetsManager.setLastHitTime(target.getPos(), server.getOverworld().getTime());
 
         // Check that target is activated
-        if (target.isDeactivated()) {
+        if (lasertargetsManager.isDeactivated(target.getPos())) {
             return;
         }
 
@@ -278,12 +278,9 @@ public class ServerLasertagManager implements IServerLasertagManager {
         var gameMode = gameModeManager.getGameMode();
 
         // Check that player didn't hit the target before
-        if (!gameMode.canLasertargetsBeHitMutlipleTimes() && target.alreadyHitBy(shooter)) {
+        if (!gameMode.canLasertargetsBeHitMutlipleTimes() && lasertargetsManager.isAlreadyHitBy(target.getPos(), shooter.getUuid())) {
             return;
         }
-
-        // Register on server
-        lasertargetManager.registerLasertarget(target);
 
         // Get the world
         var world = server.getOverworld();
@@ -295,28 +292,10 @@ public class ServerLasertagManager implements IServerLasertagManager {
         gameMode.onPlayerHitLasertarget(this.server, shooter, target);
 
         // Deactivate
-        target.setDeactivated(true);
-
-        // Reactivate after configured amount of seconds
-        var deactivationThread = ThreadUtil.createScheduledExecutor("server-lasertag-target-deactivation-thread-%d");
-        deactivationThread.schedule(() -> {
-
-            // Get the old block state
-            var oldBlockStateReset = world.getBlockState(target.getPos());
-
-            target.setDeactivated(false);
-
-            // Get the new block state
-            var newBlockState = world.getBlockState(target.getPos());
-
-            // Send lasertag updated to clients
-            world.updateListeners(target.getPos(), oldBlockStateReset, newBlockState, Block.NOTIFY_LISTENERS);
-
-            deactivationThread.shutdownNow();
-        }, settingsManager.<Long>get(SettingDescription.LASERTARGET_DEACTIVATE_TIME), TimeUnit.SECONDS);
+        lasertargetsManager.deactivate(target.getPos());
 
         // Add player to the players who hit the target
-        target.addHitBy(shooter);
+        lasertargetsManager.setHitBy(target.getPos(), shooter.getUuid());
 
         // Get the new block state
         var newBlockState = world.getBlockState(target.getPos());
@@ -483,6 +462,11 @@ public class ServerLasertagManager implements IServerLasertagManager {
         return eliminationManager;
     }
 
+    @Override
+    public ILasertargetsManager getLasertargetsManager() {
+        return lasertargetsManager;
+    }
+
     //endregion
 
     //region Private methods
@@ -513,7 +497,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
         uiStateManager.stopGameTimer();
 
         // Reset lasertargets
-        lasertargetManager.resetLasertargets();
+        lasertargetsManager.reset();
 
         // Reset music manager
         musicManager.reset();

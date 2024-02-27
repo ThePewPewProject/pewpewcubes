@@ -149,6 +149,11 @@ public class ActivationManagerTests {
             }
 
             @Override
+            public ILasertargetState getLasertargetState() {
+                return null;
+            }
+
+            @Override
             public String toJson() {
                 return null;
             }
@@ -196,6 +201,11 @@ public class ActivationManagerTests {
 
         @Override
         public IEliminationManager getEliminationManager() {
+            return null;
+        }
+
+        @Override
+        public ILasertargetsManager getLasertargetsManager() {
             return null;
         }
 

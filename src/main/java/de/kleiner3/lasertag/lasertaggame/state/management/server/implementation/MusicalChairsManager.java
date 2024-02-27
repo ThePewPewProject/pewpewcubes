@@ -3,7 +3,6 @@ package de.kleiner3.lasertag.lasertaggame.state.management.server.implementation
 import de.kleiner3.lasertag.LasertagMod;
 import de.kleiner3.lasertag.common.types.Tuple;
 import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
-import de.kleiner3.lasertag.lasertaggame.state.management.server.ILasertargetManager;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.IMusicalChairsManager;
 import de.kleiner3.lasertag.lasertaggame.state.management.server.synced.*;
 import de.kleiner3.lasertag.lasertaggame.state.server.IMusicalChairsState;
@@ -41,9 +40,9 @@ public class MusicalChairsManager implements IMusicalChairsManager {
 
     private final ITeamsConfigState teamsConfigState;
 
-    private final ILasertargetManager lasertargetManager;
-
     private final IEliminationManager eliminationManager;
+
+    private final ILasertargetsManager lasertargetsManager;
 
     private final ServerWorld world;
 
@@ -54,8 +53,8 @@ public class MusicalChairsManager implements IMusicalChairsManager {
                                 IScoreManager scoreManager,
                                 IGameModeManager gameModeManager,
                                 ITeamsConfigState teamsConfigState,
-                                ILasertargetManager lasertargetManager,
                                 IEliminationManager eliminationManager,
+                                ILasertargetsManager lasertargetsManager,
                                 ServerWorld world
     ) {
         this.settingsManager = settingsManager;
@@ -63,8 +62,8 @@ public class MusicalChairsManager implements IMusicalChairsManager {
         this.scoreManager = scoreManager;
         this.gameModeManager = gameModeManager;
         this.teamsConfigState = teamsConfigState;
-        this.lasertargetManager = lasertargetManager;
         this.eliminationManager = eliminationManager;
+        this.lasertargetsManager = lasertargetsManager;
         this.world = world;
         this.musicalChairsState = new MusicalChairsState();
     }
@@ -117,8 +116,8 @@ public class MusicalChairsManager implements IMusicalChairsManager {
 
     private void handlePhaseChange() {
 
-        // Reset the lasertargets
-        lasertargetManager.resetLasertargets();
+        // Reset the already hit by state of the lasertargets lasertargets
+        lasertargetsManager.resetAlreadyHitBy();
 
         // If the scores should be reset at the end of the phase
         if (settingsManager.<Boolean>get(SettingDescription.RESET_SCORES_AT_PHASE_END)) {
