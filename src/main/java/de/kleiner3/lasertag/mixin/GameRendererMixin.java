@@ -1,6 +1,9 @@
 package de.kleiner3.lasertag.mixin;
 
 import de.kleiner3.lasertag.block.Blocks;
+import de.kleiner3.lasertag.client.KeyBindings;
+import de.kleiner3.lasertag.item.Items;
+import de.kleiner3.lasertag.lasertaggame.settings.SettingDescription;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -13,10 +16,13 @@ import net.minecraft.util.math.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 /**
- * Mixin into the GameRenderer.class to always render the outline of the lasertag flag
+ * Mixin into the GameRenderer.class
  *
  * @author Étienne Muser
  */
@@ -66,5 +72,37 @@ public abstract class GameRendererMixin {
 
         // Call render on the world renderer
         client.worldRenderer.render(matrices, tickDelta, limitTime, renderBlockOutline, camera, (GameRenderer)(Object)this, lightmapTextureManager, positionMatrix);
+    }
+
+    /**
+     * Implements the laserweapon zoom
+     *
+     * @param camera
+     * @param tickDelta
+     * @param changingFov
+     * @param cir
+     * @param d The current calculated FOV
+     */
+    @Inject(method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D", at = @At("TAIL"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
+    private void zoom(Camera camera, float tickDelta, boolean changingFov, CallbackInfoReturnable<Double> cir, double d) {
+
+        // Get the minecraft client
+        var client = MinecraftClient.getInstance();
+
+        // Get if the player is holding a lasertag weapon
+        var playerIsHoldingWeapon = client.player.isHolding(Items.LASERTAG_WEAPON);
+
+        // If the player is holding a weapon
+        if (KeyBindings.isWeaponZoomPressed() && playerIsHoldingWeapon) {
+
+            // Get the weapon zoom setting
+            var zoomFactor = client.world.getClientLasertagManager().getSettingsManager().<Long>get(SettingDescription.WEAPON_ZOOM);
+
+            // Calculate the new fov
+            var newFov = d / zoomFactor;
+
+            // Change fov to zoom in
+            cir.setReturnValue(newFov);
+        }
     }
 }

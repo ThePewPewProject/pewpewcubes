@@ -28,6 +28,7 @@ public enum SettingDescription {
     RESPAWN_PENALTY("respawnPenalty", 0L, SettingDataType.LONG, "seconds", 0L, null),
     SHOW_NAMETAGS_OF_TEAMMATES("showNametagsOfTeammates", true, SettingDataType.BOOL, "value", null, null),
     MINING_FATIGUE_ENABLED("miningFatigueEnabled", true, SettingDataType.BOOL, "value", null, null),
+    WEAPON_ZOOM("weaponZoom", 2L, SettingDataType.LONG, "multiplier", 1L, null),
 
     // Time limited specific
     PLAY_TIME("gameDuration", 10L, SettingDataType.LONG, "minutes", 1L, null),

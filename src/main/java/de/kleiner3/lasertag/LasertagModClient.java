@@ -3,6 +3,7 @@ package de.kleiner3.lasertag;
 import de.kleiner3.lasertag.block.BlockRenderLayers;
 import de.kleiner3.lasertag.block.entity.BlockEntityRenderers;
 import de.kleiner3.lasertag.block.models.BlockModelProvider;
+import de.kleiner3.lasertag.client.KeyBindings;
 import de.kleiner3.lasertag.client.hud.HudRenderers;
 import de.kleiner3.lasertag.command.ClientCommands;
 import de.kleiner3.lasertag.entity.render.EntityRenderers;
@@ -47,6 +48,9 @@ public class LasertagModClient implements ClientModInitializer {
 
         // Register block render layer handler
         BlockRenderLayers.register();
+
+        // Register key bindings
+        KeyBindings.register();
 
         ModelLoadingRegistry.INSTANCE.registerResourceProvider(rm -> new BlockModelProvider());
     }
