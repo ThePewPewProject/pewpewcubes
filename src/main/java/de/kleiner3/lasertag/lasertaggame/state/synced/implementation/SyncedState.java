@@ -125,7 +125,7 @@ public class SyncedState implements ISyncedState {
 
         addTypeAdapterFactoriesForSubStates(builder);
 
-        return builder.create().toJson(this);
+        return builder.enableComplexMapKeySerialization().create().toJson(this);
     }
 
     public static SyncedState fromJson(String jsonString) {
