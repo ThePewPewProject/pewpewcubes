@@ -1,7 +1,7 @@
 # PewPewCubes
 
-![GitHub license](https://img.shields.io/github/license/efibs/mc-lasertag-mod?style=flat-square)
-![GitHub all releases](https://img.shields.io/github/downloads/efibs/mc-lasertag-mod/total?style=flat-square)
+![GitHub license](https://img.shields.io/github/license/ThePewPewProject/pewpewcubes?style=flat-square)
+![GitHub all releases](https://img.shields.io/github/downloads/ThePewPewProject/pewpewcubes/total?style=flat-square)
 [![Discord](https://dcbadge.vercel.app/api/server/SPbV8P2kHN?style=flat-square&theme=default-inverted)](https://discord.gg/SPbV8P2kHN)
 ![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/efibs/mc-lasertag-mod?label=Code%20Climate&style=flat-square)
 ![Codacy grade](https://img.shields.io/codacy/grade/d507c6ff34ea4467902df213999d1667?label=Codacy&style=flat-square)
@@ -26,7 +26,7 @@ The Minecraft PewPewCubes Mod is developed by a dedicated team of university stu
 * **Regular Updates:** We're dedicated to improving and expanding the mod over time, with regular updates and new features planned for the future.
 
 ## Installation
-For detailed instructions on how to install the PewPewCubes Mod, please refer to our [Installation Guide](https://github.com/efibs/mc-lasertag-mod/wiki/Installation-Guide) on our wiki page.
+For detailed instructions on how to install the PewPewCubes Mod, please refer to our [Installation Guide](https://github.com/ThePewPewProject/pewpewcubes/wiki/Installation-Guide) on our wiki page.
 
 This guide will walk you through the steps necessary to set up the mod on your Minecraft client. If you encounter any issues during the installation process, feel free to reach out to us for assistance. Let's get you geared up for some laser tag action!
 
@@ -42,7 +42,7 @@ Before you begin, ensure you have the following prerequisites installed on your 
 * Your preferred Integrated Development Environment (IDE) such as IntelliJ IDEA or Eclipse
 
 ### Cloning the Repository
-1. Fork the [PewPewCubes repository](https://github.com/efibs/mc-lasertag-mod) to your GitHub account.
+1. Fork the [PewPewCubes repository](https://github.com/ThePewPewProject/pewpewcubes) to your GitHub account.
 2. Clone your forked repository to your local machine using Git:
    ```bash
    git clone https://github.com/efibs/mc-lasertag-mod.git
@@ -62,4 +62,4 @@ Before you begin, ensure you have the following prerequisites installed on your 
 We value your feedback and are here to provide support whenever you need it. If you encounter any issues with the mod or have suggestions for improvement, please don't hesitate to reach out to us through our GitHub repository or [our Discord server](https://discord.gg/SPbV8P2kHN).
 
 ## License
-The Minecraft PewPewCubes Mod is licensed under the [GNU General Public License v3.0 (GPL-3.0)](https://github.com/efibs/mc-lasertag-mod/blob/main/COPYING), granting you the freedom to modify, distribute, and even sell the mod or its derivatives under certain conditions. We believe in the principles of open-source software and encourage collaboration within the Minecraft community. Please review the full license text for details on your rights and responsibilities as a user or contributor to the mod.
+The Minecraft PewPewCubes Mod is licensed under the [GNU General Public License v3.0 (GPL-3.0)](https://github.com/ThePewPewProject/pewpewcubes/blob/main/COPYING), granting you the freedom to modify, distribute, and even sell the mod or its derivatives under certain conditions. We believe in the principles of open-source software and encourage collaboration within the Minecraft community. Please review the full license text for details on your rights and responsibilities as a user or contributor to the mod.
