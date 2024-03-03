@@ -5,7 +5,7 @@
 [![Discord](https://dcbadge.vercel.app/api/server/SPbV8P2kHN?style=flat-square&theme=default-inverted)](https://discord.gg/SPbV8P2kHN)
 ![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/efibs/mc-lasertag-mod?label=Code%20Climate&style=flat-square)
 ![Codacy grade](https://img.shields.io/codacy/grade/d507c6ff34ea4467902df213999d1667?label=Codacy&style=flat-square)
-[![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/efibs/mc-lasertag-mod?label=Codefactor&style=flat-square)](https://www.codefactor.io/repository/github/efibs/mc-lasertag-mod/overview/dev)
+[![CodeFactor](https://www.codefactor.io/repository/github/thepewpewproject/pewpewcubes/badge)](https://www.codefactor.io/repository/github/thepewpewproject/pewpewcubes)
 [![Scrutinizer code quality (GitHub/Bitbucket)](https://img.shields.io/scrutinizer/quality/g/efibs/mc-lasertag-mod?label=Scrutinizer&style=flat-square)](https://scrutinizer-ci.com/g/efibs/mc-lasertag-mod/?branch=dev)
 
 Welcome to the Minecraft PewPewCubes Mod! Now you can enjoy the thrill of laser tag right within the blocky world of Minecraft. With this mod, you and your friends can engage in exciting laser tag battles, complete with various game modes and objectives. Whether you prefer capturing flags, eliminating opponents, hunting for points, or playing a game of Musical Chairs, there's something for everyone!
