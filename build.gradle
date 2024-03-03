@@ -119,16 +119,20 @@ tasks.register('incrBuildNumber') {
 		// Split the old version at the '+'
 		def (oldVersionNumber, oldBuildNumber) = oldVersion.tokenize('+')
 
-		// Increment build number
-		Integer nextBuildNumber = ((oldBuildNumber as Integer) + 1)
+		// If build number was given
+		if (oldBuildNumber != null) {
 
-		// Build new version number
-		String nextVersionNumber = oldVersionNumber + '+' + nextBuildNumber.toString()
+			// Increment build number
+			Integer nextBuildNumber = ((oldBuildNumber as Integer) + 1)
 
-		// Save new version number to properties file
-		props.setProperty('mod_version', nextVersionNumber)
-		props.store(propsFile.newWriter(), null)
-		props.load(propsFile.newDataInputStream())
+			// Build new version number
+			String nextVersionNumber = oldVersionNumber + '+' + nextBuildNumber.toString()
+
+			// Save new version number to properties file
+			props.setProperty('mod_version', nextVersionNumber)
+			props.store(propsFile.newWriter(), null)
+			props.load(propsFile.newDataInputStream())
+		}
 	}
 }
 
