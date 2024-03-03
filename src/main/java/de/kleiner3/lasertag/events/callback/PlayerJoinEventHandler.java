@@ -49,15 +49,15 @@ public class PlayerJoinEventHandler {
             return;
         }
 
-        // Set to adventure game mode
-        player.changeGameMode(GameMode.ADVENTURE);
-
         // If origin spawn setting is disabled
         if (!settingsManager.<Boolean>get(SettingDescription.DO_ORIGIN_SPAWN)) {
 
             // Dont teleport him to origin
             return;
         }
+
+        // Set to adventure game mode
+        player.changeGameMode(GameMode.ADVENTURE);
 
         // Teleport to spawn
         player.requestTeleport(0.5F, 1, 0.5F);

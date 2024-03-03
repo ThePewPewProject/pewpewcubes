@@ -243,9 +243,6 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements
 
     public void generateZone() {
 
-        // Clear borders cache
-        this.borderCache.clear();
-
         // get the world the entity is in
         var world = this.getWorld();
 
@@ -253,6 +250,9 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements
         if (!(world instanceof ServerWorld serverWorld)) {
             return;
         }
+
+        // Clear borders cache
+        this.borderCache.clear();
 
         // Get the first block state and save it as the search block state
         var searchBlock = serverWorld.getBlockState(this.pos.add(0, 1, 0));
@@ -321,14 +321,16 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements
             }
         }
 
-        // Get the block state at this position
-        var blockState = world.getBlockState(this.pos);
-
-        // Notify clients that the block entity has changed
-        serverWorld.updateListeners(this.pos, blockState, blockState, Block.NOTIFY_LISTENERS);
+        // Send update to clients and persist
+        updateListeners();
     }
 
     public List<Tuple<BlockPos, Direction>> getBorderCache() {
         return this.borderCache;
+    }
+
+    private void updateListeners() {
+        this.markDirty();
+        this.world.updateListeners(this.getPos(), this.getCachedState(), this.getCachedState(), Block.NOTIFY_ALL);
     }
 }
