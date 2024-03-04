@@ -100,6 +100,8 @@
 	"gui.game_manager.settings.presets_screen_title": "Lasertag Settings Presets",
 	"gui.game_manager.settings.presets.name": "Preset name",
 	"gui.game_manager.settings.presets.save": "Save preset",
+	"gui.game_manager.settings.group_header.overwritten": "Overwritten by game mode",
+	"gui.game_manager.settings.group_header.other": "Other",
 	"gui.game_manager.settings.autoOpenStatsFile": "Automatically open game statistics",
 	"gui.game_manager.settings.deathPenalty": "Death penalty",
 	"gui.game_manager.settings.respawnPenalty": "Respawn penalty",

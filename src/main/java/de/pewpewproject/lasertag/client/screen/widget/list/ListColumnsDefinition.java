@@ -1,4 +1,4 @@
-package de.pewpewproject.lasertag.client.screen.widget;
+package de.pewpewproject.lasertag.client.screen.widget.list;
 
 import java.util.List;
 

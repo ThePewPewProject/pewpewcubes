@@ -69,7 +69,7 @@ public class SettingsManager implements ISettingsManager {
     }
 
     @Override
-    public <T> T get(SettingDescription setting) {
+    public synchronized <T> T get(SettingDescription setting) {
         var key = setting.getName();
 
         // If key not in settings
@@ -82,7 +82,7 @@ public class SettingsManager implements ISettingsManager {
     }
 
     @Override
-    public <T extends Enum<T>> T getEnum(SettingDescription setting) {
+    public synchronized <T extends Enum<T>> T getEnum(SettingDescription setting) {
 
         var key = setting.getName();
 
@@ -94,11 +94,11 @@ public class SettingsManager implements ISettingsManager {
         // Get value from dictionary
         var value = settingsState.get(key);
 
-        return Enum.valueOf((Class<T>) setting.getDataType().getValueType(), (String)value);
+        return Enum.valueOf((Class<T>) setting.getDataType().getValueType(), (String) value);
     }
 
     @Override
-    public void set(String key, Object value) {
+    public synchronized void set(String key, Object value) {
 
         // If is enum setting
         if (value instanceof Enum<?> enumValue) {
@@ -110,14 +110,15 @@ public class SettingsManager implements ISettingsManager {
     }
 
     @Override
-    public void set(SettingsState newSettings) {
+    public synchronized void set(SettingsState newSettings) {
 
         settingsState.putAll(newSettings);
         sync();
     }
 
     @Override
-    public void reset() {
+    public synchronized void reset() {
+
         // Set the default settings
         settingsState.putAll(gameModeManager.getGameMode().createDefaultSettings());
 
@@ -125,7 +126,18 @@ public class SettingsManager implements ISettingsManager {
     }
 
     @Override
-    public void reset(String settingName) {
+    public synchronized void overwriteGameModeSettings() {
+
+        // Get the overwritten settings
+        var overwrittenSettings = gameModeManager.getGameMode().getOverwrittenSettings();
+
+        overwrittenSettings.forEach(s -> settingsState.put(s.x().getName(), s.y()));
+
+        sync();
+    }
+
+    @Override
+    public synchronized void reset(String settingName) {
 
         // Create default settings
         var defaultSettings = gameModeManager.getGameMode().createDefaultSettings();
@@ -136,7 +148,7 @@ public class SettingsManager implements ISettingsManager {
     }
 
     @Override
-    public SettingsState cloneSettings() {
+    public synchronized SettingsState cloneSettings() {
         return SerializationUtils.clone(settingsState);
     }
 
@@ -172,8 +184,8 @@ public class SettingsManager implements ISettingsManager {
      * Persist the setting change to the file system and sends
      * a setting changed event to every client.
      *
-     * @param key    The name of the setter method which executes the persist method
-     * @param value  The new value of the setting as a string
+     * @param key   The name of the setter method which executes the persist method
+     * @param value The new value of the setting as a string
      */
     private void sync(String key, String value) {
 

@@ -3,6 +3,7 @@ package de.pewpewproject.lasertag.lasertaggame.gamemode;
 import de.pewpewproject.lasertag.LasertagMod;
 import de.pewpewproject.lasertag.block.entity.LaserTargetBlockEntity;
 import de.pewpewproject.lasertag.common.types.ScoreHolding;
+import de.pewpewproject.lasertag.common.types.Tuple;
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.IServerLasertagManager;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.SettingsState;
@@ -64,17 +65,29 @@ public abstract class GameMode {
     //region Interface methods
 
     /**
+     * Get the settings which are overwritten by this game mode
+     *
+     * @return List containing tuples of the overwritten setting description and the value
+     */
+    public abstract List<Tuple<SettingDescription, Object>> getOverwrittenSettings();
+
+    /**
      * Creates a settings map containing the default setting values for this game mode.
-     * The default implementation simply returns the base settings.
-     * <br>
-     * Override if the game mode has special default settings.
-     * <br>
-     * This method is called when switching the game mode or resetting the settings.
      *
      * @return The default settings map
      */
-    public SettingsState createDefaultSettings() {
-        return SettingsState.createBaseSettings();
+    public final SettingsState createDefaultSettings() {
+
+        // Get the base settings
+        var baseSettings = SettingsState.createBaseSettings();
+
+        // Get the overwritten settings
+        var overwrittenSettings = getOverwrittenSettings();
+
+        // Overwrite the settings
+        overwrittenSettings.forEach(svt -> baseSettings.put(svt.x().getName(), svt.y()));
+
+        return baseSettings;
     }
 
     /**

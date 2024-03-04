@@ -1,4 +1,4 @@
-package de.pewpewproject.lasertag.client.screen.widget;
+package de.pewpewproject.lasertag.client.screen.widget.list;
 
 import net.minecraft.client.gui.Drawable;
 
@@ -50,7 +50,7 @@ public class ListColumn<T, R> {
      * @param cell The cell description of the cell
      * @return The cell template
      */
-    public Drawable getCellTemplate(ListCell<T> cell) {
+    public synchronized Drawable getCellTemplate(ListCell<T> cell) {
         var id = this.idGetter.apply(cell.value());
         var cachedDrawable = this.cellDrawablesCache.get(id);
 
@@ -69,8 +69,12 @@ public class ListColumn<T, R> {
      * @param id The id of the cell
      * @return The cell template
      */
-    public Drawable getCellTemplate(R id) {
+    public synchronized Drawable getCellTemplate(R id) {
         return this.cellDrawablesCache.get(id);
+    }
+
+    public Function<ListCell<T>, Drawable> getCellTemplate() {
+        return this.cellTemplate;
     }
 
     /**
@@ -87,7 +91,7 @@ public class ListColumn<T, R> {
      *
      * @return The cell templates and their ids
      */
-    public Set<Map.Entry<R, Drawable>> getDrawableEntries() {
+    public synchronized Set<Map.Entry<R, Drawable>> getDrawableEntries() {
         return this.cellDrawablesCache.entrySet();
     }
 
@@ -96,14 +100,14 @@ public class ListColumn<T, R> {
      *
      * @return The stream of drawables
      */
-    public Stream<Drawable> getDrawables() {
+    public synchronized Stream<Drawable> getDrawables() {
         return this.cellDrawablesCache.values().stream();
     }
 
     /**
      * Clears the cell template cache
      */
-    public void reset() {
+    public synchronized void reset() {
         this.cellDrawablesCache.clear();
     }
 }

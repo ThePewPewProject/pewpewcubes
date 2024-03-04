@@ -56,6 +56,11 @@ public interface ISettingsManager {
     void reset(String settingName);
 
     /**
+     * Overwrite the settings which are overwritten by the currently selected game mode
+     */
+    void overwriteGameModeSettings();
+
+    /**
      * Clone the current settings state
      *
      * @return The cloned settings

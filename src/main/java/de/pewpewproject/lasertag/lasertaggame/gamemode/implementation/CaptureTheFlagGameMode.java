@@ -4,11 +4,11 @@ import de.pewpewproject.lasertag.block.Blocks;
 import de.pewpewproject.lasertag.block.LasertagFlagBlock;
 import de.pewpewproject.lasertag.block.entity.LasertagFlagBlockEntity;
 import de.pewpewproject.lasertag.common.types.ScoreHolding;
+import de.pewpewproject.lasertag.common.types.Tuple;
 import de.pewpewproject.lasertag.common.util.DurationUtils;
 import de.pewpewproject.lasertag.lasertaggame.gamemode.DamageBasedGameMode;
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.IServerLasertagManager;
-import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.SettingsState;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
 import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import net.minecraft.block.Block;
@@ -22,6 +22,7 @@ import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,15 +65,15 @@ public class CaptureTheFlagGameMode extends DamageBasedGameMode {
     }
 
     @Override
-    public SettingsState createDefaultSettings() {
-        var map = super.createDefaultSettings();
+    public List<Tuple<SettingDescription, Object>> getOverwrittenSettings() {
+        var list = new LinkedList<Tuple<SettingDescription, Object>>();
 
-        map.put(SettingDescription.WEAPON_COOLDOWN.getName(), 10L);
-        map.put(SettingDescription.PLAYER_DEACTIVATE_TIME.getName(), 10L);
-        map.put(SettingDescription.LASERTARGET_DEACTIVATE_TIME.getName(), 4L);
-        map.put(SettingDescription.RESPAWN_PENALTY.getName(), 5L);
+        list.add(new Tuple<>(SettingDescription.WEAPON_COOLDOWN, 10L));
+        list.add(new Tuple<>(SettingDescription.PLAYER_DEACTIVATE_TIME, 10L));
+        list.add(new Tuple<>(SettingDescription.LASERTARGET_DEACTIVATE_TIME, 4L));
+        list.add(new Tuple<>(SettingDescription.RESPAWN_PENALTY, 5L));
 
-        return map;
+        return list;
     }
 
     @Override

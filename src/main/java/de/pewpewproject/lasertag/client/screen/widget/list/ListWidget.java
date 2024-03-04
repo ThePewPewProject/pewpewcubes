@@ -1,4 +1,4 @@
-package de.pewpewproject.lasertag.client.screen.widget;
+package de.pewpewproject.lasertag.client.screen.widget.list;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.*;
@@ -19,7 +19,6 @@ import java.util.function.Supplier;
  *
  * @param <T> The type of the values
  * @param <R> The type of the id of the values
- *
  * @author Étienne Muser
  */
 public class ListWidget<T, R> extends DrawableHelper implements Drawable, Element, Selectable {
@@ -58,17 +57,17 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
      * height of the widget based on the available height and the fixed row height of 22. Buttons can
      * only be max 22 high.
      *
-     * @param x The start x-position
-     * @param y The start y-position
-     * @param width The width of the widget
-     * @param availableHeight The available height
-     * @param dataSource Function to get the data for this list
+     * @param x                 The start x-position
+     * @param y                 The start y-position
+     * @param width             The width of the widget
+     * @param availableHeight   The available height
+     * @param dataSource        Function to get the data for this list
      * @param columnsDefinition The column definitions for this list
-     * @param parent The parent of the list
-     * @param textRenderer The text renderer used to render text
+     * @param parent            The parent of the list
+     * @param textRenderer      The text renderer used to render text
+     * @param <T>               The type of the values
+     * @param <R>               The type of the id of the values
      * @return The list widget
-     * @param <T> The type of the values
-     * @param <R> The type of the id of the values
      */
     public static <T, R> ListWidget<T, R> fromAvailableHeight(int x, int y,
                                                               int width, int availableHeight,
@@ -89,16 +88,16 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
     /**
      * Creates a list widget
      *
-     * @param x The start x-position
-     * @param y The start y-position
-     * @param width The width of the widget
-     * @param height The height of the widget
-     * @param rowHeight The height of the rows
+     * @param x                    The start x-position
+     * @param y                    The start y-position
+     * @param width                The width of the widget
+     * @param height               The height of the widget
+     * @param rowHeight            The height of the rows
      * @param numberOfVisibleItems The number of visible rows
-     * @param dataSource Function to get the data for this list
-     * @param columnsDefinition The column definitions for this list
-     * @param parent The parent of the list
-     * @param textRenderer The text renderer used to render text
+     * @param dataSource           Function to get the data for this list
+     * @param columnsDefinition    The column definitions for this list
+     * @param parent               The parent of the list
+     * @param textRenderer         The text renderer used to render text
      */
     public ListWidget(int x, int y,
                       int width, int height,
@@ -121,21 +120,31 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
     /**
      * Reload the data source of the list
      */
-    public void refreshDataSource() {
+    public synchronized void refreshDataSource() {
+        this.columnsDefinition.columns().forEach(ListColumn::reset);
 
-        synchronized (this) {
-
-            this.columnsDefinition.columns().forEach(ListColumn::reset);
-
-            this.restoreFocusNecessary = true;
-        }
+        this.restoreFocusNecessary = true;
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public synchronized void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 
-        this.renderList(matrices, mouseX, mouseY, delta);
-        this.renderScrollbar(matrices);
+        // Get the list data
+        var data = dataSource.get();
+
+        if (data.isEmpty()) {
+            this.renderEmptyList(matrices);
+            return;
+        }
+
+        renderBackground(data, matrices);
+        renderCellContents(data, matrices, mouseX, mouseY, delta);
+        renderScrollbar(data, matrices);
+
+        if (this.restoreFocusNecessary) {
+            this.restoreFocusNecessary = false;
+            restoreFocusIfPossible();
+        }
     }
 
     @Override
@@ -155,7 +164,7 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public synchronized boolean mouseClicked(double mouseX, double mouseY, int button) {
 
         if (mouseX < this.x || mouseX > this.x + this.width || mouseY < this.y || mouseY > this.y + this.height) {
             return false;
@@ -208,7 +217,7 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
         return true;
     }
 
-    public void tick() {
+    public synchronized void tick() {
         this.columnsDefinition.columns().stream()
                 .flatMap(ListColumn::getDrawables)
                 .filter(drawable -> drawable instanceof TextFieldWidget)
@@ -216,15 +225,7 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
                 .forEach(TextFieldWidget::tick);
     }
 
-    private void renderList(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-
-        // Get the list data
-        var data = dataSource.get();
-
-        if (data.isEmpty()) {
-            this.renderEmptyList(matrices);
-            return;
-        }
+    private void renderCellContents(List<T> data, MatrixStack matrices, int mouseX, int mouseY, float delta) {
 
         matrices.push();
 
@@ -235,12 +236,14 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
         // Sum the ratios of each column
         var ratioSum = columnsDefinition.columns().stream().map(ListColumn::getRatio).reduce(Integer::sum).get();
 
+        var scrollbarOffset = data.size() <= this.numberOfVisibleItems ? 0 : (SCROLLBAR_WIDTH + SCROLLBAR_PADDING);
+
         synchronized (this) {
             int startX = this.x;
             for (var columnDefinition : columnsDefinition.columns()) {
 
                 // Calculate the column width
-                var columnWidth = (int) (this.width * ((float) columnDefinition.getRatio() / (float) ratioSum)) - (SCROLLBAR_WIDTH + SCROLLBAR_PADDING);
+                var columnWidth = (int) ((this.width - scrollbarOffset) * ((float) columnDefinition.getRatio() / (float) ratioSum));
 
                 int index = 0;
                 for (var dataItem : data) {
@@ -254,8 +257,6 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
                     var cellDrawable = columnDefinition.getCellTemplate(listCell);
 
                     if (index >= this.indexOfFirstVisibleItem && index < this.indexOfFirstVisibleItem + this.numberOfVisibleItems) {
-                        // Draw background
-                        DrawableHelper.fill(matrices, startX, cellStartY, startX + columnWidth, cellStartY + rowHeight, index % 2 == 0 ? ROW_COLOR : ALT_ROW_COLOR);
 
                         // Draw cell template
                         cellDrawable.render(matrices, mouseX, mouseY, delta);
@@ -268,17 +269,38 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
             }
         }
 
-        if (this.restoreFocusNecessary) {
-            this.restoreFocusNecessary = false;
-            restoreFocusIfPossible();
+        matrices.pop();
+    }
+
+    private void renderBackground(List<?> data, MatrixStack matrices) {
+
+        matrices.push();
+
+        var listYOffset = this.indexOfFirstVisibleItem * this.rowHeight;
+        matrices.translate(0, -listYOffset, 0);
+
+        var scrollbarOffset = data.size() <= this.numberOfVisibleItems ? 0 : (SCROLLBAR_WIDTH + SCROLLBAR_PADDING);
+
+        int index = 0;
+        for (var ignored : data) {
+
+            var cellStartY = this.y + (index * rowHeight);
+
+            if (index >= this.indexOfFirstVisibleItem && index < this.indexOfFirstVisibleItem + this.numberOfVisibleItems) {
+
+                // Draw background
+                DrawableHelper.fill(matrices, this.x, cellStartY, this.x + this.width - scrollbarOffset, cellStartY + rowHeight, index % 2 == 0 ? ROW_COLOR : ALT_ROW_COLOR);
+            }
+
+            ++index;
         }
 
         matrices.pop();
     }
 
-    private void renderScrollbar(MatrixStack matrices) {
+    private void renderScrollbar(List<?> data, MatrixStack matrices) {
 
-        if (this.dataSource.get().size() <= this.numberOfVisibleItems) {
+        if (data.size() <= this.numberOfVisibleItems) {
             return;
         }
 
