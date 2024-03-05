@@ -1,7 +1,9 @@
 package de.pewpewproject.lasertag.client.screen.widget.list;
 
+import de.pewpewproject.lasertag.client.screen.widget.ITooltipHolding;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -50,6 +52,7 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
 
     private ListColumn<T, R> lastFocusedColumn = null;
     private R lastFocusedElementId = null;
+    private Drawable hoveredCell = null;
     private boolean restoreFocusNecessary = false;
 
     /**
@@ -140,6 +143,7 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
         renderBackground(data, matrices);
         renderCellContents(data, matrices, mouseX, mouseY, delta);
         renderScrollbar(data, matrices);
+        renderTooltips(matrices, mouseX, mouseY);
 
         if (this.restoreFocusNecessary) {
             this.restoreFocusNecessary = false;
@@ -225,6 +229,39 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
                 .forEach(TextFieldWidget::tick);
     }
 
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+
+        return mouseY >= y && mouseY <= y + height && mouseX >= x && mouseX <= x + width;
+    }
+
+    private void renderTooltips(MatrixStack matrices, int mouseX, int mouseY) {
+
+        // If hovered widget is not a tooltip holder
+        if (!(hoveredCell instanceof ITooltipHolding tooltipHolder)) {
+            return;
+        }
+
+        // If parent is not a screen
+        if (!(parent instanceof Screen screenParent)) {
+            return;
+        }
+
+        // Get the tooltip from the tooltip holder
+        var tooltipText = tooltipHolder.getTooltip();
+
+        // If the tooltip holder held an empty tooltip
+        if (tooltipText == null) {
+            return;
+        }
+
+        // Wrap lines
+        var lines = textRenderer.wrapLines(tooltipText, 150);
+
+        // Render the tooltip
+        screenParent.renderOrderedTooltip(matrices, lines, mouseX, mouseY);
+    }
+
     private void renderCellContents(List<T> data, MatrixStack matrices, int mouseX, int mouseY, float delta) {
 
         matrices.push();
@@ -237,6 +274,8 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
         var ratioSum = columnsDefinition.columns().stream().map(ListColumn::getRatio).reduce(Integer::sum).get();
 
         var scrollbarOffset = data.size() <= this.numberOfVisibleItems ? 0 : (SCROLLBAR_WIDTH + SCROLLBAR_PADDING);
+
+        var hoveredCellFound = false;
 
         synchronized (this) {
             int startX = this.x;
@@ -262,11 +301,25 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
                         cellDrawable.render(matrices, mouseX, mouseY, delta);
                     }
 
+                    // Check if this cell is hovered
+                    if (mouseY >= cellStartY &&
+                            mouseY <= cellStartY + rowHeight &&
+                            mouseX >= startX &&
+                            mouseX <= startX + columnWidth &&
+                            isMouseOver(mouseX, mouseY - listYOffset)) {
+                        hoveredCell = cellDrawable;
+                        hoveredCellFound = true;
+                    }
+
                     ++index;
                 }
 
                 startX += columnWidth;
             }
+        }
+
+        if (!hoveredCellFound) {
+            hoveredCell = null;
         }
 
         matrices.pop();

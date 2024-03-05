@@ -35,6 +35,7 @@
     "MouseMixin",
     "MusicTrackerMixin",
     "PlayerEntityRendererMixin",
+    "TextFieldWidgetMixin",
     "WorldRendererMixin",
     "gui.CreateWorldScreenMixin",
     "gui.InGameHudMixin",

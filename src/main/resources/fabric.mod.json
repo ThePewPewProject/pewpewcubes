@@ -2,7 +2,6 @@
   "schemaVersion": 1,
   "id": "pewpewcubes",
   "version": "${version}",
-
   "name": "PewPewCubes",
   "description": "A mod to play lasertag in minecraft with your friends.",
   "authors": [
@@ -15,41 +14,59 @@
     "Robert Senin",
     "SolAstrum"
   ],
-
   "contact": {
     "sources": "https://github.com/ThePewPewProject/pewpewcubes",
     "issues": "https://github.com/ThePewPewProject/pewpewcubes/issues",
     "discord": "https://discord.gg/SPbV8P2kHN"
   },
-
   "license": "GPL-3.0 license",
   "icon": "assets/lasertag/icon.png",
-
   "environment": "*",
   "entrypoints": {
     "main": [
       "de.pewpewproject.lasertag.LasertagMod"
     ],
-	"client": [
-	  "de.pewpewproject.lasertag.LasertagModClient"
-	]
+    "client": [
+      "de.pewpewproject.lasertag.LasertagModClient"
+    ]
   },
   "mixins": [
     "lasertag.mixins.json"
   ],
   "custom": {
-	"loom:injected_interfaces": {
-		"net/minecraft/entity/player/PlayerEntity": ["de/pewpewproject/lasertag/lasertaggame/ILasertagPlayer", "de/pewpewproject/lasertag/client/screen/ILasertagGameManagerScreenOpener", "de/pewpewproject/lasertag/client/screen/ILasertagTeamSelectorScreenOpener", "de/pewpewproject/lasertag/client/screen/ILasertagCreditsScreenOpener", "de/pewpewproject/lasertag/client/screen/ILasertagTeamZoneGeneratorScreenOpener"],
-		"net/minecraft/client/network/ClientPlayerEntity": ["de/pewpewproject/lasertag/client/screen/ILasertagGameManagerScreenOpener", "de/pewpewproject/lasertag/client/screen/ILasertagTeamSelectorScreenOpener", "de/pewpewproject/lasertag/client/screen/ILasertagCreditsScreenOpener", "de/pewpewproject/lasertag/client/screen/ILasertagTeamZoneGeneratorScreenOpener"],
-        "net/minecraft/world/World": ["de/pewpewproject/lasertag/common/util/fastiter/IFastWorldIter"],
-        "net/minecraft/client/world/ClientWorld": ["de/pewpewproject/lasertag/lasertaggame/state/management/client/IClientLasertagManagerAccessor"],
-        "net/minecraft/server/world/ServerWorld": ["de/pewpewproject/lasertag/lasertaggame/state/management/server/IServerLasertagManagerAccessor"],
-        "net/minecraft/client/MinecraftClient": ["de/pewpewproject/lasertag/lasertaggame/IStatsFilePathHolding"]
+    "loom:injected_interfaces": {
+      "net/minecraft/entity/player/PlayerEntity": [
+        "de/pewpewproject/lasertag/lasertaggame/ILasertagPlayer",
+        "de/pewpewproject/lasertag/client/screen/ILasertagGameManagerScreenOpener",
+        "de/pewpewproject/lasertag/client/screen/ILasertagTeamSelectorScreenOpener",
+        "de/pewpewproject/lasertag/client/screen/ILasertagCreditsScreenOpener",
+        "de/pewpewproject/lasertag/client/screen/ILasertagTeamZoneGeneratorScreenOpener"
+      ],
+      "net/minecraft/client/network/ClientPlayerEntity": [
+        "de/pewpewproject/lasertag/client/screen/ILasertagGameManagerScreenOpener",
+        "de/pewpewproject/lasertag/client/screen/ILasertagTeamSelectorScreenOpener",
+        "de/pewpewproject/lasertag/client/screen/ILasertagCreditsScreenOpener",
+        "de/pewpewproject/lasertag/client/screen/ILasertagTeamZoneGeneratorScreenOpener"
+      ],
+      "net/minecraft/world/World": [
+        "de/pewpewproject/lasertag/common/util/fastiter/IFastWorldIter"
+      ],
+      "net/minecraft/client/world/ClientWorld": [
+        "de/pewpewproject/lasertag/lasertaggame/state/management/client/IClientLasertagManagerAccessor"
+      ],
+      "net/minecraft/server/world/ServerWorld": [
+        "de/pewpewproject/lasertag/lasertaggame/state/management/server/IServerLasertagManagerAccessor"
+      ],
+      "net/minecraft/client/MinecraftClient": [
+        "de/pewpewproject/lasertag/lasertaggame/IStatsFilePathHolding"
+      ],
+      "net/minecraft/client/gui/widget/TextFieldWidget": [
+        "de/pewpewproject/lasertag/client/screen/widget/ITooltipHolding",
+        "de/pewpewproject/lasertag/client/screen/widget/ITooltipSetter"
+      ]
     }
   },
-
-  "accessWidener" : "lasertag.accesswidener",
-
+  "accessWidener": "lasertag.accesswidener",
   "depends": {
     "fabricloader": ">=0.14.9",
     "minecraft": "~1.19",
@@ -57,7 +74,7 @@
   },
   "suggests": {
     "sodium": "*",
-	"phosphor": "*",
-	"lithium": "*"
+    "phosphor": "*",
+    "lithium": "*"
   }
 }
