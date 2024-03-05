@@ -1,8 +1,8 @@
 package de.pewpewproject.lasertag.client.hud;
 
 import de.pewpewproject.lasertag.common.util.DurationUtils;
+import de.pewpewproject.lasertag.lasertaggame.gamemode.GameMode;
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
-import de.pewpewproject.lasertag.lasertaggame.state.management.client.IGameModeManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.client.ISettingsManager;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.ITeamsConfigState;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.UIState;
@@ -11,6 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 
 import java.time.Duration;
 
@@ -40,6 +41,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
         var gameModeManager = clientManager.getGameModeManager();
         var syncedState = clientManager.getSyncedState();
         var teamConfigState = syncedState.getTeamsConfigState();
+        var gameMode = gameModeManager.getGameMode();
 
         // Get the render data
         var uiState = clientManager.getSyncedState().getUIState();
@@ -54,7 +56,8 @@ public class LasertagHudOverlay implements HudRenderCallback {
         TextRenderer renderer = client.textRenderer;
 
         // Render HUD
-        renderTimer(renderer, matrixStack, uiState, settingsManager, gameModeManager, wMid);
+        renderTimer(renderer, matrixStack, uiState, settingsManager, gameMode, wMid);
+        renderGameMode(renderer, matrixStack, gameMode);
         renderProgressBar(renderer, matrixStack, uiState, wMid, hMid);
         renderStartingIn(renderer, matrixStack, uiState, wMid, hMid);
         renderGameOver(renderer, matrixStack, uiState, teamConfigState, wMid, hMid);
@@ -98,7 +101,7 @@ public class LasertagHudOverlay implements HudRenderCallback {
                              MatrixStack matrices,
                              UIState uiState,
                              ISettingsManager settingsManager,
-                             IGameModeManager gameModeManager,
+                             GameMode gameMode,
                              int wMid) {
 
         // If game time should not be rendered
@@ -106,9 +109,6 @@ public class LasertagHudOverlay implements HudRenderCallback {
             // Abort
             return;
         }
-
-        // Get the game mode
-        var gameMode = gameModeManager.getGameMode();
 
         // Init seconds to show with the time the game is already running
         var secondsToShow = uiState.gameTime;
@@ -121,6 +121,19 @@ public class LasertagHudOverlay implements HudRenderCallback {
         DrawableHelper.drawCenteredText(matrices, renderer,
                 DurationUtils.toString(Duration.ofSeconds(secondsToShow)),
                 wMid, 1, 0xFFFFFF);
+    }
+
+    private void renderGameMode(TextRenderer renderer,
+                                MatrixStack matrices,
+                                GameMode gameMode) {
+
+        // If the F3-Screen is displayed
+        if (MinecraftClient.getInstance().options.debugEnabled) {
+            return;
+        }
+
+        // Draw the game mode text
+        renderer.draw(matrices, Text.translatable(gameMode.getTranslatableName()), 1, 1, 0x70FFFFFF);
     }
 
     private void renderGameOver(TextRenderer renderer,
