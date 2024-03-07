@@ -13,7 +13,6 @@
     "RespawnAnchorBlockMixin",
     "ServerPlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin",
-    "ServerPropertiesHandlerMixin",
     "ServerWorldMixin",
     "SlotMixin",
     "WorldMixin",
