@@ -351,6 +351,9 @@ public abstract class GameMode {
         var activationManager = gameManager.getActivationManager();
         var playerNamesState = gameManager.getSyncedState().getPlayerNamesState();
 
+        // Stop the reactivation threads
+        activationManager.reset();
+
         // Deactivate every player
         activationManager.deactivateAll();
 
