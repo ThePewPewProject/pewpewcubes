@@ -41,4 +41,9 @@ public interface IActivationManager {
      * Activate all players
      */
     void activateAll();
+
+    /**
+     * Resets the running reactivation threads
+     */
+    void reset();
 }

@@ -1,6 +1,12 @@
 package de.pewpewproject.lasertag.client.screen;
 
-import de.pewpewproject.lasertag.client.screen.widget.*;
+import de.pewpewproject.lasertag.client.screen.widget.CyclingValueButtonWidget;
+import de.pewpewproject.lasertag.client.screen.widget.LabelWidget;
+import de.pewpewproject.lasertag.client.screen.widget.YesNoButtonWidget;
+import de.pewpewproject.lasertag.client.screen.widget.list.ListCell;
+import de.pewpewproject.lasertag.client.screen.widget.list.ListColumn;
+import de.pewpewproject.lasertag.client.screen.widget.list.ListColumnsDefinition;
+import de.pewpewproject.lasertag.client.screen.widget.list.grouped.GroupedListWidget;
 import de.pewpewproject.lasertag.common.types.Tuple;
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;
@@ -14,12 +20,11 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static de.pewpewproject.lasertag.lasertaggame.settings.SettingDataType.BOOL;
 import static de.pewpewproject.lasertag.lasertaggame.settings.SettingDataType.LONG;
@@ -31,7 +36,7 @@ import static de.pewpewproject.lasertag.lasertaggame.settings.SettingDataType.LO
  */
 public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
 
-    private ListWidget<Tuple<SettingDescription, Object>, SettingDescription> list;
+    private GroupedListWidget<SettingRowType> list;
 
     public LasertagGameManagerSettingsScreen(Screen parent, PlayerEntity player) {
         super(parent, "gui.game_manager.settings_screen_title", player);
@@ -73,20 +78,36 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
         super.init();
         this.addAdditionalButtons();
 
-        var columns = new ArrayList<ListColumn<Tuple<SettingDescription, Object>, SettingDescription>>(3);
+        var columns = new ArrayList<ListColumn<SettingRowType, UUID>>(3);
 
-        columns.add(new ListColumn<>(this::getNameCellTempate, Tuple::x, 9));
-        columns.add(new ListColumn<>(this::getValueCellTemplate, Tuple::x, 7));
-        columns.add(new ListColumn<>(this::getResetCellTemplate, Tuple::x, 2));
+        columns.add(new ListColumn<>(this::getNameCellTempate, null, 9));
+        columns.add(new ListColumn<>(this::getValueCellTemplate, null, 7));
+        columns.add(new ListColumn<>(this::getResetCellTemplate, null, 2));
 
         var columnsDefinition = new ListColumnsDefinition<>(columns);
 
         var availableHeight = this.height - (2 * verticalPadding + this.textRenderer.fontHeight + 2 * buttonPadding + buttonHeight);
 
-        this.list = this.addDrawableChild(ListWidget.fromAvailableHeight(horizontalPadding, verticalPadding + textRenderer.fontHeight + buttonPadding,
-                this.width - 2 * horizontalPadding, availableHeight,
+        this.list = this.addDrawableChild(GroupedListWidget.fromAvailableHeight(horizontalPadding,
+                verticalPadding + textRenderer.fontHeight + buttonPadding,
+                this.width - 2 * horizontalPadding,
+                availableHeight,
                 this::getSettingDescriptions,
-                columnsDefinition, this, this.textRenderer));
+                columnsDefinition,
+                SettingRowType::group,
+                this::getGroupingHeaderCellTemplate,
+                srt -> srt.x().name(),
+                this,
+                this.textRenderer));
+    }
+
+    private Drawable getGroupingHeaderCellTemplate(String groupingHeader, ListCell<?> cell) {
+
+        var labelText = Text.translatable(groupingHeader).setStyle(Style.EMPTY.withBold(true));
+
+        var startY = cell.y() + (cell.height() / 2) - (this.textRenderer.fontHeight / 2);
+        var startX = horizontalPadding + ((this.width - 2 * horizontalPadding) / 2) - (this.textRenderer.getWidth(labelText) / 2);
+        return new LabelWidget(startX, startY, this.textRenderer, labelText);
     }
 
     /**
@@ -95,10 +116,14 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
      * @param desc The cell description
      * @return The cell template
      */
-    private Drawable getNameCellTempate(ListCell<Tuple<SettingDescription, Object>> desc) {
+    private Drawable getNameCellTempate(ListCell<SettingRowType> desc) {
 
         var startY = desc.y() + (desc.height() / 2) - (this.textRenderer.fontHeight / 2);
-        return new LabelWidget(desc.x() + 5, startY, this.textRenderer, Text.translatable("gui.game_manager.settings." + desc.value().x().getName()));
+        return new LabelWidget(desc.x() + 5,
+                startY,
+                this.textRenderer,
+                Text.translatable("gui.game_manager.settings." + desc.value().x().getName()),
+                Text.translatable("gui.game_manager.settings." + desc.value().x().getName() + ".description"));
     }
 
     /**
@@ -107,15 +132,15 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
      * @param desc The cell description
      * @return The cell template
      */
-    private Drawable getValueCellTemplate(ListCell<Tuple<SettingDescription, Object>> desc) {
+    private Drawable getValueCellTemplate(ListCell<SettingRowType> desc) {
 
         var dataType = desc.value().x().getDataType();
         if (dataType.equals(BOOL)) {
-            return this.getBooleanSettingInput(desc.x() + 1, desc.y() + 1, desc.width() - 1, desc.height() - 2, desc.value().x().toString(), (Boolean) desc.value().y());
+            return this.getBooleanSettingInput(desc.x() + 1, desc.y() + 1, desc.width() - 1, desc.height() - 2, desc.value().x(), (Boolean) desc.value().y());
         } else if (dataType.equals(LONG)) {
-            return this.getLongSettingInput(desc.x() + 2, desc.y() + 2, desc.width() - 4, desc.height() - 4, desc.value().x().toString(), (long) desc.value().y());
+            return this.getLongSettingInput(desc.x() + 2, desc.y() + 2, desc.width() - 4, desc.height() - 4, desc.value().x(), (long) desc.value().y());
         } else if (dataType.isEnum()) {
-            return this.getEnumSettingInput(desc.x() + 1, desc.y() + 1, desc.width() - 1, desc.height() - 2, desc.value().x().toString(), (Enum<?>)desc.value().y());
+            return this.getEnumSettingInput(desc.x() + 1, desc.y() + 1, desc.width() - 1, desc.height() - 2, desc.value().x(), (Enum<?>)desc.value().y());
         }
 
         // Default empty drawable
@@ -128,7 +153,7 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
      * @param desc The cell description
      * @return The cell template
      */
-    private Drawable getResetCellTemplate(ListCell<Tuple<SettingDescription, Object>> desc) {
+    private Drawable getResetCellTemplate(ListCell<SettingRowType> desc) {
 
         // If player has not enough rights to edit settings
         if (!this.player.hasPermissionLevel(4)) {
@@ -154,14 +179,20 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
      *
      * @return The setting descriptions and values
      */
-    private List<Tuple<SettingDescription, Object>> getSettingDescriptions() {
+    private List<SettingRowType> getSettingDescriptions() {
 
         // Get the game managers
         var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
         var gameModeManager = gameManager.getGameModeManager();
         var settingsManager = gameManager.getSettingsManager();
 
-        return gameModeManager.getGameMode().getRelevantSettings().stream()
+        // Get the game mode
+        var gameMode = gameModeManager.getGameMode();
+
+        // Get the overwritten settings
+        var overwrittenSettings = gameMode.getOverwrittenSettings().stream().map(Tuple::x).collect(Collectors.toSet());
+
+        return gameMode.getRelevantSettings().stream()
                 .sorted(Comparator.comparing(SettingDescription::getName))
                 .map(s -> {
 
@@ -172,7 +203,7 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
                         value = settingsManager.get(s);
                     }
 
-                    return new Tuple<>(s, value);
+                    return new SettingRowType(s, value, overwrittenSettings.contains(s) ? "gui.game_manager.settings.group_header.overwritten" : "gui.game_manager.settings.group_header.other");
                 }).toList();
     }
 
@@ -183,17 +214,18 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
      * @param y The start y-value of the cell
      * @param width The width of the cell
      * @param height The height of the cell
-     * @param settingEnumName The enum name of the setting description
+     * @param setting The setting description
      * @param initialValue The initial value of the setting
      * @return The cell template
      */
-    private Drawable getBooleanSettingInput(int x, int y, int width, int height, String settingEnumName, boolean initialValue) {
+    private Drawable getBooleanSettingInput(int x, int y, int width, int height, SettingDescription setting, boolean initialValue) {
+
         if (player.hasPermissionLevel(4)) {
             var buttonWidet = new YesNoButtonWidget(x, y, width, height, initialValue, (newValue) -> {
                 // Create packet buffer
                 var buf = new PacketByteBuf(Unpooled.buffer());
 
-                buf.writeString(settingEnumName);
+                buf.writeString(setting.toString());
                 buf.writeBoolean(newValue);
 
                 ClientPlayNetworking.send(NetworkingConstants.CLIENT_TRIGGER_SETTING_CHANGE, buf);
@@ -215,11 +247,14 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
      * @param y The start y-value of the cell
      * @param width The width of the cell
      * @param height The height of the cell
-     * @param settingEnumName The enum name of the setting description
+     * @param setting The setting description
      * @param initialValue The initial value of the setting
      * @return The cell template
      */
-    private Drawable getLongSettingInput(int x, int y, int width, int height, String settingEnumName, long initialValue) {
+    private Drawable getLongSettingInput(int x, int y, int width, int height, SettingDescription setting, long initialValue) {
+
+        var tooltipText = Text.translatable("gui.game_manager.settings." + setting.getName() + ".value_unit");
+
         if (player.hasPermissionLevel(4)) {
             var textFieldWidget = new TextFieldWidget(this.textRenderer, x, y, width, height, Text.empty());
             textFieldWidget.setText(Long.toString(initialValue));
@@ -235,7 +270,7 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
                     }
 
                     // Get the setting description
-                    var settingDescription = SettingDescription.valueOf(settingEnumName);
+                    var settingDescription = SettingDescription.valueOf(setting.toString());
 
                     var minValue = settingDescription.getMinValue();
                     if (minValue != null && newLongValue < (long) minValue) {
@@ -250,7 +285,7 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
                     // Create packet buffer
                     var buf = new PacketByteBuf(Unpooled.buffer());
 
-                    buf.writeString(settingEnumName);
+                    buf.writeString(setting.toString());
                     buf.writeLong(newLongValue);
 
                     ClientPlayNetworking.send(NetworkingConstants.CLIENT_TRIGGER_SETTING_CHANGE, buf);
@@ -259,24 +294,26 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
                 }
             });
 
+            textFieldWidget.setTooltip(tooltipText);
+
             return textFieldWidget;
         } else {
             var startY = y + (height / 2) - (this.textRenderer.fontHeight / 2);
-            return new LabelWidget(x + 5, startY, this.textRenderer, Text.literal(Long.toString(initialValue)));
+            return new LabelWidget(x + 5, startY, this.textRenderer, Text.literal(Long.toString(initialValue)), tooltipText);
         }
     }
 
-    private Drawable getEnumSettingInput(int x, int y, int width, int height, String settingEnumName, Enum<?> initialValue) {
+    private Drawable getEnumSettingInput(int x, int y, int width, int height, SettingDescription setting, Enum<?> initialValue) {
         if (player.hasPermissionLevel(4)) {
 
             // Get the setting description
-            var settingDescription = SettingDescription.valueOf(settingEnumName);
+            var settingDescription = SettingDescription.valueOf(setting.toString());
 
             // Get the enum values
             var enumValues = settingDescription.getDataType().getValueType().getEnumConstants();
 
             return new CyclingValueButtonWidget<>(x, y, width, height, initialValue,
-                    value -> Text.translatable(settingEnumName + "." + ((Enum<?>)value).name()),
+                    value -> Text.translatable(setting + "." + ((Enum<?>)value).name()),
                     Arrays.stream(enumValues).toList(),
                     value -> {
                         // Get the enum value as a string
@@ -285,14 +322,14 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
                         // Create packet buffer
                         var buf = new PacketByteBuf(Unpooled.buffer());
 
-                        buf.writeString(settingEnumName);
+                        buf.writeString(setting.toString());
                         buf.writeString(enumValueString);
 
                         ClientPlayNetworking.send(NetworkingConstants.CLIENT_TRIGGER_SETTING_CHANGE, buf);
                     });
         } else {
             var startY = y + (height / 2) - (this.textRenderer.fontHeight / 2);
-            return new LabelWidget(x + 5, startY, this.textRenderer, Text.translatable(settingEnumName + "." + initialValue.name()));
+            return new LabelWidget(x + 5, startY, this.textRenderer, Text.translatable(setting.toString() + "." + initialValue.name()));
         }
     }
 
@@ -313,4 +350,6 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
             ClientPlayNetworking.send(NetworkingConstants.CLIENT_TRIGGER_SETTINGS_RESET, PacketByteBufs.empty());
         }));
     }
+
+    private static record SettingRowType(SettingDescription x, Object y, String group) {}
 }

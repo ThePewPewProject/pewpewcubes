@@ -11,6 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +24,19 @@ import java.util.UUID;
 public class PointHunterGameMode extends PointBasedGameMode {
     public PointHunterGameMode() {
         super("gameMode.point_hunter", false, true);
+    }
+
+    @Override
+    public List<Tuple<SettingDescription, Object>> getOverwrittenSettings() {
+
+        var list = new LinkedList<Tuple<SettingDescription, Object>>();
+
+        list.add(new Tuple<>(SettingDescription.WEAPON_COOLDOWN, 4L));
+        list.add(new Tuple<>(SettingDescription.PLAYER_DEACTIVATE_TIME, 5L));
+        list.add(new Tuple<>(SettingDescription.LASERTARGET_DEACTIVATE_TIME, 7L));
+        list.add(new Tuple<>(SettingDescription.RESPAWN_PENALTY, 0L));
+
+        return list;
     }
 
     @Override

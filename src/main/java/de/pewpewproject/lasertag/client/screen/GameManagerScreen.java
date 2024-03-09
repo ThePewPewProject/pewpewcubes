@@ -22,6 +22,8 @@ public abstract class GameManagerScreen extends Screen {
     private final Screen parent;
     protected final PlayerEntity player;
 
+    protected int backgroundColor = 0x80000000;
+
     protected static final int horizontalPadding = 20;
     protected static final int verticalPadding = 15;
     protected static final int buttonPadding = 10;
@@ -109,6 +111,6 @@ public abstract class GameManagerScreen extends Screen {
     }
 
     private void drawBackground(MatrixStack matrices) {
-        DrawableHelper.fill(matrices, 0, 0, this.width, this.height, 0x80000000);
+        DrawableHelper.fill(matrices, 0, 0, this.width, this.height, backgroundColor);
     }
 }

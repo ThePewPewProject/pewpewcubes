@@ -3,6 +3,7 @@ package de.pewpewproject.lasertag.lasertaggame.gamemode.implementation;
 import de.pewpewproject.lasertag.LasertagMod;
 import de.pewpewproject.lasertag.block.entity.LaserTargetBlockEntity;
 import de.pewpewproject.lasertag.common.types.ScoreHolding;
+import de.pewpewproject.lasertag.common.types.Tuple;
 import de.pewpewproject.lasertag.common.util.DurationUtils;
 import de.pewpewproject.lasertag.lasertaggame.gamemode.PointBasedGameMode;
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
@@ -14,6 +15,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,6 +56,19 @@ public class MusicalChairsGameMode extends PointBasedGameMode {
         // Reset game managers
         eliminationManager.reset();
         musicalChairsManager.reset();
+    }
+
+    @Override
+    public List<Tuple<SettingDescription, Object>> getOverwrittenSettings() {
+
+        var list = new LinkedList<Tuple<SettingDescription, Object>>();
+
+        list.add(new Tuple<>(SettingDescription.WEAPON_COOLDOWN, 4L));
+        list.add(new Tuple<>(SettingDescription.PLAYER_DEACTIVATE_TIME, 5L));
+        list.add(new Tuple<>(SettingDescription.LASERTARGET_DEACTIVATE_TIME, 7L));
+        list.add(new Tuple<>(SettingDescription.RESPAWN_PENALTY, 0L));
+
+        return list;
     }
 
     @Override

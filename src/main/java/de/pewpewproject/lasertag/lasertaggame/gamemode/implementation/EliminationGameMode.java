@@ -1,11 +1,11 @@
 package de.pewpewproject.lasertag.lasertaggame.gamemode.implementation;
 
 import de.pewpewproject.lasertag.common.types.ScoreHolding;
+import de.pewpewproject.lasertag.common.types.Tuple;
 import de.pewpewproject.lasertag.common.util.DurationUtils;
 import de.pewpewproject.lasertag.lasertaggame.gamemode.DamageBasedGameMode;
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.IServerLasertagManager;
-import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.SettingsState;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
 import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import net.minecraft.client.MinecraftClient;
@@ -16,6 +16,7 @@ import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,14 +45,15 @@ public class EliminationGameMode extends DamageBasedGameMode {
     }
 
     @Override
-    public SettingsState createDefaultSettings() {
+    public List<Tuple<SettingDescription, Object>> getOverwrittenSettings() {
 
-        var map = super.createDefaultSettings();
+        var list = new LinkedList<Tuple<SettingDescription, Object>>();
 
-        map.put(SettingDescription.WEAPON_COOLDOWN.getName(), 10L);
-        map.put(SettingDescription.LASERTARGET_DEACTIVATE_TIME.getName(), 4L);
+        list.add(new Tuple<>(SettingDescription.WEAPON_COOLDOWN, 10L));
+        list.add(new Tuple<>(SettingDescription.LASERTARGET_DEACTIVATE_TIME, 4L));
+        list.add(new Tuple<>(SettingDescription.RESPAWN_PENALTY, 0L));
 
-        return map;
+        return list;
     }
 
     @Override
@@ -64,6 +66,9 @@ public class EliminationGameMode extends DamageBasedGameMode {
         list.add(SettingDescription.INITIAL_BORDER_SIZE);
         list.add(SettingDescription.BORDER_SHRINK_DISTANCE);
         list.add(SettingDescription.BORDER_SHRINK_TIME);
+
+        // Remove player deactivation duration
+        list.remove(SettingDescription.PLAYER_DEACTIVATE_TIME);
 
         return list;
     }

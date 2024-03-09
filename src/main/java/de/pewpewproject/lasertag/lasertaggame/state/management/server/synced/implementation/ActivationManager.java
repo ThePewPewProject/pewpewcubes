@@ -13,7 +13,10 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,6 +32,11 @@ public class ActivationManager implements IActivationManager {
     private final ISettingsManager settingsManager;
 
     private final IPlayerNamesState playerNamesState;
+
+    /**
+     * Set containing all currently running reactivation threads
+     */
+    private final Set<ExecutorService> reactivationThreads = new HashSet<>();
 
     public ActivationManager(IActivationState activationState,
                              MinecraftServer server,
@@ -51,17 +59,19 @@ public class ActivationManager implements IActivationManager {
     }
 
     @Override
-    public void deactivate(UUID playerUuid, long deactivationDuration) {
+    public synchronized void deactivate(UUID playerUuid, long deactivationDuration) {
 
         // Deactivate player
         setPlayerDeactivated(playerUuid);
 
         // Reactivate player after configured amount of time
         var deactivationThread = ThreadUtil.createScheduledExecutor("server-lasertag-player-deactivation-thread-%d");
+        reactivationThreads.add(deactivationThread);
         deactivationThread.schedule(() -> {
 
             setPlayerActivated(playerUuid);
             deactivationThread.shutdownNow();
+            reactivationThreads.remove(deactivationThread);
         }, deactivationDuration, TimeUnit.SECONDS);
     }
 
@@ -75,6 +85,13 @@ public class ActivationManager implements IActivationManager {
     public void activateAll() {
 
         playerNamesState.forEachPlayer(this::setPlayerActivated);
+    }
+
+    @Override
+    public synchronized void reset() {
+
+        reactivationThreads.forEach(ExecutorService::shutdownNow);
+        reactivationThreads.clear();
     }
 
     private void setPlayerDeactivated(UUID playerUuid) {

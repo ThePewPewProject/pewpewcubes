@@ -1,6 +1,10 @@
 package de.pewpewproject.lasertag.client.screen;
 
-import de.pewpewproject.lasertag.client.screen.widget.*;
+import de.pewpewproject.lasertag.client.screen.widget.LabelWidget;
+import de.pewpewproject.lasertag.client.screen.widget.list.ListCell;
+import de.pewpewproject.lasertag.client.screen.widget.list.ListColumn;
+import de.pewpewproject.lasertag.client.screen.widget.list.ListColumnsDefinition;
+import de.pewpewproject.lasertag.client.screen.widget.list.ListWidget;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
 import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;

@@ -1,6 +1,10 @@
 package de.pewpewproject.lasertag.client.screen;
 
-import de.pewpewproject.lasertag.client.screen.widget.*;
+import de.pewpewproject.lasertag.client.screen.widget.LabelWidget;
+import de.pewpewproject.lasertag.client.screen.widget.list.ListCell;
+import de.pewpewproject.lasertag.client.screen.widget.list.ListColumn;
+import de.pewpewproject.lasertag.client.screen.widget.list.ListColumnsDefinition;
+import de.pewpewproject.lasertag.client.screen.widget.list.ListWidget;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;
 import de.pewpewproject.lasertag.worldgen.chunkgen.type.ArenaType;
 import de.pewpewproject.lasertag.worldgen.chunkgen.type.ProceduralArenaType;
@@ -54,7 +58,8 @@ public class LasertaGameManagerArenaScreen extends GameManagerScreen {
 
         var columns = new ArrayList<ListColumn<String, String>>(2);
 
-        columns.add(new ListColumn<>(this::getArenaNameColumn, s -> s, 5));
+        columns.add(new ListColumn<>(this::getArenaNameColumn, s -> s, 4));
+        columns.add(new ListColumn<>(this::getArenaInfoColumn, s -> s, 1));
         columns.add(new ListColumn<>(this::getLoadArenaColumn, s -> s, 1));
 
         var columnsDefinition = new ListColumnsDefinition<>(columns);
@@ -78,6 +83,26 @@ public class LasertaGameManagerArenaScreen extends GameManagerScreen {
         return new LabelWidget(desc.x() + 5, startY, this.textRenderer, Text.translatable(desc.value()));
     }
 
+    private Drawable getArenaInfoColumn(ListCell<String> desc) {
+
+        // Get arena translatable name
+        var arenaName = desc.value();
+
+        if (arenaName.endsWith(PROCEDURAL_NAME_EXTENSION)) {
+            arenaName = arenaName.substring(0, arenaName.length() - PROCEDURAL_NAME_EXTENSION.length());
+        }
+
+        var arenaNameFinal = arenaName;
+        return new ButtonWidget(desc.x() + 1,
+                desc.y() + 1,
+                desc.width() - 2,
+                desc.height() - 2,
+                Text.translatable("gui.info"),
+                button -> {
+                    this.client.setScreen(new LasertagArenaInfoScreen(this, arenaNameFinal, player));
+                });
+    }
+
     /**
      * Get the template for the load column of the list
      *
@@ -85,7 +110,7 @@ public class LasertaGameManagerArenaScreen extends GameManagerScreen {
      * @return The cell template
      */
     private Drawable getLoadArenaColumn(ListCell<String> desc) {
-        return new ButtonWidget(desc.x() + 1, desc.y() + 1, desc.width() - 2, desc.height() - 2, Text.translatable("gui.load"), button -> {
+        var b = new ButtonWidget(desc.x() + 1, desc.y() + 1, desc.width() - 2, desc.height() - 2, Text.translatable("gui.load"), button -> {
 
             this.client.setScreen(null);
 
@@ -103,6 +128,8 @@ public class LasertaGameManagerArenaScreen extends GameManagerScreen {
 
             ClientPlayNetworking.send(NetworkingConstants.CLIENT_TRIGGER_LOAD_MAP, buf);
         });
+        b.active = player.hasPermissionLevel(4);
+        return b;
     }
 
     /**

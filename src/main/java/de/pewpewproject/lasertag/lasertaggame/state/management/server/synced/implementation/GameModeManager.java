@@ -66,7 +66,7 @@ public class GameModeManager implements IGameModeManager {
         gameModeState.currentGameModeTranslatableName = newGameMode.getTranslatableName();
         persist(newGameMode);
         sync(newGameMode);
-        settingsManager.reset();
+        settingsManager.overwriteGameModeSettings();
     }
 
     @Override
