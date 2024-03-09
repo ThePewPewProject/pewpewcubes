@@ -17,6 +17,13 @@ public interface IBlockTickManager {
     void registerTicker(LasertagCustomBlockTickable ticker);
 
     /**
+     * Unregister a block entity ticker
+     *
+     * @param ticker The ticker to unregister
+     */
+    void unregisterTicker(LasertagCustomBlockTickable ticker);
+
+    /**
      * Clear the registered block entity tickers
      */
     void clear();

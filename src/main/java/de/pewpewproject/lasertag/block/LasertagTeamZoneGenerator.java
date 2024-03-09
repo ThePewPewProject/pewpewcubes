@@ -1,5 +1,6 @@
 package de.pewpewproject.lasertag.block;
 
+import de.pewpewproject.lasertag.block.entity.LasertagCustomBlockTickable;
 import de.pewpewproject.lasertag.block.entity.LasertagTeamZoneGeneratorBlockEntity;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -9,6 +10,7 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
@@ -28,6 +30,35 @@ public class LasertagTeamZoneGenerator extends BlockWithEntity {
 
     protected LasertagTeamZoneGenerator(Settings settings) {
         super(settings);
+    }
+
+    @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+
+        // If is not on the server
+        if (!(world instanceof ServerWorld serverWorld)) {
+
+            return;
+        }
+
+        // If was not a state change that resulted in the block being broken
+        if (state.isOf(newState.getBlock())) {
+            return;
+        }
+
+        // Get the entity
+        var blockEntity = world.getBlockEntity(pos);
+
+        if (blockEntity instanceof LasertagTeamZoneGeneratorBlockEntity teamZoneGeneratorBlockEntity) {
+
+            // Get the block tick manager
+            var blockTickManager = serverWorld.getServerLasertagManager().getBlockTickManager();
+
+            // Unregister the block entity ticker
+            blockTickManager.unregisterTicker((LasertagCustomBlockTickable) blockEntity);
+        }
+
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Override
