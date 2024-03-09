@@ -16,9 +16,13 @@ import net.minecraft.util.Identifier;
  */
 public class LasertagArenaInfoScreen extends GameManagerScreen {
 
+    private static final int IMAGE_TOP_PADDING = 5;
+
     private static final int TEXT_IMAGE_PADDING = 5;
 
     private static final float IMAGE_RATIO = 440.0F / 55.0F;
+
+    private static final int PARAGRAPH_PADDING = 4;
 
     private final String arenaInfoTextTranslatable;
 
@@ -51,7 +55,7 @@ public class LasertagArenaInfoScreen extends GameManagerScreen {
 
         var availableWidth = client.currentScreen.width - 2 * horizontalPadding;
         var imageHeight = (int)(availableWidth / IMAGE_RATIO);
-        var effectiveStartHeight = verticalPadding + textRenderer.fontHeight + buttonPadding;
+        var effectiveStartHeight = verticalPadding + textRenderer.fontHeight + IMAGE_TOP_PADDING;
 
         RenderSystem.setShaderTexture(0, arenaImageIdentifier);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -67,21 +71,24 @@ public class LasertagArenaInfoScreen extends GameManagerScreen {
                 imageHeight);
         RenderSystem.disableBlend();
 
-        var idx = 0;
+        float lineYPos = effectiveStartHeight + imageHeight + TEXT_IMAGE_PADDING;
         for (var line : textRenderer.wrapLines(arenaInfoText, availableWidth)) {
 
-            var lineYPos = effectiveStartHeight +
-                    imageHeight +
-                    TEXT_IMAGE_PADDING +
-                    idx * (textRenderer.fontHeight + 1.0F);
+            // If the line is an empty line (that means a paragraph is ending)
+            if (textRenderer.getWidth(line) <= 0) {
+                lineYPos += PARAGRAPH_PADDING;
+                continue;
+            }
 
+            // Draw the line
             textRenderer.draw(matrices,
                     line,
                     horizontalPadding,
                     lineYPos,
                     0xFFFFFF);
 
-            ++idx;
+            // Increment line y pos
+            lineYPos += (textRenderer.fontHeight + 1.0F);
         }
 
         matrices.pop();
