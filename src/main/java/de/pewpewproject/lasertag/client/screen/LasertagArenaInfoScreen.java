@@ -16,9 +16,9 @@ import net.minecraft.util.Identifier;
  */
 public class LasertagArenaInfoScreen extends GameManagerScreen {
 
-    private static final int IMAGE_HEIGHT = 55;
-
     private static final int TEXT_IMAGE_PADDING = 5;
+
+    private static final float IMAGE_RATIO = 440.0F / 55.0F;
 
     private final String arenaInfoTextTranslatable;
 
@@ -50,6 +50,7 @@ public class LasertagArenaInfoScreen extends GameManagerScreen {
         matrices.push();
 
         var availableWidth = client.currentScreen.width - 2 * horizontalPadding;
+        var imageHeight = (int)(availableWidth / IMAGE_RATIO);
         var effectiveStartHeight = verticalPadding + textRenderer.fontHeight + buttonPadding;
 
         RenderSystem.setShaderTexture(0, arenaImageIdentifier);
@@ -61,16 +62,16 @@ public class LasertagArenaInfoScreen extends GameManagerScreen {
                 0,
                 0,
                 availableWidth,
-                IMAGE_HEIGHT,
+                imageHeight,
                 availableWidth,
-                IMAGE_HEIGHT);
+                imageHeight);
         RenderSystem.disableBlend();
 
         var idx = 0;
         for (var line : textRenderer.wrapLines(arenaInfoText, availableWidth)) {
 
             var lineYPos = effectiveStartHeight +
-                    IMAGE_HEIGHT +
+                    imageHeight +
                     TEXT_IMAGE_PADDING +
                     idx * (textRenderer.fontHeight + 1.0F);
 
