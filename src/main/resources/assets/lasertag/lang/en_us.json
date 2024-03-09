@@ -86,6 +86,7 @@
 	"gui.yes": "Yes",
 	"gui.no": "No",
 	"gui.load": "Load",
+	"gui.info": "Info",
 	"gui.save": "Save",
 	"gui.delete": "Delete",
 	"gui.kick": "Kick",
@@ -191,6 +192,20 @@
 	"gui.game_manager.settings.initialBorderSize.value_unit": "Blocks",
 	"gui.game_manager.settings.borderShrinkDistance.value_unit": "Blocks",
 	"gui.game_manager.settings.borderShrinkTime.value_unit": "Seconds",
+
+	"gui.game_manager.arena_info_screen_title.arenaType.procedural.small_two_team": "The Small Two Team Procedural Arena",
+	"gui.game_manager.arena_info_screen_title.arenaType.procedural.large_four_team": "The Large Four Team Procedural Arena",
+	"gui.game_manager.arena_info_screen_title.arenaType.jungle": "The Jungle Arena",
+	"gui.game_manager.arena_info_screen_title.arenaType.desert": "The Desert Arena",
+	"gui.game_manager.arena_info_screen_title.arenaType.flower_forest": "The Flower Forest Arena",
+	"gui.game_manager.arena_info_screen_title.arenaType.medieval_city": "The Medieval City Arena",
+
+	"gui.game_manager.arena_info_screen.procedural.small_two_team_description": "Welcome to our smallest procedurally generated arena, tailored for two teams of four players each. This arena is meticulously crafted to provide a dynamic environment where strategy and quick reflexes are paramount.\nDesigned with color-coded segments, the arena facilitates easy navigation, allowing players to swiftly move through the playing field. Each segment offers its own set of challenges, ensuring that no two matches are alike and providing players with a diverse range of tactical opportunities.\nIn this competitive setting, teamwork is essential. Players must collaborate closely with their teammates to outmaneuver opponents, secure advantageous positions, and strategically utilize the terrain to their advantage.",
+	"gui.game_manager.arena_info_screen.procedural.large_four_team_description": "Welcome to the heart-pounding chaos of our largest procedurally generated arena! Prepare yourself for an adrenaline-fueled experience like no other as you and your friends battle it out in this fast-paced, high-energy arena designed for four teams of around 5 players per team.\nWith its ever-changing layout and dynamic obstacles, no two games are ever the same, guaranteeing endless replayability and excitement. Duck behind barriers, weave through tight corridors, and strategize with your team to outmaneuver and outshoot your opponents.\nBut beware, the arena's chaotic nature means you'll need lightning-fast reflexes and sharp shooting skills to emerge victorious.",
+	"gui.game_manager.arena_info_screen.jungle_description": "Welcome to the heart of the jungle, where adventure meets competition! Designed for intense battles with four or fewer players, our jungle-themed arena offers an immersive experience like no other.\nStep into a world of lush foliage, towering trees, and hidden pathways as you navigate through our symmetrical map. Each team has designated spawn points strategically placed around the arena, ensuring fair and balanced gameplay.\nAt the center of it all lies the mesmerizing glass dome, a focal point of the arena's design. Beneath this dome lies a mysterious underground area teeming with points of interest waiting to be discovered.",
+	"gui.game_manager.arena_info_screen.desert_description": "Welcome to our desert-themed arena! This immersive battleground is designed for intense laser tag battles, accommodating four teams with approximately three players per team.\nSet against the backdrop of a desolate desert landscape, the arena features a captivating blend of ancient ruins and natural formations. On one side, a weathered village lies in ruins, yet still inhabited by daring adventurers seeking refuge from the unforgiving sands. The remnants of this village serve as the starting point for your laser tag journey, offering strategic vantage points and plenty of cover for tactical maneuvers.\nOpposite the village stands a colossal pyramid, its imposing silhouette casting a shadow over the barren terrain. Within its depths, an intricate labyrinth of corridors and chambers awaits, providing ample space for exhilarating combat encounters in all three dimensions.",
+	"gui.game_manager.arena_info_screen.flower_forest_description": "Welcome to our Flower Forest Laser Tag Arena! Immerse yourself in a vibrant world where the beauty of nature meets the excitement of laser tag battles.\nIn this immersive arena, teams of around three players each can compete in exhilarating matches amidst the lush greenery and colorful flowers. With six teams in total, the competition is fierce as players navigate through the dense foliage, utilizing strategic tactics to outmaneuver their opponents.\nThe Flower Forest Arena offers a variety of terrains and obstacles, from towering trees to winding paths, providing ample opportunities for players to showcase their agility and teamwork. Take cover behind blooming bushes, dart between towering lilacs, or strategize from the top of a majestic oak tree.",
+	"gui.game_manager.arena_info_screen.medieval_city_description": "Welcome to our medieval city-themed arena! Designed for six teams and accommodating five or more players per team, this arena offers thrilling gameplay experiences for all participants.\nExplore the open streets, utilizing cover and obstacles to your advantage, or traverse the tight alleyways for sneak attacks and surprise maneuvers. Every corner holds the potential for intense skirmishes and exhilarating showdowns.\nWith its detailed medieval architecture and immersive atmosphere, this laser tag arena transports players to a bygone era filled with excitement and adventure.",
 
 	"gui.game_manager.map_button": "Arena...",
 	"gui.game_manager.teams_button": "Teams...",

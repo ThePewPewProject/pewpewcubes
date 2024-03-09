@@ -57,9 +57,8 @@ public class LasertagGameManagerScreen extends GameManagerScreen {
 
         this.addListedButton("gui.game_manager.settings_button", this::onSettingsClick);
 
-        if (this.player.hasPermissionLevel(4)) {
-            this.addListedButton("gui.game_manager.map_button", this::onMapClick);
-        }
+        this.addListedButton("gui.game_manager.map_button", this::onMapClick);
+
         if (this.player.hasPermissionLevel(4)) {
             this.addListedButton("gui.game_manager.teams_button", this::onTeamsClick);
         }
