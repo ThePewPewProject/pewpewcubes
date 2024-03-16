@@ -90,6 +90,7 @@
 	"gui.save": "Save",
 	"gui.delete": "Delete",
 	"gui.kick": "Kick",
+	"gui.search": "Search",
 
 	"gui.list_widget.empty": "No data",
 

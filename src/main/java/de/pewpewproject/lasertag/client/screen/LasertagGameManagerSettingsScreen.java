@@ -18,6 +18,7 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Style;
@@ -36,7 +37,31 @@ import static de.pewpewproject.lasertag.lasertaggame.settings.SettingDataType.LO
  */
 public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
 
+    /**
+     * The height of the search text field widget
+     */
+    private static final int SEARCH_TEXT_FIELD_HEIGHT = 11;
+
+    /**
+     * The width of the search text field widget
+     */
+    private static final int SEARCH_TEXT_FIELD_WIDTH = 150;
+
+    /**
+     * The padding between the search text widget and the settings list
+     */
+    private static final int SEARCH_TEXT_LIST_PADDING = 5;
+
+    /**
+     * The padding between the search text widget and the label in front of it
+     */
+    private static final int SEARCH_TEXT_LABEL_PADDING = 4;
+
     private GroupedListWidget<SettingRowType> list;
+
+    private TextFieldWidget searchTextField;
+
+    private String previousSearchText;
 
     public LasertagGameManagerSettingsScreen(Screen parent, PlayerEntity player) {
         super(parent, "gui.game_manager.settings_screen_title", player);
@@ -78,6 +103,22 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
         super.init();
         this.addAdditionalButtons();
 
+        var searchTextFieldStartY = verticalPadding + textRenderer.fontHeight + buttonPadding;
+        var searchTextFieldLabelStartY = (int)(searchTextFieldStartY + (SEARCH_TEXT_FIELD_HEIGHT / 2.0) - (textRenderer.fontHeight / 2.0));
+        var searchTextFieldLabelText = Text.translatable("gui.search").append(":");
+
+        this.addDrawableChild(new LabelWidget(horizontalPadding,
+                searchTextFieldLabelStartY,
+                textRenderer,
+                searchTextFieldLabelText));
+
+        searchTextField = this.addDrawableChild(new TextFieldWidget(textRenderer,
+                horizontalPadding + textRenderer.getWidth(searchTextFieldLabelText) + SEARCH_TEXT_LABEL_PADDING,
+                searchTextFieldStartY,
+                SEARCH_TEXT_FIELD_WIDTH,
+                SEARCH_TEXT_FIELD_HEIGHT,
+                Text.empty()));
+
         var columns = new ArrayList<ListColumn<SettingRowType, UUID>>(3);
 
         columns.add(new ListColumn<>(this::getNameCellTempate, null, 9));
@@ -86,10 +127,11 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
 
         var columnsDefinition = new ListColumnsDefinition<>(columns);
 
-        var availableHeight = this.height - (2 * verticalPadding + this.textRenderer.fontHeight + 2 * buttonPadding + buttonHeight);
+        var listStartY = searchTextFieldStartY + SEARCH_TEXT_FIELD_HEIGHT + SEARCH_TEXT_LIST_PADDING;
+        var availableHeight = this.height - (listStartY + verticalPadding + buttonPadding + buttonHeight);
 
         this.list = this.addDrawableChild(GroupedListWidget.fromAvailableHeight(horizontalPadding,
-                verticalPadding + textRenderer.fontHeight + buttonPadding,
+                listStartY,
                 this.width - 2 * horizontalPadding,
                 availableHeight,
                 this::getSettingDescriptions,
@@ -192,7 +234,31 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
         // Get the overwritten settings
         var overwrittenSettings = gameMode.getOverwrittenSettings().stream().map(Tuple::x).collect(Collectors.toSet());
 
-        return gameMode.getRelevantSettings().stream()
+        // Get all relevant settings
+        var relevantSettings = gameMode.getRelevantSettings().stream();
+
+        // Get the search text
+        var searchText = searchTextField.getText().trim().toLowerCase();
+
+        // If the search text changed
+        if (!searchText.equals(previousSearchText)) {
+
+            // Reset the list
+            resetList();
+
+            // Set the previous search text
+            previousSearchText = searchText;
+        }
+
+        // If a search text is given
+        if (!searchText.isEmpty()) {
+
+            // Filter
+            relevantSettings = relevantSettings.filter(s -> I18n.translate("gui.game_manager.settings." + s.getName()).toLowerCase().contains(searchText));
+        }
+
+        // Sort and map
+        return relevantSettings
                 .sorted(Comparator.comparing(SettingDescription::getName))
                 .map(s -> {
 

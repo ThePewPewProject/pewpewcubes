@@ -124,9 +124,11 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
      * Reload the data source of the list
      */
     public synchronized void refreshDataSource() {
-        this.columnsDefinition.columns().forEach(ListColumn::reset);
-
-        this.restoreFocusNecessary = true;
+        columnsDefinition.columns().forEach(ListColumn::reset);
+        indexOfFirstVisibleItem = 0;
+        restoreFocusNecessary = true;
+        lastFocusedColumn = null;
+        lastFocusedElementId = null;
     }
 
     @Override
