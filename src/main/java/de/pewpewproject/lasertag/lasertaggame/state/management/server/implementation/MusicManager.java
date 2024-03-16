@@ -18,31 +18,54 @@ public class MusicManager implements IMusicManager {
 
     private final MinecraftServer server;
 
-    private boolean playingThisMinute = false;
+    /**
+     * Flag to indicate there should be music running the next minute
+     */
+    private boolean playingNextMinute = false;
+
+    /**
+     * Flag to indicate the music manager is running.
+     * If this flag is false, then the music manager doesn't
+     * react to tick events.
+     * This is preventing a tick after reset to mutate the state
+     * of the music manager.
+     */
+    private boolean isRunning = false;
 
     public MusicManager(MinecraftServer server) {
         this.server = server;
     }
 
     public void playIntro(ArenaType arenaType) {
+
+        isRunning = true;
         server.getOverworld().playSound(null, BlockPos.ORIGIN, arenaType.introMusic, SoundCategory.MUSIC, SOUND_VOLUME, 1.0f);
     }
 
     public void tick(ArenaType arenaType, boolean isLastMinute) {
+
+        // If the music manager is not running
+        if (!isRunning) {
+
+            // Do nothing
+            return;
+        }
 
         // Do not play music in the last minute
         if (isLastMinute) {
             return;
         }
 
-        if (this.playingThisMinute) {
+        if (playingNextMinute) {
             server.getOverworld().playSound(null, BlockPos.ORIGIN, arenaType.music, SoundCategory.MUSIC, SOUND_VOLUME, 1.0f);
         }
 
-        this.playingThisMinute = !this.playingThisMinute;
+        playingNextMinute = !playingNextMinute;
     }
 
     public void playOutro(ArenaType arenaType) {
+
+        isRunning = false;
         server.getOverworld().playSound(null, BlockPos.ORIGIN, arenaType.outroMusic, SoundCategory.MUSIC, SOUND_VOLUME, 1.0f);
     }
 
@@ -61,6 +84,8 @@ public class MusicManager implements IMusicManager {
     }
 
     public void reset() {
-        this.playingThisMinute = false;
+
+        isRunning = false;
+        playingNextMinute = false;
     }
 }
