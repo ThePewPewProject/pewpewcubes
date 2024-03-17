@@ -238,7 +238,15 @@ public class EliminationGameMode extends DamageBasedGameMode {
         var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
         var eliminationManager = gameManager.getEliminationManager();
 
-        return eliminationManager.getRemainingTeamIds().get(0);
+        // Get the remaining teams
+        var remainingTeams = eliminationManager.getRemainingTeamIds();
+
+        // If there is no team left
+        if (remainingTeams.isEmpty()) {
+            return -1;
+        }
+
+        return remainingTeams.get(0);
     }
 
     @Override
