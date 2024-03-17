@@ -13,6 +13,7 @@ import net.minecraft.util.Formatting;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static net.minecraft.command.argument.EntityArgumentType.players;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -26,7 +27,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class KickPlayerCommand extends ServerFeedbackCommand {
 
     @Override
-    protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+    protected CompletableFuture<Optional<CommandFeedback>> execute(CommandContext<ServerCommandSource> context) {
 
         // Get the game managers
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
@@ -36,7 +37,7 @@ public class KickPlayerCommand extends ServerFeedbackCommand {
         try {
             players = EntityArgumentType.getPlayers(context, "players");
         } catch (CommandSyntaxException e) {
-            return Optional.of(new CommandFeedback(Text.literal("Invalid players").formatted(Formatting.RED), false, false));
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Invalid players").formatted(Formatting.RED), false, false)));
         }
 
         for (var player : players) {
@@ -47,9 +48,9 @@ public class KickPlayerCommand extends ServerFeedbackCommand {
 
         // Send successful feedback
         if (players.size() > 1) {
-            return Optional.of(new CommandFeedback(Text.literal("Successfully kicked players from their teams."), false, true));
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Successfully kicked players from their teams."), false, true)));
         } else {
-            return Optional.of(new CommandFeedback(Text.literal("Successfully kicked player from his team."), false, true));
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Successfully kicked player from his team."), false, true)));
         }
     }
 

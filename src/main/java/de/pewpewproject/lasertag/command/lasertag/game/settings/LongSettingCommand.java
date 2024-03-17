@@ -8,6 +8,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Class representing a setting command of a long type setting
@@ -25,7 +26,7 @@ public class LongSettingCommand extends ServerFeedbackCommand {
     }
 
     @Override
-    protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+    protected CompletableFuture<Optional<CommandFeedback>> execute(CommandContext<ServerCommandSource> context) {
 
         // Get the game managers
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
@@ -34,6 +35,6 @@ public class LongSettingCommand extends ServerFeedbackCommand {
         var value = LongArgumentType.getLong(context, settingValueName);
         settingsManager.set(settingName, value);
 
-        return Optional.of(new CommandFeedback(Text.literal("Lasertag setting " + settingName + " is now set to " + value), false, true));
+        return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Lasertag setting " + settingName + " is now set to " + value), false, true)));
     }
 }

@@ -14,6 +14,7 @@ import net.minecraft.util.Formatting;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -26,7 +27,7 @@ import static net.minecraft.server.command.CommandManager.literal;
  */
 public class LoadMapCommand extends ServerFeedbackCommand {
     @Override
-    protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+    protected CompletableFuture<Optional<CommandFeedback>> execute(CommandContext<ServerCommandSource> context) {
 
         // Get the game managers
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
@@ -49,16 +50,16 @@ public class LoadMapCommand extends ServerFeedbackCommand {
 
         if (arenaTypeOptional.isEmpty()) {
 
-            return Optional.of(new CommandFeedback(Text.literal("Could not find map.").formatted(Formatting.RED), false, false));
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Could not find map.").formatted(Formatting.RED), false, false)));
         }
 
         try {
             arenaManager.loadArena(arenaTypeOptional.get(), proceduralTypeOptional.orElse(ProceduralArenaType.SMALL_2V2));
         } catch (Exception e) {
-            return Optional.of(new CommandFeedback(Text.literal("Unexpected error while loading map: " + e.getMessage()).formatted(Formatting.RED), false, false));
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Unexpected error while loading map: " + e.getMessage()).formatted(Formatting.RED), false, false)));
         }
 
-        return Optional.of(new CommandFeedback(Text.literal("Map loaded."), false, false));
+        return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Map loaded."), false, false)));
     }
 
     public static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {

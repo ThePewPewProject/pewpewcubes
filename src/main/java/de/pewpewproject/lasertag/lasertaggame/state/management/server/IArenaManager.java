@@ -3,6 +3,8 @@ package de.pewpewproject.lasertag.lasertaggame.state.management.server;
 import de.pewpewproject.lasertag.worldgen.chunkgen.type.ArenaType;
 import de.pewpewproject.lasertag.worldgen.chunkgen.type.ProceduralArenaType;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Interface for a server arena manager
  *
@@ -18,6 +20,21 @@ public interface IArenaManager {
      * @return True if the arena could be loaded. Otherwise, false.
      */
     boolean loadArena(ArenaType newArenaType, ProceduralArenaType newProceduralArenaType);
+
+    /**
+     * Regenerates the arena with the arena types which were used
+     * to generate the arena.
+     *
+     * @return True if the arena could be loaded. Otherwise, false.
+     */
+    boolean reloadArena();
+
+    /**
+     * Retrieves the future of the arena load
+     *
+     * @return The arena load future
+     */
+    CompletableFuture<Void> getLoadArenaFuture();
 
     /**
      * Check if an arena is currently loading

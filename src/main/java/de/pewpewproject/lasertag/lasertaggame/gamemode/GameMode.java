@@ -104,6 +104,7 @@ public abstract class GameMode {
         list.add(SettingDescription.WEAPON_COOLDOWN);
         list.add(SettingDescription.WEAPON_REACH);
         list.add(SettingDescription.WEAPON_ZOOM);
+        list.add(SettingDescription.RELOAD_ARENAS_BEFORE_GAME);
         list.add(SettingDescription.SHOW_LASER_RAYS);
         list.add(SettingDescription.MAX_TEAM_SIZE);
         list.add(SettingDescription.RENDER_TEAM_LIST);

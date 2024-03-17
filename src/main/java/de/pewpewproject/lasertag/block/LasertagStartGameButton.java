@@ -45,9 +45,11 @@ public class LasertagStartGameButton extends StoneButtonBlock implements BlockEn
             var gameManager = serverWorld.getServerLasertagManager();
 
             var server = world.getServer();
-            var abortReasons = gameManager.startGame(false);
-
-            abortReasons.ifPresent(feedback -> server.getPlayerManager().broadcast(Text.literal("Start game aborted. Reasons:\n" + feedback).formatted(Formatting.RED), false));
+            gameManager.startGame(false)
+                    .thenAcceptAsync(abortReasons -> abortReasons
+                            .ifPresent(feedback -> server.getPlayerManager()
+                                    .broadcast(Text.literal("Start game aborted. Reasons:\n" + feedback)
+                                            .formatted(Formatting.RED), false)));
         }
 
         return ActionResult.SUCCESS;

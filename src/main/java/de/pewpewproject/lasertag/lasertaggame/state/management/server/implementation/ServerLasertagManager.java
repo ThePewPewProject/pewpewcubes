@@ -27,8 +27,8 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.function.Function;
 
 /**
  * Implementation of IServerLasertagManager for the server lasertag game
@@ -136,66 +136,81 @@ public class ServerLasertagManager implements IServerLasertagManager {
      * @return The reasons why the start game got aborted.
      */
     @Override
-    public Optional<String> startGame(boolean scanSpawnpoints) {
+    public CompletableFuture<Optional<String>> startGame(boolean scanSpawnpoints) {
 
-        // Get the game mode
-        var gameMode = gameModeManager.getGameMode();
+        // If the reload arena setting is set
+        if (settingsManager.<Boolean>get(SettingDescription.RELOAD_ARENAS_BEFORE_GAME)) {
 
-        var world = server.getOverworld();
+            LasertagMod.LOGGER.info("[ServerLasertagManager] reloading arena...");
 
-        spawnpointManager.initSpawnpointCacheIfNecessary(world, scanSpawnpoints);
-
-        // Check starting conditions
-        var abortReasons = gameMode.checkStartingConditions(server);
-
-        // If should abort
-        if (abortReasons.isPresent()) {
-
-            return abortReasons;
+            // Reload the arena
+            arenaManager.reloadArena();
         }
 
-        // Delegate to the game mode
-        gameMode.sendPlayersToSpawnpoints(this.server);
+        Function<Void, Optional<String>> arenaLoadCallback = ignored -> {
 
-        // Start game
-        isRunning = true;
-        syncedState.getUIState().isGameRunning = true;
+            // Get the game mode
+            var gameMode = gameModeManager.getGameMode();
 
-        var preGameDelayTimer = ThreadUtil.createScheduledExecutor("server-lasertag-server-pregame-delay-timer-thread-%d");
-        var preGameDelay = settingsManager.<Long>get(SettingDescription.PREGAME_DURATION);
+            var world = server.getOverworld();
 
-        if (world.getChunkManager().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator) {
-            musicManager.playIntro(arenaChunkGenerator.getConfig().getType());
-        }
+            spawnpointManager.initSpawnpointCacheIfNecessary(world, scanSpawnpoints);
 
-        preGameDelayTimer.schedule(() -> {
+            // Check starting conditions
+            var abortReasons = gameMode.checkStartingConditions(server);
 
-            // Delegate to game mode
-            gameMode.onGameStart(this.server);
+            // If should abort
+            if (abortReasons.isPresent()) {
 
-            // Start game tick timer
-            gameTickTimer = ThreadUtil.createScheduledExecutor("server-lasertag-game-tick-timer-thread-%d");
-            gameTickTimer.scheduleAtFixedRate(new GameTickTimerTask(this, gameModeManager, settingsManager), 0, 1, TimeUnit.SECONDS);
+                return abortReasons;
+            }
 
-            // Stop the pre game delay timer
-            preGameDelayTimer.shutdownNow();
+            // Delegate to the game mode
+            gameMode.sendPlayersToSpawnpoints(this.server);
 
-        }, preGameDelay, TimeUnit.SECONDS);
+            // Start game
+            isRunning = true;
+            syncedState.getUIState().isGameRunning = true;
 
-        // Delegate to the game mode
-        gameMode.onPreGameStart(this.server);
+            var preGameDelayTimer = ThreadUtil.createScheduledExecutor("server-lasertag-server-pregame-delay-timer-thread-%d");
+            var preGameDelay = settingsManager.<Long>get(SettingDescription.PREGAME_DURATION);
 
-        // Notify players
-        ServerEventSending.sendToEveryone(server, NetworkingConstants.GAME_STARTED, PacketByteBufs.empty());
+            if (world.getChunkManager().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator) {
+                musicManager.playIntro(arenaChunkGenerator.getConfig().getType());
+            }
 
-        // Start pregame count down timer
-        uiStateManager.startPreGameCountdownTimer(settingsManager.<Long>get(SettingDescription.PREGAME_DURATION));
+            preGameDelayTimer.schedule(() -> {
 
-        return Optional.empty();
+                // Delegate to game mode
+                gameMode.onGameStart(this.server);
+
+                // Start game tick timer
+                gameTickTimer = ThreadUtil.createScheduledExecutor("server-lasertag-game-tick-timer-thread-%d");
+                gameTickTimer.scheduleAtFixedRate(new GameTickTimerTask(this, gameModeManager, settingsManager), 0, 1, TimeUnit.SECONDS);
+
+                // Stop the pre game delay timer
+                preGameDelayTimer.shutdownNow();
+
+            }, preGameDelay, TimeUnit.SECONDS);
+
+            // Delegate to the game mode
+            gameMode.onPreGameStart(this.server);
+
+            // Notify players
+            ServerEventSending.sendToEveryone(server, NetworkingConstants.GAME_STARTED, PacketByteBufs.empty());
+
+            // Start pregame count down timer
+            uiStateManager.startPreGameCountdownTimer(settingsManager.<Long>get(SettingDescription.PREGAME_DURATION));
+
+            return Optional.empty();
+        };
+
+        return arenaManager.getLoadArenaFuture().thenApplyAsync(arenaLoadCallback);
     }
 
     /**
      * Stops the running lasertag game
+     *
      * @return False if there was no game running. Otherwise, true.
      */
     @Override
@@ -225,7 +240,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
      * This gets called when a player hit another player
      *
      * @param shooter The player who fired
-     * @param target The player who got hit
+     * @param target  The player who got hit
      */
     @Override
     public void playerHitPlayer(ServerPlayerEntity shooter, ServerPlayerEntity target) {
@@ -240,7 +255,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
      * This gets called when a player hit another player
      *
      * @param shooterUuid The uuid of the player who fired
-     * @param targetUuid The uuid of the player who got hit
+     * @param targetUuid  The uuid of the player who got hit
      */
     @Override
     public void playerHitPlayer(UUID shooterUuid, UUID targetUuid) {
@@ -262,7 +277,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
      * This gets called when a player hit a lasertarget
      *
      * @param shooter The player who fired
-     * @param target The lasertarget who got hit
+     * @param target  The lasertarget who got hit
      */
     @Override
     public void playerHitLasertarget(ServerPlayerEntity shooter, LaserTargetBlockEntity target) {
@@ -308,7 +323,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
      * This gets called when a player hit a lasertarget
      *
      * @param shooterUuid The uuid of the player who fired
-     * @param targetPos The block pos of the lasertarget who got hit
+     * @param targetPos   The block pos of the lasertarget who got hit
      */
     @Override
     public void playerHitLasertarget(UUID shooterUuid, BlockPos targetPos) {
@@ -325,7 +340,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
                 return;
             }
 
-            playerHitLasertarget(shooter, (LaserTargetBlockEntity)target);
+            playerHitLasertarget(shooter, (LaserTargetBlockEntity) target);
         });
     }
 

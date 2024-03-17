@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
@@ -55,6 +55,8 @@ public class ArenaManager implements IArenaManager {
 
     private boolean isLoading = false;
 
+    private CompletableFuture<Void> arenaGenerationFuture;
+
     public ArenaManager(MinecraftServer server,
                         ISpawnpointManager spawnpointManager,
                         IPlayerNamesState playerNamesState,
@@ -63,12 +65,46 @@ public class ArenaManager implements IArenaManager {
         this.spawnpointManager = spawnpointManager;
         this.playerNamesState = playerNamesState;
         this.blockTickManager = blockTickManager;
+        arenaGenerationFuture = CompletableFuture.completedFuture(null);
     }
 
     //region Public methods
 
     @Override
     public boolean loadArena(ArenaType newArenaType, ProceduralArenaType newProceduralArenaType) {
+
+        return loadArena(newArenaType, newProceduralArenaType, true);
+    }
+
+    @Override
+    public boolean reloadArena() {
+
+        // Check if this is an arena world
+        var chunkGenerator = Objects.requireNonNull(server.getSaveProperties()
+                .getGeneratorOptions()
+                .getDimensions()
+                .get(DimensionOptions.OVERWORLD))
+                .chunkGenerator;
+
+        // If the chunk generator is not an arena chunk generator
+        if (!(chunkGenerator instanceof ArenaChunkGenerator arenaChunkGenerator)) {
+            LasertagMod.LOGGER.warn("Cannot reload map in non-arena world");
+            return false;
+        }
+
+        // Get the arena types
+        var lastArenaType = arenaChunkGenerator.getConfig().getType();
+        var lastProceduralArenaType = arenaChunkGenerator.getConfig().getProceduralType();
+
+        return loadArena(lastArenaType, lastProceduralArenaType, false);
+    }
+
+    @Override
+    public CompletableFuture<Void> getLoadArenaFuture() {
+        return arenaGenerationFuture;
+    }
+
+    private boolean loadArena(ArenaType newArenaType, ProceduralArenaType newProceduralArenaType, boolean sendPlayersToOrigin) {
 
         // Start the generation
         LasertagMod.LOGGER.info("Starting to load new arena '" + newArenaType.translatableName + "(" + newProceduralArenaType.translatableName + ")'");
@@ -86,15 +122,18 @@ public class ArenaManager implements IArenaManager {
             return false;
         }
 
-        var singleThreadExecutor = Executors.newSingleThreadExecutor();
-        singleThreadExecutor.execute(() -> loadArenaInner(arenaChunkGenerator, newArenaType, newProceduralArenaType));
+        loadArenaInner(arenaChunkGenerator, newArenaType, newProceduralArenaType, sendPlayersToOrigin);
 
         return true;
     }
 
     private void loadArenaInner(ArenaChunkGenerator arenaChunkGenerator,
                                 ArenaType newArenaType,
-                                ProceduralArenaType newProceduralArenaType) {
+                                ProceduralArenaType newProceduralArenaType,
+                                boolean sendPlayersToOrigin) {
+
+        // The arena load future
+        arenaGenerationFuture = CompletableFuture.completedFuture(null);
 
         // Show loading screen
         this.sendMapLoadProgressEvent("Starting the generation of the arena", 0);
@@ -116,12 +155,15 @@ public class ArenaManager implements IArenaManager {
         // Start time measurement
         var blockPlaceStartTime = System.currentTimeMillis();
 
-        // Teleport all players back to origin for their own safety
-        server.execute(this::teleportPlayersToOrigin);
+        if (sendPlayersToOrigin) {
+
+            // Teleport all players back to origin for their own safety
+            arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(this::teleportPlayersToOrigin, server);
+        }
 
         // Remove all blocks of the old arena
         var oldArenaBounds = this.calculateBounds(oldArenaTemplate);
-        server.execute(() -> this.removeOldBlocks(oldArenaBounds));
+        arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(() -> this.removeOldBlocks(oldArenaBounds), server);
 
         // Clear spawn-point cache if necessary and reset arena structure placer
         if (!oldArenaType.equals(newArenaType) || oldArenaType.equals(ArenaType.PROCEDURAL)) {
@@ -129,10 +171,10 @@ public class ArenaManager implements IArenaManager {
         }
 
         // Remove all entities except the players
-        server.execute(this::removeEntities);
+        arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(this::removeEntities, server);
 
         // Relieve The server thread by waiting
-        relieveAction.run();
+        arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(relieveAction);
 
         // Set new arena chunk generator config
         var newSeed = new Random().nextLong();
@@ -144,16 +186,19 @@ public class ArenaManager implements IArenaManager {
         generateArena(arenaChunkGenerator, newArenaBounds, relieveAction);
 
         // Set biomes
-        server.execute(() -> this.setBiomes(newArenaBounds, arenaChunkGenerator));
+        arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(() -> this.setBiomes(newArenaBounds, arenaChunkGenerator), server);
 
-        // Teleport players back to origin
-        server.execute(this::teleportPlayersToOrigin);
+        if (sendPlayersToOrigin) {
+
+            // Teleport players back to origin
+            arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(this::teleportPlayersToOrigin, server);
+        }
 
         // Calculate the union of the new and old arena
         var updateBounds = this.calculateUnion(oldArenaBounds, newArenaBounds);
 
         // Execute final step
-        server.execute(() -> {
+        arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(() -> {
 
             // Final logging
             var blockPlaceDuration = System.currentTimeMillis() - blockPlaceStartTime;
@@ -162,7 +207,7 @@ public class ArenaManager implements IArenaManager {
             // Stop loading
             this.sendMapLoadProgressEvent("", -1.0);
             this.isLoading = false;
-        });
+        }, server);
     }
 
     @Override
@@ -311,7 +356,7 @@ public class ArenaManager implements IArenaManager {
             }
 
             // Generation step for this chunk finished -> Send progress event
-            server.execute(() -> {
+            arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(() -> {
 
                 // Generate arena
                 chunkGenerator.generateFeatures(serverWorld,
@@ -327,7 +372,7 @@ public class ArenaManager implements IArenaManager {
                 // Send progress update
                 this.sendMapLoadProgressEvent(currentStepString,
                         (double) currentStepChunkIndex.incrementAndGet() / (double) newArenaBounds.numChunks());
-            });
+            }, server);
 
             // If this was the 50th Chunk
             if (indexCounter.incrementAndGet() >= 50) {
@@ -336,12 +381,12 @@ public class ArenaManager implements IArenaManager {
                 indexCounter.set(0);
 
                 // Relieve the server
-                relieveAction.run();
+                arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(relieveAction);
             }
         });
 
         // Final logging
-        server.execute(() -> LasertagMod.LOGGER.info("Generating Arena took " + (System.currentTimeMillis() - stepStartTime) + " ms"));
+        arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(() -> LasertagMod.LOGGER.info("Generating Arena took " + (System.currentTimeMillis() - stepStartTime) + " ms"), server);
     }
 
     /**

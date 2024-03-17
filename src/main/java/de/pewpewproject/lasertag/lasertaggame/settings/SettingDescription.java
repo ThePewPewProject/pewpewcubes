@@ -29,6 +29,7 @@ public enum SettingDescription {
     SHOW_NAMETAGS_OF_TEAMMATES("showNametagsOfTeammates", true, SettingDataType.BOOL, "value", null, null),
     MINING_FATIGUE_ENABLED("miningFatigueEnabled", true, SettingDataType.BOOL, "value", null, null),
     WEAPON_ZOOM("weaponZoom", 2L, SettingDataType.LONG, "multiplier", 1L, null),
+    RELOAD_ARENAS_BEFORE_GAME("reloadArenasBeforeGame", false, SettingDataType.BOOL, "value", null, null),
 
     // Time limited specific
     PLAY_TIME("gameDuration", 10L, SettingDataType.LONG, "minutes", 1L, null),

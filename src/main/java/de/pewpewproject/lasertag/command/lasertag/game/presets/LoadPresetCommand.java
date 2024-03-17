@@ -9,6 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.string;
@@ -22,7 +23,7 @@ import static net.minecraft.server.command.CommandManager.literal;
  */
 public class LoadPresetCommand extends ServerFeedbackCommand {
     @Override
-    protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+    protected CompletableFuture<Optional<CommandFeedback>> execute(CommandContext<ServerCommandSource> context) {
 
         // Get the game managers
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
@@ -34,9 +35,9 @@ public class LoadPresetCommand extends ServerFeedbackCommand {
         var successful = settingsPresetsManager.loadPreset(presetName);
 
         if (successful) {
-            return Optional.of(new CommandFeedback(Text.literal("Loaded settings preset '" + presetName + "'"), true, true));
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Loaded settings preset '" + presetName + "'"), true, true)));
         } else {
-            return Optional.of(new CommandFeedback(Text.literal("Settings preset '" + presetName + "' does not exist").formatted(Formatting.RED), true, false));
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Settings preset '" + presetName + "' does not exist").formatted(Formatting.RED), true, false)));
         }
     }
 

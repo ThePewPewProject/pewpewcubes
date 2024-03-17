@@ -12,6 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -25,7 +26,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class LasertagGameModeCommand extends ServerFeedbackCommand {
 
     @Override
-    protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+    protected CompletableFuture<Optional<CommandFeedback>> execute(CommandContext<ServerCommandSource> context) {
 
         // Get the game managers
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
@@ -39,7 +40,7 @@ public class LasertagGameModeCommand extends ServerFeedbackCommand {
 
         // Sanity check
         if (newGameMode == null) {
-            return Optional.of(new CommandFeedback(Text.literal("Invalid game mode.").formatted(Formatting.RED), false, false));
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Invalid game mode.").formatted(Formatting.RED), false, false)));
         }
 
         // Set the game mode
@@ -48,7 +49,7 @@ public class LasertagGameModeCommand extends ServerFeedbackCommand {
         // Translate the game mode name
         var translatedGameModeName = Text.translatable(gameModeTranslatableName).getString();
 
-        return Optional.of(new CommandFeedback(Text.literal("Game mode changed to '" + translatedGameModeName + "'."), false, true));
+        return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Game mode changed to '" + translatedGameModeName + "'."), false, true)));
     }
 
     private static int executeWithoutArgs(CommandContext<ServerCommandSource> context) {
