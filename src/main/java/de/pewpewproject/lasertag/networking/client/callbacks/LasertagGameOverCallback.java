@@ -23,6 +23,7 @@ public class LasertagGameOverCallback implements ClientPlayNetworking.PlayChanne
             var uiManager = gameManager.getUIStateManager();
             var uiState = gameManager.getSyncedState().getUIState();
 
+            uiManager.stopPreGameCountdownTimer();
             uiManager.stopGameTimer();
             uiState.isGameRunning = false;
         } catch (Exception ex) {

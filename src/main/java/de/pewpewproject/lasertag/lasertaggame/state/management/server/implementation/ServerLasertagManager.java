@@ -53,6 +53,8 @@ public class ServerLasertagManager implements IServerLasertagManager {
 
     private ScheduledExecutorService gameTickTimer = null;
 
+    private ScheduledExecutorService preGameDelayTimer = null;
+
     /**
      * The synchronized state of the game.
      * This state must be synchronized with the clients.
@@ -177,7 +179,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
             isRunning = true;
             syncedState.getUIState().isGameRunning = true;
 
-            var preGameDelayTimer = ThreadUtil.createScheduledExecutor("server-lasertag-server-pregame-delay-timer-thread-%d");
+            preGameDelayTimer = ThreadUtil.createScheduledExecutor("server-lasertag-server-pregame-delay-timer-thread-%d");
             var preGameDelay = settingsManager.<Long>get(SettingDescription.PREGAME_DURATION);
 
             if (world.getChunkManager().getChunkGenerator() instanceof ArenaChunkGenerator arenaChunkGenerator) {
@@ -194,7 +196,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
                 gameTickTimer.scheduleAtFixedRate(new GameTickTimerTask(this, gameModeManager, settingsManager), 0, 1, TimeUnit.SECONDS);
 
                 // Stop the pre game delay timer
-                preGameDelayTimer.shutdownNow();
+                shutdownPreGameDelayTimer();
 
             }, preGameDelay, TimeUnit.SECONDS);
 
@@ -350,14 +352,15 @@ public class ServerLasertagManager implements IServerLasertagManager {
     }
 
     @Override
-    public void dispose() {
-        synchronized (this) {
-            if (gameTickTimer == null) {
-                return;
-            }
-            gameTickTimer.shutdownNow();
-            gameTickTimer = null;
+    public synchronized void dispose() {
+
+        shutdownPreGameDelayTimer();
+
+        if (gameTickTimer == null) {
+            return;
         }
+        gameTickTimer.shutdownNow();
+        gameTickTimer = null;
     }
 
     @Override
@@ -490,6 +493,16 @@ public class ServerLasertagManager implements IServerLasertagManager {
     //endregion
 
     //region Private methods
+
+    private synchronized void shutdownPreGameDelayTimer() {
+
+        if (preGameDelayTimer == null) {
+            return;
+        }
+
+        preGameDelayTimer.shutdownNow();
+        preGameDelayTimer = null;
+    }
 
     /**
      * This method is called when the game ends
