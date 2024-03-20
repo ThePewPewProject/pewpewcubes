@@ -33,6 +33,12 @@ public class LoadMapCommand extends ServerFeedbackCommand {
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
         var arenaManager = gameManager.getArenaManager();
 
+        // If a game is running
+        if (gameManager.isGameRunning()) {
+            // Cannot change arena in-game
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Cannot change arena while a game is running").formatted(Formatting.RED), true, false)));
+        }
+
         var mapTranslatableName = StringArgumentType.getString(context, "map");
 
         var arenaTypeOptional = Arrays.stream(ArenaType.values())

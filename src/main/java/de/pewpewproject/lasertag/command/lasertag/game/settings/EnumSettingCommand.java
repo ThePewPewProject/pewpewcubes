@@ -6,6 +6,7 @@ import de.pewpewproject.lasertag.command.CommandFeedback;
 import de.pewpewproject.lasertag.command.ServerFeedbackCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -31,6 +32,12 @@ public class EnumSettingCommand extends ServerFeedbackCommand {
         // Get the game managers
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
         var settingsManager = gameManager.getSettingsManager();
+
+        // If a game is running
+        if (gameManager.isGameRunning()) {
+            // Cannot change settings in-game
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Cannot change settings while a game is running").formatted(Formatting.RED), true, false)));
+        }
 
         var value = StringArgumentType.getString(context, this.settingValueName);
         settingsManager.set(settingName, value);

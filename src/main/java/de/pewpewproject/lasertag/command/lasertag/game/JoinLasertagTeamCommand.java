@@ -32,11 +32,14 @@ public class JoinLasertagTeamCommand extends ServerFeedbackCommand {
         var syncedState = gameManager.getSyncedState();
         var teamsConfigState = syncedState.getTeamsConfigState();
 
+        // If a game is running
+        if (gameManager.isGameRunning()) {
+            // Cannot change teams in-game
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Cannot change teams while a game is running").formatted(Formatting.RED), true, false)));
+        }
+
         // Get the team
         var teamName = StringArgumentType.getString(context, "team");
-
-        // Get the server
-        var server = context.getSource().getServer();
 
         // Get executing player
         var player = context.getSource().getPlayer();

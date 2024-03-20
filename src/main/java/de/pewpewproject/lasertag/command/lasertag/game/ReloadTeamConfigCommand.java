@@ -5,6 +5,8 @@ import com.mojang.brigadier.context.CommandContext;
 import de.pewpewproject.lasertag.command.CommandFeedback;
 import de.pewpewproject.lasertag.command.ServerFeedbackCommand;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -24,6 +26,12 @@ public class ReloadTeamConfigCommand extends ServerFeedbackCommand {
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
         var playerNamesState = gameManager.getSyncedState().getPlayerNamesState();
         var teamsManager = gameManager.getTeamsManager();
+
+        // If a game is running
+        if (gameManager.isGameRunning()) {
+            // Cannot reload teams config in-game
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Cannot reload team config while a game is running").formatted(Formatting.RED), true, false)));
+        }
 
         var world = context.getSource().getWorld();
 

@@ -23,6 +23,12 @@ public class ClientTriggerLoadPresetCallback implements ServerPlayNetworking.Pla
             var gameManager = server.getOverworld().getServerLasertagManager();
             var settingsPresetsManager = gameManager.getSettingsPresetsManager();
 
+            // If a game is running
+            if (gameManager.isGameRunning()) {
+                // Cannot change settings in-game
+                return;
+            }
+
             // Get the preset name
             var presetName = buf.readString();
 

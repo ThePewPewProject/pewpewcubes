@@ -29,8 +29,13 @@ public class LoadPresetCommand extends ServerFeedbackCommand {
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
         var settingsPresetsManager = gameManager.getSettingsPresetsManager();
 
+        // If a game is running
+        if (gameManager.isGameRunning()) {
+            // Cannot change settings in-game
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Cannot change settings while a game is running").formatted(Formatting.RED), true, false)));
+        }
+
         var presetName = getString(context, "name");
-        var server = context.getSource().getServer();
 
         var successful = settingsPresetsManager.loadPreset(presetName);
 

@@ -31,6 +31,12 @@ public class StartLasertagGameCommand extends ServerFeedbackCommand {
         // Get the game managers
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
 
+        // If a game is running
+        if (gameManager.isGameRunning()) {
+            // Game is already running
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("There is already a game running").formatted(Formatting.RED), true, false)));
+        }
+
         return gameManager.startGame(scanSpawnpoints)
                 .thenApplyAsync(abortReasons -> abortReasons
                         .map(s -> new CommandFeedback(Text.literal("Start game aborted. Reasons:\n" + s)

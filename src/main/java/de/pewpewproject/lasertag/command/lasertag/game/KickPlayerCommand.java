@@ -33,6 +33,12 @@ public class KickPlayerCommand extends ServerFeedbackCommand {
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
         var teamsManager = gameManager.getTeamsManager();
 
+        // If a game is running
+        if (gameManager.isGameRunning()) {
+            // Cannot change teams in-game
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Cannot change teams while a game is running").formatted(Formatting.RED), true, false)));
+        }
+
         Collection<ServerPlayerEntity> players;
         try {
             players = EntityArgumentType.getPlayers(context, "players");

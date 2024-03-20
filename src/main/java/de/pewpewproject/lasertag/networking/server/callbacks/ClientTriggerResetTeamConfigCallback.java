@@ -29,6 +29,12 @@ public class ClientTriggerResetTeamConfigCallback implements ServerPlayNetworkin
             var teamsConfigState = syncedState.getTeamsConfigState();
             var playerNamesState = gameManager.getSyncedState().getPlayerNamesState();
 
+            // If a game is running
+            if (gameManager.isGameRunning()) {
+                // Cannot reset team config in-game
+                return;
+            }
+
             server.execute(() -> {
 
                 var world = server.getOverworld();

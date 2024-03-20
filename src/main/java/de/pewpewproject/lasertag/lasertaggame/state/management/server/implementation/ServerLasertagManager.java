@@ -149,6 +149,11 @@ public class ServerLasertagManager implements IServerLasertagManager {
 
         Function<Void, Optional<String>> arenaLoadCallback = ignored -> {
 
+            // If there is already a game running
+            if (isRunning) {
+                return Optional.of("There is already a game running");
+            }
+
             // Get the game mode
             var gameMode = gameModeManager.getGameMode();
 
@@ -205,7 +210,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
             return Optional.empty();
         };
 
-        return arenaManager.getLoadArenaFuture().thenApplyAsync(arenaLoadCallback);
+        return arenaManager.getLoadArenaFuture().thenApplyAsync(arenaLoadCallback, server);
     }
 
     /**

@@ -32,6 +32,12 @@ public class LasertagGameModeCommand extends ServerFeedbackCommand {
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
         var gameModeManager = gameManager.getGameModeManager();
 
+        // If a game is running
+        if (gameManager.isGameRunning()) {
+            // Cannot change game mode in-game
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Cannot change game mode while a game is running").formatted(Formatting.RED), true, false)));
+        }
+
         // Get the game mode translatable name
         var gameModeTranslatableName = StringArgumentType.getString(context, "gamemode");
 

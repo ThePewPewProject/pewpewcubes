@@ -23,6 +23,12 @@ public class ClientTriggerSettingResetCallback implements ServerPlayNetworking.P
             var gameManager = server.getOverworld().getServerLasertagManager();
             var settingsManager = gameManager.getSettingsManager();
 
+            // If a game is running
+            if (gameManager.isGameRunning()) {
+                // Cannot change settings in-game
+                return;
+            }
+
             // Get setting name
             var settingName = buf.readString();
 
