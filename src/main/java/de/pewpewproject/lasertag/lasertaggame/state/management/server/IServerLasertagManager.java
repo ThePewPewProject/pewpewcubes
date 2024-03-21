@@ -42,6 +42,13 @@ public interface IServerLasertagManager extends ITickable {
     boolean isGameRunning();
 
     /**
+     * Get if the pre game count down is over
+     *
+     * @return True if the pre game count down is over and a game is running. Otherwise, false.
+     */
+    boolean hasPreGamePassed();
+
+    /**
      * A player hit another player
      *
      * @param shooter The player who fired the weapon

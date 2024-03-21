@@ -118,6 +118,13 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer, ILasertagGam
             var teamsConfigState = syncedState.getTeamsConfigState();
             var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
 
+            // If the pre game count down has not passed
+            if (!gameManager.hasPreGamePassed()) {
+                // Player can not break flags before the pre game count down has passed
+                cir.setReturnValue(true);
+                return;
+            }
+
             // Get the team of the flag
             var flagTeam = teamsConfigState.getTeamOfName(flagEntity.getTeamName());
 
@@ -153,6 +160,14 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer, ILasertagGam
             var syncedState = gameManager.getSyncedState();
             var teamsConfigState = syncedState.getTeamsConfigState();
             var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
+            var uiManager = gameManager.getUIStateManager();
+
+            // If the pre game count down has not passed
+            if (!uiManager.hasPreGamePassed()) {
+                // Player can not break flags before the pre game count down has passed
+                cir.setReturnValue(true);
+                return;
+            }
 
             // Get the team of the flag
             var flagTeam = teamsConfigState.getTeamOfName(flagEntity.getTeamName());
@@ -237,6 +252,13 @@ public abstract class PlayerEntityMixin implements ILasertagPlayer, ILasertagGam
         var syncedState = gameManager.getSyncedState();
         var teamsConfigState = syncedState.getTeamsConfigState();
         var captureTheFlagManager = gameManager.getCaptureTheFlagManager();
+
+        // If the pre game count down has not passed
+        if (!gameManager.hasPreGamePassed()) {
+            // Player can not break flags before the pre game count down has passed
+            cir.setReturnValue(true);
+            return;
+        }
 
         // Get the team of the flag
         var flagTeam = teamsConfigState.getTeamOfName(flagEntity.getTeamName());

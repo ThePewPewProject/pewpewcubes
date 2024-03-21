@@ -51,6 +51,12 @@ public class ServerLasertagManager implements IServerLasertagManager {
      */
     private boolean isRunning;
 
+    /**
+     * Flag to indicate that the pre game count down of
+     * this game has already passed
+     */
+    private boolean hasPreGamePassed;
+
     private ScheduledExecutorService gameTickTimer = null;
 
     private ScheduledExecutorService preGameDelayTimer = null;
@@ -113,6 +119,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
         this.eliminationManager = eliminationManager;
         this.lasertargetsManager = lasertargetsManager;
         isRunning = false;
+        hasPreGamePassed = false;
 
         this.arenaManager = arenaManager;
         this.blockTickManager = blockTickManager;
@@ -188,6 +195,8 @@ public class ServerLasertagManager implements IServerLasertagManager {
 
             preGameDelayTimer.schedule(() -> {
 
+                hasPreGamePassed = true;
+
                 // Delegate to game mode
                 gameMode.onGameStart(this.server);
 
@@ -241,6 +250,11 @@ public class ServerLasertagManager implements IServerLasertagManager {
     @Override
     public boolean isGameRunning() {
         return isRunning;
+    }
+
+    @Override
+    public boolean hasPreGamePassed() {
+        return hasPreGamePassed;
     }
 
     /**
@@ -519,6 +533,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
         musicManager.stopMusic();
 
         isRunning = false;
+        hasPreGamePassed = false;
         syncedState.getUIState().isGameRunning = false;
 
         ServerEventSending.sendToEveryone(server, NetworkingConstants.GAME_OVER, PacketByteBufs.empty());

@@ -27,10 +27,17 @@ public class UIStateManager implements IUIStateManager {
 
     private final ISettingsManager settingsManager;
 
+    /**
+     * Flag to indicate that the pre game count down of
+     * this game has already passed
+     */
+    private boolean hasPreGamePassed;
+
     public UIStateManager(IGameModeManager gameModeManager, ISettingsManager settingsManager) {
 
         this.gameModeManager = gameModeManager;
         this.settingsManager = settingsManager;
+        hasPreGamePassed = false;
     }
 
     public void setClientManager(IClientLasertagManager clientManager) {
@@ -59,6 +66,8 @@ public class UIStateManager implements IUIStateManager {
             if (gameTimer == null) {
                 return;
             }
+
+            hasPreGamePassed = false;
 
             gameTimer.shutdownNow();
             gameTimer = null;
@@ -95,6 +104,11 @@ public class UIStateManager implements IUIStateManager {
         }
     }
 
+    @Override
+    public boolean hasPreGamePassed() {
+        return hasPreGamePassed;
+    }
+
     //endregion
 
     //region Private methods
@@ -117,6 +131,8 @@ public class UIStateManager implements IUIStateManager {
 
         // If the count down is at the end
         if (clientManager.getSyncedState().getUIState().startingIn <= -1) {
+
+            hasPreGamePassed = true;
 
             // Start game count down timer from the start
             startGameTimer(0);
