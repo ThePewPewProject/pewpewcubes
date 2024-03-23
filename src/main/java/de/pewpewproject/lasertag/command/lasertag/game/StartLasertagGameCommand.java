@@ -44,8 +44,10 @@ public class StartLasertagGameCommand extends ServerFeedbackCommand {
     }
 
     static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
+
         lab.then(literal("startLasertagGame")
-                .requires(s -> s.hasPermissionLevel(1))
+                .requires(s -> s.hasPermissionLevel(1) ||
+                          s.getWorld().getServerLasertagManager().getStartGamePermissionManager().isStartGamePermitted(s.getPlayer()))
                 .executes(new StartLasertagGameCommand(false))
                 .then(literal("scanSpawnpoints")
                         .executes(new StartLasertagGameCommand(true))));

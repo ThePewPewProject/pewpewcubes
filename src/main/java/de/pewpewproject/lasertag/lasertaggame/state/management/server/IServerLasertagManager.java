@@ -121,4 +121,6 @@ public interface IServerLasertagManager extends ITickable {
     IEliminationManager getEliminationManager();
 
     ILasertargetsManager getLasertargetsManager();
+
+    IStartGamePermissionManager getStartGamePermissionManager();
 }

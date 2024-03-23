@@ -27,7 +27,9 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
@@ -92,6 +94,7 @@ public class ServerLasertagManager implements IServerLasertagManager {
     private final IUIStateManager uiStateManager;
     private final IEliminationManager eliminationManager;
     private final ILasertargetsManager lasertargetsManager;
+    private final IStartGamePermissionManager startGamePermissionManager;
 
     //endregion
 
@@ -112,12 +115,13 @@ public class ServerLasertagManager implements IServerLasertagManager {
                                  IUIStateManager uiStateManager,
                                  IMusicalChairsManager musicalChairsManager,
                                  IEliminationManager eliminationManager,
-                                 ILasertargetsManager lasertargetsManager) {
+                                 ILasertargetsManager lasertargetsManager, IStartGamePermissionManager startGamePermissionManager) {
 
         this.server = server;
         this.syncedState = syncedState;
         this.eliminationManager = eliminationManager;
         this.lasertargetsManager = lasertargetsManager;
+        this.startGamePermissionManager = startGamePermissionManager;
         isRunning = false;
         hasPreGamePassed = false;
 
@@ -504,6 +508,11 @@ public class ServerLasertagManager implements IServerLasertagManager {
         return lasertargetsManager;
     }
 
+    @Override
+    public IStartGamePermissionManager getStartGamePermissionManager() {
+        return startGamePermissionManager;
+    }
+
     //endregion
 
     //region Private methods
@@ -523,6 +532,10 @@ public class ServerLasertagManager implements IServerLasertagManager {
      */
     private void lasertagGameOver() {
 
+        isRunning = false;
+        hasPreGamePassed = false;
+        syncedState.getUIState().isGameRunning = false;
+
         // Get the game mode
         var gameMode = gameModeManager.getGameMode();
 
@@ -531,10 +544,6 @@ public class ServerLasertagManager implements IServerLasertagManager {
 
         // Stop all music from playing
         musicManager.stopMusic();
-
-        isRunning = false;
-        hasPreGamePassed = false;
-        syncedState.getUIState().isGameRunning = false;
 
         ServerEventSending.sendToEveryone(server, NetworkingConstants.GAME_OVER, PacketByteBufs.empty());
 

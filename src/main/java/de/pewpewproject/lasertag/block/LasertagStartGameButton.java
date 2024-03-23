@@ -29,13 +29,6 @@ public class LasertagStartGameButton extends StoneButtonBlock implements BlockEn
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 
-        // If player does not have permission to start the game
-        if (!player.hasPermissionLevel(1)) {
-            // Send feedback
-            player.sendMessage(Text.translatable("chat.message.start_game_button_not_enough_permissions").formatted(Formatting.RED), true);
-            return ActionResult.FAIL;
-        }
-
         if (!world.isClient) {
 
             // Cast to server world
@@ -43,6 +36,15 @@ public class LasertagStartGameButton extends StoneButtonBlock implements BlockEn
 
             // Get the game managers
             var gameManager = serverWorld.getServerLasertagManager();
+            var startGamePermissionManager = gameManager.getStartGamePermissionManager();
+
+            // If player does not have permission to start the game
+            if (!player.hasPermissionLevel(4) &&
+                    !startGamePermissionManager.isStartGamePermitted(player)) {
+                // Send feedback
+                player.sendMessage(Text.translatable("chat.message.start_game_button_not_enough_permissions").formatted(Formatting.RED), true);
+                return ActionResult.FAIL;
+            }
 
             var server = world.getServer();
             gameManager.startGame(false)
