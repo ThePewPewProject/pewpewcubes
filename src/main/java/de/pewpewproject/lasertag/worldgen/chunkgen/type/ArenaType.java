@@ -36,8 +36,8 @@ public enum ArenaType {
             SoundEvents.JUNGLE_ARENA_OUTRO_MUSIC_SOUND_EVENT),
     DESERT(BiomeKeys.DESERT,
             new Identifier(LasertagMod.ID, "structures/prebuild_arenas/desert_arena.litematic"),
-            new Vec3i(55, 26, 99),
-            new Vec3i(117, 75, 179),
+            new Vec3i(275, 26, 321),
+            new Vec3i(558, 82, 622),
             "arenaType.desert",
             SoundEvents.DESERT_ARENA_INTRO_MUSIC_SOUND_EVENT,
             SoundEvents.DESERT_ARENA_MUSIC_SOUND_EVENT,
@@ -65,7 +65,9 @@ public enum ArenaType {
      * @param biome The biome for the arena (BiomeKeys.YOUR_BIOME)
      * @param nbtFileId The id of the nbt file where the arena data is stored. Size has to be >0 in x, y and z! If this is a .litematic file the used region has to be called "main"
      * @param placementOffset The offset with which to place the arena. Insert the coordinates of the world spawn point block so that this block is 0, 0, 0
-     *                        (To calculate: Generate arena with offset 0,0,0 and use the targeted block coordinates of the desired spawn point block as the offset)
+     *                        (To calculate: Generate arena with offset 0,0,0 and use the targeted block coordinates of the desired spawn point block as the offset.
+     *                        OR if you already built the arena with the spawn point block at 0,0,0 in the world:
+     *                        Take the coordinates of the block with the smallest coordinates and invert the signs of the coordinates.)
      * @param translatableName The name used for translation
      */
     ArenaType(RegistryKey<Biome> biome,
