@@ -92,9 +92,16 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
                 .max(Comparator.comparingInt(i -> i))
                 .get();
 
-        var numberOfRows = (int)Math.ceil((float)numberOfTeams / (float)MAX_NUMBER_TEAMS_PER_ROW);
         var numberOfcolumns = Math.min(numberOfTeams, MAX_NUMBER_TEAMS_PER_ROW);
+
         var teamListWidth = (numberOfcolumns * TEAM_WIDTH) + ((numberOfcolumns + 1) * TEAM_PADDING);
+
+        while (teamListWidth > scaledWindowWidth) {
+            numberOfcolumns--;
+            teamListWidth = (numberOfcolumns * TEAM_WIDTH) + ((numberOfcolumns + 1) * TEAM_PADDING);
+        }
+
+        var numberOfRows = (int)Math.ceil((float)numberOfTeams / (float)numberOfcolumns);
         var teamHeight = TEXT_PADDING + TEXT_RENDERER.fontHeight + TEXT_PADDING + (maxNumberOfPlayersInTeam * (INTRA_PLAYER_PADDING + TEXT_RENDERER.fontHeight));
         var teamListHeight = (numberOfRows * teamHeight) + ((numberOfRows + 1) * TEAM_PADDING);
         var startX = (int)((scaledWindowWidth / 2.0) - (teamListWidth / 2.0));
@@ -109,7 +116,7 @@ public class TeamListHudOverlay extends AdvancedDrawableHelper {
 
         var teamIterator = sortedTeams.iterator();
         for (int row = 0; row < numberOfRows; ++row) {
-            for (int column = 0; column < MAX_NUMBER_TEAMS_PER_ROW; ++column) {
+            for (int column = 0; column < numberOfcolumns; ++column) {
                 if (!teamIterator.hasNext()) {
                     break;
                 }
