@@ -61,5 +61,14 @@ Before you begin, ensure you have the following prerequisites installed on your 
 ## Feedback and Support
 We value your feedback and are here to provide support whenever you need it. If you encounter any issues with the mod or have suggestions for improvement, please don't hesitate to reach out to us through our GitHub repository or [our Discord server](https://discord.gg/SPbV8P2kHN).
 
+## Special Thanks
+
+We would like to extend our heartfelt gratitude to the following individuals and organizations for their invaluable contributions, support, and inspiration throughout the development of the PewPewCubes Mod:
+
+- Philipp Schmidt aka Yochyo: For being readily available to help with alpha-testing and invaluable support with programming questions
+- [Junker Technologies GmbH](https://www.junker-technologies.com/): For helpful advice in all things UX and hosting an in-person beta-testing event
+
+Your encouragement and assistance have played a vital role in making this project a reality. Thank you for being a part of our journey!
+
 ## License
 The Minecraft PewPewCubes Mod is licensed under the [GNU General Public License v3.0 (GPL-3.0)](https://github.com/ThePewPewProject/pewpewcubes/blob/main/COPYING), granting you the freedom to modify, distribute, and even sell the mod or its derivatives under certain conditions. We believe in the principles of open-source software and encourage collaboration within the Minecraft community. Please review the full license text for details on your rights and responsibilities as a user or contributor to the mod.
