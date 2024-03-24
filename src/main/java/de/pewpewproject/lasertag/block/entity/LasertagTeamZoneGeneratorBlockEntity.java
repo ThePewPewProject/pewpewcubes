@@ -29,17 +29,33 @@ import java.util.*;
  */
 public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements LasertagCustomBlockTickable {
 
+    /**
+     * How long (in seconds) is waited until the team
+     * full warning is sent again for a player
+     */
+    private static final int TEAM_FULL_RETRY_DELAY = 5;
+
+    private static final int WORLD_TIME_SPEED_FACTOR = 20;
+
     private int radius = 5;
     private int height = 10;
     private String teamName = "";
     private final List<Tuple<BlockPos, Direction>> borderCache;
     private final Set<BlockPos> zoneCache;
+    /**
+     * Dictionary containing the last times (in world time) the player
+     * received a team full warning by this entity.
+     *     key:   The players uuid
+     *     value: The last time the player received the warning (in world time)
+     */
+    private final Map<UUID, Long> lastTeamFullWarningTimeCache;
 
     public LasertagTeamZoneGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(Entities.LASERTAG_TEAM_ZONE_GENERATOR_BLOCK_ENTITY, pos, state);
 
         borderCache = new ArrayList<>();
         zoneCache = new HashSet<>();
+        lastTeamFullWarningTimeCache = new HashMap<>();
     }
 
     public void serverTick(ServerWorld world) {
@@ -120,7 +136,7 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements
         }
     }
 
-    private static void playerJoinTeamIfNecessary(ServerWorld world, PlayerEntity player, TeamDto team) {
+    private void playerJoinTeamIfNecessary(ServerWorld world, PlayerEntity player, TeamDto team) {
 
         // Get the game managers
         var gameManager = world.getServerLasertagManager();
@@ -142,7 +158,7 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements
 
         // If join did not succeed
         if (!joinSucceeded) {
-            player.sendMessage(Text.literal("That team is already full.").formatted(Formatting.RED), false);
+            sendTeamFullMessage(player);
         } else {
             player.sendMessage(Text.literal("You joined team " + team.name()), true);
         }
@@ -332,5 +348,29 @@ public class LasertagTeamZoneGeneratorBlockEntity extends BlockEntity implements
     private void updateListeners() {
         this.markDirty();
         this.world.updateListeners(this.getPos(), this.getCachedState(), this.getCachedState(), Block.NOTIFY_ALL);
+    }
+
+    private void sendTeamFullMessage(PlayerEntity player) {
+
+        // Get the current world time
+        var worldTime = world.getTime();
+
+        // Get the last team full message time
+        var lastTeamFullMessageTime = lastTeamFullWarningTimeCache.get(player.getUuid());
+
+        // If there is a last team full time, and it was sent
+        // not long enough ago
+        if (lastTeamFullMessageTime != null &&
+            worldTime - lastTeamFullMessageTime < TEAM_FULL_RETRY_DELAY * WORLD_TIME_SPEED_FACTOR) {
+
+            // Do nothing
+            return;
+        }
+
+        // Send the message
+        player.sendMessage(Text.literal("That team is already full.").formatted(Formatting.RED), true);
+
+        // Put the world time into the cache
+        lastTeamFullWarningTimeCache.put(player.getUuid(), worldTime);
     }
 }
