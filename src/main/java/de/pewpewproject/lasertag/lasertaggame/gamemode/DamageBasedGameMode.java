@@ -69,13 +69,15 @@ public abstract class DamageBasedGameMode extends GameMode {
         var gameManager = server.getOverworld().getServerLasertagManager();
         var teamsManager = gameManager.getTeamsManager();
         var activationManager = gameManager.getActivationManager();
+        var settingsManager = gameManager.getSettingsManager();
 
         // Get the teams of shooter and target
         var shooterTeam = teamsManager.getTeamOfPlayer(shooter.getUuid());
         var targetTeam = teamsManager.getTeamOfPlayer(target.getUuid());
 
         // Check that hit player is not in same team as firing player
-        if (shooterTeam.equals(targetTeam)) {
+        if (!settingsManager.<Boolean>get(SettingDescription.FRIENDLY_FIRE_ENABLED) &&
+                shooterTeam.equals(targetTeam)) {
             return;
         }
 
