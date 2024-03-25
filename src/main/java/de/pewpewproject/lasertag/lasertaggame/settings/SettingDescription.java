@@ -41,9 +41,9 @@ public enum SettingDescription {
     DEATH_PENALTY("deathPenalty", 500L, SettingDataType.LONG, "points", null, null),
 
     // Damage based specific
-    LASER_RAY_DAMAGE("laserDamage", 5L, SettingDataType.LONG, "amount", 0L, 20L),
-    LASERTARGET_HEAL("lasertargetHeal", 5L, SettingDataType.LONG, "amount", 0L, 20L),
-    PLAYER_RESET_HEAL("playerResetHeal", 20L, SettingDataType.LONG, "amount", 0L, 20L),
+    LASER_RAY_DAMAGE("laserDamage", 5L, SettingDataType.LONG, "amount", -20L, 20L),
+    LASERTARGET_HEAL("lasertargetHeal", 5L, SettingDataType.LONG, "amount", -20L, 20L),
+    PLAYER_RESET_HEAL("playerResetHeal", 20L, SettingDataType.LONG, "amount", -20L, 20L),
 
     // Capture the flag specific
     FLAG_COUNT("numberOfFlags", 3L, SettingDataType.LONG, "number", 0L, null),

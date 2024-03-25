@@ -15,4 +15,6 @@ public class DamageSources {
 
         return new EntityDamageSource("laser", shooter).setBypassesArmor().setUnblockable();
     }
+
+    public static final DamageSource LASER = new DamageSource("laser").setBypassesArmor().setUnblockable();
 }

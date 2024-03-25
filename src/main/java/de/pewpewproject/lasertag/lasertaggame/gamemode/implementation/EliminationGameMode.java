@@ -174,8 +174,12 @@ public class EliminationGameMode extends DamageBasedGameMode {
             // Get the shooter
             var shooter = (ServerPlayerEntity) source.getAttacker();
 
-            // Get the shooters uuid
-            shooterUuid = shooter.getUuid();
+            // If there was a shooter
+            if (shooter != null) {
+
+                // Get the shooters uuid
+                shooterUuid = shooter.getUuid();
+            }
         }
         // Get the game managers
         var gameManager = server.getOverworld().getServerLasertagManager();
