@@ -1,6 +1,7 @@
 package de.pewpewproject.lasertag.networking.client.callbacks;
 
 import de.pewpewproject.lasertag.LasertagMod;
+import de.pewpewproject.lasertag.client.screen.GameManagerScreen;
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -29,6 +30,13 @@ public class LasertagGameStartedCallback implements ClientPlayNetworking.PlayCha
 
             // Start pregame count down timer
             uiManager.startPreGameCountdownTimer(settingsManager.<Long>get(SettingDescription.PREGAME_DURATION));
+
+            // If the current screen is a game manager screen
+            if (client.currentScreen instanceof GameManagerScreen) {
+
+                // Close the screen
+                client.execute(() -> client.setScreen(null));
+            }
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in LasertagGameStartedCallback", ex);
             throw ex;
