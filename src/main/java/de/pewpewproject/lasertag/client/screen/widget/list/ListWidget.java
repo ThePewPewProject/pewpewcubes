@@ -44,6 +44,7 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
     private final int numberOfVisibleItems;
 
     private int indexOfFirstVisibleItem = 0;
+    private int lastNumberOfElementsInDataSource = 0;
 
     private boolean scrolling = false;
 
@@ -125,7 +126,6 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
      */
     public synchronized void refreshDataSource() {
         columnsDefinition.columns().forEach(ListColumn::reset);
-        indexOfFirstVisibleItem = 0;
         restoreFocusNecessary = true;
     }
 
@@ -134,6 +134,16 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
 
         // Get the list data
         var data = dataSource.get();
+
+        // If the number of elements in the data source changed
+        if (lastNumberOfElementsInDataSource != data.size()) {
+
+            // Set the first index to 0
+            indexOfFirstVisibleItem = 0;
+
+            // Set the new value
+            lastNumberOfElementsInDataSource = data.size();
+        }
 
         if (data.isEmpty()) {
             this.renderEmptyList(matrices);
@@ -171,6 +181,11 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
     public synchronized boolean mouseClicked(double mouseX, double mouseY, int button) {
 
         if (mouseX < this.x || mouseX > this.x + this.width || mouseY < this.y || mouseY > this.y + this.height) {
+
+            // Forget the last focused element
+            lastFocusedColumnIndex = null;
+            lastFocusedElementId = null;
+
             return false;
         }
 
