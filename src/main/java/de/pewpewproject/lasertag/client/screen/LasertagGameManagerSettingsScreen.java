@@ -7,7 +7,6 @@ import de.pewpewproject.lasertag.client.screen.widget.list.ListCell;
 import de.pewpewproject.lasertag.client.screen.widget.list.ListColumn;
 import de.pewpewproject.lasertag.client.screen.widget.list.ListColumnsDefinition;
 import de.pewpewproject.lasertag.client.screen.widget.list.grouped.GroupedListWidget;
-import de.pewpewproject.lasertag.common.types.Tuple;
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;
 import io.netty.buffer.Unpooled;
@@ -25,7 +24,6 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static de.pewpewproject.lasertag.lasertaggame.settings.SettingDataType.BOOL;
 import static de.pewpewproject.lasertag.lasertaggame.settings.SettingDataType.LONG;
@@ -231,9 +229,6 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
         // Get the game mode
         var gameMode = gameModeManager.getGameMode();
 
-        // Get the overwritten settings
-        var overwrittenSettings = gameMode.getOverwrittenSettings().stream().map(Tuple::x).collect(Collectors.toSet());
-
         // Get all relevant settings
         var relevantSettings = gameMode.getRelevantSettings().stream();
 
@@ -269,7 +264,7 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
                         value = settingsManager.get(s);
                     }
 
-                    return new SettingRowType(s, value, overwrittenSettings.contains(s) ? "gui.game_manager.settings.group_header.overwritten" : "gui.game_manager.settings.group_header.other");
+                    return new SettingRowType(s, value, s.isGeneral() ? "gui.game_manager.settings.group_header.general" : "gui.game_manager.settings.group_header.game_mode_specific");
                 }).toList();
     }
 
@@ -417,5 +412,5 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
         }));
     }
 
-    private static record SettingRowType(SettingDescription x, Object y, String group) {}
+    private record SettingRowType(SettingDescription x, Object y, String group) {}
 }

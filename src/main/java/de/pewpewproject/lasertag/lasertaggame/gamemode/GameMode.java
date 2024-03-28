@@ -6,7 +6,6 @@ import de.pewpewproject.lasertag.common.types.ScoreHolding;
 import de.pewpewproject.lasertag.common.types.Tuple;
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.IServerLasertagManager;
-import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.SettingsState;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
 import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;
@@ -70,25 +69,6 @@ public abstract class GameMode {
      * @return List containing tuples of the overwritten setting description and the value
      */
     public abstract List<Tuple<SettingDescription, Object>> getOverwrittenSettings();
-
-    /**
-     * Creates a settings map containing the default setting values for this game mode.
-     *
-     * @return The default settings map
-     */
-    public final SettingsState createDefaultSettings() {
-
-        // Get the base settings
-        var baseSettings = SettingsState.createBaseSettings();
-
-        // Get the overwritten settings
-        var overwrittenSettings = getOverwrittenSettings();
-
-        // Overwrite the settings
-        overwrittenSettings.forEach(svt -> baseSettings.put(svt.x().getName(), svt.y()));
-
-        return baseSettings;
-    }
 
     /**
      * Gets the settings which have an effect in this game mode.

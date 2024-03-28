@@ -27,53 +27,57 @@ public class SettingsManager implements ISettingsManager {
     @Override
     public <T> T get(SettingDescription setting) {
 
+        var gameModeName = gameModeManager.getGameMode().getTranslatableName();
         var key = setting.getName();
 
         // If key not in settings
-        if (!clientManager.getSyncedState().getSettingsState().containsKey(key)) {
+        if (!clientManager.getSyncedState().getSettingsState().contains(gameModeName, key)) {
             putDefault(key);
         }
 
         // Get value from dictionary
-        return (T) clientManager.getSyncedState().getSettingsState().get(key);
+        return (T) clientManager.getSyncedState().getSettingsState().get(gameModeName, key);
     }
 
     @Override
     public <T extends Enum<T>> T getEnum(SettingDescription setting) {
 
+        var gameModeName = gameModeManager.getGameMode().getTranslatableName();
         var key = setting.getName();
 
         // If key not in settings
-        if (!clientManager.getSyncedState().getSettingsState().containsKey(key)) {
+        if (!clientManager.getSyncedState().getSettingsState().contains(gameModeName, key)) {
             putDefault(key);
         }
 
         // Get value from dictionary
-        var value = clientManager.getSyncedState().getSettingsState().get(key);
+        var value = clientManager.getSyncedState().getSettingsState().get(gameModeName, key);
 
         return Enum.valueOf((Class<T>) setting.getDataType().getValueType(), (String)value);
     }
 
     @Override
     public void set(String newSettingsJson) {
-        clientManager.getSyncedState().getSettingsState().clear();
-        clientManager.getSyncedState().getSettingsState().putAll(SettingsState.fromJson(newSettingsJson));
+        clientManager.getSyncedState().getSettingsState().fillWith(SettingsState.fromJson(newSettingsJson));
     }
 
     @Override
     public void set(String settingName, Object newValue) {
-        clientManager.getSyncedState().getSettingsState().put(settingName, newValue);
+        var gameModeName = gameModeManager.getGameMode().getTranslatableName();
+        clientManager.getSyncedState().getSettingsState().set(gameModeName, settingName, newValue);
     }
 
     private void putDefault(String key) {
 
+        var gameModeName = gameModeManager.getGameMode().getTranslatableName();
+
         // Get default settings
-        var defaultSettings = gameModeManager.getGameMode().createDefaultSettings();
+        var defaultSettings = new SettingsState();
 
         // Get the default value
-        var defaultValue = defaultSettings.get(key);
+        var defaultValue = defaultSettings.get(gameModeName, key);
 
         // Put the default value in this settings
-        clientManager.getSyncedState().getSettingsState().put(key, defaultValue);
+        clientManager.getSyncedState().getSettingsState().set(gameModeName, key, defaultValue);
     }
 }
