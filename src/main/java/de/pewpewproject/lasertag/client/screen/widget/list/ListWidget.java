@@ -50,7 +50,7 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
     private final ParentElement parent;
     private final TextRenderer textRenderer;
 
-    private ListColumn<T, R> lastFocusedColumn = null;
+    private Integer lastFocusedColumnIndex = null;
     private R lastFocusedElementId = null;
     private Drawable hoveredCell = null;
     private boolean restoreFocusNecessary = false;
@@ -127,8 +127,6 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
         columnsDefinition.columns().forEach(ListColumn::reset);
         indexOfFirstVisibleItem = 0;
         restoreFocusNecessary = true;
-        lastFocusedColumn = null;
-        lastFocusedElementId = null;
     }
 
     @Override
@@ -188,6 +186,7 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
         double finalMouseY = mouseY;
 
         var result = false;
+        var colIndex = 0;
         for (var column : this.columnsDefinition.columns()) {
 
             for (var drawableEntry : column.getDrawableEntries()) {
@@ -196,16 +195,18 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
                 if (drawableEntry.getValue() instanceof Element element) {
                     if (element.mouseClicked(mouseX, finalMouseY, button)) {
                         parent.setFocused(element);
-                        this.lastFocusedColumn = column;
+                        this.lastFocusedColumnIndex = colIndex;
                         this.lastFocusedElementId = drawableEntry.getKey();
                         result = true;
                     }
                 }
             }
+
+            colIndex++;
         }
 
         if (!result) {
-            this.lastFocusedColumn = null;
+            this.lastFocusedColumnIndex = null;
             this.lastFocusedElementId = null;
         }
 
@@ -403,10 +404,10 @@ public class ListWidget<T, R> extends DrawableHelper implements Drawable, Elemen
     }
 
     private void restoreFocusIfPossible() {
-        if (this.lastFocusedColumn != null) {
+        if (lastFocusedColumnIndex != null) {
 
             // Restore focus
-            var element = (Element) this.lastFocusedColumn.getCellTemplate(this.lastFocusedElementId);
+            var element = (Element) columnsDefinition.columns().get(lastFocusedColumnIndex).getCellTemplate(lastFocusedElementId);
 
             if (element == null) {
                 return;
