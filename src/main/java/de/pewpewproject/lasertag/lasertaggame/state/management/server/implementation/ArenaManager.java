@@ -21,7 +21,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Clearable;
 import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -38,6 +37,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
@@ -48,12 +48,15 @@ import java.util.function.BiConsumer;
  */
 public class ArenaManager implements IArenaManager {
 
+    private static final long UPDATE_FREQUENCY = 200;
+
     private final MinecraftServer server;
     private final ISpawnpointManager spawnpointManager;
     private final IPlayerNamesState playerNamesState;
     private final IBlockTickManager blockTickManager;
 
     private boolean isLoading = false;
+    private long lastStatusUpdateTime = 0;
 
     private CompletableFuture<Void> arenaGenerationFuture;
 
@@ -122,7 +125,7 @@ public class ArenaManager implements IArenaManager {
             return false;
         }
 
-        loadArenaInner(arenaChunkGenerator, newArenaType, newProceduralArenaType, sendPlayersToOrigin);
+        Executors.newSingleThreadExecutor().execute(() -> loadArenaInner(arenaChunkGenerator, newArenaType, newProceduralArenaType, sendPlayersToOrigin));
 
         return true;
     }
@@ -136,16 +139,8 @@ public class ArenaManager implements IArenaManager {
         arenaGenerationFuture = CompletableFuture.completedFuture(null);
 
         // Show loading screen
-        this.sendMapLoadProgressEvent("Starting the generation of the arena", 0);
+        this.sendMapLoadProgressEvent("Starting the generation of the arena", 0, false);
         this.isLoading = true;
-
-        // Can be called on the relieveExecutor to relieve the server thread
-        Runnable relieveAction = () -> {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ignored) {
-            }
-        };
 
         // Create old arena template
         var oldArenaType = arenaChunkGenerator.getConfig().getType();
@@ -173,9 +168,6 @@ public class ArenaManager implements IArenaManager {
         // Remove all entities except the players
         arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(this::removeEntities, server);
 
-        // Relieve The server thread by waiting
-        arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(relieveAction);
-
         // Set new arena chunk generator config
         var newSeed = new Random().nextLong();
         arenaChunkGenerator.setConfig(new ArenaChunkGeneratorConfig(newArenaType.ordinal(), newProceduralArenaType.ordinal(), newSeed));
@@ -183,7 +175,7 @@ public class ArenaManager implements IArenaManager {
 
         // Generate new arena
         var newArenaBounds = this.calculateBounds(newArenaTemplate);
-        generateArena(arenaChunkGenerator, newArenaBounds, relieveAction);
+        generateArena(arenaChunkGenerator, newArenaBounds);
 
         // Set biomes
         arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(() -> this.setBiomes(newArenaBounds, arenaChunkGenerator), server);
@@ -205,7 +197,7 @@ public class ArenaManager implements IArenaManager {
             LasertagMod.LOGGER.info(String.format(Locale.ROOT, "Arena loaded. This took %d ms for %d chunks, or %02f ms per chunk", blockPlaceDuration, updateBounds.numChunks(), (float) blockPlaceDuration / (float) updateBounds.numChunks()));
 
             // Stop loading
-            this.sendMapLoadProgressEvent("", -1.0);
+            this.sendMapLoadProgressEvent("", -1.0, false);
             this.isLoading = false;
         }, server);
     }
@@ -254,7 +246,7 @@ public class ArenaManager implements IArenaManager {
 
         // Init progress variables
         var currentStepString = "Removing blocks from old arena";
-        this.sendMapLoadProgressEvent(currentStepString, 0.0);
+        this.sendMapLoadProgressEvent(currentStepString, 0.0, true);
         var removeBlocksChunkIndex = new AtomicInteger(0);
 
         // Remove all blocks of the old arena
@@ -293,10 +285,6 @@ public class ArenaManager implements IArenaManager {
                     continue;
                 }
 
-                // Clear block entity
-                var blockEntity = serverWorld.getBlockEntity(blockPos);
-                Clearable.clear(blockEntity);
-
                 // Set block to air. Block.FORCE_STATE so that no items drop (Flowers, seeds, etc)
                 serverWorld.setBlockState(blockPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
             }
@@ -304,7 +292,7 @@ public class ArenaManager implements IArenaManager {
             worldChunk.clear();
 
             this.sendMapLoadProgressEvent(currentStepString,
-                    (double) (removeBlocksChunkIndex.incrementAndGet()) / (double) oldArenaBounds.numChunks());
+                    (double) (removeBlocksChunkIndex.incrementAndGet()) / (double) oldArenaBounds.numChunks(), true);
         });
     }
 
@@ -324,8 +312,7 @@ public class ArenaManager implements IArenaManager {
      * @param newArenaBounds The bounds of the new arena
      */
     private void generateArena(ChunkGenerator chunkGenerator,
-                               ArenaBoundsDto newArenaBounds,
-                               Runnable relieveAction) {
+                               ArenaBoundsDto newArenaBounds) {
 
         // Get chunk manager
         var serverWorld = server.getOverworld();
@@ -335,13 +322,10 @@ public class ArenaManager implements IArenaManager {
         // Init progress variables
         var currentStepChunkIndex = new AtomicInteger(0);
         var currentStepString = "Generating new arena";
-        this.sendMapLoadProgressEvent(currentStepString, 0.0);
+        this.sendMapLoadProgressEvent(currentStepString, 0.0, true);
 
         // Start time measurement for this step
         var stepStartTime = System.currentTimeMillis();
-
-        // Create counter
-        var indexCounter = new AtomicInteger(0);
 
         // For each chunk
         forEachChunk(newArenaBounds, (chunkX, chunkZ) -> {
@@ -371,18 +355,8 @@ public class ArenaManager implements IArenaManager {
 
                 // Send progress update
                 this.sendMapLoadProgressEvent(currentStepString,
-                        (double) currentStepChunkIndex.incrementAndGet() / (double) newArenaBounds.numChunks());
+                        (double) currentStepChunkIndex.incrementAndGet() / (double) newArenaBounds.numChunks(), true);
             }, server);
-
-            // If this was the 50th Chunk
-            if (indexCounter.incrementAndGet() >= 50) {
-
-                // Reset the counter
-                indexCounter.set(0);
-
-                // Relieve the server
-                arenaGenerationFuture = arenaGenerationFuture.thenRunAsync(relieveAction);
-            }
         });
 
         // Final logging
@@ -399,7 +373,7 @@ public class ArenaManager implements IArenaManager {
 
         // Init progress variables
         var currentStepString = "Setting biomes";
-        this.sendMapLoadProgressEvent(currentStepString, 0.0);
+        this.sendMapLoadProgressEvent(currentStepString, 0.0, true);
         var markUpdateChunkIndex = new AtomicInteger(0);
 
         // Get chunk manager
@@ -431,7 +405,7 @@ public class ArenaManager implements IArenaManager {
             }
 
             this.sendMapLoadProgressEvent(currentStepString,
-                    (double) (markUpdateChunkIndex.incrementAndGet()) / (double) newArenaBounds.numChunks());
+                    (double) (markUpdateChunkIndex.incrementAndGet()) / (double) newArenaBounds.numChunks(), true);
         });
     }
 
@@ -483,7 +457,21 @@ public class ArenaManager implements IArenaManager {
      * @param stepString String describing what the current step is
      * @param progress   The progress in percent of the current step
      */
-    private void sendMapLoadProgressEvent(String stepString, double progress) {
+    private void sendMapLoadProgressEvent(String stepString, double progress, boolean throttled) {
+
+        if (throttled) {
+
+            // Get the current time
+            var currTime = System.currentTimeMillis();
+
+            if (currTime - lastStatusUpdateTime < UPDATE_FREQUENCY) {
+                return;
+            }
+
+            lastStatusUpdateTime = currTime;
+        }
+
+        LasertagMod.LOGGER.info("Progress '{}': {}", stepString, progress);
 
         // Create packet buffer
         var buf = new PacketByteBuf(Unpooled.buffer());

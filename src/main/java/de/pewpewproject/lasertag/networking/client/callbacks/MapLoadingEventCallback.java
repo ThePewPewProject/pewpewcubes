@@ -36,6 +36,11 @@ public class MapLoadingEventCallback implements ClientPlayNetworking.PlayChannel
             }
 
             if (oldProgress >= 0 && newProgress == -1) {
+
+                if (client.currentScreen instanceof LasertagLoadingScreen loadingScreen) {
+                    loadingScreen.stopSpinner();
+                }
+
                 client.execute(() -> client.setScreen(null));
             }
         } catch (Exception ex) {
