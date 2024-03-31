@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ThreadUtil {
     /**
-     * Correctly shuts down a executor service with timeout = 3 seconds
+     * Correctly shuts down an executor service with timeout = 3 seconds
      * <p>
      * ALWAYS DO THIS AS THE LAST OPERATION! This method blocks for 3 seconds!
      * Do everything you need to do before calling this method!
@@ -25,7 +25,7 @@ public class ThreadUtil {
     }
 
     /**
-     * Correctly shuts down a executor service
+     * Correctly shuts down an executor service
      * <p>
      * ALWAYS DO THIS AS THE LAST OPERATION! This method blocks for <code>timeout</code> seconds!
      * Do everything you need to do before calling this method!
@@ -54,5 +54,18 @@ public class ThreadUtil {
      */
     public static ScheduledExecutorService createScheduledExecutor(String format) {
         return Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat(format).setDaemon(true).build());
+    }
+
+    /**
+     * Create a new thread pool with the given format as the name specifier for the threads
+     * and the number of available processors as the size of the thread pool.
+     *
+     * @param format The name format for the created threads
+     * @return The created executor service
+     */
+    public static ExecutorService createThreadPool(String format) {
+        return Executors.newFixedThreadPool(
+                Runtime.getRuntime().availableProcessors(),
+                new ThreadFactoryBuilder().setNameFormat(format).setDaemon(true).build());
     }
 }

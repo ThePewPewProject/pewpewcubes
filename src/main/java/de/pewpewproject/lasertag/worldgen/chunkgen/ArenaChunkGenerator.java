@@ -21,6 +21,7 @@ import net.minecraft.world.biome.SpawnSettings;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.biome.source.FixedBiomeSource;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.Blender;
@@ -69,7 +70,7 @@ public class ArenaChunkGenerator extends ChunkGenerator {
         var type = config.getType();
 
         // Place the arena
-        type.arenaPlacer.placeArenaChunkSegment(template, chunk, world);
+        type.arenaPlacer.placeArenaChunkSegment(template, chunk, world, true);
     }
 
     public ArenaChunkGeneratorConfig getConfig() {
@@ -148,5 +149,9 @@ public class ArenaChunkGenerator extends ChunkGenerator {
         this.config = newConfig;
         this.biomeSource = new FixedBiomeSource(biomeRegistry.getOrCreateEntry(config.getType().biome));
         this.template = TemplateRegistry.getTemplate(config.getType(), config.getProceduralType(), config.getSeed());
+    }
+
+    public ArenaTemplate getTemplate() {
+        return template;
     }
 }

@@ -16,6 +16,7 @@
     "ServerPlayNetworkHandlerMixin",
     "ServerWorldMixin",
     "SlotMixin",
+    "WorldChunkMixin",
     "WorldMixin",
     "WorldPresetsMixin",
     "fastiter.WorldMixin"

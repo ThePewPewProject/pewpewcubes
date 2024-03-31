@@ -10,6 +10,7 @@ accessible method net/minecraft/client/gui/screen/world/CreateWorldScreen <init>
 accessible method net/minecraft/client/gui/screen/world/CreateWorldScreen addDrawableChild (Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;
 accessible method net/minecraft/server/world/ThreadedAnvilChunkStorage sendChunkDataPackets (Lnet/minecraft/server/network/ServerPlayerEntity;Lorg/apache/commons/lang3/mutable/MutableObject;Lnet/minecraft/world/chunk/WorldChunk;)V
 accessible method net/minecraft/server/dedicated/DedicatedServerWatchdog shutdown ()V
+accessible method net/minecraft/world/chunk/WorldChunk updateTicker (Lnet/minecraft/block/entity/BlockEntity;)V
 
 # Fields
 accessible field net/minecraft/entity/Entity dimensions Lnet/minecraft/entity/EntityDimensions;

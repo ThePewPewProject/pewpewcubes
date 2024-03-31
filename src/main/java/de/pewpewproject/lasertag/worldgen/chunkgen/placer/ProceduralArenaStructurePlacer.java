@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.WorldChunk;
 
 /**
  * Helper class to place all blocks of a procedural arena
@@ -21,7 +22,8 @@ public class ProceduralArenaStructurePlacer extends ArenaStructurePlacer {
     @Override
     public void placeArenaChunkSegment(ArenaTemplate template,
                                        Chunk chunk,
-                                       StructureWorldAccess world) {
+                                       StructureWorldAccess world,
+                                       boolean isGenerate) {
 
         // Sanity check
         if (template == null) {
@@ -45,7 +47,7 @@ public class ProceduralArenaStructurePlacer extends ArenaStructurePlacer {
         if (proceduralArenaTemplateArenaTemplate.isLobbyChunk(chunkX, chunkZ)) {
 
             // Place the lobby into the world
-            this.placeLobbyChunkSegment(proceduralArenaTemplateArenaTemplate, chunkBox, world);
+            this.placeLobbyChunkSegment(proceduralArenaTemplateArenaTemplate, chunkBox, world, chunk, isGenerate);
             return;
         }
 
@@ -55,19 +57,23 @@ public class ProceduralArenaStructurePlacer extends ArenaStructurePlacer {
         }
 
         // Place the arena into the world
-        this.placeArenaChunkSegment(proceduralArenaTemplateArenaTemplate, chunkX, chunkZ, chunkBox, world);
+        this.placeArenaChunkSegment(proceduralArenaTemplateArenaTemplate, chunkX, chunkZ, chunkBox, world, chunk, isGenerate);
     }
 
     @Override
-    public void spawnEntitiesOfArena(ArenaTemplate template, ChunkRegion chunkRegion) {
+    public void spawnEntitiesOfArena(ArenaTemplate template, StructureWorldAccess chunkRegion) {
         // No entities to spawn
     }
 
-    private void placeLobbyChunkSegment(ProceduralArenaTemplate proceduralArenaTemplate, BlockBox chunkBox, StructureWorldAccess world) {
+    private void placeLobbyChunkSegment(ProceduralArenaTemplate proceduralArenaTemplate,
+                                        BlockBox chunkBox,
+                                        StructureWorldAccess world,
+                                        Chunk chunk,
+                                        boolean isGenerate) {
 
         var lobbyTemplate = proceduralArenaTemplate.getLobbyTemplate();
 
-        this.placeArenaChunkSegment(lobbyTemplate, chunkBox, world);
+        this.placeArenaChunkSegment(lobbyTemplate, chunkBox, world, chunk, isGenerate);
 
     }
 
@@ -75,13 +81,15 @@ public class ProceduralArenaStructurePlacer extends ArenaStructurePlacer {
                                         int chunkX,
                                         int chunkZ,
                                         BlockBox chunkBox,
-                                        StructureWorldAccess world) {
+                                        StructureWorldAccess world,
+                                        Chunk chunk,
+                                        boolean isGenerate) {
 
         var proceduralArenaType = proceduralArenaTemplate.getProceduralArenaType();
 
         // Build shell
         var shellTemplate = proceduralArenaTemplate.getShellTemplate();
-        this.placeArenaChunkSegment(shellTemplate, chunkBox, world);
+        this.placeArenaChunkSegment(shellTemplate, chunkBox, world, chunk, isGenerate);
 
         // Check if is arena or just shell
         if (!proceduralArenaTemplate.isArenaChunkWithoutShell(chunkX, chunkZ)) {
@@ -92,7 +100,7 @@ public class ProceduralArenaStructurePlacer extends ArenaStructurePlacer {
         var arenaChunkZ = chunkZ - proceduralArenaTemplate.getArenaMinChunkZ() - 1;
         var segmentId = this.getSegmentId(proceduralArenaType, arenaChunkX, arenaChunkZ);
         var arenaSegmentTemplate = proceduralArenaTemplate.getRandomTemplate(segmentId);
-        this.placeArenaChunkSegment(arenaSegmentTemplate, chunkBox, world);
+        this.placeArenaChunkSegment(arenaSegmentTemplate, chunkBox, world, chunk, isGenerate);
     }
 
     private int getSegmentId(ProceduralArenaType proceduralArenaType, int chunkX, int chunkZ) {

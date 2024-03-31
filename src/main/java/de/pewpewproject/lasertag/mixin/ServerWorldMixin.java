@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.function.BooleanSupplier;
+
 /**
  * Mixin into the ServerWorld.class to save the server lasertag manager
  *
@@ -74,5 +76,13 @@ public abstract class ServerWorldMixin implements IServerLasertagManagerAccessor
     @Override
     public IServerLasertagManager getServerLasertagManager() {
         return serverLasertagManager;
+    }
+
+    @Inject(method = "tick(Ljava/util/function/BooleanSupplier;)V", at = @At("HEAD"), cancellable = true)
+    public void disableTickDuringArenaLoad(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+
+        if (serverLasertagManager.getArenaManager().isLoading()) {
+            ci.cancel();
+        }
     }
 }

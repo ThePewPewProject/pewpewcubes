@@ -49,7 +49,10 @@
         "de/pewpewproject/lasertag/client/screen/ILasertagTeamZoneGeneratorScreenOpener"
       ],
       "net/minecraft/world/World": [
-        "de/pewpewproject/lasertag/common/util/fastiter/IFastWorldIter"
+        "de/pewpewproject/lasertag/common/util/IFastWorld"
+      ],
+      "net/minecraft/world/chunk/WorldChunk": [
+        "de/pewpewproject/lasertag/common/util/IFastChunk"
       ],
       "net/minecraft/client/world/ClientWorld": [
         "de/pewpewproject/lasertag/lasertaggame/state/management/client/IClientLasertagManagerAccessor"
