@@ -26,6 +26,12 @@ public class ClientTriggerReloadTeamConfigCallback implements ServerPlayNetworki
             var teamsManager = gameManager.getTeamsManager();
             var playerNamesState = gameManager.getSyncedState().getPlayerNamesState();
 
+            // If a game is running
+            if (gameManager.isGameRunning()) {
+                // Cannot reload team config in-game
+                return;
+            }
+
             server.execute(() -> {
 
                 var world = server.getOverworld();

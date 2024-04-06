@@ -25,6 +25,12 @@ public class ClientTriggerPlayerJoinTeamCallback implements ServerPlayNetworking
             var syncedState = gameManager.getSyncedState();
             var teamsConfigState = syncedState.getTeamsConfigState();
 
+            // If a game is running
+            if (gameManager.isGameRunning()) {
+                // Cannot change teams in-game
+                return;
+            }
+
             // Read team id
             var teamId = buf.readInt();
 

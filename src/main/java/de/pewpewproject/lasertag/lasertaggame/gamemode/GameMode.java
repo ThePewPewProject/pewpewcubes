@@ -6,7 +6,6 @@ import de.pewpewproject.lasertag.common.types.ScoreHolding;
 import de.pewpewproject.lasertag.common.types.Tuple;
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.IServerLasertagManager;
-import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.SettingsState;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
 import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;
@@ -72,25 +71,6 @@ public abstract class GameMode {
     public abstract List<Tuple<SettingDescription, Object>> getOverwrittenSettings();
 
     /**
-     * Creates a settings map containing the default setting values for this game mode.
-     *
-     * @return The default settings map
-     */
-    public final SettingsState createDefaultSettings() {
-
-        // Get the base settings
-        var baseSettings = SettingsState.createBaseSettings();
-
-        // Get the overwritten settings
-        var overwrittenSettings = getOverwrittenSettings();
-
-        // Overwrite the settings
-        overwrittenSettings.forEach(svt -> baseSettings.put(svt.x().getName(), svt.y()));
-
-        return baseSettings;
-    }
-
-    /**
      * Gets the settings which have an effect in this game mode.
      * The default implementation returns the settings that are used by all game modes.
      * <br>
@@ -104,6 +84,8 @@ public abstract class GameMode {
         list.add(SettingDescription.WEAPON_COOLDOWN);
         list.add(SettingDescription.WEAPON_REACH);
         list.add(SettingDescription.WEAPON_ZOOM);
+        list.add(SettingDescription.FRIENDLY_FIRE_ENABLED);
+        list.add(SettingDescription.RELOAD_ARENAS_BEFORE_GAME);
         list.add(SettingDescription.SHOW_LASER_RAYS);
         list.add(SettingDescription.MAX_TEAM_SIZE);
         list.add(SettingDescription.RENDER_TEAM_LIST);

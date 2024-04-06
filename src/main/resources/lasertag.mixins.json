@@ -7,6 +7,7 @@
     "BedBlockMixin",
     "IStructureTemplateAccessor",
     "ItemStackMixin",
+    "LivingEntityMixin",
     "MinecraftServerMixin",
     "PlayerEntityMixin",
     "PlayerInventoryMixin",

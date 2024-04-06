@@ -11,6 +11,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.word;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -23,7 +24,7 @@ import static net.minecraft.server.command.CommandManager.literal;
  */
 public class JoinLasertagTeamCommand extends ServerFeedbackCommand {
     @Override
-    protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+    protected CompletableFuture<Optional<CommandFeedback>> execute(CommandContext<ServerCommandSource> context) {
 
         // Get the game managers
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
@@ -31,11 +32,14 @@ public class JoinLasertagTeamCommand extends ServerFeedbackCommand {
         var syncedState = gameManager.getSyncedState();
         var teamsConfigState = syncedState.getTeamsConfigState();
 
+        // If a game is running
+        if (gameManager.isGameRunning()) {
+            // Cannot change teams in-game
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Cannot change teams while a game is running").formatted(Formatting.RED), true, false)));
+        }
+
         // Get the team
         var teamName = StringArgumentType.getString(context, "team");
-
-        // Get the server
-        var server = context.getSource().getServer();
 
         // Get executing player
         var player = context.getSource().getPlayer();
@@ -45,7 +49,7 @@ public class JoinLasertagTeamCommand extends ServerFeedbackCommand {
 
         // If team was not found
         if (teamDto.isEmpty()) {
-            return Optional.of(new CommandFeedback(Text.literal("That team does not exist.").formatted(Formatting.RED), false, false));
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("That team does not exist.").formatted(Formatting.RED), false, false)));
         }
 
         // Join team
@@ -53,11 +57,11 @@ public class JoinLasertagTeamCommand extends ServerFeedbackCommand {
 
         // If join did not succeed
         if (!joinSucceeded) {
-            return Optional.of(new CommandFeedback(Text.literal("That team is already full.").formatted(Formatting.RED), false, false));
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("That team is already full.").formatted(Formatting.RED), false, false)));
         }
 
         // Return feedback
-        return Optional.of(new CommandFeedback(Text.literal("You joined team " + teamName), true, false));
+        return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("You joined team " + teamName), true, false)));
     }
 
     static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {

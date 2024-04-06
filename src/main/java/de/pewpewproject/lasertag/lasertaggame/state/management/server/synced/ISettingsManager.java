@@ -1,6 +1,7 @@
 package de.pewpewproject.lasertag.lasertaggame.state.management.server.synced;
 
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
+import de.pewpewproject.lasertag.lasertaggame.state.server.implementation.SettingsPreset;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.SettingsState;
 
 /**
@@ -37,6 +38,13 @@ public interface ISettingsManager {
     void set(String key, Object value);
 
     /**
+     * Load a given preset
+     *
+     * @param preset The preset to load
+     */
+    void set(SettingsPreset preset);
+
+    /**
      * Set all settings
      *
      * @param newSettings The new settings
@@ -54,16 +62,4 @@ public interface ISettingsManager {
      * @param settingName The name of the setting
      */
     void reset(String settingName);
-
-    /**
-     * Overwrite the settings which are overwritten by the currently selected game mode
-     */
-    void overwriteGameModeSettings();
-
-    /**
-     * Clone the current settings state
-     *
-     * @return The cloned settings
-     */
-    SettingsState cloneSettings();
 }

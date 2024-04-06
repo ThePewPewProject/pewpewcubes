@@ -8,6 +8,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Abstract base class for all ServerCommands.
@@ -19,30 +20,32 @@ public abstract class ServerFeedbackCommand implements Command<ServerCommandSour
     /**
      * Exectues the command and gets the response message.
      * @param context The command context
-     * @return Optional of the command feedback. If this is present, then this text will be printed.
+     * @return Completable future returning an optional of the command feedback.
+     * If this is present, then this text will be printed.
      */
-    protected abstract Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context);
+    protected abstract CompletableFuture<Optional<CommandFeedback>> execute(CommandContext<ServerCommandSource> context);
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) {
 
         try {
             // Execute command and get response
-            var response = execute(context);
+            execute(context).thenAcceptAsync(response -> {
 
-            // If response is present
-            response.ifPresent(feedback -> {
-                // Get the command source
-                var source = context.getSource();
+                // If response is present
+                response.ifPresent(feedback -> {
+                    // Get the command source
+                    var source = context.getSource();
 
-                // If should broadcast
-                if (feedback.broadcast()) {
-                    // Send broadcast
-                    source.getServer().getPlayerManager().broadcast(feedback.text(), feedback.overlay());
-                } else {
-                    // Send response to player
-                    source.getPlayer().sendMessage(feedback.text(), feedback.overlay());
-                }
+                    // If should broadcast
+                    if (feedback.broadcast()) {
+                        // Send broadcast
+                        source.getServer().getPlayerManager().broadcast(feedback.text(), feedback.overlay());
+                    } else {
+                        // Send response to player
+                        source.getPlayer().sendMessage(feedback.text(), feedback.overlay());
+                    }
+                });
             });
         } // Rethrow command syntax exception
         catch (Exception e) {

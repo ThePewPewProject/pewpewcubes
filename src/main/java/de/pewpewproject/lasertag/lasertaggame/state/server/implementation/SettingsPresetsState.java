@@ -3,7 +3,6 @@ package de.pewpewproject.lasertag.lasertaggame.state.server.implementation;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.ToNumberPolicy;
-import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.SettingsState;
 
 import java.util.HashMap;
 
@@ -12,14 +11,11 @@ import java.util.HashMap;
  *
  * @author Étienne Muser
  */
-public class SettingsPresetsState extends HashMap<String, SettingsState> {
+public class SettingsPresetsState extends HashMap<String, SettingsPreset> {
 
     public static SettingsPresetsState createNewPresetsMap() {
 
         var presetsMap = new SettingsPresetsState();
-
-        // Put default presets
-        presetsMap.put("default", SettingsState.createBaseSettings());
 
         return presetsMap;
     }
@@ -31,5 +27,7 @@ public class SettingsPresetsState extends HashMap<String, SettingsState> {
                 .fromJson(json, SettingsPresetsState.class);
     }
 
-    public String toJson() { return new Gson().toJson(this); }
+    public String toJson() {
+        return new Gson().toJson(this);
+    }
 }

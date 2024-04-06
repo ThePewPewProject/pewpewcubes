@@ -24,6 +24,12 @@ public class ClientTriggerGameModeChangeCallback implements ServerPlayNetworking
             var gameManager = server.getOverworld().getServerLasertagManager();
             var gameModeManager = gameManager.getGameModeManager();
 
+            // If a game is running
+            if (gameManager.isGameRunning()) {
+                // Cannot change game mode in-game
+                return;
+            }
+
             // Get the game mode translatable name
             var newGameModeTranslatableName = buf.readString();
 

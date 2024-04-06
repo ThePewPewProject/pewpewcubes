@@ -90,6 +90,7 @@
 	"gui.save": "Save",
 	"gui.delete": "Delete",
 	"gui.kick": "Kick",
+	"gui.search": "Search",
 
 	"gui.list_widget.empty": "No data",
 
@@ -101,8 +102,8 @@
 	"gui.game_manager.settings.presets_screen_title": "Lasertag Settings Presets",
 	"gui.game_manager.settings.presets.name": "Preset name",
 	"gui.game_manager.settings.presets.save": "Save preset",
-	"gui.game_manager.settings.group_header.overwritten": "Overwritten by game mode",
-	"gui.game_manager.settings.group_header.other": "Other",
+	"gui.game_manager.settings.group_header.general": "General",
+	"gui.game_manager.settings.group_header.game_mode_specific": "Game mode specific",
 
 	"gui.game_manager.settings.autoOpenStatsFile": "Automatically open game statistics",
 	"gui.game_manager.settings.deathPenalty": "Death penalty",
@@ -124,6 +125,8 @@
 	"gui.game_manager.settings.weaponCooldown": "Weapon cooldown",
 	"gui.game_manager.settings.weaponReach": "Weapon reach",
 	"gui.game_manager.settings.weaponZoom": "Weapon zoom factor",
+	"gui.game_manager.settings.reloadArenasBeforeGame": "Reload arenas before game",
+	"gui.game_manager.settings.friendlyFireEnabled": "Friendly fire enabled",
 	"gui.game_manager.settings.laserDamage": "Laser damage",
 	"gui.game_manager.settings.lasertargetHeal": "Lasertarget heal",
 	"gui.game_manager.settings.playerResetHeal": "Player reset heal",
@@ -158,6 +161,8 @@
 	"gui.game_manager.settings.weaponCooldown.description": "Determines how fast your weapons fire.\nA smaller cooldown means your weapons fire faster.",
 	"gui.game_manager.settings.weaponReach.description": "The reach of your weapons.\nYou won't be able to hit stuff outside that range.",
 	"gui.game_manager.settings.weaponZoom.description": "How much you are able to zoom in with your weapon.\nYou can zoom while holding your weapon by holding down the V key on your keyboard. The keybinding can be configured in your client's settings.",
+	"gui.game_manager.settings.reloadArenasBeforeGame.description": "If enabled, the arena will regenerate before each game.\nKEEP IN MIND THAT REGENERATING THE ARENA MIGHT TAKE A WHILE.",
+	"gui.game_manager.settings.friendlyFireEnabled.description": "If enabled, you will be able to hit your teammates.",
 	"gui.game_manager.settings.laserDamage.description": "How much damage being hit by another player does.",
 	"gui.game_manager.settings.lasertargetHeal.description": "How much health you regenerate by hitting a lasertarget.",
 	"gui.game_manager.settings.playerResetHeal.description": "How much health you regenerate by resetting another player.",

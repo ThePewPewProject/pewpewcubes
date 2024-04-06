@@ -20,24 +20,14 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 /**
- * Command to kick a player out of his team
+ * Command to grant a player the ability to start a game
  *
  * @author Étienne Muser
  */
-public class KickPlayerCommand extends ServerFeedbackCommand {
+public class PermitGameStartCommand extends ServerFeedbackCommand {
 
     @Override
     protected CompletableFuture<Optional<CommandFeedback>> execute(CommandContext<ServerCommandSource> context) {
-
-        // Get the game managers
-        var gameManager = context.getSource().getWorld().getServerLasertagManager();
-        var teamsManager = gameManager.getTeamsManager();
-
-        // If a game is running
-        if (gameManager.isGameRunning()) {
-            // Cannot change teams in-game
-            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Cannot change teams while a game is running").formatted(Formatting.RED), true, false)));
-        }
 
         Collection<ServerPlayerEntity> players;
         try {
@@ -46,24 +36,28 @@ public class KickPlayerCommand extends ServerFeedbackCommand {
             return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Invalid players").formatted(Formatting.RED), false, false)));
         }
 
-        for (var player : players) {
-            teamsManager.playerLeaveHisTeam(player);
+        // Get the server
+        var server = context.getSource().getServer();
 
-            player.getInventory().clear();
-        }
+        // Get the game managers
+        var gameManager = context.getSource().getWorld().getServerLasertagManager();
+        var startGamePermissionManager = gameManager.getStartGamePermissionManager();
 
-        // Send successful feedback
-        if (players.size() > 1) {
-            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Successfully kicked players from their teams."), false, true)));
-        } else {
-            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Successfully kicked player from his team."), false, true)));
-        }
+        // Get the servers player manager
+        var playerManager = server.getPlayerManager();
+
+        players.forEach(p -> {
+            startGamePermissionManager.setStartGamePermitted(p);
+            playerManager.sendCommandTree(p);
+        });
+
+        return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Players permitted."), false, false)));
     }
 
     static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {
-        lab.then(literal("kickPlayer")
-                .requires(s -> s.hasPermissionLevel(1))
+        lab.then(literal("permitGameStart")
+                .requires(s -> s.hasPermissionLevel(4))
                 .then(argument("players", players())
-                        .executes(new KickPlayerCommand())));
+                        .executes(new PermitGameStartCommand())));
     }
 }

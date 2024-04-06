@@ -5,8 +5,11 @@ import com.mojang.brigadier.context.CommandContext;
 import de.pewpewproject.lasertag.command.CommandFeedback;
 import de.pewpewproject.lasertag.command.ServerFeedbackCommand;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -18,7 +21,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class ResetTeamConfigCommand extends ServerFeedbackCommand {
 
     @Override
-    protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+    protected CompletableFuture<Optional<CommandFeedback>> execute(CommandContext<ServerCommandSource> context) {
 
         // Get the game managers
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
@@ -26,6 +29,12 @@ public class ResetTeamConfigCommand extends ServerFeedbackCommand {
         var playerNamesState = gameManager.getSyncedState().getPlayerNamesState();
         var syncedState = gameManager.getSyncedState();
         var teamsConfigState = syncedState.getTeamsConfigState();
+
+        // If a game is running
+        if (gameManager.isGameRunning()) {
+            // Cannot reset teams config in-game
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Cannot reset team config while a game is running").formatted(Formatting.RED), true, false)));
+        }
 
         var world = context.getSource().getWorld();
 
@@ -39,7 +48,7 @@ public class ResetTeamConfigCommand extends ServerFeedbackCommand {
 
         teamsConfigState.reset();
 
-        return Optional.empty();
+        return CompletableFuture.completedFuture(Optional.empty());
     }
 
     static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {

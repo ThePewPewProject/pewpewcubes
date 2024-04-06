@@ -6,8 +6,10 @@ import de.pewpewproject.lasertag.command.CommandFeedback;
 import de.pewpewproject.lasertag.command.ServerFeedbackCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -17,14 +19,17 @@ import static net.minecraft.server.command.CommandManager.literal;
  * @author Étienne Muser
  */
 public class LeaveLasertagTeamCommand extends ServerFeedbackCommand {
-    protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+    protected CompletableFuture<Optional<CommandFeedback>> execute(CommandContext<ServerCommandSource> context) {
 
         // Get the game managers
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
         var teamsManager = gameManager.getTeamsManager();
 
-        // Get the server
-        var server = context.getSource().getServer();
+        // If a game is running
+        if (gameManager.isGameRunning()) {
+            // Cannot change teams in-game
+            return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("Cannot change teams while a game is running").formatted(Formatting.RED), true, false)));
+        }
 
         // Get executing player
         var player = context.getSource().getPlayer();
@@ -36,7 +41,7 @@ public class LeaveLasertagTeamCommand extends ServerFeedbackCommand {
         player.getInventory().clear();
 
         // Notify player in chat
-        return Optional.of(new CommandFeedback(Text.literal("You left your team"), true, false));
+        return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal("You left your team"), true, false)));
     }
 
     static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {

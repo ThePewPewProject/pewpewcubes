@@ -54,10 +54,21 @@ public abstract class DamageBasedGameMode extends GameMode {
         var gameManager = server.getOverworld().getServerLasertagManager();
         var settingsManager = gameManager.getSettingsManager();
 
+        // Get the heal amount
         long healAmount = settingsManager.get(SettingDescription.LASERTARGET_HEAL);
 
-        // Regenerate health
-        shooter.heal(healAmount);
+        // If the heal amount is positive
+        if (healAmount > 0) {
+
+            // Regenerate health
+            shooter.heal(healAmount);
+        } else if (healAmount < 0) {
+
+            // Else if the heal amount is negative
+
+            // Damage the shooter
+            shooter.damage(DamageSources.LASER, -healAmount);
+        }
 
         super.onPlayerHitLasertarget(server, shooter, target);
     }
@@ -69,13 +80,15 @@ public abstract class DamageBasedGameMode extends GameMode {
         var gameManager = server.getOverworld().getServerLasertagManager();
         var teamsManager = gameManager.getTeamsManager();
         var activationManager = gameManager.getActivationManager();
+        var settingsManager = gameManager.getSettingsManager();
 
         // Get the teams of shooter and target
         var shooterTeam = teamsManager.getTeamOfPlayer(shooter.getUuid());
         var targetTeam = teamsManager.getTeamOfPlayer(target.getUuid());
 
         // Check that hit player is not in same team as firing player
-        if (shooterTeam.equals(targetTeam)) {
+        if (!settingsManager.<Boolean>get(SettingDescription.FRIENDLY_FIRE_ENABLED) &&
+                shooterTeam.equals(targetTeam)) {
             return;
         }
 
@@ -87,8 +100,18 @@ public abstract class DamageBasedGameMode extends GameMode {
         // Get the damage amount
         long damageAmount = gameManager.getSettingsManager().get(SettingDescription.LASER_RAY_DAMAGE);
 
-        // Damage the target
-        target.damage(DamageSources.laser(shooter), damageAmount);
+        // If the damage amount is positive
+        if (damageAmount > 0) {
+
+            // Damage the target
+            target.damage(DamageSources.laser(shooter), damageAmount);
+        } else if (damageAmount < 0) {
+
+            // Else if the damage amount is negative
+
+            // Heal the target
+            target.heal(-damageAmount);
+        }
 
         super.onPlayerHitPlayer(server, shooter, target);
     }
@@ -100,16 +123,36 @@ public abstract class DamageBasedGameMode extends GameMode {
         var gameManager = server.getOverworld().getServerLasertagManager();
         var settingsManager = gameManager.getSettingsManager();
 
-        // If the player got damaged by laser
-        if (source.name.equals("laser")) {
+        // If the player didn't get damaged by laser
+        if (!source.name.equals("laser")) {
 
-            // Get the shooter
-            var shooter = (ServerPlayerEntity)source.getAttacker();
+            return;
+        }
+        // Get the shooter
+        var shooter = (ServerPlayerEntity) source.getAttacker();
+
+        // If there was no shooter
+        if (shooter == null) {
+
+            return;
+        }
+
+        // Get the heal amount
+        long healAmount = settingsManager.get(SettingDescription.PLAYER_RESET_HEAL);
+
+        // If the heal amount is positive
+        if (healAmount > 0) {
 
             // Heal the shooter
-            long healAmount = settingsManager.get(SettingDescription.PLAYER_RESET_HEAL);
             shooter.heal(healAmount);
+        } else if (healAmount < 0) {
+
+            // Else if the heal amount is negative
+
+            // Damage the shooter
+            shooter.damage(DamageSources.LASER, -healAmount);
         }
+
     }
 
     @Override

@@ -29,6 +29,8 @@ public class LasertagCommand {
         LasertagSettingsPresetCommand.register(cmd);
         LoadMapCommand.register(cmd);
         LasertagGameModeCommand.register(cmd);
+        PermitGameStartCommand.register(cmd);
+        DenyGameStartCommand.register(cmd);
 
         dispatcher.register(cmd);
     }

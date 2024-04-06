@@ -174,8 +174,12 @@ public class EliminationGameMode extends DamageBasedGameMode {
             // Get the shooter
             var shooter = (ServerPlayerEntity) source.getAttacker();
 
-            // Get the shooters uuid
-            shooterUuid = shooter.getUuid();
+            // If there was a shooter
+            if (shooter != null) {
+
+                // Get the shooters uuid
+                shooterUuid = shooter.getUuid();
+            }
         }
         // Get the game managers
         var gameManager = server.getOverworld().getServerLasertagManager();
@@ -238,7 +242,15 @@ public class EliminationGameMode extends DamageBasedGameMode {
         var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
         var eliminationManager = gameManager.getEliminationManager();
 
-        return eliminationManager.getRemainingTeamIds().get(0);
+        // Get the remaining teams
+        var remainingTeams = eliminationManager.getRemainingTeamIds();
+
+        // If there is no team left
+        if (remainingTeams.isEmpty()) {
+            return -1;
+        }
+
+        return remainingTeams.get(0);
     }
 
     @Override

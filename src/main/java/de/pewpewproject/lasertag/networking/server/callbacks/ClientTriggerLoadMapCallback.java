@@ -28,6 +28,12 @@ public class ClientTriggerLoadMapCallback implements ServerPlayNetworking.PlayCh
             var gameManager = server.getOverworld().getServerLasertagManager();
             var arenaManager = gameManager.getArenaManager();
 
+            // If a game is running
+            if (gameManager.isGameRunning()) {
+                // Cannot change arena in-game
+                return;
+            }
+
             // Get the arena name
             var mapTranslatableName = buf.readString();
 

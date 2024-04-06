@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Interface for a server lasertag manager
@@ -21,9 +22,10 @@ public interface IServerLasertagManager extends ITickable {
      * Start the lasertag game
      *
      * @param scanSpawnpoints Flag to indicate that the spawnpoints should be rescanned
-     * @return Optional containing the reasons the start was aborted. Optional.empty if the start wasn't aborted.
+     * @return Completable future returning an optional containing the reasons the start was aborted.
+     * Optional.empty if the start wasn't aborted.
      */
-    Optional<String> startGame(boolean scanSpawnpoints);
+    CompletableFuture<Optional<String>> startGame(boolean scanSpawnpoints);
 
     /**
      * Stop the running lasertag game
@@ -38,6 +40,13 @@ public interface IServerLasertagManager extends ITickable {
      * @return True if a game is currently running. Otherwise, false.
      */
     boolean isGameRunning();
+
+    /**
+     * Get if the pre game count down is over
+     *
+     * @return True if the pre game count down is over and a game is running. Otherwise, false.
+     */
+    boolean hasPreGamePassed();
 
     /**
      * A player hit another player
@@ -112,4 +121,6 @@ public interface IServerLasertagManager extends ITickable {
     IEliminationManager getEliminationManager();
 
     ILasertargetsManager getLasertargetsManager();
+
+    IStartGamePermissionManager getStartGamePermissionManager();
 }

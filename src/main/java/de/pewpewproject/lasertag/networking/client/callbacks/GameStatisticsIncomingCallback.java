@@ -49,6 +49,9 @@ public class GameStatisticsIncomingCallback implements ClientPlayNetworking.Play
             // If something went wrong
             if (winnerTeamId == -1) {
                 LasertagMod.LOGGER.warn("Something went wrong while deciding what team won.");
+                client.player.sendMessage(Text.literal("Something went wrong while deciding what team won.")
+                        .fillStyle(Style.EMPTY.withColor(Formatting.RED)), false);
+                return;
             }
 
             // Set the winner team id

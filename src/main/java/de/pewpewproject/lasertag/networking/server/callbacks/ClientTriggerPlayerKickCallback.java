@@ -23,6 +23,12 @@ public class ClientTriggerPlayerKickCallback implements ServerPlayNetworking.Pla
             var gameManager = server.getOverworld().getServerLasertagManager();
             var teamsManager = gameManager.getTeamsManager();
 
+            // If a game is running
+            if (gameManager.isGameRunning()) {
+                // Cannot change teams in-game
+                return;
+            }
+
             var playerUuid = buf.readUuid();
 
             teamsManager.playerLeaveHisTeam(playerUuid);

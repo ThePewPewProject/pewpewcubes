@@ -8,6 +8,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -17,13 +18,13 @@ import static net.minecraft.server.command.CommandManager.literal;
  * @author Étienne Muser
  */
 public class LasertagSettingsCommand extends ServerFeedbackCommand {
-    protected Optional<CommandFeedback> execute(CommandContext<ServerCommandSource> context) {
+    protected CompletableFuture<Optional<CommandFeedback>> execute(CommandContext<ServerCommandSource> context) {
 
         // Get the game managers
         var gameManager = context.getSource().getWorld().getServerLasertagManager();
         var settingsManager = gameManager.getSettingsManager();
 
-        return Optional.of(new CommandFeedback(Text.literal(settingsManager.toString()), false, false));
+        return CompletableFuture.completedFuture(Optional.of(new CommandFeedback(Text.literal(settingsManager.toString()), false, false)));
     }
 
     public static void register(LiteralArgumentBuilder<ServerCommandSource> lab) {

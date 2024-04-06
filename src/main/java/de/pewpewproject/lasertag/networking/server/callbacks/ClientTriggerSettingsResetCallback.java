@@ -23,6 +23,12 @@ public class ClientTriggerSettingsResetCallback implements ServerPlayNetworking.
             var gameManager = server.getOverworld().getServerLasertagManager();
             var settingsManager = gameManager.getSettingsManager();
 
+            // If a game is running
+            if (gameManager.isGameRunning()) {
+                // Cannot change settings in-game
+                return;
+            }
+
             settingsManager.reset();
         } catch (Exception ex) {
             LasertagMod.LOGGER.error("Error in ClientTriggerSettingsResetCallback", ex);

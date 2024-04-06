@@ -3,6 +3,7 @@ package de.pewpewproject.lasertag.networking.client.callbacks;
 import de.pewpewproject.lasertag.LasertagMod;
 import de.pewpewproject.lasertag.client.screen.LasertagGameManagerSettingsScreen;
 import de.pewpewproject.lasertag.common.util.ConverterUtil;
+import de.pewpewproject.lasertag.lasertaggame.gamemode.GameModes;
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -24,10 +25,19 @@ public class LasertagSettingChangedCallback implements ClientPlayNetworking.Play
             // Get the game managers
             var gameManager = client.world.getClientLasertagManager();
             var settingsManager = gameManager.getSettingsManager();
+            var gameModeManager = gameManager.getGameModeManager();
 
             // Read from buffer
+            var gameModeName = buf.readString();
             var settingsName = buf.readString();
             var value = buf.readString();
+
+            // If the game mode is desynced (should normally never happen)
+            if (!gameModeManager.getGameMode().getTranslatableName().equals(gameModeName)) {
+
+                // Set the game mode
+                gameModeManager.setGameMode(GameModes.GAME_MODES.get(gameModeName));
+            }
 
             // Get the setting description
             var settingDescription = SettingDescription.byName(settingsName);

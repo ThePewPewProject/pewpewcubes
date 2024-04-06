@@ -1,10 +1,14 @@
 package de.pewpewproject.lasertag.lasertaggame.state.management.server.implementation;
 
 import de.pewpewproject.lasertag.LasertagMod;
+import de.pewpewproject.lasertag.lasertaggame.gamemode.GameModes;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.ISettingsPresetsManager;
+import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.IGameModeManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.ISettingsManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.ISettingsPresetsNameManager;
+import de.pewpewproject.lasertag.lasertaggame.state.server.implementation.SettingsPreset;
 import de.pewpewproject.lasertag.lasertaggame.state.server.implementation.SettingsPresetsState;
+import de.pewpewproject.lasertag.lasertaggame.state.synced.ISettingsState;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,37 +25,48 @@ public class SettingsPresetsManager implements ISettingsPresetsManager {
     //region Private fields
     private final SettingsPresetsState state;
 
+    private final ISettingsState settingsState;
+
     // Get path to lasertag settings file
     private static final Path lasertagSettingsPresetsFilePath = LasertagMod.configFolderPath.resolve("lasertagSettingsPresets.json");
 
     private final ISettingsManager settingsManager;
 
+    private final IGameModeManager gameModeManager;
+
     //endregion
 
-    public SettingsPresetsManager(SettingsPresetsState state,
+    public SettingsPresetsManager(ISettingsState settingsState,
                                   ISettingsPresetsNameManager settingsPresetsNamesManager,
-                                  ISettingsManager settingsManager) {
+                                  ISettingsManager settingsManager,
+                                  IGameModeManager gameModeManager) {
 
-        this.state = state;
+        this.settingsState = settingsState;
         this.settingsManager = settingsManager;
+        this.gameModeManager = gameModeManager;
+
+        SettingsPresetsState presetsState = null;
 
         if (Files.exists(lasertagSettingsPresetsFilePath)) {
 
             try {
                 var presetsFileContents = Files.readString(lasertagSettingsPresetsFilePath);
 
-                state = SettingsPresetsState.fromJson(presetsFileContents);
-            } catch (IOException e) {
+                presetsState = SettingsPresetsState.fromJson(presetsFileContents);
+            } catch (Exception e) {
                 LasertagMod.LOGGER.warn("Reading of lasertag settings presets file failed: " + e.getMessage());
             }
-        } else {
-            state = SettingsPresetsState.createNewPresetsMap();
-            persist();
         }
 
-        if (state != null) {
-            state.keySet().forEach(settingsPresetsNamesManager::addPresetName);
+        if (presetsState == null) {
+            presetsState = SettingsPresetsState.createNewPresetsMap();
         }
+
+        state = presetsState;
+
+        persist();
+
+        state.keySet().forEach(settingsPresetsNamesManager::addPresetName);
     }
 
     @Override
@@ -61,7 +76,7 @@ public class SettingsPresetsManager implements ISettingsPresetsManager {
 
     @Override
     public void savePreset(String name) {
-        state.put(name, settingsManager.cloneSettings());
+        state.put(name, SettingsPreset.fromSettings(settingsState, gameModeManager.getGameMode().getTranslatableName()));
         persist();
     }
 
@@ -72,8 +87,18 @@ public class SettingsPresetsManager implements ISettingsPresetsManager {
             return false;
         }
 
+        // Get the preset
         var preset = state.get(name);
+
+        // Get the game mode of the preset
+        var gameMode = GameModes.GAME_MODES.get(preset.getGameMode());
+
+        // Set the game mode
+        gameModeManager.setGameMode(gameMode);
+
+        // Load the settings
         settingsManager.set(preset);
+
         return true;
     }
 

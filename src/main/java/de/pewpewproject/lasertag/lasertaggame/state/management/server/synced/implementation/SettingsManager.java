@@ -4,19 +4,20 @@ import de.pewpewproject.lasertag.LasertagMod;
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.IGameModeManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.ISettingsManager;
+import de.pewpewproject.lasertag.lasertaggame.state.server.implementation.SettingsPreset;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.SettingsState;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;
 import de.pewpewproject.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
-import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Map;
+import java.util.Arrays;
 
 /**
  * Implementation of the ISettingsManager for the lasertag game
@@ -47,18 +48,13 @@ public class SettingsManager implements ISettingsManager {
 
                 // Parse file
                 var loadedSettingsState = SettingsState.fromJson(settingsFileContents);
-
-                settingsState.putAll(loadedSettingsState);
-            } catch (IOException e) {
+                
+                settingsState.fillWith(loadedSettingsState);
+            } catch (Exception e) {
                 LasertagMod.LOGGER.warn("Reading of lasertag settings file failed: " + e.getMessage());
             }
 
         } else {
-
-            // Use default settings
-            var defaultSettingsState = gameModeManager.getGameMode().createDefaultSettings();
-
-            settingsState.putAll(defaultSettingsState);
 
             // Log that default settings is being used
             LasertagMod.LOGGER.info("Default lasertag settings is being used.");
@@ -70,29 +66,31 @@ public class SettingsManager implements ISettingsManager {
 
     @Override
     public synchronized <T> T get(SettingDescription setting) {
-        var key = setting.getName();
+        var gameModeName = gameModeManager.getGameMode().getTranslatableName();
+        var settingName = setting.getName();
 
         // If key not in settings
-        if (!settingsState.containsKey(key)) {
-            putDefault(key);
+        if (!settingsState.contains(gameModeName, settingName)) {
+            putDefault(settingName);
         }
 
         // Get value from dictionary
-        return (T) settingsState.get(key);
+        return (T) settingsState.get(gameModeName, settingName);
     }
 
     @Override
     public synchronized <T extends Enum<T>> T getEnum(SettingDescription setting) {
 
-        var key = setting.getName();
+        var gameModeName = gameModeManager.getGameMode().getTranslatableName();
+        var settingName = setting.getName();
 
         // If key not in settings
-        if (!settingsState.containsKey(key)) {
-            putDefault(key);
+        if (!settingsState.contains(gameModeName, settingName)) {
+            putDefault(settingName);
         }
 
         // Get value from dictionary
-        var value = settingsState.get(key);
+        var value = settingsState.get(gameModeName, settingName);
 
         return Enum.valueOf((Class<T>) setting.getDataType().getValueType(), (String) value);
     }
@@ -100,19 +98,31 @@ public class SettingsManager implements ISettingsManager {
     @Override
     public synchronized void set(String key, Object value) {
 
+        var gameModeName = gameModeManager.getGameMode().getTranslatableName();
+
         // If is enum setting
         if (value instanceof Enum<?> enumValue) {
             value = enumValue.name();
         }
 
-        settingsState.put(key, value);
+        settingsState.set(gameModeName, key, value);
         sync(key, value.toString());
+    }
+
+    @Override
+    public void set(SettingsPreset preset) {
+
+        var gameModeName = gameModeManager.getGameMode().getTranslatableName();
+
+        preset.forEach((sn, sv) -> settingsState.set(gameModeName, sn, sv));
+
+        sync();
     }
 
     @Override
     public synchronized void set(SettingsState newSettings) {
 
-        settingsState.putAll(newSettings);
+        settingsState.fillWith(newSettings);
         sync();
     }
 
@@ -120,18 +130,7 @@ public class SettingsManager implements ISettingsManager {
     public synchronized void reset() {
 
         // Set the default settings
-        settingsState.putAll(gameModeManager.getGameMode().createDefaultSettings());
-
-        sync();
-    }
-
-    @Override
-    public synchronized void overwriteGameModeSettings() {
-
-        // Get the overwritten settings
-        var overwrittenSettings = gameModeManager.getGameMode().getOverwrittenSettings();
-
-        overwrittenSettings.forEach(s -> settingsState.put(s.x().getName(), s.y()));
+        settingsState.fillWith(new SettingsState());
 
         sync();
     }
@@ -139,17 +138,14 @@ public class SettingsManager implements ISettingsManager {
     @Override
     public synchronized void reset(String settingName) {
 
+        var gameModeName = gameModeManager.getGameMode().getTranslatableName();
+
         // Create default settings
-        var defaultSettings = gameModeManager.getGameMode().createDefaultSettings();
+        var defaultSettings = new SettingsState();
 
-        this.set(settingName, defaultSettings.get(settingName));
+        this.set(settingName, defaultSettings.get(gameModeName, settingName));
 
-        sync(settingName, defaultSettings.get(settingName).toString());
-    }
-
-    @Override
-    public synchronized SettingsState cloneSettings() {
-        return SerializationUtils.clone(settingsState);
+        sync(settingName, defaultSettings.get(gameModeName, settingName).toString());
     }
 
     private void persist() {
@@ -167,14 +163,17 @@ public class SettingsManager implements ISettingsManager {
     }
 
     private void putDefault(String key) {
+
+        var gameModeName = gameModeManager.getGameMode().getTranslatableName();
+
         // Get default settings
-        var defaultSettings = gameModeManager.getGameMode().createDefaultSettings();
+        var defaultSettings = new SettingsState();
 
         // Get the default value
-        var defaultValue = defaultSettings.get(key);
+        var defaultValue = defaultSettings.get(gameModeName, key);
 
         // Put the default value in this settings
-        settingsState.put(key, defaultValue);
+        settingsState.set(gameModeName, key, defaultValue);
 
         // Write to settings file
         persist();
@@ -191,6 +190,9 @@ public class SettingsManager implements ISettingsManager {
 
         // Create packet
         var buf = new PacketByteBuf(Unpooled.buffer());
+
+        // Write game mode to packet
+        buf.writeString(gameModeManager.getGameMode().getTranslatableName());
 
         // Write to packet
         buf.writeString(key);
@@ -212,6 +214,9 @@ public class SettingsManager implements ISettingsManager {
         // Create packet
         var buf = new PacketByteBuf(Unpooled.buffer());
 
+        // Write game mode to packet
+        buf.writeString(gameModeManager.getGameMode().getTranslatableName());
+
         // Write to packet
         buf.writeString(settingsState.toJson());
 
@@ -225,14 +230,18 @@ public class SettingsManager implements ISettingsManager {
     @Override
     public String toString() {
 
-        var builder = new StringBuilder("--------------------\n");
+        var gameModeName = gameModeManager.getGameMode().getTranslatableName();
 
-        settingsState.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .forEach(e -> {
-                    builder.append(e.getKey());
+        var builder = new StringBuilder(I18n.translate(gameModeName));
+        builder.append(":\n--------------------\n");
+
+        Arrays.stream(SettingDescription.values())
+                .map(SettingDescription::getName)
+                .sorted()
+                .forEach(s -> {
+                    builder.append(s);
                     builder.append(": ");
-                    builder.append(e.getValue().toString());
+                    builder.append(settingsState.get(gameModeName, s).toString());
                     builder.append("\n");
                 });
 

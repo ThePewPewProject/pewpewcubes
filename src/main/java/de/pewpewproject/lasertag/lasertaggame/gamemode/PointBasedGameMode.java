@@ -70,7 +70,8 @@ public abstract class PointBasedGameMode extends GameMode {
         var targetTeam = teamsManager.getTeamOfPlayer(target.getUuid());
 
         // Check that hit player is not in same team as firing player
-        if (shooterTeam.equals(targetTeam)) {
+        if (!settingsManager.<Boolean>get(SettingDescription.FRIENDLY_FIRE_ENABLED) &&
+                shooterTeam.equals(targetTeam)) {
             return;
         }
 
