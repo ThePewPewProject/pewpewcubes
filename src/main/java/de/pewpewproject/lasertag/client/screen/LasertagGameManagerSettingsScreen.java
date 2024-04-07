@@ -143,11 +143,21 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
 
     private Drawable getGroupingHeaderCellTemplate(String groupingHeader, ListCell<?> cell) {
 
-        var labelText = Text.translatable(groupingHeader).setStyle(Style.EMPTY.withBold(true));
+        // Get the game managers
+        var gameManager = MinecraftClient.getInstance().world.getClientLasertagManager();
+        var gameModeManager = gameManager.getGameModeManager();
+        var gameMode = gameModeManager.getGameMode();
+
+        var gameModeName = Text.translatable(gameMode.getTranslatableName());
+        var labelText = Text.translatable(groupingHeader, gameModeName);
+        var labelTextComplete = Text.literal(" ========== ")
+                .append(labelText)
+                .append(" ========== ")
+                .setStyle(Style.EMPTY.withBold(true));
 
         var startY = cell.y() + (cell.height() / 2) - (this.textRenderer.fontHeight / 2);
-        var startX = horizontalPadding + ((this.width - 2 * horizontalPadding) / 2) - (this.textRenderer.getWidth(labelText) / 2);
-        return new LabelWidget(startX, startY, this.textRenderer, labelText);
+        var startX = horizontalPadding + ((this.width - 2 * horizontalPadding) / 2) - (this.textRenderer.getWidth(labelTextComplete) / 2);
+        return new LabelWidget(startX, startY, this.textRenderer, labelTextComplete);
     }
 
     /**
@@ -264,7 +274,9 @@ public class LasertagGameManagerSettingsScreen extends GameManagerScreen {
                         value = settingsManager.get(s);
                     }
 
-                    return new SettingRowType(s, value, s.isGeneral() ? "gui.game_manager.settings.group_header.general" : "gui.game_manager.settings.group_header.game_mode_specific");
+                    var translatableName = s.isGeneral() ? "gui.game_manager.settings.group_header.general" : "gui.game_manager.settings.group_header.game_mode_specific";
+
+                    return new SettingRowType(s, value, translatableName);
                 }).toList();
     }
 
