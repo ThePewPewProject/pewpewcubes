@@ -15,6 +15,7 @@ import de.pewpewproject.lasertag.networking.NetworkingConstants;
 import de.pewpewproject.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -71,7 +72,12 @@ public class EliminationManager implements IEliminationManager {
     @Override
     public synchronized void eliminatePlayer(UUID eliminatedPlayerUuid, UUID shooterUuid, boolean playEliminationSound) {
 
-        LasertagMod.LOGGER.info("Trying to eliminate player '" + server.getOverworld().getPlayerByUuid(eliminatedPlayerUuid).getDisplayName().getString() + "'");
+        var player = server.getPlayerManager().getPlayer(eliminatedPlayerUuid);
+
+        if (player != null) {
+            LasertagMod.LOGGER.info("Trying to eliminate player '" + player.getDisplayName().getString() + "'");
+        }
+
 
         // If the player is already eliminated
         if (eliminationState.isPlayerEliminated(eliminatedPlayerUuid)) {
@@ -82,7 +88,10 @@ public class EliminationManager implements IEliminationManager {
             return;
         }
 
-        LasertagMod.LOGGER.info("Eliminating player '" + server.getOverworld().getPlayerByUuid(eliminatedPlayerUuid).getDisplayName().getString() + "'");
+        if (player != null){
+            LasertagMod.LOGGER.info("Eliminating player '" + player.getDisplayName().getString() + "'");
+        }
+
 
         // Eliminate the player
         eliminationState.eliminatePlayer(eliminatedPlayerUuid);
@@ -110,7 +119,7 @@ public class EliminationManager implements IEliminationManager {
         checkTeamElimination(eliminatedPlayerUuid, surviveTime);
 
         // Put the player into spectator game mode
-        putPlayerToSpectatorGameMode(eliminatedPlayerUuid);
+        putPlayerToSpectatorGameMode(player);
 
         // Send the network event
         sendPlayerEliminatedNetworkEvent(eliminatedPlayerUuid, shooterUuid, newEliminationCount, surviveTime);
@@ -226,12 +235,8 @@ public class EliminationManager implements IEliminationManager {
         sendTeamEliminatedNetworkEvent(team, surviveTime);
     }
 
-    private void putPlayerToSpectatorGameMode(UUID playerUuid) {
+    private void putPlayerToSpectatorGameMode(PlayerEntity player) {
 
-        // Get the eliminated player
-        var player = server.getOverworld().getPlayerByUuid(playerUuid);
-
-        // Sanity check
         if (player == null) {
             return;
         }
