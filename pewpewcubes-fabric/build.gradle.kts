@@ -16,7 +16,11 @@ base {
 }
 
 repositories {
-
+    // GeckoLib
+    maven {
+        name = "GeckoLib"
+        url = uri("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/")
+    }
 }
 
 dependencies {
@@ -24,7 +28,8 @@ dependencies {
     mappings("net.fabricmc:yarn:${yarnVersion}:v2")
     modImplementation(libs.fabric)
     modImplementation(libs.fabric.api)
-    modImplementation(libs.geckolib)
+    //modImplementation(libs.geckolib)
+    modImplementation("software.bernie.geckolib:geckolib-fabric-1.19:3.1.40")
 
     //compileOnly(project(":common"))
 }
@@ -60,10 +65,6 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.named<Jar>("sourcesJar").configure {
     //from(project(":common").sourceSets.getByName("main").allSource)
-}
-
-tasks.withType<Javadoc>().configureEach {
-    //source(project(":common").sourceSets.getByName("main").allJava)
 }
 
 tasks.withType<ProcessResources>().configureEach {

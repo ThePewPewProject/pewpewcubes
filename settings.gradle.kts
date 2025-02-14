@@ -1,7 +1,5 @@
 pluginManagement {
     repositories {
-        gradlePluginPortal()
-
         // Fabric
         maven {
             name ="Fabric"
@@ -12,12 +10,6 @@ pluginManagement {
             }
         }
 
-        // GeckoLib
-        maven {
-            name = "GeckoLib"
-            url = uri("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/")
-        }
-
         maven {
             name = "Sponge"
             url = uri("https://repo.spongepowered.org/repository/maven-public/")
@@ -25,6 +17,8 @@ pluginManagement {
                 includeGroupAndSubgroups("org.spongepowered")
             }
         }
+
+        gradlePluginPortal()
     }
 }
 

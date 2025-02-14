@@ -1,7 +1,7 @@
 package de.pewpewproject.lasertag.lasertaggame.state.management.server.implementation;
 
 import de.pewpewproject.lasertag.LasertagMod;
-import de.pewpewproject.lasertag.core.ArenaBoundsDto;
+import de.pewpewproject.lasertag.lasertaggame.arena.ArenaBoundsDto;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.IArenaManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.IBlockTickManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.ISpawnpointManager;
@@ -194,7 +194,7 @@ public class ArenaManager implements IArenaManager {
 
             // Final logging
             var blockPlaceDuration = System.currentTimeMillis() - blockPlaceStartTime;
-            LasertagMod.LOGGER.info(String.format(Locale.ROOT, "Arena loaded. This took %d ms for %d chunks, or %02f ms per chunk", blockPlaceDuration, updateBounds.getNumChunks(), (float) blockPlaceDuration / (float) updateBounds.getNumChunks()));
+            LasertagMod.LOGGER.info(String.format(Locale.ROOT, "Arena loaded. This took %d ms for %d chunks, or %02f ms per chunk", blockPlaceDuration, updateBounds.numChunks(), (float) blockPlaceDuration / (float) updateBounds.numChunks()));
 
             // Stop loading
             this.sendMapLoadProgressEvent("", -1.0, false);
@@ -292,7 +292,7 @@ public class ArenaManager implements IArenaManager {
             worldChunk.clear();
 
             this.sendMapLoadProgressEvent(currentStepString,
-                    (double) (removeBlocksChunkIndex.incrementAndGet()) / (double) oldArenaBounds.getNumChunks(), true);
+                    (double) (removeBlocksChunkIndex.incrementAndGet()) / (double) oldArenaBounds.numChunks(), true);
         });
     }
 
@@ -355,7 +355,7 @@ public class ArenaManager implements IArenaManager {
 
                 // Send progress update
                 this.sendMapLoadProgressEvent(currentStepString,
-                        (double) currentStepChunkIndex.incrementAndGet() / (double) newArenaBounds.getNumChunks(), true);
+                        (double) currentStepChunkIndex.incrementAndGet() / (double) newArenaBounds.numChunks(), true);
             }, server);
         });
 
@@ -405,7 +405,7 @@ public class ArenaManager implements IArenaManager {
             }
 
             this.sendMapLoadProgressEvent(currentStepString,
-                    (double) (markUpdateChunkIndex.incrementAndGet()) / (double) newArenaBounds.getNumChunks(), true);
+                    (double) (markUpdateChunkIndex.incrementAndGet()) / (double) newArenaBounds.numChunks(), true);
         });
     }
 
@@ -442,10 +442,10 @@ public class ArenaManager implements IArenaManager {
      */
     private ArenaBoundsDto calculateUnion(ArenaBoundsDto first, ArenaBoundsDto second) {
 
-        var unionStartChunkZ = Math.min(first.getStartZ(), second.getStartZ());
-        var unionStartChunkX = Math.min(first.getStartX(), second.getStartX());
-        var unionEndChunkZ = Math.max(first.getEndZ(), second.getEndZ());
-        var unionEndChunkX = Math.max(first.getEndX(), second.getEndX());
+        var unionStartChunkZ = Math.min(first.startZ(), second.startZ());
+        var unionStartChunkX = Math.min(first.startX(), second.startX());
+        var unionEndChunkZ = Math.max(first.endZ(), second.endZ());
+        var unionEndChunkX = Math.max(first.endX(), second.endX());
         var unionNumChunks = (unionEndChunkZ - unionStartChunkZ + 1) * (unionEndChunkX - unionStartChunkX + 1);
 
         return new ArenaBoundsDto(unionStartChunkX, unionStartChunkZ, unionEndChunkX, unionEndChunkZ, unionNumChunks);
@@ -491,10 +491,10 @@ public class ArenaManager implements IArenaManager {
     private void forEachChunk(ArenaBoundsDto bounds, BiConsumer<Integer, Integer> action) {
 
         // For every slice of chunks in z-direction
-        for (var chunkZ = bounds.getStartZ(); chunkZ <= bounds.getEndZ(); ++chunkZ) {
+        for (var chunkZ = bounds.startZ(); chunkZ <= bounds.endZ(); ++chunkZ) {
 
             // For every chunk in the slice
-            for (var chunkX = bounds.getStartX(); chunkX <= bounds.getEndX(); ++chunkX) {
+            for (var chunkX = bounds.startX(); chunkX <= bounds.endX(); ++chunkX) {
 
                 // Call the action
                 action.accept(chunkX, chunkZ);

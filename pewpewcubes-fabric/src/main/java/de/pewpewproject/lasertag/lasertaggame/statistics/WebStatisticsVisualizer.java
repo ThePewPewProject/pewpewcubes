@@ -8,7 +8,7 @@ import de.pewpewproject.lasertag.lasertaggame.statistics.mojangsessionaccess.Pro
 import de.pewpewproject.lasertag.lasertaggame.statistics.mojangsessionaccess.SessionPlayerProfileDto;
 import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import de.pewpewproject.lasertag.resource.WebResourceManager;
-import de.pewpewproject.lasertag.core.PlayerInfoDto;
+import de.pewpewproject.lasertag.lasertaggame.statistics.mojangsessionaccess.PlayerInfoDto;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.Identifier;
@@ -241,7 +241,7 @@ public class WebStatisticsVisualizer {
         var playerInfoInputStreamReader = new InputStreamReader(playerInfoUrl.openStream());
 
         // Get uuid of player
-        var uuid = new Gson().fromJson(playerInfoInputStreamReader, PlayerInfoDto.class).getId();
+        var uuid = new Gson().fromJson(playerInfoInputStreamReader, PlayerInfoDto.class).id;
 
         // Url to session profile of player
         var sessionProfileUrl = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid);
