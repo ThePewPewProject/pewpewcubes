@@ -1,0 +1,154 @@
+---- Minecraft Crash Report ----
+// Don't do that.
+
+Time: 2025-02-07 23:23:01
+Description: Initializing game
+
+java.lang.RuntimeException: Could not execute entrypoint stage 'client' due to errors, provided by 'pewpewcubes-fabric'!
+	at net.fabricmc.loader.impl.entrypoint.EntrypointUtils.lambda$invoke0$0(EntrypointUtils.java:51)
+	at net.fabricmc.loader.impl.util.ExceptionUtil.gatherExceptions(ExceptionUtil.java:33)
+	at net.fabricmc.loader.impl.entrypoint.EntrypointUtils.invoke0(EntrypointUtils.java:49)
+	at net.fabricmc.loader.impl.entrypoint.EntrypointUtils.invoke(EntrypointUtils.java:35)
+	at net.fabricmc.loader.impl.game.minecraft.Hooks.startClient(Hooks.java:53)
+	at net.minecraft.client.MinecraftClient.<init>(MinecraftClient.java:459)
+	at net.minecraft.client.main.Main.main(Main.java:205)
+	at net.minecraft.client.main.Main.main(Main.java:51)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:462)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:74)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at net.fabricmc.devlaunchinjector.Main.main(Main.java:86)
+Caused by: net.fabricmc.loader.api.EntrypointException: Exception while loading entries for entrypoint 'client' provided by 'pewpewcubes-fabric'
+	at net.fabricmc.loader.impl.entrypoint.EntrypointContainerImpl.getEntrypoint(EntrypointContainerImpl.java:56)
+	at net.fabricmc.loader.impl.entrypoint.EntrypointUtils.invoke0(EntrypointUtils.java:47)
+	... 9 more
+Caused by: net.fabricmc.loader.api.LanguageAdapterException: java.lang.ClassNotFoundException: de.pewpewproject.pewpewcubes.client.PewPewCubesModClient
+	at net.fabricmc.loader.impl.util.DefaultLanguageAdapter.create(DefaultLanguageAdapter.java:52)
+	at net.fabricmc.loader.impl.entrypoint.EntrypointStorage$NewEntry.getOrCreate(EntrypointStorage.java:117)
+	at net.fabricmc.loader.impl.entrypoint.EntrypointContainerImpl.getEntrypoint(EntrypointContainerImpl.java:53)
+	... 10 more
+Caused by: java.lang.ClassNotFoundException: de.pewpewproject.pewpewcubes.client.PewPewCubesModClient
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at net.fabricmc.loader.impl.launch.knot.KnotClassDelegate.loadClass(KnotClassDelegate.java:226)
+	at net.fabricmc.loader.impl.launch.knot.KnotClassLoader.loadClass(KnotClassLoader.java:112)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:467)
+	at net.fabricmc.loader.impl.util.DefaultLanguageAdapter.create(DefaultLanguageAdapter.java:50)
+	... 12 more
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Thread: Render thread
+Stacktrace:
+	at net.fabricmc.loader.impl.entrypoint.EntrypointUtils.lambda$invoke0$0(EntrypointUtils.java:51)
+	at net.fabricmc.loader.impl.util.ExceptionUtil.gatherExceptions(ExceptionUtil.java:33)
+	at net.fabricmc.loader.impl.entrypoint.EntrypointUtils.invoke0(EntrypointUtils.java:49)
+	at net.fabricmc.loader.impl.entrypoint.EntrypointUtils.invoke(EntrypointUtils.java:35)
+	at net.fabricmc.loader.impl.game.minecraft.Hooks.startClient(Hooks.java:53)
+	at net.minecraft.client.MinecraftClient.<init>(MinecraftClient.java:459)
+
+-- Initialization --
+Details:
+	Modules: 
+Stacktrace:
+	at net.minecraft.client.main.Main.main(Main.java:205)
+	at net.minecraft.client.main.Main.main(Main.java:51)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:462)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:74)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at net.fabricmc.devlaunchinjector.Main.main(Main.java:86)
+
+-- System Details --
+Details:
+	Minecraft Version: 1.19.2
+	Minecraft Version ID: 1.19.2
+	Operating System: Linux (amd64) version 6.8.0-52-generic
+	Java Version: 17.0.14, Eclipse Adoptium
+	Java VM Version: OpenJDK 64-Bit Server VM (mixed mode, sharing), Eclipse Adoptium
+	Memory: 2336239824 bytes (2228 MiB) / 4236247040 bytes (4040 MiB) up to 16634609664 bytes (15864 MiB)
+	CPUs: 32
+	Processor Vendor: AuthenticAMD
+	Processor Name: AMD Ryzen 9 7950X3D 16-Core Processor
+	Identifier: AuthenticAMD Family 25 Model 97 Stepping 2
+	Microarchitecture: Zen 3
+	Frequency (GHz): 5.76
+	Number of physical packages: 1
+	Number of physical CPUs: 16
+	Number of logical CPUs: 32
+	Graphics card #0 name: GA102GL [RTX A5000]
+	Graphics card #0 vendor: NVIDIA Corporation (0x10de)
+	Graphics card #0 VRAM (MB): 32800.00
+	Graphics card #0 deviceId: 0x2231
+	Graphics card #0 versionInfo: unknown
+	Graphics card #1 name: Raphael
+	Graphics card #1 vendor: Advanced Micro Devices, Inc. [AMD/ATI] (0x1002)
+	Graphics card #1 VRAM (MB): 258.00
+	Graphics card #1 deviceId: 0x164e
+	Graphics card #1 versionInfo: unknown
+	Virtual memory max (MB): 39907.47
+	Virtual memory used (MB): 22621.00
+	Swap memory total (MB): 8192.00
+	Swap memory used (MB): 1.50
+	JVM Flags: 0 total; 
+	Fabric Mods: 
+		fabric-api: Fabric API 0.76.0+1.19.2
+		fabric-api-base: Fabric API Base 0.4.15+8f4e8eb390
+		fabric-api-lookup-api-v1: Fabric API Lookup API (v1) 1.6.14+93d8cb8290
+		fabric-biome-api-v1: Fabric Biome API (v1) 9.1.1+16f1e31390
+		fabric-block-api-v1: Fabric Block API (v1) 1.0.2+e415d50e90
+		fabric-blockrenderlayer-v1: Fabric BlockRenderLayer Registration (v1) 1.1.25+cafc6e8e90
+		fabric-client-tags-api-v1: Fabric Client Tags 1.0.5+b35fea8390
+		fabric-command-api-v2: Fabric Command API (v2) 2.2.1+413cbbc790
+		fabric-content-registries-v0: Fabric Content Registries (v0) 3.5.2+7c6cd14d90
+		fabric-convention-tags-v1: Fabric Convention Tags 1.3.0+4bc6e26290
+		fabric-crash-report-info-v1: Fabric Crash Report Info (v1) 0.2.8+aeb40ebe90
+		fabric-data-generation-api-v1: Fabric Data Generation API (v1) 5.3.8+413cbbc790
+		fabric-dimensions-v1: Fabric Dimensions API (v1) 2.1.35+0d0f210290
+		fabric-entity-events-v1: Fabric Entity Events (v1) 1.5.4+9244241690
+		fabric-events-interaction-v0: Fabric Events Interaction (v0) 0.4.34+562bff6e90
+		fabric-game-rule-api-v1: Fabric Game Rule API (v1) 1.0.24+b6b6abb490
+		fabric-gametest-api-v1: Fabric Game Test API (v1) 1.1.8+4d0d570390
+		fabric-item-api-v1: Fabric Item API (v1) 1.6.6+b7d1888890
+		fabric-item-groups-v0: Fabric Item Groups (v0) 0.3.39+9244241690
+		fabric-key-binding-api-v1: Fabric Key Binding API (v1) 1.0.25+5c4fce2890
+		fabric-lifecycle-events-v1: Fabric Lifecycle Events (v1) 2.2.4+1b46dc7890
+		fabric-loot-api-v2: Fabric Loot API (v2) 1.1.13+83a8659290
+		fabric-message-api-v1: Fabric Message API (v1) 5.0.7+93d8cb8290
+		fabric-mining-level-api-v1: Fabric Mining Level API (v1) 2.1.24+33fbc73890
+		fabric-models-v0: Fabric Models (v0) 0.3.21+c6af733c90
+		fabric-networking-api-v1: Fabric Networking API (v1) 1.2.11+10eb22f490
+		fabric-object-builder-api-v1: Fabric Object Builder API (v1) 4.2.2+d8ef690890
+		fabric-particles-v1: Fabric Particles (v1) 1.0.14+4d0d570390
+		fabric-recipe-api-v1: Fabric Recipe API (v1) 1.0.1+413cbbc790
+		fabric-registry-sync-v0: Fabric Registry Sync (v0) 0.9.32+9244241690
+		fabric-renderer-api-v1: Fabric Renderer API (v1) 1.2.1+1adbf27790
+		fabric-renderer-indigo: Fabric Renderer - Indigo 0.8.0+1adbf27790
+		fabric-rendering-data-attachment-v1: Fabric Rendering Data Attachment (v1) 0.3.19+6e0787e690
+		fabric-rendering-fluids-v1: Fabric Rendering Fluids (v1) 3.0.11+4d0d570390
+		fabric-rendering-v1: Fabric Rendering (v1) 1.12.1+d8ef690890
+		fabric-resource-conditions-api-v1: Fabric Resource Conditions API (v1) 2.1.2+aae9039d90
+		fabric-resource-loader-v0: Fabric Resource Loader (v0) 0.8.4+edbdcddb90
+		fabric-screen-api-v1: Fabric Screen API (v1) 1.0.32+4d0d570390
+		fabric-screen-handler-api-v1: Fabric Screen Handler API (v1) 1.3.7+1cc24b1b90
+		fabric-sound-api-v1: Fabric Sound API (v1) 1.0.2+c4f28df590
+		fabric-textures-v0: Fabric Textures (v0) 1.0.24+aeb40ebe90
+		fabric-transfer-api-v1: Fabric Transfer API (v1) 2.1.6+413cbbc790
+		fabric-transitive-access-wideners-v1: Fabric Transitive Access Wideners (v1) 1.3.3+08b73de490
+		fabricloader: Fabric Loader 0.14.19
+		java: OpenJDK 64-Bit Server VM 17
+		minecraft: Minecraft 1.19.2
+		pewpewcubes-fabric: PewPewCubes 1.0.0-beta1
+	Launched Version: Fabric
+	Backend library: LWJGL version 3.3.1 SNAPSHOT
+	Backend API: Unknown
+	Window size: <not initialized>
+	GL Caps: Using framebuffer using OpenGL 3.2
+	GL debug messages: <disabled>
+	Using VBOs: Yes
+	Is Modded: Definitely; Client brand changed to 'fabric'
+	Type: Client (map_client.txt)
+	CPU: <unknown>

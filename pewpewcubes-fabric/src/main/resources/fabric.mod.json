@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "id": "pewpewcubes-fabric",
+  "version": "${version}",
+
+  "name": "${mod_display_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${mod_authors}"
+  ],
+  "contributors": [
+    "${mod_contributors}"
+  ],
+  "contact": {
+    "sources": "https://github.com/ThePewPewProject/pewpewcubes",
+    "issues": "https://github.com/ThePewPewProject/pewpewcubes/issues",
+    "discord": "https://discord.gg/SPbV8P2kHN"
+  },
+
+  "license": "GPL-3.0",
+  "icon": "$icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "client": ["de.pewpewproject.lasertag.LasertagModClient"],
+    "main": ["de.pewpewproject.lasertag.LasertagMod"]
+  },
+
+  "mixins": [
+    "pewpewcubes-fabric.mixins.json"
+  ],
+  "custom": {
+    "loom:injected_interfaces": {
+      "net/minecraft/entity/player/PlayerEntity": [
+        "de/pewpewproject/lasertag/lasertaggame/ILasertagPlayer",
+        "de/pewpewproject/lasertag/client/screen/ILasertagGameManagerScreenOpener",
+        "de/pewpewproject/lasertag/client/screen/ILasertagTeamSelectorScreenOpener",
+        "de/pewpewproject/lasertag/client/screen/ILasertagCreditsScreenOpener",
+        "de/pewpewproject/lasertag/client/screen/ILasertagTeamZoneGeneratorScreenOpener"
+      ],
+      "net/minecraft/client/network/ClientPlayerEntity": [
+        "de/pewpewproject/lasertag/client/screen/ILasertagGameManagerScreenOpener",
+        "de/pewpewproject/lasertag/client/screen/ILasertagTeamSelectorScreenOpener",
+        "de/pewpewproject/lasertag/client/screen/ILasertagCreditsScreenOpener",
+        "de/pewpewproject/lasertag/client/screen/ILasertagTeamZoneGeneratorScreenOpener"
+      ],
+      "net/minecraft/world/World": [
+        "de/pewpewproject/lasertag/common/util/fastiter/IFastWorldIter"
+      ],
+      "net/minecraft/client/world/ClientWorld": [
+        "de/pewpewproject/lasertag/lasertaggame/state/management/client/IClientLasertagManagerAccessor"
+      ],
+      "net/minecraft/server/world/ServerWorld": [
+        "de/pewpewproject/lasertag/lasertaggame/state/management/server/IServerLasertagManagerAccessor"
+      ],
+      "net/minecraft/client/MinecraftClient": [
+        "de/pewpewproject/lasertag/lasertaggame/IStatsFilePathHolding"
+      ],
+      "net/minecraft/client/gui/widget/TextFieldWidget": [
+        "de/pewpewproject/lasertag/client/screen/widget/ITooltipHolding",
+        "de/pewpewproject/lasertag/client/screen/widget/ITooltipSetter"
+      ]
+    }
+  },
+
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version_range}",
+    "fabric-api": ">=${fabric_api_version_range}",
+    "java": ">=17",
+    "minecraft": "=${minecraft_version}"
+  },
+
+  "suggests": {
+    "sodium": "*",
+    "phosphor": "*",
+    "lithium": "*"
+  }
+}

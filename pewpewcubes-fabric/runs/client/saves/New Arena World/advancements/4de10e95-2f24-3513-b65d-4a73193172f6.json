@@ -1,0 +1,10 @@
+{
+  "minecraft:adventure/adventuring_time": {
+    "criteria": {
+      "minecraft:desert": "2024-03-31 22:04:29 +0200",
+      "minecraft:plains": "2024-03-31 22:06:00 +0200"
+    },
+    "done": false
+  },
+  "DataVersion": 3120
+}
