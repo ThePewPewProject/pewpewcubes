@@ -1,0 +1,44 @@
+{
+  "Red": {
+    "id": 1,
+    "red": 255,
+    "green": 0,
+    "blue": 0,
+    "spawnpointBlock": "minecraft:red_concrete"
+  },
+  "Pink": {
+    "id": 6,
+    "red": 255,
+    "green": 0,
+    "blue": 255,
+    "spawnpointBlock": "minecraft:pink_concrete"
+  },
+  "Blue": {
+    "id": 3,
+    "red": 0,
+    "green": 0,
+    "blue": 255,
+    "spawnpointBlock": "minecraft:blue_concrete"
+  },
+  "Teal": {
+    "id": 5,
+    "red": 0,
+    "green": 128,
+    "blue": 255,
+    "spawnpointBlock": "minecraft:light_blue_concrete"
+  },
+  "Orange": {
+    "id": 4,
+    "red": 255,
+    "green": 128,
+    "blue": 0,
+    "spawnpointBlock": "minecraft:orange_concrete"
+  },
+  "Green": {
+    "id": 2,
+    "red": 0,
+    "green": 255,
+    "blue": 0,
+    "spawnpointBlock": "minecraft:lime_concrete"
+  }
+}

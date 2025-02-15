@@ -1,0 +1,9 @@
+{
+  "minecraft:adventure/adventuring_time": {
+    "criteria": {
+      "minecraft:jungle": "2025-02-15 13:06:08 +0100"
+    },
+    "done": false
+  },
+  "DataVersion": 3120
+}
