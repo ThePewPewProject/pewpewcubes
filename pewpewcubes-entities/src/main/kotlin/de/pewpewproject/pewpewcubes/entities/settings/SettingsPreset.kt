@@ -1,4 +1,4 @@
-package de.pewpewproject.pewpewcubes.entities
+package de.pewpewproject.pewpewcubes.entities.settings
 
 
 data class SettingsPreset(

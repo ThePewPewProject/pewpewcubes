@@ -1,4 +1,4 @@
-package de.pewpewproject.pewpewcubes.ports.mojangapiaccess
+package de.pewpewproject.pewpewcubes.core.ports
 
 /**
  * Interface for accessing the mojang apij

@@ -1,6 +1,6 @@
-package de.pewpewproject.pewpewcubes.state
+package de.pewpewproject.pewpewcubes.entities.state
 
-import de.pewpewproject.pewpewcubes.entities.SettingsPreset
+import de.pewpewproject.pewpewcubes.entities.settings.SettingsPreset
 import java.util.*
 
 class PewPewCubesServerState {
@@ -21,11 +21,16 @@ class PewPewCubesServerState {
     }
 
     /**
+     * Flag to indicate this state has been initialized
+     */
+    var initialized: Boolean = false
+
+    /**
      * Map mapping every settings preset name to the preset
      *      key:   The settings preset name
      *      value: The preset
      */
-    val settingsPresets: Map<String, SettingsPreset> = HashMap()
+    var settingsPresets: Map<String, SettingsPreset> = HashMap()
 
     /**
      * Set of the uuids of all players that are permitted to start the game

@@ -1,4 +1,4 @@
-package de.pewpewproject.pewpewcubes.state
+package de.pewpewproject.pewpewcubes.entities.state
 
 import de.pewpewproject.pewpewcubes.entities.GameMode
 import de.pewpewproject.pewpewcubes.entities.Position
@@ -47,7 +47,7 @@ class PewPewCubesState {
     /**
      * The currently selected game mode
      */
-    val currentGameMode: GameMode = GameMode.ELIMINATION
+    var currentGameMode: GameMode = GameMode.ELIMINATION
 
     /**
      * Map every player's uuid to their username. This is used to still show the username
@@ -76,7 +76,7 @@ class PewPewCubesState {
      *      key:    The game mode of the settings
      *      value:  Map of every setting description to the value of the setting
      */
-    val settings: Map<GameMode, Map<SettingDescription, Any>> = EnumMap(GameMode::class.java)
+    var settings: Map<GameMode, Map<SettingDescription, Any>> = EnumMap(GameMode::class.java)
 
     /**
      * Set of all settings preset names
