@@ -29,3 +29,5 @@ plugins {
 rootProject.name = "pewpewcubes"
 
 include("pewpewcubes-fabric")
+include("pewpewcubes-http-mojang-api-access")
+include("pewpewcubes-core")
