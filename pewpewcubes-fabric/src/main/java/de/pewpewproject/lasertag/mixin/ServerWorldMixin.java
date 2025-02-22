@@ -5,7 +5,6 @@ import de.pewpewproject.lasertag.lasertaggame.state.management.server.IServerLas
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.implementation.*;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.implementation.*;
 import de.pewpewproject.lasertag.lasertaggame.state.server.implementation.SettingsPresetsState;
-import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.SyncedState;
 import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

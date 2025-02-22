@@ -2,7 +2,6 @@ package de.pewpewproject.lasertag.lasertaggame.state.management.client.implement
 
 import de.pewpewproject.lasertag.lasertaggame.state.management.client.IClientLasertagManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.client.ITeamsManager;
-import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 
 import java.util.List;
 import java.util.Optional;

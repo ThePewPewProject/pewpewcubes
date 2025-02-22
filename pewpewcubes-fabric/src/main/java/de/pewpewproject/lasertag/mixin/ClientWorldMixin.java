@@ -3,7 +3,6 @@ package de.pewpewproject.lasertag.mixin;
 import de.pewpewproject.lasertag.lasertaggame.state.management.client.IClientLasertagManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.client.IClientLasertagManagerAccessor;
 import de.pewpewproject.lasertag.lasertaggame.state.management.client.implementation.*;
-import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.SyncedState;
 import net.minecraft.client.world.ClientWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

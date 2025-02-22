@@ -5,7 +5,6 @@ import de.pewpewproject.lasertag.client.SoundEvents;
 import de.pewpewproject.lasertag.common.util.RaycastUtil;
 import de.pewpewproject.lasertag.common.util.ThreadUtil;
 import de.pewpewproject.lasertag.entity.LaserRayEntity;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.EnvType;

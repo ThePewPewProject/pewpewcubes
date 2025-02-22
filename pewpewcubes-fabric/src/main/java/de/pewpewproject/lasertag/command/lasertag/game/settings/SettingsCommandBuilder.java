@@ -5,7 +5,6 @@ import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import de.pewpewproject.lasertag.command.suggestions.EnumSettingSuggestionProvider;
 import de.pewpewproject.lasertag.lasertaggame.settings.SettingDataType;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import net.minecraft.server.command.ServerCommandSource;
 
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;

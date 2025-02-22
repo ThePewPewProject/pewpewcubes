@@ -3,7 +3,6 @@ package de.pewpewproject.lasertag.client.screen;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.pewpewproject.lasertag.common.util.ThreadUtil;
-import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.UIState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;

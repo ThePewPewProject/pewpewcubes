@@ -1,7 +1,6 @@
 package de.pewpewproject.lasertag.networking.server.callbacks;
 
 import de.pewpewproject.lasertag.LasertagMod;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;

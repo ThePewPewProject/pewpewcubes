@@ -2,10 +2,8 @@ package de.pewpewproject.lasertag.client.hud;
 
 import de.pewpewproject.lasertag.common.util.DurationUtils;
 import de.pewpewproject.lasertag.lasertaggame.gamemode.GameMode;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.state.management.client.ISettingsManager;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.ITeamsConfigState;
-import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.UIState;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

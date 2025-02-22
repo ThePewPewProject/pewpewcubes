@@ -2,14 +2,11 @@ package de.pewpewproject.lasertag.lasertaggame.state.management.server.implement
 
 import de.pewpewproject.lasertag.LasertagMod;
 import de.pewpewproject.lasertag.common.types.Tuple;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.IMusicalChairsManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.*;
 import de.pewpewproject.lasertag.lasertaggame.state.server.IMusicalChairsState;
-import de.pewpewproject.lasertag.lasertaggame.state.server.implementation.MusicalChairsState;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.ITeamsConfigState;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
-import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import net.minecraft.server.world.ServerWorld;
 
 import java.util.ArrayDeque;

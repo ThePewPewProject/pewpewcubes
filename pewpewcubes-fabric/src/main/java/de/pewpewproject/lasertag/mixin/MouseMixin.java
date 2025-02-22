@@ -2,7 +2,6 @@ package de.pewpewproject.lasertag.mixin;
 
 import de.pewpewproject.lasertag.client.KeyBindings;
 import de.pewpewproject.lasertag.item.Items;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.option.SimpleOption;

@@ -5,7 +5,6 @@ import de.pewpewproject.lasertag.lasertaggame.gamemode.GameMode;
 import de.pewpewproject.lasertag.lasertaggame.gamemode.GameModes;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.IGameModeManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.ISettingsManager;
-import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.GameModeState;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;
 import de.pewpewproject.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;

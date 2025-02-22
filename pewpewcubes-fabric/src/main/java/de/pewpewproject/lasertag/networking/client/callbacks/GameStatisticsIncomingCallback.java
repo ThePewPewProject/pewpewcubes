@@ -3,7 +3,6 @@ package de.pewpewproject.lasertag.networking.client.callbacks;
 import com.google.gson.Gson;
 import de.pewpewproject.lasertag.LasertagMod;
 import de.pewpewproject.lasertag.common.util.ThreadUtil;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.statistics.GameStats;
 import de.pewpewproject.lasertag.lasertaggame.statistics.WebStatisticsVisualizer;
 import de.pewpewproject.lasertag.resource.ResourceManagers;

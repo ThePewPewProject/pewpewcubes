@@ -4,7 +4,6 @@ import de.pewpewproject.lasertag.LasertagMod;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.ISpawnpointManager;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.ITeamsConfigState;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
-import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;
 import de.pewpewproject.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;

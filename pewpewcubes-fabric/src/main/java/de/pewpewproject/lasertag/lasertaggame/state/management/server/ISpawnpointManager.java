@@ -1,6 +1,5 @@
 package de.pewpewproject.lasertag.lasertaggame.state.management.server;
 
-import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 

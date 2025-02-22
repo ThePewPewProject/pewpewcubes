@@ -2,7 +2,6 @@ package de.pewpewproject.lasertag.block.entity;
 
 import de.pewpewproject.lasertag.common.types.Tuple;
 import de.pewpewproject.lasertag.entity.Entities;
-import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

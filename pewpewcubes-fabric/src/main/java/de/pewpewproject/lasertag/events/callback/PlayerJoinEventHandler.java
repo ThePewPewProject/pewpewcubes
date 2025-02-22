@@ -1,6 +1,5 @@
 package de.pewpewproject.lasertag.events.callback;
 
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;
 import de.pewpewproject.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;

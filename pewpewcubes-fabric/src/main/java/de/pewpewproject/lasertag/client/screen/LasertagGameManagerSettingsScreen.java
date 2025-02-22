@@ -7,7 +7,6 @@ import de.pewpewproject.lasertag.client.screen.widget.list.ListCell;
 import de.pewpewproject.lasertag.client.screen.widget.list.ListColumn;
 import de.pewpewproject.lasertag.client.screen.widget.list.ListColumnsDefinition;
 import de.pewpewproject.lasertag.client.screen.widget.list.grouped.GroupedListWidget;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;

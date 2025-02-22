@@ -1,7 +1,5 @@
 package de.pewpewproject.lasertag.lasertaggame.state.management.client;
 
-import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

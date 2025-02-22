@@ -1,13 +1,11 @@
 package de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.implementation;
 
 import de.pewpewproject.lasertag.item.Items;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.ISettingsManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.ITeamsManager;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.ITeamsConfigState;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.ITeamsState;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
-import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;
 import de.pewpewproject.lasertag.networking.server.ServerEventSending;
 import io.netty.buffer.Unpooled;

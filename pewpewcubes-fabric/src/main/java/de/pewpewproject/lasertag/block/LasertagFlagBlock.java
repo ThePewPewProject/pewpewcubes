@@ -4,7 +4,6 @@ import de.pewpewproject.lasertag.block.entity.LasertagFlagBlockEntity;
 import de.pewpewproject.lasertag.entity.Entities;
 import de.pewpewproject.lasertag.item.Items;
 import de.pewpewproject.lasertag.lasertaggame.gamemode.implementation.CaptureTheFlagGameMode;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.settings.valuetypes.CTFFlagHoldingPlayerVisibility;
 import de.pewpewproject.lasertag.networking.NetworkingConstants;
 import de.pewpewproject.lasertag.networking.server.ServerEventSending;

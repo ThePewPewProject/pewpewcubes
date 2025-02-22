@@ -2,7 +2,6 @@ package de.pewpewproject.lasertag.lasertaggame.gamemode;
 
 import de.pewpewproject.lasertag.block.entity.LaserTargetBlockEntity;
 import de.pewpewproject.lasertag.damage.DamageSources;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;

@@ -1,12 +1,10 @@
 package de.pewpewproject.lasertag.lasertaggame.statistics;
 
-import com.google.gson.Gson;
 import de.pewpewproject.lasertag.LasertagMod;
 import de.pewpewproject.lasertag.common.util.DurationUtils;
 import de.pewpewproject.lasertag.lasertaggame.gamemode.GameMode;
 import de.pewpewproject.lasertag.lasertaggame.statistics.mojangsessionaccess.ProfileTextureDto;
 import de.pewpewproject.lasertag.lasertaggame.statistics.mojangsessionaccess.SessionPlayerProfileDto;
-import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import de.pewpewproject.lasertag.resource.WebResourceManager;
 import de.pewpewproject.lasertag.lasertaggame.statistics.mojangsessionaccess.PlayerInfoDto;
 import net.fabricmc.loader.api.FabricLoader;
@@ -14,15 +12,11 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.Identifier;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.time.Duration;
-import java.util.Base64;
 import java.util.stream.Collectors;
 
 /**
@@ -231,31 +225,5 @@ public class WebStatisticsVisualizer {
         } catch (Exception ignored) {
             return "<div class=\"face-container\"></div>" + playerName;
         }
-    }
-
-    private static String getSkinUrlFromPlayerName(String playerName) throws Exception {
-        // Url to player info
-        var playerInfoUrl = new URL("https://api.mojang.com/users/profiles/minecraft/" + playerName);
-
-        // Create input stream
-        var playerInfoInputStreamReader = new InputStreamReader(playerInfoUrl.openStream());
-
-        // Get uuid of player
-        var uuid = new Gson().fromJson(playerInfoInputStreamReader, PlayerInfoDto.class).id;
-
-        // Url to session profile of player
-        var sessionProfileUrl = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid);
-
-        // Create input stream
-        var sessionProfileInputStreamReader = new InputStreamReader(sessionProfileUrl.openStream());
-
-        // Get base64 encoded texture json
-        var encodedTextureJson = new Gson().fromJson(sessionProfileInputStreamReader, SessionPlayerProfileDto.class).properties[0].value;
-
-        // Decode
-        var decodedTextureJson = new String(Base64.getDecoder().decode(encodedTextureJson), StandardCharsets.UTF_8);
-
-        // Get skin url
-        return new Gson().fromJson(decodedTextureJson, ProfileTextureDto.class).textures.get("SKIN").url;
     }
 }

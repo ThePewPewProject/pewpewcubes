@@ -71,10 +71,10 @@
 	"arenaType.procedural.large_four_team": "Large 4 Teams",
 	"arenaType.procedural.large_four_team_extended": "Procedural: Large 4 Teams",
 
-	"gameMode.point_hunter": "Point Hunter",
-	"gameMode.capture_the_flag": "Capture The Flag",
-	"gameMode.musical_chairs": "Musical Chairs",
-	"gameMode.elimination": "Elimination",
+	"game_mode.point_hunter": "Point Hunter",
+	"game_mode.capture_the_flag": "Capture The Flag",
+	"game_mode.musical_chairs": "Musical Chairs",
+	"game_mode.elimination": "Elimination",
 
 	"subtitles.lasertag.music": "Thrilling music",
 	"subtitles.lasertag.weapon_fire_sound": "Laserweapon firing",

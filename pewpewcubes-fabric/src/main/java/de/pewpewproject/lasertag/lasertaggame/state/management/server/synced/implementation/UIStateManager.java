@@ -1,11 +1,9 @@
 package de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.implementation;
 
 import de.pewpewproject.lasertag.common.util.ThreadUtil;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.IGameModeManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.ISettingsManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.server.synced.IUIStateManager;
-import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.UIState;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;

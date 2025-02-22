@@ -2,9 +2,7 @@ package de.pewpewproject.lasertag.client.hud;
 
 import de.pewpewproject.lasertag.common.types.Tuple;
 import de.pewpewproject.lasertag.common.util.AdvancedDrawableHelper;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.TeamsConfigState;
-import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.resource.language.I18n;

@@ -1,6 +1,5 @@
 package de.pewpewproject.lasertag.mixin;
 
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;

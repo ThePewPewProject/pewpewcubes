@@ -1,7 +1,6 @@
 package de.pewpewproject.lasertag.lasertaggame.state.management.client.implementation;
 
 import de.pewpewproject.lasertag.common.util.ThreadUtil;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.state.management.client.IClientLasertagManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.client.IGameModeManager;
 import de.pewpewproject.lasertag.lasertaggame.state.management.client.ISettingsManager;

@@ -3,7 +3,6 @@ package de.pewpewproject.lasertag.mixin;
 import de.pewpewproject.lasertag.block.Blocks;
 import de.pewpewproject.lasertag.client.KeyBindings;
 import de.pewpewproject.lasertag.item.Items;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;

@@ -4,7 +4,6 @@ import de.pewpewproject.lasertag.LasertagMod;
 import de.pewpewproject.lasertag.client.screen.LasertagGameManagerSettingsScreen;
 import de.pewpewproject.lasertag.common.util.ConverterUtil;
 import de.pewpewproject.lasertag.lasertaggame.gamemode.GameModes;
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;

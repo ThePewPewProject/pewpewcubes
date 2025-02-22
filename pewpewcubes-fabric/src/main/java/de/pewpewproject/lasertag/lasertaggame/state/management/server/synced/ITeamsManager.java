@@ -1,6 +1,5 @@
 package de.pewpewproject.lasertag.lasertaggame.state.management.server.synced;
 
-import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.List;

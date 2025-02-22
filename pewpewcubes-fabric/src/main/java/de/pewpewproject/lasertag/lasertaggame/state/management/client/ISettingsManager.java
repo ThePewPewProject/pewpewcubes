@@ -1,7 +1,5 @@
 package de.pewpewproject.lasertag.lasertaggame.state.management.client;
 
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
-
 /**
  * Interface for a client settings manager.
  *

@@ -3,7 +3,6 @@ package de.pewpewproject.lasertag.networking.client.callbacks;
 import de.pewpewproject.lasertag.LasertagMod;
 import de.pewpewproject.lasertag.client.screen.LasertagGameManagerTeamsScreen;
 import de.pewpewproject.lasertag.client.screen.LasertagTeamSelectorScreen;
-import de.pewpewproject.lasertag.lasertaggame.team.TeamDto;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;

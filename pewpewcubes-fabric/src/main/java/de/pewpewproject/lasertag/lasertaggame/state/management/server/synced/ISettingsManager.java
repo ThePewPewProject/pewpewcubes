@@ -1,8 +1,6 @@
 package de.pewpewproject.lasertag.lasertaggame.state.management.server.synced;
 
-import de.pewpewproject.lasertag.lasertaggame.settings.SettingDescription;
 import de.pewpewproject.lasertag.lasertaggame.state.server.implementation.SettingsPreset;
-import de.pewpewproject.lasertag.lasertaggame.state.synced.implementation.SettingsState;
 
 /**
  * Interface for a server settings manager
